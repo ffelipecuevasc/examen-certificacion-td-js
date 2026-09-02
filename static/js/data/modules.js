@@ -6,6 +6,7 @@ export const modulesData = [
   {
     parte: 'Parte 1',
     modulo: 'Módulo 2',
+    icono: 'devices',
     titulo: 'Fundamentos de Desarrollo Front-End',
     resumen: '6 preguntas de selección múltiple + 2 ejercicios de código',
     temas: [
@@ -32,6 +33,7 @@ export const modulesData = [
   {
     parte: 'Parte 2',
     modulo: 'Módulo 3',
+    icono: 'data-object',
     titulo: 'Fundamentos de Programación en JavaScript',
     resumen: 'Evaluación práctica de lógica pura en JavaScript',
     temas: [
@@ -57,6 +59,7 @@ export const modulesData = [
   {
     parte: 'Parte 3',
     modulo: 'Módulo 4',
+    icono: 'bolt',
     titulo: 'Programación Avanzada en JavaScript',
     resumen: 'Paradigmas y manejo de asincronía',
     temas: [
@@ -76,6 +79,7 @@ export const modulesData = [
   {
     parte: 'Parte 4',
     modulo: 'Módulo 5',
+    icono: 'database',
     titulo: 'Fundamentos de Bases de Datos Relacionales',
     resumen: 'Preguntas conceptuales y escritura de consultas SQL',
     temas: [
@@ -109,6 +113,7 @@ export const modulesData = [
   {
     parte: 'Parte 5',
     modulo: 'Módulo 6',
+    icono: 'dns',
     titulo: 'Desarrollo de Aplicaciones Web Node Express',
     resumen: 'Arquitectura del servidor, enrutamiento y módulos',
     temas: [
@@ -132,6 +137,7 @@ export const modulesData = [
   {
     parte: 'Parte 6',
     modulo: 'Módulo 7',
+    icono: 'layers',
     titulo: 'Acceso a Datos en Aplicaciones Node',
     resumen: 'Persistencia avanzada, transacciones y ORM',
     temas: [
@@ -160,6 +166,7 @@ export const modulesData = [
   {
     parte: 'Parte 7',
     modulo: 'Módulo 8',
+    icono: 'shield-lock',
     titulo: 'Implementación de API Backend Node Express',
     resumen: 'Buenas prácticas REST y autenticación con JWT',
     temas: [

@@ -10,14 +10,18 @@ export function setupMobileMenu() {
     const isOpen = toggle.getAttribute('aria-expanded') === 'true';
     toggle.setAttribute('aria-expanded', String(!isOpen));
     menu.classList.toggle('hidden', isOpen);
+    toggle.querySelector('.menu-icon-open')?.classList.toggle('hidden', !isOpen);
+    toggle.querySelector('.menu-icon-close')?.classList.toggle('hidden', isOpen);
   });
 
-  $$('.mobile-link', menu).forEach((link) =>
-    link.addEventListener('click', () => {
-      toggle.setAttribute('aria-expanded', 'false');
-      menu.classList.add('hidden');
-    })
-  );
+  const closeMenu = () => {
+    toggle.setAttribute('aria-expanded', 'false');
+    menu.classList.add('hidden');
+    toggle.querySelector('.menu-icon-open')?.classList.remove('hidden');
+    toggle.querySelector('.menu-icon-close')?.classList.add('hidden');
+  };
+
+  $$('.mobile-link', menu).forEach((link) => link.addEventListener('click', closeMenu));
 }
 
 /** Resalta en el menu la seccion que la persona esta leyendo. */

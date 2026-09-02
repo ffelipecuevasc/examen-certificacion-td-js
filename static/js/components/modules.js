@@ -1,4 +1,4 @@
-import { $, $$, esc } from '../utils/dom.js';
+import { $, $$, esc, icon } from '../utils/dom.js';
 import { modulesData } from '../data/modules.js';
 
 /** Abre o cierra un modulo del acordeon. */
@@ -15,7 +15,9 @@ function codeBlock(ejercicio, codeId) {
     <div class="mt-3 rounded-lg overflow-hidden border border-panel3">
       <div class="flex items-center justify-between bg-panel2 px-4 py-2">
         <span class="font-mono text-[11px] text-muted">${esc(ejercicio.lang)}</span>
-        <button type="button" class="code-copy-btn font-mono text-[11px] text-muted hover:text-jsyellow transition-colors" data-target="${codeId}">Copiar</button>
+        <button type="button" class="code-copy-btn font-mono text-[11px] text-muted hover:text-jsyellow transition-colors inline-flex items-center gap-1.5" data-target="${codeId}">
+          ${icon('content-copy', 'text-sm')}<span class="copy-label">Copiar</span>
+        </button>
       </div>
       <pre class="bg-ink px-4 py-4 overflow-x-auto"><code id="${codeId}" class="font-mono text-[12.5px] leading-6 text-paper/90">${esc(ejercicio.code)}</code></pre>
     </div>`;
@@ -50,21 +52,20 @@ export function renderModules() {
       <article id="modulo-${i}" class="scroll-mt-24 bg-panel border border-panel3 rounded-xl overflow-hidden">
         <button type="button" class="module-toggle w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left" aria-expanded="false" aria-controls="panel-${i}">
           <div class="flex items-center gap-4 min-w-0">
-            <span class="font-display font-bold text-jsyellow text-sm shrink-0 w-20">${esc(m.modulo)}</span>
+            <span class="grid place-items-center w-11 h-11 rounded-lg bg-panel2 text-jsyellow shrink-0">${icon(m.icono, 'text-2xl')}</span>
+            <span class="font-display font-bold text-jsyellow text-sm shrink-0 w-20 hidden sm:block">${esc(m.modulo)}</span>
             <div class="min-w-0">
               <h3 class="font-display font-bold text-base sm:text-lg text-paper leading-snug">${esc(m.titulo)}</h3>
               <p class="text-xs text-mutedink font-mono mt-1">${esc(m.parte)} · ${esc(m.resumen)}</p>
             </div>
           </div>
-          <svg class="chevron w-5 h-5 text-jsyellow shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          ${icon('expand-more', 'chevron text-2xl text-jsyellow')}
         </button>
         <div id="panel-${i}" class="accordion-panel">
           <div class="px-5 sm:px-6 pb-7 border-t border-panel3 pt-6">
-            <p class="font-mono text-[11px] text-mutedink mb-3">Temas evaluados</p>
+            <p class="font-mono text-[11px] text-mutedink mb-3 flex items-center gap-2">${icon('history-edu', 'text-base')}Temas evaluados</p>
             <ul class="flex flex-col gap-2">${temas}</ul>
-            ${ejercicios ? `<p class="font-mono text-[11px] text-mutedink mt-7 mb-2">Código de ejemplo</p>${ejercicios}` : ''}
+            ${ejercicios ? `<p class="font-mono text-[11px] text-mutedink mt-7 mb-2 flex items-center gap-2">${icon('commit', 'text-base')}Código de ejemplo</p>${ejercicios}` : ''}
           </div>
         </div>
       </article>`;
@@ -82,15 +83,16 @@ export function renderModules() {
     if (!button) return;
 
     const codeEl = document.getElementById(button.dataset.target);
-    const original = button.textContent;
+    const label = button.querySelector('.copy-label');
+    const original = label.textContent;
     try {
       await navigator.clipboard.writeText(codeEl.textContent);
-      button.textContent = 'Copiado';
+      label.textContent = 'Copiado';
     } catch (error) {
-      button.textContent = 'No se pudo copiar';
+      label.textContent = 'No se pudo copiar';
     }
     setTimeout(() => {
-      button.textContent = original;
+      label.textContent = original;
     }, 1500);
   });
 }

@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background: theme('colors.jsyellow');
+    color: theme('colors.ink');
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: theme('colors.ink');
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #3a3820;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.jsyellow');
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.jsyellow');
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /**
+   * Sistema de iconos.
+   * Los SVG viven como archivos en static/resources/ y se pintan con mascaras CSS,
+   * de modo que heredan el color del texto (currentColor) y se pueden colorear
+   * con cualquier utilidad de Tailwind. El tamano se controla con font-size.
+   */
+  .icon {
+    @apply inline-block flex-none align-middle;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
+
+  .icon-btn {
+    @apply grid place-items-center w-10 h-10 rounded-lg border border-panel3 text-muted transition-colors;
+  }
+
+  .icon-btn:hover {
+    @apply text-jsyellow border-jsyellow;
+  }
+
+  .skip-link {
+    @apply absolute -left-[9999px] top-0;
+  }
+
+  .skip-link:focus {
+    @apply left-4 top-4 z-[100];
+  }
+
+  .accordion-panel {
+    @apply max-h-0 overflow-hidden;
+    transition: max-height 420ms ease;
+  }
+
+  .accordion-panel.is-open {
+    max-height: 5000px;
+  }
+
+  .chevron {
+    transition: transform 260ms ease;
+  }
+
+  .is-open .chevron {
+    transform: rotate(180deg);
+  }
+
+  .progress-fill {
+    transition: width 380ms ease;
+  }
+
+  .nav-link {
+    @apply relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute left-0 -bottom-1 h-0.5 w-0 bg-jsyellow;
+    transition: width 220ms ease;
+  }
+
+  .nav-link.active::after,
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  .quiz-option[data-state='correct'] {
+    @apply bg-jsyellow text-ink border-jsyellow;
+  }
+
+  .quiz-option[data-state='wrong'] {
+    border-color: #7a2e2e;
+    color: #e8b4b4;
+  }
+
+  .quiz-option[data-state='dimmed'] {
+    @apply opacity-40;
+  }
+
+  .quiz-option:disabled {
+    @apply cursor-default;
+  }
+
+  .code-copy-btn:active {
+    @apply scale-95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

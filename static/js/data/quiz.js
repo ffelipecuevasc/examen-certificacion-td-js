@@ -5,6 +5,7 @@
 export const quizData = [
   {
     modulo: 'Módulo 2',
+    icono: 'devices',
     titulo: 'Fundamentos de Desarrollo Front-End',
     preguntas: [
       {
@@ -34,6 +35,7 @@ export const quizData = [
   },
   {
     modulo: 'Módulo 3',
+    icono: 'data-object',
     titulo: 'Fundamentos de Programación en JavaScript',
     preguntas: [
       {
@@ -63,6 +65,7 @@ export const quizData = [
   },
   {
     modulo: 'Módulo 4',
+    icono: 'bolt',
     titulo: 'Programación Avanzada en JavaScript',
     preguntas: [
       {
@@ -92,6 +95,7 @@ export const quizData = [
   },
   {
     modulo: 'Módulo 5',
+    icono: 'database',
     titulo: 'Fundamentos de Bases de Datos Relacionales',
     preguntas: [
       {
@@ -131,6 +135,7 @@ export const quizData = [
   },
   {
     modulo: 'Módulo 6',
+    icono: 'dns',
     titulo: 'Desarrollo de Aplicaciones Web Node Express',
     preguntas: [
       {
@@ -165,6 +170,7 @@ export const quizData = [
   },
   {
     modulo: 'Módulo 7',
+    icono: 'layers',
     titulo: 'Acceso a Datos en Aplicaciones Node',
     preguntas: [
       {
@@ -194,6 +200,7 @@ export const quizData = [
   },
   {
     modulo: 'Módulo 8',
+    icono: 'shield-lock',
     titulo: 'Implementación de API Backend Node Express',
     preguntas: [
       {
