@@ -5,15 +5,12 @@
  */
 import { renderRoadmap } from './components/roadmap.js';
 import { renderModules, setupToggleAll } from './components/modules.js';
-import { renderQuiz, setupQuizReset } from './components/quiz.js';
 import { setupMobileMenu, setupScrollSpy, animateCounters, setCurrentYear } from './components/nav.js';
 
 function init() {
   renderRoadmap();
   renderModules();
   setupToggleAll();
-  renderQuiz();
-  setupQuizReset();
   setupMobileMenu();
   setupScrollSpy();
   animateCounters();

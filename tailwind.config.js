@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './index.html',
+    './*.html',
     './static/js/**/*.js',
   ],
   theme: {
@@ -16,6 +16,10 @@ module.exports = {
         paper: '#FBF7E8',
         muted: '#9C9A85',
         mutedink: '#5C5A4A',
+        ruby: '#E0115F',
+        rubydim: '#7A1236',
+        esmeralda: '#10B981',
+        esmeraldadim: '#0A5C43',
       },
       fontFamily: {
         display: ['"Space Grotesk"', 'sans-serif'],

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario de Práctica - Certificación FullStack JavaScript | Felipe Cuevas</title>
+<meta name="description" content="Cuestionario de práctica con 105 preguntas de los módulos 2 al 8 para preparar el examen de certificación de Talento Digital para Chile.">
+<meta name="author" content="Felipe Cuevas">
+
+<link rel="icon" type="image/svg+xml" href="static/resources/js-logo.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="static/css/style.css">
+<link rel="stylesheet" href="static/css/icons.css">
+</head>
+
+<body class="bg-ink text-paper font-sans antialiased">
+
+<a href="#cuestionario" class="skip-link bg-jsyellow text-ink font-display font-bold px-4 py-2 rounded">Saltar al cuestionario</a>
+
+<!-- ============ NAV ============ -->
+<header class="fixed top-0 inset-x-0 z-50 border-b border-panel3 bg-ink/90 backdrop-blur">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2.5 shrink-0">
+      <img src="static/resources/js-logo.svg" alt="" class="w-8 h-8 rounded-md">
+      <span class="font-display font-bold text-sm sm:text-base tracking-tight">Certificación FullStack JS</span>
+    </a>
+
+    <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
+      <a href="index.html#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
+      <a href="index.html#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
+      <a href="cuestionario.html" class="nav-link active text-paper transition-colors">Cuestionario</a>
+      <a href="index.html#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
+    </nav>
+
+    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded border border-panel3">
+      <span class="sr-only">Abrir menú</span>
+      <span class="icon i-menu text-xl text-paper menu-icon-open" aria-hidden="true"></span>
+      <span class="icon i-close text-xl text-paper menu-icon-close hidden" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" aria-label="Navegación móvil" class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
+    <a href="index.html#mapa" class="mobile-link">Mapa</a>
+    <a href="index.html#modulos" class="mobile-link">Módulos</a>
+    <a href="cuestionario.html" class="mobile-link text-jsyellow">Cuestionario</a>
+    <a href="index.html#consejos" class="mobile-link">Consejos</a>
+  </nav>
+</header>
+
+<main class="pt-16">
+  <div class="grid lg:grid-cols-2 items-start">
+      <!-- ============ PANEL FIJO ============ -->
+      <div class="lg:h-[calc(100vh-4rem)] lg:sticky lg:top-16 lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-panel3 px-5 sm:px-8 xl:px-12 py-10 lg:py-12 flex flex-col">
+
+        <span class="inline-flex self-start items-center gap-2 border border-jsyellow/40 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow">
+          <span class="icon i-quiz text-base" aria-hidden="true"></span>105 preguntas · 7 módulos
+        </span>
+
+        <h1 class="mt-6 font-display font-bold text-4xl xl:text-5xl leading-[1.02] tracking-tight">
+          Cuestionario de<br><span class="text-jsyellow">práctica</span>
+        </h1>
+
+        <p class="mt-5 text-muted leading-relaxed max-w-md">
+          Preguntas de evaluación avanzada de los módulos 2 al 8 del plan formativo. Elige una alternativa y sabrás al instante si acertaste. Las alternativas se barajan en cada carga, así que no memorices posiciones: entiende el porqué.
+        </p>
+
+        <div class="mt-9 flex items-end gap-5 sm:gap-8">
+          <div class="flex flex-col items-center gap-3">
+              <span class="font-display font-bold text-2xl text-jsyellow" id="valor-avance">0</span>
+              <div class="relative w-10 lg:w-12 h-40 xl:h-52 rounded-full bg-panel2 border border-panel3 overflow-hidden">
+                <div id="barra-avance" class="barra-vertical absolute inset-x-0 bottom-0 bg-jsyellow" style="height:0%"></div>
+              </div>
+              <span class="grid place-items-center w-8 h-8 rounded-lg bg-jsyellowdim/20 text-jsyellow"><span class="icon i-trending-up text-base" aria-hidden="true"></span></span>
+              <span class="font-mono text-[10px] text-mutedink text-center leading-tight w-16">Respondidas</span>
+            </div>
+          <div class="flex flex-col items-center gap-3">
+              <span class="font-display font-bold text-2xl text-ruby" id="valor-incorrectas">0</span>
+              <div class="relative w-10 lg:w-12 h-40 xl:h-52 rounded-full bg-panel2 border border-panel3 overflow-hidden">
+                <div id="barra-incorrectas" class="barra-vertical absolute inset-x-0 bottom-0 bg-ruby" style="height:0%"></div>
+              </div>
+              <span class="grid place-items-center w-8 h-8 rounded-lg bg-rubydim text-ruby"><span class="icon i-cancel text-base" aria-hidden="true"></span></span>
+              <span class="font-mono text-[10px] text-mutedink text-center leading-tight w-16">Incorrectas</span>
+            </div>
+          <div class="flex flex-col items-center gap-3">
+              <span class="font-display font-bold text-2xl text-esmeralda" id="valor-correctas">0</span>
+              <div class="relative w-10 lg:w-12 h-40 xl:h-52 rounded-full bg-panel2 border border-panel3 overflow-hidden">
+                <div id="barra-correctas" class="barra-vertical absolute inset-x-0 bottom-0 bg-esmeralda" style="height:0%"></div>
+              </div>
+              <span class="grid place-items-center w-8 h-8 rounded-lg bg-esmeraldadim text-esmeralda"><span class="icon i-check-circle text-base" aria-hidden="true"></span></span>
+              <span class="font-mono text-[10px] text-mutedink text-center leading-tight w-16">Correctas</span>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-panel border border-panel3 rounded-xl p-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="font-mono text-[11px] text-mutedink">Avance total</span>
+            <span class="font-display font-bold text-xl text-jsyellow" id="pct-avance">0%</span>
+          </div>
+          <p class="mt-2 text-sm text-muted" id="mensaje-avance">Responde la primera pregunta para comenzar.</p>
+          <p class="mt-1 font-mono text-[11px] text-mutedink">Total de preguntas: <span id="total-preguntas">0</span></p>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button id="reiniciar" type="button" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
+            <span class="icon i-restart-alt text-base" aria-hidden="true"></span>Reiniciar cuestionario
+          </button>
+          <a href="index.html#modulos" class="inline-flex items-center gap-2 border border-panel3 text-muted font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow hover:text-paper transition-colors">
+            <span class="icon i-menu-book text-base" aria-hidden="true"></span>Repasar la materia
+          </a>
+        </div>
+
+        <div class="mt-auto pt-8">
+          <p class="font-mono text-[11px] text-mutedink">¿Quieres practicar todavía más?</p>
+          <div class="mt-3 flex flex-col gap-2">
+            <a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm text-muted hover:text-jsyellow transition-colors">
+              <span class="grid place-items-center w-6 h-6 rounded bg-jsyellow shrink-0"><img src="static/resources/notebooklm-gemini-icon.svg" alt="" class="w-3.5 h-auto"></span>NotebookLM · Módulos 3 y 4
+            </a>
+            <a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm text-muted hover:text-jsyellow transition-colors">
+              <span class="grid place-items-center w-6 h-6 rounded bg-jsyellow shrink-0"><img src="static/resources/notebooklm-gemini-icon.svg" alt="" class="w-3.5 h-auto"></span>NotebookLM · Módulos 6, 7 y 8
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============ CUESTIONARIO ============ -->
+      <div class="px-5 sm:px-8 xl:px-12 py-10 lg:py-12">
+        <div id="cuestionario" class="flex flex-col gap-12"></div>
+      </div>
+  </div>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="border-t border-panel3 bg-panel">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-14">
+    <div class="grid md:grid-cols-[1.4fr_1fr_1fr] gap-10">
+
+      <div>
+        <div class="flex items-center gap-3">
+          <img src="static/resources/js-logo.svg" alt="" class="w-10 h-10 rounded-md">
+          <div>
+            <p class="font-display font-bold text-paper">Felipe Cuevas</p>
+            <p class="text-xs text-muted">Instructor · Bootcamp Desarrollador FullStack JavaScript</p>
+          </div>
+        </div>
+        <p class="mt-5 text-sm text-muted max-w-sm leading-relaxed">
+          Guía de estudio creada para las y los estudiantes que rinden la certificación de Talento Digital para Chile.
+        </p>
+        <div class="mt-6 flex items-center gap-2">
+          <a href="https://www.linkedin.com/in/ffelipecuevasc/" target="_blank" rel="noopener" class="icon-btn" aria-label="LinkedIn de Felipe Cuevas">
+            <span class="icon i-linkedin-icon text-xl" aria-hidden="true"></span>
+          </a>
+          <a href="https://github.com/ffelipecuevasc" target="_blank" rel="noopener" class="icon-btn" aria-label="GitHub de Felipe Cuevas">
+            <span class="icon i-github-icon text-xl" aria-hidden="true"></span>
+          </a>
+          <a href="https://felipecuevas.dev" target="_blank" rel="noopener"
+             class="inline-flex items-center gap-2 h-10 bg-jsyellow text-ink font-display font-bold text-xs px-4 rounded hover:bg-jsyellowdim transition-colors">
+            <span class="icon i-web-internet-icon text-base" aria-hidden="true"></span>felipecuevas.dev
+          </a>
+        </div>
+      </div>
+
+      <nav aria-label="Secciones de la guía">
+        <p class="font-display font-bold text-sm text-paper">Guía</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
+          <li><a href="index.html#mapa" class="hover:text-jsyellow transition-colors">Mapa del examen</a></li>
+          <li><a href="index.html#modulos" class="hover:text-jsyellow transition-colors">Módulos evaluados</a></li>
+          <li><a href="cuestionario.html" class="hover:text-jsyellow transition-colors">Cuestionario de práctica</a></li>
+          <li><a href="index.html#consejos" class="hover:text-jsyellow transition-colors">Consejos de preparación</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-label="Recursos para practicar">
+        <p class="font-display font-bold text-sm text-paper">Practicar más</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
+          <li><a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-jsyellow transition-colors"><span class="grid place-items-center w-6 h-6 rounded bg-jsyellow shrink-0"><img src="static/resources/notebooklm-gemini-icon.svg" alt="" class="w-3.5 h-auto"></span>NotebookLM · Módulos 3 y 4</a></li>
+          <li><a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-jsyellow transition-colors"><span class="grid place-items-center w-6 h-6 rounded bg-jsyellow shrink-0"><img src="static/resources/notebooklm-gemini-icon.svg" alt="" class="w-3.5 h-auto"></span>NotebookLM · Módulos 6, 7 y 8</a></li>
+          <li><a href="https://felipecuevas.dev" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-jsyellow transition-colors"><span class="icon i-web-internet-icon text-base" aria-hidden="true"></span>Sitio del instructor</a></li>
+        </ul>
+      </nav>
+
+    </div>
+
+    <div class="mt-12 pt-6 border-t border-panel3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <p class="font-mono text-xs text-mutedink max-w-xl">
+        Material de apoyo no oficial, elaborado a partir del testimonio de alumnos que ya rindieron el examen 2026.
+      </p>
+      <p class="font-mono text-xs text-mutedink">© <span id="year">2026</span> Felipe Cuevas</p>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="static/js/cuestionario-main.js"></script>
+
+</body>
+</html>

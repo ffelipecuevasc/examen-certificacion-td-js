@@ -10,7 +10,8 @@
     "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify",
     "serve": "npx serve .",
     "start": "npm run dev",
-    "icons": "node scripts/build-icons.mjs"
+    "icons": "node scripts/build-icons.mjs",
+    "cuestionario": "python3 scripts/build-cuestionario.py"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17"

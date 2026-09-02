@@ -32,7 +32,7 @@
     <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
       <a href="#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
       <a href="#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
-      <a href="#repaso" class="nav-link hover:text-paper transition-colors">Miniexamen</a>
+      <a href="cuestionario.html" class="nav-link hover:text-paper transition-colors">Cuestionario</a>
       <a href="#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
     </nav>
 
@@ -46,7 +46,7 @@
   <nav id="mobile-menu" aria-label="Navegación móvil" class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
     <a href="#mapa" class="mobile-link">Mapa</a>
     <a href="#modulos" class="mobile-link">Módulos</a>
-    <a href="#repaso" class="mobile-link">Miniexamen</a>
+    <a href="cuestionario.html" class="mobile-link">Cuestionario</a>
     <a href="#consejos" class="mobile-link">Consejos</a>
   </nav>
 </header>
@@ -74,7 +74,7 @@
           </p>
 
           <div class="mt-8 flex flex-wrap gap-3">
-            <a href="#repaso" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3.5 rounded hover:bg-jsyellowdim transition-colors">
+            <a href="cuestionario.html" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3.5 rounded hover:bg-jsyellowdim transition-colors">
               <span class="icon i-rocket-launch text-lg" aria-hidden="true"></span>Poner a prueba mis conocimientos
             </a>
             <a href="#mapa" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-6 py-3.5 rounded hover:border-jsyellow transition-colors">
@@ -166,45 +166,42 @@
     </div>
   </section>
 
-  <!-- ============ MINIEXAMEN ============ -->
+  <!-- ============ LLAMADA AL CUESTIONARIO ============ -->
   <section id="repaso" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center max-w-3xl mx-auto">
-        <span class="inline-flex items-center gap-2 border border-jsyellow/40 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow">
-          <span class="icon i-quiz text-base" aria-hidden="true"></span>Tu plan de repaso
+
+      <div class="bg-jsyellow text-ink rounded-2xl px-6 py-12 sm:px-12 sm:py-16 text-center">
+        <span class="inline-flex items-center gap-2 border border-ink/30 rounded-full px-4 py-1.5 font-mono text-[11px]">
+          <span class="icon i-quiz text-base" aria-hidden="true"></span>105 preguntas · 7 módulos
         </span>
 
         <h2 class="mt-6 font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight">
-          ¡Practica para el<br><span class="text-jsyellow">examen acá!</span>
+          ¡Practica para el<br>examen acá!
         </h2>
 
-        <p class="mt-6 text-lg text-muted">
-          21 preguntas al nivel de la certificación. Elige una alternativa y descubre al instante si acertaste.
+        <p class="mt-6 text-lg text-ink/70 max-w-xl mx-auto">
+          El cuestionario completo vive en su propia página, con seguimiento de aciertos y errores en tiempo real.
         </p>
-      </div>
 
-      <div class="mt-8 bg-jsyellow text-ink rounded-2xl p-6 sm:p-7">
-        <div class="grid sm:grid-cols-[1fr_auto] gap-6 items-center">
-          <div class="w-full">
-            <div class="flex items-end justify-between gap-4 mb-3">
-              <p class="font-display font-bold text-lg flex items-center gap-2"><span class="icon i-trending-up text-xl" aria-hidden="true"></span>Avance del miniexamen</p>
-              <p class="font-mono text-sm" id="progress-label">0 / 21 respondidas</p>
-            </div>
-            <div class="w-full h-3 rounded-full overflow-hidden bg-ink/20">
-              <div id="progress-fill" class="progress-fill h-full bg-ink rounded-full" style="width:0%"></div>
-            </div>
+        <a href="cuestionario.html" class="mt-9 inline-flex items-center gap-2 bg-ink text-jsyellow font-display font-bold text-base px-8 py-4 rounded hover:bg-panel2 transition-colors">
+          <span class="icon i-rocket-launch text-xl" aria-hidden="true"></span>Ir al cuestionario de práctica
+        </a>
+
+        <div class="mt-10 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left">
+          <div class="flex items-start gap-3">
+            <span class="icon i-check-circle text-xl mt-0.5" aria-hidden="true"></span>
+            <p class="text-sm text-ink/70">Corrección inmediata en cada pregunta</p>
           </div>
-          <div class="text-center sm:text-right sm:border-l sm:border-ink/20 sm:pl-6">
-            <p class="font-display font-bold text-4xl flex items-center justify-center sm:justify-end gap-2"><span class="icon i-task-alt text-2xl" aria-hidden="true"></span><span id="score-value">0</span></p>
-            <p class="text-xs text-ink/70">correctas</p>
+          <div class="flex items-start gap-3">
+            <span class="icon i-trending-up text-xl mt-0.5" aria-hidden="true"></span>
+            <p class="text-sm text-ink/70">Barras de avance, aciertos y errores</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="icon i-restart-alt text-xl mt-0.5" aria-hidden="true"></span>
+            <p class="text-sm text-ink/70">Alternativas barajadas en cada intento</p>
           </div>
         </div>
-        <button id="reset-quiz" type="button" class="mt-5 inline-flex items-center gap-2 font-mono text-xs border border-ink/30 rounded px-3 py-2 hover:bg-ink/10 transition-colors">
-          <span class="icon i-restart-alt text-base" aria-hidden="true"></span>Reiniciar respuestas
-        </button>
       </div>
-
-      <div id="quiz" class="mt-10 flex flex-col gap-10"></div>
 
       <!-- NotebookLM -->
       <div class="mt-14 border border-jsyellow/40 rounded-2xl p-7 sm:p-8 bg-panel">
@@ -310,7 +307,7 @@
         <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
           <li><a href="#mapa" class="hover:text-jsyellow transition-colors">Mapa del examen</a></li>
           <li><a href="#modulos" class="hover:text-jsyellow transition-colors">Módulos evaluados</a></li>
-          <li><a href="#repaso" class="hover:text-jsyellow transition-colors">Miniexamen de práctica</a></li>
+          <li><a href="cuestionario.html" class="hover:text-jsyellow transition-colors">Cuestionario de práctica</a></li>
           <li><a href="#consejos" class="hover:text-jsyellow transition-colors">Consejos de preparación</a></li>
         </ul>
       </nav>
