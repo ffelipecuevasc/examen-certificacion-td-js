@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Certificación — Bootcamp FullStack JavaScript | Talento Digital</title>
+    <meta name="description"
+          content="Guía de estudio para el examen de certificación de Talento Digital para Chile: maquetación, algoritmos, asincronía, SQL, Node/Express, ORM y seguridad JWT.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#000000',
+                        panel: '#121108',
+                        panel2: '#1B1910',
+                        panel3: '#25220F',
+                        jsyellow: '#F7DF1E',
+                        jsyellowdim: '#D8C420',
+                        paper: '#FBF7E8',
+                        muted: '#9C9A85',
+                        mutedink: '#5C5A4A',
+                    },
+                    fontFamily: {
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        ::selection {
+            background: #F7DF1E;
+            color: #000000;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3A3820;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #F7DF1E;
+        }
+
+        :focus-visible {
+            outline: 2px solid #F7DF1E;
+            outline-offset: 3px;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+        }
+
+        .skip-link:focus {
+            left: 1rem;
+            top: 1rem;
+            z-index: 100;
+        }
+
+        .accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 420ms ease;
+        }
+
+        .accordion-panel.is-open {
+            max-height: 4000px;
+        }
+
+        .chevron {
+            transition: transform 260ms ease;
+        }
+
+        .is-open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .caret {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: #000000;
+            margin-left: 2px;
+            vertical-align: -0.15em;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .progress-track {
+            background: #000000;
+        }
+
+        .progress-fill {
+            transition: width 380ms ease;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            height: 2px;
+            width: 0;
+            background: #F7DF1E;
+            transition: width 220ms ease;
+        }
+
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .code-copy-btn:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+
+<body class="bg-ink text-paper font-sans antialiased">
+
+<a href="#contenido" class="skip-link bg-jsyellow text-ink font-display font-bold px-4 py-2 rounded">Saltar al
+    contenido</a>
+
+<!-- ============ NAV ============ -->
+<header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-panel3 bg-ink/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+        <a href="#inicio" class="flex items-center gap-2.5 shrink-0">
+            <span class="w-8 h-8 rounded-md bg-jsyellow text-ink font-display font-bold text-sm flex items-center justify-center">JS</span>
+            <span class="font-display font-bold text-sm sm:text-base tracking-tight">Guía de Certificación</span>
+        </a>
+
+        <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
+            <a href="#resumen" class="nav-link hover:text-paper transition-colors">Estructura</a>
+            <a href="#modulos" class="nav-link hover:text-paper transition-colors">Las 7 partes</a>
+            <a href="#repaso" class="nav-link hover:text-paper transition-colors">Plan de repaso</a>
+            <a href="#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
+        </nav>
+
+        <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu"
+                class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded border border-panel3">
+            <span class="sr-only">Abrir menú</span>
+            <span class="w-5 h-0.5 bg-paper" aria-hidden="true"></span>
+            <span class="w-5 h-0.5 bg-paper" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <nav id="mobile-menu" aria-label="Navegación móvil"
+         class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
+        <a href="#resumen" class="mobile-link">Estructura del examen</a>
+        <a href="#modulos" class="mobile-link">Las 7 partes</a>
+        <a href="#repaso" class="mobile-link">Plan de repaso</a>
+        <a href="#consejos" class="mobile-link">Consejos</a>
+    </nav>
+</header>
+
+<main id="contenido">
+
+    <!-- ============ HERO ============ -->
+    <section id="inicio"
+             class="relative pt-32 pb-20 sm:pt-40 sm:pb-28 px-5 sm:px-8 border-b border-panel3 overflow-hidden">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
+
+            <div>
+                <p class="font-mono text-xs text-jsyellow mb-5">Bootcamp Desarrollador(a) FullStack JavaScript</p>
+                <h1 class="font-display font-bold text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.05] tracking-tight text-paper">
+                    Todo lo que necesitas saber sobre tu examen de certificación
+                </h1>
+                <p class="mt-6 text-base sm:text-lg text-muted max-w-xl leading-relaxed">
+                    Talento Digital para Chile evalúa siete áreas del desarrollo fullstack: desde una etiqueta <code
+                        class="font-mono text-jsyellow text-sm">&lt;div&gt;</code> con estilos en línea hasta la firma
+                    de un token JWT. Esta guía ordena cada parte, con ejemplos de código y un plan de repaso para que
+                    llegues con la materia clara.
+                </p>
+                <div class="mt-9 flex flex-wrap gap-3">
+                    <a href="#modulos"
+                       class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-5 py-3 rounded hover:bg-jsyellowdim transition-colors">
+                        Ver las 7 partes del examen
+                    </a>
+                    <a href="#repaso"
+                       class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">
+                        Ir al plan de repaso
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-jsyellow text-ink rounded-2xl p-6 sm:p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.05)]">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-ink/70"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-ink/40"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-ink/20"></span>
+                    <span class="ml-2 font-mono text-xs text-ink/60">certificacion.js</span>
+                </div>
+                <pre class="font-mono text-[13px] sm:text-sm leading-6 overflow-x-auto"><code><span class="text-ink/50">// Estructura oficial del examen</span>
+<span class="font-semibold">const</span> examen = {
+  programa: <span id="hero-typed"></span><span class="caret" aria-hidden="true"></span>
+  partes: 7,
+  formato: [<span class="text-ink/70">"selección múltiple"</span>,
+            <span class="text-ink/70">"ejercicios de código"</span>]
+};</code></pre>
+                <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-ink/10 rounded-lg py-3">
+                        <p class="font-display font-bold text-2xl">7</p>
+                        <p class="text-[11px] uppercase tracking-wide text-ink/60 mt-0.5">Partes</p>
+                    </div>
+                    <div class="bg-ink/10 rounded-lg py-3">
+                        <p class="font-display font-bold text-2xl">SQL</p>
+                        <p class="text-[11px] uppercase tracking-wide text-ink/60 mt-0.5">+ ORM</p>
+                    </div>
+                    <div class="bg-ink/10 rounded-lg py-3">
+                        <p class="font-display font-bold text-2xl">JWT</p>
+                        <p class="text-[11px] uppercase tracking-wide text-ink/60 mt-0.5">Seguridad</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============ RESUMEN / ESTRUCTURA ============ -->
+    <section id="resumen" class="py-20 sm:py-24 px-5 sm:px-8 border-b border-panel3">
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-2xl">
+                <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">La ruta completa, de la vista al
+                    servidor</h2>
+                <p class="mt-4 text-muted leading-relaxed">
+                    El examen avanza en el mismo orden en que se construye una aplicación fullstack: primero la
+                    interfaz, luego la lógica, después los datos y por último la seguridad. Cada parte combina preguntas
+                    teóricas de selección múltiple con ejercicios prácticos de código.
+                </p>
+            </div>
+
+            <div id="roadmap"
+                 class="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-panel3 rounded-xl overflow-hidden"></div>
+        </div>
+    </section>
+
+    <!-- ============ MODULOS (LAS 7 PARTES) ============ -->
+    <section id="modulos" class="py-20 sm:py-24 px-5 sm:px-8 border-b border-panel3">
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-2xl">
+                <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Las 7 partes en detalle</h2>
+                <p class="mt-4 text-muted leading-relaxed">
+                    Despliega cada parte para revisar los temas evaluados y ejemplos de código equivalentes a los
+                    ejercicios del examen. Los fragmentos son material de estudio propio de esta guía, no las respuestas
+                    exactas de la prueba.
+                </p>
+            </div>
+
+            <div id="modules-list" class="mt-12 flex flex-col gap-4"></div>
+        </div>
+    </section>
+
+    <!-- ============ PLAN DE REPASO ============ -->
+    <section id="repaso" class="py-20 sm:py-24 px-5 sm:px-8 border-b border-panel3">
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-2xl">
+                <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Tu plan de repaso</h2>
+                <p class="mt-4 text-muted leading-relaxed">
+                    Marca cada tema a medida que lo repases. La barra de progreso se actualiza en el momento; es solo
+                    una guía visual para esta sesión de estudio, así que no se guarda al recargar la página.
+                </p>
+            </div>
+
+            <div class="mt-10 bg-jsyellow text-ink rounded-2xl p-6 sm:p-8">
+                <div class="flex items-end justify-between gap-4 mb-3">
+                    <p class="font-display font-bold text-lg">Progreso general</p>
+                    <p class="font-mono text-sm" id="progress-label">0 / 0 temas</p>
+                </div>
+                <div class="progress-track w-full h-3 rounded-full overflow-hidden">
+                    <div id="progress-fill" class="progress-fill h-full bg-ink rounded-full" style="width:0%"></div>
+                </div>
+            </div>
+
+            <div id="checklist" class="mt-8 grid sm:grid-cols-2 gap-5"></div>
+        </div>
+    </section>
+
+    <!-- ============ CONSEJOS ============ -->
+    <section id="consejos" class="py-20 sm:py-24 px-5 sm:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-2xl">
+                <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Cómo prepararte</h2>
+                <p class="mt-4 text-muted leading-relaxed">
+                    Ideas concretas para que las siete partes dejen de sentirse como siete temas sueltos y se conviertan
+                    en un solo recorrido que ya conoces.
+                </p>
+            </div>
+
+            <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Practica en el navegador, no solo lea</p>
+                    <p class="text-sm text-muted leading-relaxed">Para la Parte 1, crea de memoria un <code
+                            class="font-mono text-paper">&lt;div&gt;</code> con estilos en línea y una imagen circular
+                        de <code class="font-mono text-paper">150px</code> enlazada. Que la sintaxis exacta salga sin
+                        pensarla.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Resuelve con datos reales</p>
+                    <p class="text-sm text-muted leading-relaxed">Arma un arreglo de objetos con notas de alumnos
+                        ficticios y practica el <code class="font-mono text-paper">switch</code> del auto disponible y
+                        la función de promedios hasta que te salgan sin revisar apuntes.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Compara promesas en voz alta</p>
+                    <p class="text-sm text-muted leading-relaxed">Explícate a ti mismo(a) por qué <code
+                            class="font-mono text-paper">Promise.all()</code> corta ante el primer error y <code
+                            class="font-mono text-paper">Promise.allSettled()</code> no. Si puedes enseñarlo, lo tienes
+                        claro.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Escribe SQL a mano</p>
+                    <p class="text-sm text-muted leading-relaxed">Practica <code
+                            class="font-mono text-paper">UPDATE</code>, <code class="font-mono text-paper">ALTER
+                        TABLE</code>, subconsultas y un <code class="font-mono text-paper">JOIN</code> con <code
+                            class="font-mono text-paper">SUM()</code> y <code class="font-mono text-paper">WHERE</code>
+                        sin autocompletado.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Dibuja el flujo MVC</p>
+                    <p class="text-sm text-muted leading-relaxed">Traza en papel cómo una petición pasa por una ruta de
+                        Express, un middleware, un controlador y el modelo. Ubicar cada pieza evita confundir
+                        responsabilidades.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Simula una transacción</p>
+                    <p class="text-sm text-muted leading-relaxed">Repasa cuándo se ejecuta un <code
+                            class="font-mono text-paper">ROLLBACK</code> y practica <code class="font-mono text-paper">belongsTo</code>
+                        y una relación N:M en Sequelize con un ejemplo propio.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Arma una ruta REST completa</p>
+                    <p class="text-sm text-muted leading-relaxed">Escribe una ruta que use <code
+                            class="font-mono text-paper">express.json()</code>, responda con estado <code
+                            class="font-mono text-paper">201</code> y devuelva JSON. Después agrégale la generación de
+                        un JWT.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Repasa Git en la terminal</p>
+                    <p class="text-sm text-muted leading-relaxed">Ejecuta de memoria los comandos básicos de control de
+                        versiones: crear una rama, confirmar cambios y subirlos, sin depender de una interfaz
+                        gráfica.</p>
+                </article>
+                <article class="bg-panel border border-panel3 rounded-xl p-6">
+                    <p class="font-display font-bold text-jsyellow mb-2">Usa el plan de repaso de esta guía</p>
+                    <p class="text-sm text-muted leading-relaxed">Baja a la sección de repaso y marca cada tema conforme
+                        lo domines. Volver a los que queden sin marcar es tu lista de estudio final.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="border-t border-panel3 px-5 sm:px-8 py-10">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-md bg-jsyellow text-ink font-display font-bold text-xs flex items-center justify-center">JS</span>
+            <p class="text-sm text-muted">Guía de estudio para el Bootcamp FullStack JavaScript — Talento Digital para
+                Chile.</p>
+        </div>
+        <p class="font-mono text-xs text-mutedink">Material de apoyo no oficial, elaborado a partir del temario del
+            examen.</p>
+    </div>
+</footer>
+
+<script>
+    'use strict';
+
+    /* ============ Datos de las 7 partes ============ */
+    const modulesData = [
+        {
+            numero: '01',
+            titulo: 'Maquetación, estilos y control de versiones',
+            resumen: '8 preguntas · 6 de selección múltiple + 2 ejercicios de código',
+            temas: [
+                'Uso y configuración de media queries para diseño responsivo',
+                'Comandos básicos de Git para el control de versiones',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Estructura y estilos en línea',
+                    detalle: 'Crear un <div> que contenga un <h1> aplicando estilos con el atributo style.',
+                    lang: 'html',
+                    code: `<div style="background-color:#1B1910; padding:24px; border-radius:12px;">
+  <h1 style="color:#F7DF1E; font-family:sans-serif; margin:0;">
+    ¡Hola, Bootcamp!
+  </h1>
+</div>`,
+                },
+                {
+                    titulo: 'Imagen circular con enlace',
+                    detalle: 'Imagen de 150px de diámetro exacto que redirige a Google.com al hacer clic.',
+                    lang: 'html',
+                    code: `<a href="https://www.google.com" target="_blank" rel="noopener">
+  <img src="avatar.jpg" alt="Foto de perfil"
+       style="width:150px; height:150px;
+              border-radius:50%; object-fit:cover;">
+</a>`,
+                },
+            ],
+        },
+        {
+            numero: '02',
+            titulo: 'Algoritmos y estructuras de datos en JavaScript',
+            resumen: 'Evaluación práctica de lógica pura en JavaScript',
+            temas: [
+                'Control de flujo con switch / case',
+                'Manipulación de arreglos y objetos',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Disponibilidad de un auto (switch / case)',
+                    detalle: 'Evaluar el estado de un auto según sus variables y determinar si está disponible.',
+                    lang: 'javascript',
+                    code: `function estadoAuto(disponible, enMantencion) {
+  switch (true) {
+    case enMantencion:
+      return 'En mantención';
+    case disponible:
+      return 'Disponible';
+    default:
+      return 'No disponible';
+  }
+}`,
+                },
+                {
+                    titulo: 'Promedio de notas por alumno',
+                    detalle: 'Recibir un arreglo de objetos con notas y devolver el promedio de cada alumno.',
+                    lang: 'javascript',
+                    code: `function promedioPorAlumno(notas) {
+  const agrupado = {};
+  notas.forEach(({ nombre, nota }) => {
+    if (!agrupado[nombre]) agrupado[nombre] = [];
+    agrupado[nombre].push(nota);
+  });
+
+  return Object.entries(agrupado).map(([nombre, lista]) => ({
+    nombre,
+    promedio: lista.reduce((a, b) => a + b, 0) / lista.length,
+  }));
+}`,
+                },
+            ],
+        },
+        {
+            numero: '03',
+            titulo: 'JavaScript avanzado y asincronía',
+            resumen: 'Preguntas teóricas sobre paradigmas y asincronía',
+            temas: [
+                'Conceptos de programación orientada a objetos (OOP)',
+                'Diferencias entre Promise.all() y Promise.allSettled()',
+                'Sintaxis correcta de funciones asíncronas con async / await',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Promise.all() vs Promise.allSettled()',
+                    detalle: 'La primera se detiene ante el primer rechazo; la segunda espera a todas.',
+                    lang: 'javascript',
+                    code: `const tareas = [fetchUsuario(), fetchPedidos(), fetchPagos()];
+
+// Se detiene si UNA promesa falla
+Promise.all(tareas)
+  .then(console.log)
+  .catch(console.error);
+
+// Espera a todas, exitosas o no
+Promise.allSettled(tareas).then((resultados) => {
+  resultados.forEach((r) => console.log(r.status));
+});`,
+                },
+            ],
+        },
+        {
+            numero: '04',
+            titulo: 'Bases de datos relacionales y SQL',
+            resumen: 'Preguntas conceptuales y escritura de consultas SQL',
+            temas: [
+                'Modificación de datos con UPDATE',
+                'Estructura de tablas con ALTER TABLE',
+                'Subconsultas (subqueries)',
+                'Modelo entidad-relación y relaciones 1:N',
+                'Consultas con JOIN, SUM() y WHERE',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Aumentar precios en un 10%',
+                    detalle: 'Actualizar todos los registros de una tabla con UPDATE.',
+                    lang: 'sql',
+                    code: `UPDATE productos
+                           SET precio = precio * 1.10;`,
+                },
+                {
+                    titulo: 'Modificar una tabla existente',
+                    detalle: 'Agregar una columna y ampliar un VARCHAR sin perder datos.',
+                    lang: 'sql',
+                    code: `ALTER TABLE usuarios
+                        ADD COLUMN telefono VARCHAR(20);
+
+                    ALTER TABLE usuarios
+                        MODIFY COLUMN correo VARCHAR (255);`,
+                },
+                {
+                    titulo: 'JOIN + SUM() + WHERE',
+                    detalle: 'Total gastado por cliente considerando solo pedidos pagados.',
+                    lang: 'sql',
+                    code: `SELECT c.nombre, SUM(p.total) AS total_gastado
+                           FROM clientes c
+                                    JOIN pedidos p ON p.cliente_id = c.id
+                           WHERE p.estado = 'pagado'
+                           GROUP BY c.nombre;`,
+                },
+            ],
+        },
+        {
+            numero: '05',
+            titulo: 'Backend con Node.js, Express y MVC',
+            resumen: 'Arquitectura del servidor, enrutamiento y módulos',
+            temas: [
+                'Ejecución de un archivo Node desde la consola',
+                'Error al omitir ./ en importaciones de módulos locales',
+                'Definición y propósito de un middleware',
+                'app.use() global versus middleware en una ruta específica',
+                'La capa Modelo y la responsabilidad del Controlador en MVC',
+                'Motores de plantillas (template engines)',
+                'Serialización de datos a JSON',
+                'Desventajas de usar archivos JSON planos frente a una base de datos',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Middleware global y por ruta',
+                    detalle: 'app.use() se aplica a toda petición; el middleware de ruta solo a un endpoint.',
+                    lang: 'javascript',
+                    code: `app.use((req, res, next) => {
+  console.log(\`\${req.method} \${req.url}\`);
+  next();
+});
+
+app.get('/perfil', verificarSesion, (req, res) => {
+  res.render('perfil');
+});`,
+                },
+            ],
+        },
+        {
+            numero: '06',
+            titulo: 'Persistencia avanzada, transacciones y ORM',
+            resumen: 'Interacción avanzada del backend con la base de datos',
+            temas: [
+                'Pool de conexiones frente a conexiones individuales',
+                'Cursores en una base de datos',
+                'Transacciones SQL, UPDATE transaccional y ROLLBACK',
+                'Propósito de un ORM',
+                'Crear y actualizar registros con Sequelize',
+                'Relaciones N:M y el método belongsTo',
+                'Acceso a datos vinculados en relaciones 1:N',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Transacción con Sequelize',
+                    detalle: 'Confirmar cambios con commit() o revertirlos con rollback() ante un error.',
+                    lang: 'javascript',
+                    code: `const t = await sequelize.transaction();
+try {
+  await Cuenta.update(
+    { saldo: nuevoSaldo },
+    { where: { id }, transaction: t }
+  );
+  await t.commit();
+} catch (error) {
+  await t.rollback();
+}`,
+                },
+                {
+                    titulo: 'Asociación belongsTo',
+                    detalle: 'Un pedido pertenece a un cliente; se accede al dato relacionado con include.',
+                    lang: 'javascript',
+                    code: `Pedido.belongsTo(Cliente, { foreignKey: 'clienteId' });
+
+const pedido = await Pedido.findOne({ include: Cliente });`,
+                },
+            ],
+        },
+        {
+            numero: '07',
+            titulo: 'APIs REST, HTTP y seguridad con JWT',
+            resumen: 'Buenas prácticas de servicios web y autenticación',
+            temas: [
+                'JSON como formato estándar de intercambio en REST',
+                'Uso semántico del verbo HTTP PUT',
+                'El verbo HTTP más seguro según los principios de REST',
+                'Definición de rutas en Express',
+                'El middleware express.json()',
+                'Respuesta JSON con código de estado 201 (Created)',
+                'Modularización de rutas en una API Express',
+                'Objetivo principal de un JWT',
+                'Generación de un JWT en Node.js',
+                'Buenas prácticas para prevenir vulnerabilidades en autenticación con JWT',
+            ],
+            ejercicios: [
+                {
+                    titulo: 'Ruta con respuesta 201',
+                    detalle: 'Crear un recurso y responder con el código de estado correcto en JSON.',
+                    lang: 'javascript',
+                    code: `app.use(express.json());
+
+app.post('/usuarios', (req, res) => {
+  const nuevoUsuario = crearUsuario(req.body);
+  res.status(201).json(nuevoUsuario);
+});`,
+                },
+                {
+                    titulo: 'Generar un JWT',
+                    detalle: 'Firmar un token con una clave secreta y un tiempo de expiración.',
+                    lang: 'javascript',
+                    code: `const jwt = require('jsonwebtoken');
+
+const token = jwt.sign(
+  { id: usuario.id },
+  process.env.JWT_SECRET,
+  { expiresIn: '1h' }
+);`,
+                },
+            ],
+        },
+    ];
+
+    /* ============ Utilidades ============ */
+    const $ = (selector, scope = document) => scope.querySelector(selector);
+    const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+    const escapeHtml = (str) =>
+        str.replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+
+    /* ============ Roadmap (resumen) ============ */
+    function renderRoadmap() {
+        const container = $('#roadmap');
+        container.innerHTML = modulesData
+            .map(
+                (m, i) => `
+      <a href="#modulo-${i}" class="group bg-panel hover:bg-panel2 transition-colors p-6 flex flex-col gap-3">
+        <span class="font-display font-bold text-jsyellow text-sm">${m.numero}</span>
+        <span class="font-display font-semibold text-paper leading-snug">${m.titulo}</span>
+        <span class="mt-auto text-xs text-mutedink font-mono">${m.resumen.split(' · ')[0]}</span>
+      </a>`
+            )
+            .join('');
+    }
+
+    /* ============ Módulos (acordeón) ============ */
+    function codeBlock(ej, moduleIndex, exIndex) {
+        const id = `code-${moduleIndex}-${exIndex}`;
+        return `
+    <div class="mt-4 rounded-lg overflow-hidden border border-panel3">
+      <div class="flex items-center justify-between bg-panel2 px-4 py-2">
+        <span class="font-mono text-[11px] text-muted">${ej.lang}</span>
+        <button type="button" class="code-copy-btn font-mono text-[11px] text-muted hover:text-jsyellow transition-colors" data-target="${id}">
+          Copiar
+        </button>
+      </div>
+      <pre class="bg-ink px-4 py-4 overflow-x-auto"><code id="${id}" class="font-mono text-[12.5px] leading-6 text-paper/90">${escapeHtml(ej.code)}</code></pre>
+    </div>`;
+    }
+
+    function renderModules() {
+        const container = $('#modules-list');
+        container.innerHTML = modulesData
+            .map((m, i) => {
+                const temasHtml = m.temas
+                    .map((t) => `<li class="flex gap-3 text-sm text-muted leading-relaxed"><span class="text-jsyellow mt-0.5">·</span><span>${t}</span></li>`)
+                    .join('');
+
+                const ejerciciosHtml = (m.ejercicios || [])
+                    .map(
+                        (ej, j) => `
+          <div class="${j > 0 ? 'mt-6' : ''}">
+            <p class="font-sans font-semibold text-sm text-paper">${ej.titulo}</p>
+            <p class="text-sm text-muted mt-1">${ej.detalle}</p>
+            ${codeBlock(ej, i, j)}
+          </div>`
+                    )
+                    .join('');
+
+                return `
+      <article id="modulo-${i}" class="scroll-mt-24 bg-panel border border-panel3 rounded-xl overflow-hidden">
+        <button type="button" class="module-toggle w-full flex items-center justify-between gap-4 p-6 text-left" aria-expanded="false" aria-controls="panel-${i}">
+          <div class="flex items-center gap-4">
+            <span class="font-display font-bold text-jsyellow text-lg shrink-0">${m.numero}</span>
+            <div>
+              <h3 class="font-display font-bold text-lg text-paper leading-snug">${m.titulo}</h3>
+              <p class="text-xs text-mutedink font-mono mt-1">${m.resumen}</p>
+            </div>
+          </div>
+          <svg class="chevron w-5 h-5 text-jsyellow shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div id="panel-${i}" class="accordion-panel">
+          <div class="px-6 pb-7 border-t border-panel3 pt-6">
+            <p class="text-xs uppercase tracking-wide text-mutedink font-mono mb-3">Temas evaluados</p>
+            <ul class="flex flex-col gap-2">${temasHtml}</ul>
+            ${ejerciciosHtml ? `<p class="text-xs uppercase tracking-wide text-mutedink font-mono mt-7 mb-1">Ejemplo de estudio</p>${ejerciciosHtml}` : ''}
+          </div>
+        </div>
+      </article>`;
+            })
+            .join('');
+
+        $$('.module-toggle').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const panel = document.getElementById(btn.getAttribute('aria-controls'));
+                const isOpen = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', String(!isOpen));
+                btn.parentElement.classList.toggle('is-open', !isOpen);
+                panel.classList.toggle('is-open', !isOpen);
+            });
+        });
+
+        $$('.code-copy-btn').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const codeEl = document.getElementById(btn.dataset.target);
+                const original = btn.textContent;
+                try {
+                    await navigator.clipboard.writeText(codeEl.textContent);
+                    btn.textContent = 'Copiado';
+                } catch (err) {
+                    btn.textContent = 'No se pudo copiar';
+                }
+                setTimeout(() => {
+                    btn.textContent = original;
+                }, 1500);
+            });
+        });
+    }
+
+    /* ============ Plan de repaso (checklist) ============ */
+    function renderChecklist() {
+        const container = $('#checklist');
+        container.innerHTML = modulesData
+            .map(
+                (m, i) => `
+      <div class="bg-panel border border-panel3 rounded-xl p-6">
+        <p class="font-display font-bold text-sm text-paper mb-4"><span class="text-jsyellow">${m.numero}</span> — ${m.titulo}</p>
+        <ul class="flex flex-col gap-3">
+          ${m.temas
+                    .map(
+                        (t, j) => `
+            <li>
+              <label class="flex items-start gap-3 text-sm text-muted cursor-pointer">
+                <input type="checkbox" class="repaso-check mt-0.5 w-4 h-4 accent-[#F7DF1E]" data-mod="${i}" data-item="${j}">
+                <span>${t}</span>
+              </label>
+            </li>`
+                    )
+                    .join('')}
+        </ul>
+      </div>`
+            )
+            .join('');
+
+        const checks = $$('.repaso-check');
+        const total = checks.length;
+
+        function updateProgress() {
+            const checked = checks.filter((c) => c.checked).length;
+            const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
+            $('#progress-fill').style.width = `${pct}%`;
+            $('#progress-label').textContent = `${checked} / ${total} temas`;
+        }
+
+        checks.forEach((c) => c.addEventListener('change', updateProgress));
+        updateProgress();
+    }
+
+    /* ============ Menú móvil ============ */
+    function setupMobileMenu() {
+        const toggle = $('#menu-toggle');
+        const menu = $('#mobile-menu');
+        toggle.addEventListener('click', () => {
+            const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', String(!isOpen));
+            menu.classList.toggle('hidden', isOpen);
+        });
+        $$('.mobile-link', menu).forEach((link) =>
+            link.addEventListener('click', () => {
+                toggle.setAttribute('aria-expanded', 'false');
+                menu.classList.add('hidden');
+            })
+        );
+    }
+
+    /* ============ Resaltado de sección activa ============ */
+    function setupScrollSpy() {
+        const links = $$('.nav-link');
+        const sections = ['resumen', 'modulos', 'repaso', 'consejos']
+            .map((id) => document.getElementById(id))
+            .filter(Boolean);
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    links.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`));
+                });
+            },
+            {rootMargin: '-45% 0px -50% 0px'}
+        );
+
+        sections.forEach((section) => observer.observe(section));
+    }
+
+    /* ============ Efecto de escritura en el hero ============ */
+    async function typeText(el, text, delay = 45) {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion) {
+            el.textContent = `'${text}',`;
+            return;
+        }
+        el.textContent = "'";
+        for (const char of text) {
+            el.textContent += char;
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+        el.textContent += "',";
+    }
+
+    /* ============ Inicio ============ */
+    document.addEventListener('DOMContentLoaded', () => {
+        renderRoadmap();
+        renderModules();
+        renderChecklist();
+        setupMobileMenu();
+        setupScrollSpy();
+        typeText($('#hero-typed'), 'FullStack JavaScript');
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+# ==========================================
+# NODE.JS & NPM / YARN
+# ==========================================
+# Dependencias
+node_modules/
+jspm_packages/
+
+# Logs de Node
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Caché de npm/yarn
+.npm/
+.yarn-integrity
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.pnp.*
+
+# ==========================================
+# COMPILACIÓN DE TAILWIND Y BUILDS
+# ==========================================
+# Directorios de salida (Si configuras Tailwind para exportar aquí)
+# Descomenta las siguientes líneas si usas un directorio dist/ o build/ en tu output
+# dist/
+# build/
+# out/
+
+# Caché de bundlers (Vite, Parcel, Webpack, etc. por si los usas en el futuro)
+.cache/
+.parcel-cache/
+dist-ssr/
+
+# ==========================================
+# WEBSTORM & JETBRAINS IDEs
+# ==========================================
+# Configuraciones locales del proyecto en WebStorm
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Archivos de historial local de JetBrains
+.history/
+
+# ==========================================
+# SISTEMAS OPERATIVOS
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.DocumentRevisions-V100
+.VolumeIcon.icns
+.fseventsd
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+$RECYCLE.BIN/
+desktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==========================================
+# VARIABLES DE ENTORNO Y SECRETOS
+# ==========================================
+# Ignorar siempre archivos con claves secretas o configuración de base de datos
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.backup
+
+# ==========================================
+# OTROS (Opcional)
+# ==========================================
+# Archivos comprimidos no deseados en el repo
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+
+# Archivos de reportes de cobertura de tests (si en el futuro haces testing)
+coverage/
+.nyc_output/
