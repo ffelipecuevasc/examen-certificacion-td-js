@@ -1,1210 +1,297 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía de Certificación — Bootcamp FullStack JavaScript | Felipe Cuevas</title>
-    <meta name="description"
-          content="Guía visual de estudio para el examen de certificación de Talento Digital para Chile: módulos 2 al 8 del Bootcamp Desarrollador FullStack JavaScript, con miniexamen interactivo.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Certificación - Bootcamp FullStack JavaScript | Felipe Cuevas</title>
+<meta name="description" content="Guía visual de estudio para el examen de certificación de Talento Digital para Chile: módulos 2 al 8 del Bootcamp Desarrollador FullStack JavaScript, con miniexamen interactivo.">
+<meta name="author" content="Felipe Cuevas">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="static/resources/js-logo.svg">
 
-    <link rel="icon"
-          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f7df1e'/%3E%3Cpath d='M324.1 404.6c10.3 16.8 23.7 29.2 47.4 29.2 19.9 0 32.6-10 32.6-23.7 0-16.5-13-22.3-34.9-31.9l-12-5.2c-34.6-14.7-57.6-33.2-57.6-72.3 0-36 27.4-63.4 70.3-63.4 30.5 0 52.5 10.6 68.3 38.4l-37.4 24c-8.2-14.8-17.1-20.6-30.9-20.6-14.1 0-23 8.9-23 20.6 0 14.4 8.9 20.2 29.5 29.2l12 5.1c40.8 17.5 63.8 35.3 63.8 75.4 0 43.2-34 66.9-79.6 66.9-44.6 0-73.4-21.3-87.5-49.1zM170.1 408.6c7.6 13.4 14.4 24.7 30.9 24.7 15.8 0 25.8-6.2 25.8-30.2V239.4h48v164.4c0 49.7-29.1 72.3-71.6 72.3-38.4 0-60.6-19.9-72-43.8z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        ink: '#000000',
-                        panel: '#121108',
-                        panel2: '#1B1910',
-                        panel3: '#25220F',
-                        jsyellow: '#F7DF1E',
-                        jsyellowdim: '#D8C420',
-                        paper: '#FBF7E8',
-                        muted: '#9C9A85',
-                        mutedink: '#5C5A4A',
-                    },
-                    fontFamily: {
-                        display: ['"Space Grotesk"', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                    },
-                },
-            },
-        };
-    </script>
-
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        ::selection {
-            background: #F7DF1E;
-            color: #000000;
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #000000;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #3A3820;
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #F7DF1E;
-        }
-
-        :focus-visible {
-            outline: 2px solid #F7DF1E;
-            outline-offset: 3px;
-        }
-
-        .skip-link {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-        }
-
-        .skip-link:focus {
-            left: 1rem;
-            top: 1rem;
-            z-index: 100;
-        }
-
-        .accordion-panel {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 420ms ease;
-        }
-
-        .accordion-panel.is-open {
-            max-height: 5000px;
-        }
-
-        .chevron {
-            transition: transform 260ms ease;
-        }
-
-        .is-open .chevron {
-            transform: rotate(180deg);
-        }
-
-        .progress-fill {
-            transition: width 380ms ease;
-        }
-
-        .nav-link {
-            position: relative;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -4px;
-            height: 2px;
-            width: 0;
-            background: #F7DF1E;
-            transition: width 220ms ease;
-        }
-
-        .nav-link.active::after, .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .hero-logo {
-            animation: floaty 6s ease-in-out infinite;
-        }
-
-        @keyframes floaty {
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .quiz-option[data-state="correct"] {
-            background: #F7DF1E;
-            color: #000000;
-            border-color: #F7DF1E;
-        }
-
-        .quiz-option[data-state="wrong"] {
-            border-color: #7A2E2E;
-            color: #E8B4B4;
-        }
-
-        .quiz-option[data-state="dimmed"] {
-            opacity: .45;
-        }
-
-        .quiz-option:disabled {
-            cursor: default;
-        }
-
-        .code-copy-btn:active {
-            transform: scale(0.96);
-        }
-    </style>
+<link rel="stylesheet" href="static/css/style.css">
 </head>
 
 <body class="bg-ink text-paper font-sans antialiased">
 
-<a href="#contenido" class="skip-link bg-jsyellow text-ink font-display font-bold px-4 py-2 rounded">Saltar al
-    contenido</a>
-
-<!-- Logo oficial de JavaScript, reutilizado por referencia en toda la página -->
-<svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
-    <symbol id="js-logo" viewBox="0 0 512 512">
-        <rect width="512" height="512" fill="#F7DF1E"/>
-        <path fill="#000000"
-              d="M324.1,404.6c10.3,16.8,23.7,29.2,47.4,29.2c19.9,0,32.6-10,32.6-23.7c0-16.5-13-22.3-34.9-31.9l-12-5.2c-34.6-14.7-57.6-33.2-57.6-72.3c0-36,27.4-63.4,70.3-63.4c30.5,0,52.5,10.6,68.3,38.4l-37.4,24c-8.2-14.8-17.1-20.6-30.9-20.6c-14.1,0-23,8.9-23,20.6c0,14.4,8.9,20.2,29.5,29.2l12,5.1c40.8,17.5,63.8,35.3,63.8,75.4c0,43.2-34,66.9-79.6,66.9c-44.6,0-73.4-21.3-87.5-49.1L324.1,404.6z"/>
-        <path fill="#000000"
-              d="M170.1,408.6c7.6,13.4,14.4,24.7,30.9,24.7c15.8,0,25.8-6.2,25.8-30.2V239.4h48v164.4c0,49.7-29.1,72.3-71.6,72.3c-38.4,0-60.6-19.9-72-43.8L170.1,408.6z"/>
-    </symbol>
-</svg>
+<a href="#contenido" class="skip-link bg-jsyellow text-ink font-display font-bold px-4 py-2 rounded">Saltar al contenido</a>
 
 <!-- ============ NAV ============ -->
 <header class="fixed top-0 inset-x-0 z-50 border-b border-panel3 bg-ink/90 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <a href="#inicio" class="flex items-center gap-2.5 shrink-0">
-            <svg class="w-8 h-8 rounded-md" aria-hidden="true">
-                <use href="#js-logo"/>
-            </svg>
-            <span class="font-display font-bold text-sm sm:text-base tracking-tight">Certificación FullStack</span>
-        </a>
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="#inicio" class="flex items-center gap-2.5 shrink-0">
+      <img src="static/resources/js-logo.svg" alt="" class="w-8 h-8 rounded-md">
+      <span class="font-display font-bold text-sm sm:text-base tracking-tight">Certificación FullStack JS</span>
+    </a>
 
-        <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
-            <a href="#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
-            <a href="#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
-            <a href="#repaso" class="nav-link hover:text-paper transition-colors">Miniexamen</a>
-            <a href="#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
-        </nav>
-
-        <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu"
-                class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded border border-panel3">
-            <span class="sr-only">Abrir menú</span>
-            <span class="w-5 h-0.5 bg-paper" aria-hidden="true"></span>
-            <span class="w-5 h-0.5 bg-paper" aria-hidden="true"></span>
-        </button>
-    </div>
-
-    <nav id="mobile-menu" aria-label="Navegación móvil"
-         class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
-        <a href="#mapa" class="mobile-link">Mapa</a>
-        <a href="#modulos" class="mobile-link">Módulos</a>
-        <a href="#repaso" class="mobile-link">Miniexamen</a>
-        <a href="#consejos" class="mobile-link">Consejos</a>
+    <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
+      <a href="#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
+      <a href="#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
+      <a href="#repaso" class="nav-link hover:text-paper transition-colors">Miniexamen</a>
+      <a href="#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
     </nav>
+
+    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded border border-panel3">
+      <span class="sr-only">Abrir menú</span>
+      <span class="w-5 h-0.5 bg-paper" aria-hidden="true"></span>
+      <span class="w-5 h-0.5 bg-paper" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" aria-label="Navegación móvil" class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
+    <a href="#mapa" class="mobile-link">Mapa</a>
+    <a href="#modulos" class="mobile-link">Módulos</a>
+    <a href="#repaso" class="mobile-link">Miniexamen</a>
+    <a href="#consejos" class="mobile-link">Consejos</a>
+  </nav>
 </header>
 
 <main id="contenido">
 
-    <!-- ============ HERO ============ -->
-    <section id="inicio" class="relative pt-28 pb-16 sm:pt-36 sm:pb-20 px-5 sm:px-8 border-b border-panel3">
-        <div class="max-w-6xl mx-auto">
+  <!-- ============ HERO ============ -->
+  <section id="inicio" class="relative pt-28 pb-16 sm:pt-36 sm:pb-20 px-5 sm:px-8 border-b border-panel3">
+    <div class="max-w-6xl mx-auto">
 
-            <div class="grid lg:grid-cols-[1fr_auto] gap-12 items-center">
-                <div>
+      <div class="grid lg:grid-cols-[1fr_auto] gap-12 items-center">
+        <div>
           <span class="inline-flex items-center gap-2 border border-panel3 rounded-full px-3 py-1 font-mono text-[11px] text-jsyellow">
             Talento Digital para Chile
           </span>
 
-                    <h1 class="mt-6 font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight">
-                        7 módulos.<br>
-                        <span class="text-jsyellow">1 examen.</span><br>
-                        Tú puedes.
-                    </h1>
+          <h1 class="mt-6 font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight">
+            7 módulos.<br>
+            <span class="text-jsyellow">1 examen.</span><br>
+            Tú puedes.
+          </h1>
 
-                    <p class="mt-6 text-lg text-muted max-w-md leading-snug">
-                        Del primer <code class="font-mono text-jsyellow text-base">&lt;div&gt;</code> hasta firmar un
-                        token JWT. Esto es todo lo que entra.
-                    </p>
+          <p class="mt-6 text-lg text-muted max-w-md leading-snug">
+            Del primer <code class="font-mono text-jsyellow text-base">&lt;div&gt;</code> hasta firmar un token JWT. Esto es todo lo que entra.
+          </p>
 
-                    <div class="mt-8 flex flex-wrap gap-3">
-                        <a href="#repaso"
-                           class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3.5 rounded hover:bg-jsyellowdim transition-colors">
-                            Poner a prueba mis conocimientos
-                        </a>
-                        <a href="#mapa"
-                           class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-6 py-3.5 rounded hover:border-jsyellow transition-colors">
-                            Ver el mapa del examen
-                        </a>
-                    </div>
-                </div>
-
-                <svg class="hero-logo hidden lg:block w-64 h-64 rounded-2xl" aria-label="Logotipo de JavaScript"
-                     role="img">
-                    <use href="#js-logo"/>
-                </svg>
-            </div>
-
-            <dl class="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-px bg-panel3 rounded-xl overflow-hidden">
-                <div class="bg-panel p-6">
-                    <dd class="font-display font-bold text-4xl text-jsyellow" data-count="7">0</dd>
-                    <dt class="mt-1 text-xs text-muted">Módulos evaluados</dt>
-                </div>
-                <div class="bg-panel p-6">
-                    <dd class="font-display font-bold text-4xl text-jsyellow" data-count="21">0</dd>
-                    <dt class="mt-1 text-xs text-muted">Preguntas de práctica</dt>
-                </div>
-                <div class="bg-panel p-6">
-                    <dd class="font-display font-bold text-4xl text-jsyellow" data-count="2">0</dd>
-                    <dt class="mt-1 text-xs text-muted">Formatos: teoría y código</dt>
-                </div>
-                <div class="bg-panel p-6">
-                    <dd class="font-display font-bold text-4xl text-jsyellow">JWT</dd>
-                    <dt class="mt-1 text-xs text-muted">El último tema del examen</dt>
-                </div>
-            </dl>
-
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#repaso" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3.5 rounded hover:bg-jsyellowdim transition-colors">
+              Poner a prueba mis conocimientos
+            </a>
+            <a href="#mapa" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-6 py-3.5 rounded hover:border-jsyellow transition-colors">
+              Ver el mapa del examen
+            </a>
+          </div>
         </div>
-    </section>
 
-    <!-- ============ MAPA ============ -->
-    <section id="mapa" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Mapa del examen</h2>
-            <p class="mt-3 text-muted">Del navegador al servidor, en el mismo orden del plan formativo.</p>
+        <img src="static/resources/js-logo.svg" alt="Logotipo de JavaScript" class="animate-floaty hidden lg:block w-64 h-64 rounded-2xl">
+      </div>
 
-            <div id="roadmap"
-                 class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-panel3 rounded-xl overflow-hidden"></div>
+      <dl class="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-px bg-panel3 rounded-xl overflow-hidden">
+        <div class="bg-panel p-6">
+          <dd class="font-display font-bold text-4xl text-jsyellow" data-count="7">0</dd>
+          <dt class="mt-1 text-xs text-muted">Módulos evaluados</dt>
+        </div>
+        <div class="bg-panel p-6">
+          <dd class="font-display font-bold text-4xl text-jsyellow" data-count="21">0</dd>
+          <dt class="mt-1 text-xs text-muted">Preguntas de práctica</dt>
+        </div>
+        <div class="bg-panel p-6">
+          <dd class="font-display font-bold text-4xl text-jsyellow" data-count="2">0</dd>
+          <dt class="mt-1 text-xs text-muted">Formatos: teoría y código</dt>
+        </div>
+        <div class="bg-panel p-6">
+          <dd class="font-display font-bold text-4xl text-jsyellow">JWT</dd>
+          <dt class="mt-1 text-xs text-muted">El último tema del examen</dt>
+        </div>
+      </dl>
 
-            <div class="mt-6 flex flex-wrap gap-3">
+    </div>
+  </section>
+
+  <!-- ============ MAPA ============ -->
+  <section id="mapa" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Mapa del examen</h2>
+      <p class="mt-3 text-muted">Del navegador al servidor, en el mismo orden del plan formativo.</p>
+
+      <div id="roadmap" class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-panel3 rounded-xl overflow-hidden"></div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
         <span class="inline-flex items-center gap-2 bg-panel border border-panel3 rounded-lg px-3 py-2 text-xs text-mutedink">
           <span class="w-2 h-2 rounded-full bg-jsyellow"></span> Módulos 2 al 8: entran al examen
         </span>
-                <span class="inline-flex items-center gap-2 bg-panel border border-panel3 rounded-lg px-3 py-2 text-xs text-mutedink">
+        <span class="inline-flex items-center gap-2 bg-panel border border-panel3 rounded-lg px-3 py-2 text-xs text-mutedink">
           <span class="w-2 h-2 rounded-full bg-mutedink"></span> Módulos 1, 9 y 10: no se evalúan aquí
         </span>
-            </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODULOS ============ -->
+  <section id="modulos" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Qué entra en cada módulo</h2>
+          <p class="mt-3 text-muted">Abre uno y revisa sus temas con código de ejemplo.</p>
         </div>
-    </section>
+        <button id="toggle-all" type="button" class="font-mono text-xs text-muted hover:text-jsyellow border border-panel3 rounded px-3 py-2 transition-colors">
+          Abrir todos
+        </button>
+      </div>
 
-    <!-- ============ MODULOS ============ -->
-    <section id="modulos" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Qué entra en cada módulo</h2>
-                    <p class="mt-3 text-muted">Abre uno y revisa sus temas con código de ejemplo.</p>
-                </div>
-                <button id="toggle-all" type="button"
-                        class="font-mono text-xs text-muted hover:text-jsyellow border border-panel3 rounded px-3 py-2 transition-colors">
-                    Abrir todos
-                </button>
+      <div id="modules-list" class="mt-10 flex flex-col gap-3"></div>
+    </div>
+  </section>
+
+  <!-- ============ MINIEXAMEN ============ -->
+  <section id="repaso" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Tu plan de repaso</h2>
+      <p class="mt-3 text-muted">21 preguntas al nivel del examen. Elige una alternativa y verás al instante la correcta.</p>
+
+      <div class="mt-8 bg-jsyellow text-ink rounded-2xl p-6 sm:p-7">
+        <div class="grid sm:grid-cols-[1fr_auto] gap-6 items-center">
+          <div class="w-full">
+            <div class="flex items-end justify-between gap-4 mb-3">
+              <p class="font-display font-bold text-lg">Avance del miniexamen</p>
+              <p class="font-mono text-sm" id="progress-label">0 / 21 respondidas</p>
             </div>
-
-            <div id="modules-list" class="mt-10 flex flex-col gap-3"></div>
+            <div class="w-full h-3 rounded-full overflow-hidden bg-ink/20">
+              <div id="progress-fill" class="progress-fill h-full bg-ink rounded-full" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="text-center sm:text-right sm:border-l sm:border-ink/20 sm:pl-6">
+            <p class="font-display font-bold text-4xl" id="score-value">0</p>
+            <p class="text-xs text-ink/70">correctas</p>
+          </div>
         </div>
-    </section>
+        <button id="reset-quiz" type="button" class="mt-5 font-mono text-xs border border-ink/30 rounded px-3 py-2 hover:bg-ink/10 transition-colors">
+          Reiniciar respuestas
+        </button>
+      </div>
 
-    <!-- ============ MINIEXAMEN ============ -->
-    <section id="repaso" class="py-16 sm:py-20 px-5 sm:px-8 border-b border-panel3">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Tu plan de repaso</h2>
-            <p class="mt-3 text-muted">21 preguntas al nivel del examen. Elige una alternativa y verás al instante la
-                correcta.</p>
+      <div id="quiz" class="mt-10 flex flex-col gap-10"></div>
 
-            <div class="mt-8 bg-jsyellow text-ink rounded-2xl p-6 sm:p-7">
-                <div class="grid sm:grid-cols-[1fr_auto] gap-6 items-center">
-                    <div class="w-full">
-                        <div class="flex items-end justify-between gap-4 mb-3">
-                            <p class="font-display font-bold text-lg">Avance del miniexamen</p>
-                            <p class="font-mono text-sm" id="progress-label">0 / 21 respondidas</p>
-                        </div>
-                        <div class="w-full h-3 rounded-full overflow-hidden bg-ink/20">
-                            <div id="progress-fill" class="progress-fill h-full bg-ink rounded-full"
-                                 style="width:0%"></div>
-                        </div>
-                    </div>
-                    <div class="text-center sm:text-right sm:border-l sm:border-ink/20 sm:pl-6">
-                        <p class="font-display font-bold text-4xl" id="score-value">0</p>
-                        <p class="text-xs text-ink/70">correctas</p>
-                    </div>
-                </div>
-                <button id="reset-quiz" type="button"
-                        class="mt-5 font-mono text-xs border border-ink/30 rounded px-3 py-2 hover:bg-ink/10 transition-colors">
-                    Reiniciar respuestas
-                </button>
-            </div>
-
-            <div id="quiz" class="mt-10 flex flex-col gap-10"></div>
-
-            <!-- NotebookLM -->
-            <div class="mt-14 border border-jsyellow/40 rounded-2xl p-7 sm:p-8 bg-panel">
-                <h3 class="font-display font-bold text-2xl">¿Quieres seguir practicando?</h3>
-                <p class="mt-3 text-muted max-w-2xl">
-                    Preparé dos cuadernos en NotebookLM con cuestionarios y videos adicionales para profundizar en los
-                    módulos que más se preguntan.
-                </p>
-                <div class="mt-6 grid sm:grid-cols-2 gap-4">
-                    <a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46" target="_blank"
-                       rel="noopener"
-                       class="group bg-panel2 border border-panel3 hover:border-jsyellow rounded-xl p-5 transition-colors">
-                        <p class="font-mono text-[11px] text-jsyellow">Módulos 3 y 4</p>
-                        <p class="mt-2 font-display font-bold text-paper">Fundamentos y programación avanzada en
-                            JavaScript</p>
-                        <p class="mt-3 text-xs text-mutedink">Abrir en NotebookLM</p>
-                    </a>
-                    <a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e" target="_blank"
-                       rel="noopener"
-                       class="group bg-panel2 border border-panel3 hover:border-jsyellow rounded-xl p-5 transition-colors">
-                        <p class="font-mono text-[11px] text-jsyellow">Módulos 6, 7 y 8</p>
-                        <p class="mt-2 font-display font-bold text-paper">Node, Express, acceso a datos y APIs
-                            backend</p>
-                        <p class="mt-3 text-xs text-mutedink">Abrir en NotebookLM</p>
-                    </a>
-                </div>
-            </div>
+      <!-- NotebookLM -->
+      <div class="mt-14 border border-jsyellow/40 rounded-2xl p-7 sm:p-8 bg-panel">
+        <h3 class="font-display font-bold text-2xl">¿Quieres seguir practicando?</h3>
+        <p class="mt-3 text-muted max-w-2xl">
+          Preparé dos cuadernos en NotebookLM con cuestionarios y videos adicionales para profundizar en los módulos que más se preguntan.
+        </p>
+        <div class="mt-6 grid sm:grid-cols-2 gap-4">
+          <a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46" target="_blank" rel="noopener"
+             class="group bg-panel2 border border-panel3 hover:border-jsyellow rounded-xl p-5 transition-colors">
+            <p class="font-mono text-[11px] text-jsyellow">Módulos 3 y 4</p>
+            <p class="mt-2 font-display font-bold text-paper">Fundamentos y programación avanzada en JavaScript</p>
+            <p class="mt-3 text-xs text-mutedink">Abrir en NotebookLM</p>
+          </a>
+          <a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e" target="_blank" rel="noopener"
+             class="group bg-panel2 border border-panel3 hover:border-jsyellow rounded-xl p-5 transition-colors">
+            <p class="font-mono text-[11px] text-jsyellow">Módulos 6, 7 y 8</p>
+            <p class="mt-2 font-display font-bold text-paper">Node, Express, acceso a datos y APIs backend</p>
+            <p class="mt-3 text-xs text-mutedink">Abrir en NotebookLM</p>
+          </a>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- ============ CONSEJOS ============ -->
-    <section id="consejos" class="py-16 sm:py-20 px-5 sm:px-8">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Cómo llegar preparado</h2>
-            <p class="mt-3 text-muted">Seis hábitos que marcan la diferencia la semana previa.</p>
+  <!-- ============ CONSEJOS ============ -->
+  <section id="consejos" class="py-16 sm:py-20 px-5 sm:px-8">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">Cómo llegar preparado</h2>
+      <p class="mt-3 text-muted">Seis hábitos que marcan la diferencia la semana previa.</p>
 
-            <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <article class="bg-panel border border-panel3 rounded-xl p-6">
-                    <p class="font-display font-bold text-5xl text-jsyellow/30">01</p>
-                    <p class="mt-3 font-display font-bold text-paper">Escribe, no leas</p>
-                    <p class="mt-2 text-sm text-muted leading-relaxed">Teclea el código de memoria. Reconocer una
-                        sintaxis no es lo mismo que producirla bajo presión.</p>
-                </article>
-                <article class="bg-panel border border-panel3 rounded-xl p-6">
-                    <p class="font-display font-bold text-5xl text-jsyellow/30">02</p>
-                    <p class="mt-3 font-display font-bold text-paper">Explica en voz alta</p>
-                    <p class="mt-2 text-sm text-muted leading-relaxed">Si puedes explicar la diferencia entre <code
-                            class="font-mono text-paper">all</code> y <code
-                            class="font-mono text-paper">allSettled</code>, ya la sabes.</p>
-                </article>
-                <article class="bg-panel border border-panel3 rounded-xl p-6">
-                    <p class="font-display font-bold text-5xl text-jsyellow/30">03</p>
-                    <p class="mt-3 font-display font-bold text-paper">SQL sin autocompletado</p>
-                    <p class="mt-2 text-sm text-muted leading-relaxed">Practica <code class="font-mono text-paper">UPDATE</code>,
-                        <code class="font-mono text-paper">ALTER TABLE</code> y <code
-                                class="font-mono text-paper">JOIN</code> a mano, en papel.</p>
-                </article>
-                <article class="bg-panel border border-panel3 rounded-xl p-6">
-                    <p class="font-display font-bold text-5xl text-jsyellow/30">04</p>
-                    <p class="mt-3 font-display font-bold text-paper">Dibuja el flujo</p>
-                    <p class="mt-2 text-sm text-muted leading-relaxed">Ruta, middleware, controlador, modelo. Ubicar
-                        cada pieza evita confundir responsabilidades.</p>
-                </article>
-                <article class="bg-panel border border-panel3 rounded-xl p-6">
-                    <p class="font-display font-bold text-5xl text-jsyellow/30">05</p>
-                    <p class="mt-3 font-display font-bold text-paper">Rompe una transacción</p>
-                    <p class="mt-2 text-sm text-muted leading-relaxed">Provoca un error a propósito y observa el <code
-                            class="font-mono text-paper">rollback</code>. Se entiende viéndolo.</p>
-                </article>
-                <article class="bg-panel border border-panel3 rounded-xl p-6">
-                    <p class="font-display font-bold text-5xl text-jsyellow/30">06</p>
-                    <p class="mt-3 font-display font-bold text-paper">Repite el miniexamen</p>
-                    <p class="mt-2 text-sm text-muted leading-relaxed">Vuelve a las preguntas que fallaste hasta
-                        responderlas sin dudar.</p>
-                </article>
-            </div>
-        </div>
-    </section>
+      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-5xl text-jsyellow/30">01</p>
+          <p class="mt-3 font-display font-bold text-paper">Escribe, no leas</p>
+          <p class="mt-2 text-sm text-muted leading-relaxed">Teclea el código de memoria. Reconocer una sintaxis no es lo mismo que producirla bajo presión.</p>
+        </article>
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-5xl text-jsyellow/30">02</p>
+          <p class="mt-3 font-display font-bold text-paper">Explica en voz alta</p>
+          <p class="mt-2 text-sm text-muted leading-relaxed">Si puedes explicar la diferencia entre <code class="font-mono text-paper">all</code> y <code class="font-mono text-paper">allSettled</code>, ya la sabes.</p>
+        </article>
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-5xl text-jsyellow/30">03</p>
+          <p class="mt-3 font-display font-bold text-paper">SQL sin autocompletado</p>
+          <p class="mt-2 text-sm text-muted leading-relaxed">Practica <code class="font-mono text-paper">UPDATE</code>, <code class="font-mono text-paper">ALTER TABLE</code> y <code class="font-mono text-paper">JOIN</code> a mano, en papel.</p>
+        </article>
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-5xl text-jsyellow/30">04</p>
+          <p class="mt-3 font-display font-bold text-paper">Dibuja el flujo</p>
+          <p class="mt-2 text-sm text-muted leading-relaxed">Ruta, middleware, controlador, modelo. Ubicar cada pieza evita confundir responsabilidades.</p>
+        </article>
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-5xl text-jsyellow/30">05</p>
+          <p class="mt-3 font-display font-bold text-paper">Rompe una transacción</p>
+          <p class="mt-2 text-sm text-muted leading-relaxed">Provoca un error a propósito y observa el <code class="font-mono text-paper">rollback</code>. Se entiende viéndolo.</p>
+        </article>
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-5xl text-jsyellow/30">06</p>
+          <p class="mt-3 font-display font-bold text-paper">Repite el miniexamen</p>
+          <p class="mt-2 text-sm text-muted leading-relaxed">Vuelve a las preguntas que fallaste hasta responderlas sin dudar.</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
 </main>
 
 <!-- ============ FOOTER ============ -->
 <footer class="border-t border-panel3 bg-panel">
-    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-14">
-        <div class="grid md:grid-cols-[1.4fr_1fr_1fr] gap-10">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-14">
+    <div class="grid md:grid-cols-[1.4fr_1fr_1fr] gap-10">
 
-            <div>
-                <div class="flex items-center gap-3">
-                    <svg class="w-10 h-10 rounded-md" aria-hidden="true">
-                        <use href="#js-logo"/>
-                    </svg>
-                    <div>
-                        <p class="font-display font-bold text-paper">Felipe Cuevas</p>
-                        <p class="text-xs text-muted">Instructor · Bootcamp Desarrollador FullStack JavaScript</p>
-                    </div>
-                </div>
-                <p class="mt-5 text-sm text-muted max-w-sm leading-relaxed">
-                    Guía de estudio creada para las y los estudiantes que rinden la certificación de Talento Digital
-                    para Chile.
-                </p>
-                <a href="https://felipecuevas.dev" target="_blank" rel="noopener"
-                   class="mt-5 inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-xs px-4 py-2.5 rounded hover:bg-jsyellowdim transition-colors">
-                    felipecuevas.dev
-                </a>
-            </div>
-
-            <nav aria-label="Secciones de la guía">
-                <p class="font-display font-bold text-sm text-paper">Guía</p>
-                <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
-                    <li><a href="#mapa" class="hover:text-jsyellow transition-colors">Mapa del examen</a></li>
-                    <li><a href="#modulos" class="hover:text-jsyellow transition-colors">Módulos evaluados</a></li>
-                    <li><a href="#repaso" class="hover:text-jsyellow transition-colors">Miniexamen de práctica</a></li>
-                    <li><a href="#consejos" class="hover:text-jsyellow transition-colors">Consejos de preparación</a>
-                    </li>
-                </ul>
-            </nav>
-
-            <nav aria-label="Recursos para practicar">
-                <p class="font-display font-bold text-sm text-paper">Practicar más</p>
-                <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
-                    <li><a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46"
-                           target="_blank" rel="noopener" class="hover:text-jsyellow transition-colors">NotebookLM ·
-                        Módulos 3 y 4</a></li>
-                    <li><a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e"
-                           target="_blank" rel="noopener" class="hover:text-jsyellow transition-colors">NotebookLM ·
-                        Módulos 6, 7 y 8</a></li>
-                    <li><a href="https://felipecuevas.dev" target="_blank" rel="noopener"
-                           class="hover:text-jsyellow transition-colors">Sitio del instructor</a></li>
-                </ul>
-            </nav>
-
+      <div>
+        <div class="flex items-center gap-3">
+          <img src="static/resources/js-logo.svg" alt="" class="w-10 h-10 rounded-md">
+          <div>
+            <p class="font-display font-bold text-paper">Felipe Cuevas</p>
+            <p class="text-xs text-muted">Instructor · Bootcamp Desarrollador FullStack JavaScript</p>
+          </div>
         </div>
+        <p class="mt-5 text-sm text-muted max-w-sm leading-relaxed">
+          Guía de estudio creada para las y los estudiantes que rinden la certificación de Talento Digital para Chile.
+        </p>
+        <a href="https://felipecuevas.dev" target="_blank" rel="noopener"
+           class="mt-5 inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-xs px-4 py-2.5 rounded hover:bg-jsyellowdim transition-colors">
+          felipecuevas.dev
+        </a>
+      </div>
 
-        <div class="mt-12 pt-6 border-t border-panel3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <p class="font-mono text-xs text-mutedink max-w-xl">
-                Material de apoyo no oficial, elaborado a partir del testimonio de alumnos que ya rindieron el examen
-                2026.
-            </p>
-            <p class="font-mono text-xs text-mutedink">© <span id="year">2026</span> Felipe Cuevas</p>
-        </div>
+      <nav aria-label="Secciones de la guía">
+        <p class="font-display font-bold text-sm text-paper">Guía</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
+          <li><a href="#mapa" class="hover:text-jsyellow transition-colors">Mapa del examen</a></li>
+          <li><a href="#modulos" class="hover:text-jsyellow transition-colors">Módulos evaluados</a></li>
+          <li><a href="#repaso" class="hover:text-jsyellow transition-colors">Miniexamen de práctica</a></li>
+          <li><a href="#consejos" class="hover:text-jsyellow transition-colors">Consejos de preparación</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-label="Recursos para practicar">
+        <p class="font-display font-bold text-sm text-paper">Practicar más</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
+          <li><a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46" target="_blank" rel="noopener" class="hover:text-jsyellow transition-colors">NotebookLM · Módulos 3 y 4</a></li>
+          <li><a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e" target="_blank" rel="noopener" class="hover:text-jsyellow transition-colors">NotebookLM · Módulos 6, 7 y 8</a></li>
+          <li><a href="https://felipecuevas.dev" target="_blank" rel="noopener" class="hover:text-jsyellow transition-colors">Sitio del instructor</a></li>
+        </ul>
+      </nav>
+
     </div>
+
+    <div class="mt-12 pt-6 border-t border-panel3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <p class="font-mono text-xs text-mutedink max-w-xl">
+        Material de apoyo no oficial, elaborado a partir del testimonio de alumnos que ya rindieron el examen 2026.
+      </p>
+      <p class="font-mono text-xs text-mutedink">© <span id="year">2026</span> Felipe Cuevas</p>
+    </div>
+  </div>
 </footer>
 
-<script>
-    'use strict';
-
-    /* ============ Datos: módulos 2 al 8 del plan formativo ============ */
-    const modulesData = [
-        {
-            parte: 'Parte 1',
-            modulo: 'Módulo 2',
-            titulo: 'Fundamentos de Desarrollo Front-End',
-            resumen: '6 preguntas de selección múltiple + 2 ejercicios de código',
-            temas: [
-                'Uso y configuración de media queries para diseño responsivo',
-                'Comandos básicos de Git para el control de versiones',
-                'Estilos en línea mediante el atributo style',
-                'Imágenes circulares con dimensiones estrictas y enlaces envolventes',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Estructura y estilos en línea',
-                    detalle: 'Crear un <div> que contenga un <h1> en su interior aplicando estilos con el atributo style.',
-                    lang: 'html',
-                    code: '<div style="background-color:#1B1910; padding:24px; border-radius:12px;">\n  <h1 style="color:#F7DF1E; font-family:sans-serif; margin:0;">\n    ¡Hola, Bootcamp!\n  </h1>\n</div>',
-                },
-                {
-                    titulo: 'Imagen circular con enlace',
-                    detalle: 'Imagen de 150px de diámetro exacto que redirige a Google.com al hacer clic.',
-                    lang: 'html',
-                    code: '<a href="https://www.google.com" target="_blank" rel="noopener">\n  <img src="avatar.jpg" alt="Foto de perfil"\n       style="width:150px; height:150px;\n              border-radius:50%; object-fit:cover;">\n</a>',
-                },
-            ],
-        },
-        {
-            parte: 'Parte 2',
-            modulo: 'Módulo 3',
-            titulo: 'Fundamentos de Programación en JavaScript',
-            resumen: 'Evaluación práctica de lógica pura en JavaScript',
-            temas: [
-                'Control de flujo con switch / case',
-                'Manipulación de arreglos y objetos',
-                'Funciones que procesan colecciones de datos',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Disponibilidad de un auto (switch / case)',
-                    detalle: 'Evaluar el estado de un automóvil según sus variables y determinar si está disponible.',
-                    lang: 'javascript',
-                    code: "function estadoAuto(disponible, enMantencion) {\n  switch (true) {\n    case enMantencion:\n      return 'En mantención';\n    case disponible:\n      return 'Disponible';\n    default:\n      return 'No disponible';\n  }\n}",
-                },
-                {
-                    titulo: 'Promedio de notas por alumno',
-                    detalle: 'Recibir un arreglo de objetos con notas y devolver el promedio de cada alumno.',
-                    lang: 'javascript',
-                    code: 'function promedioPorAlumno(notas) {\n  const agrupado = {};\n  notas.forEach(({ nombre, nota }) => {\n    if (!agrupado[nombre]) agrupado[nombre] = [];\n    agrupado[nombre].push(nota);\n  });\n\n  return Object.entries(agrupado).map(([nombre, lista]) => ({\n    nombre,\n    promedio: lista.reduce((a, b) => a + b, 0) / lista.length,\n  }));\n}',
-                },
-            ],
-        },
-        {
-            parte: 'Parte 3',
-            modulo: 'Módulo 4',
-            titulo: 'Programación Avanzada en JavaScript',
-            resumen: 'Paradigmas y manejo de asincronía',
-            temas: [
-                'Conceptos de programación orientada a objetos (OOP)',
-                'Diferencias entre Promise.all() y Promise.allSettled()',
-                'Sintaxis correcta de funciones asíncronas con async / await',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Promise.all() frente a Promise.allSettled()',
-                    detalle: 'La primera se detiene ante el primer rechazo; la segunda espera el resultado de todas.',
-                    lang: 'javascript',
-                    code: 'const tareas = [fetchUsuario(), fetchPedidos(), fetchPagos()];\n\n// Se detiene si UNA promesa falla\nPromise.all(tareas)\n  .then(console.log)\n  .catch(console.error);\n\n// Espera a todas, exitosas o no\nPromise.allSettled(tareas).then((resultados) => {\n  resultados.forEach((r) => console.log(r.status));\n});',
-                },
-            ],
-        },
-        {
-            parte: 'Parte 4',
-            modulo: 'Módulo 5',
-            titulo: 'Fundamentos de Bases de Datos Relacionales',
-            resumen: 'Preguntas conceptuales y escritura de consultas SQL',
-            temas: [
-                'Modificación de datos con UPDATE',
-                'Estructura de tablas con ALTER TABLE: agregar columnas, cambiar tipos y ampliar tamaños',
-                'Construcción y uso de subconsultas',
-                'Modelo entidad-relación y relaciones de uno a muchos (1:N)',
-                'Consultas combinando JOIN, SUM() y WHERE',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Aumentar los precios en un 10%',
-                    detalle: 'Actualizar todos los registros de una tabla con UPDATE.',
-                    lang: 'sql',
-                    code: 'UPDATE productos\nSET precio = precio * 1.10;',
-                },
-                {
-                    titulo: 'Modificar una tabla existente',
-                    detalle: 'Agregar una columna y ampliar un VARCHAR(100) a VARCHAR(255) sin perder los datos.',
-                    lang: 'sql',
-                    code: 'ALTER TABLE usuarios\n  ADD COLUMN telefono VARCHAR(20);\n\nALTER TABLE usuarios\n  MODIFY COLUMN correo VARCHAR(255);',
-                },
-                {
-                    titulo: 'JOIN con SUM() y WHERE',
-                    detalle: 'Total gastado por cliente considerando solo los pedidos pagados.',
-                    lang: 'sql',
-                    code: "SELECT c.nombre, SUM(p.total) AS total_gastado\nFROM clientes c\nJOIN pedidos p ON p.cliente_id = c.id\nWHERE p.estado = 'pagado'\nGROUP BY c.nombre;",
-                },
-            ],
-        },
-        {
-            parte: 'Parte 5',
-            modulo: 'Módulo 6',
-            titulo: 'Desarrollo de Aplicaciones Web Node Express',
-            resumen: 'Arquitectura del servidor, enrutamiento y módulos',
-            temas: [
-                'Ejecución de un archivo Node desde la consola de comandos',
-                'Error al omitir ./ al importar módulos locales',
-                'Definición y propósito de un middleware',
-                'app.use() global frente a middleware en una ruta específica',
-                'La capa Modelo y la responsabilidad del Controlador en MVC',
-                'Uso de un motor de plantillas',
-                'Serialización de datos a JSON y desventajas de los archivos JSON planos',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Middleware global y por ruta',
-                    detalle: 'app.use() se aplica a toda petición; el middleware de ruta solo al endpoint indicado.',
-                    lang: 'javascript',
-                    code: "app.use((req, res, next) => {\n  console.log(req.method + ' ' + req.url);\n  next();\n});\n\napp.get('/perfil', verificarSesion, (req, res) => {\n  res.render('perfil');\n});",
-                },
-            ],
-        },
-        {
-            parte: 'Parte 6',
-            modulo: 'Módulo 7',
-            titulo: 'Acceso a Datos en Aplicaciones Node',
-            resumen: 'Persistencia avanzada, transacciones y ORM',
-            temas: [
-                'Pool de conexiones frente a conexiones individuales',
-                'Qué son los cursores y cómo funcionan',
-                'Transacciones SQL, UPDATE transaccional y ROLLBACK',
-                'Propósito principal de un ORM',
-                'Crear y actualizar registros con Sequelize',
-                'Relaciones N:M, método belongsTo y acceso a datos vinculados en 1:N',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Transacción con Sequelize',
-                    detalle: 'Confirmar los cambios con commit() o revertirlos con rollback() ante un error.',
-                    lang: 'javascript',
-                    code: 'const t = await sequelize.transaction();\ntry {\n  await Cuenta.update(\n    { saldo: nuevoSaldo },\n    { where: { id }, transaction: t }\n  );\n  await t.commit();\n} catch (error) {\n  await t.rollback();\n}',
-                },
-                {
-                    titulo: 'Asociación belongsTo',
-                    detalle: 'Un pedido pertenece a un cliente; se accede al dato relacionado con include.',
-                    lang: 'javascript',
-                    code: "Pedido.belongsTo(Cliente, { foreignKey: 'clienteId' });\n\nconst pedido = await Pedido.findOne({ include: Cliente });",
-                },
-            ],
-        },
-        {
-            parte: 'Parte 7',
-            modulo: 'Módulo 8',
-            titulo: 'Implementación de API Backend Node Express',
-            resumen: 'Buenas prácticas REST y autenticación con JWT',
-            temas: [
-                'JSON como formato de intercambio en servicios REST',
-                'Uso semántico del verbo HTTP PUT y el verbo más seguro según REST',
-                'Definición de rutas en Express y modularización',
-                'El middleware incorporado express.json()',
-                'Respuesta JSON forzando el código de estado 201 (Created)',
-                'Objetivo del JWT, su generación en Node.js y prevención de vulnerabilidades',
-            ],
-            ejercicios: [
-                {
-                    titulo: 'Ruta con respuesta 201',
-                    detalle: 'Crear un recurso y responder con el código de estado correcto en formato JSON.',
-                    lang: 'javascript',
-                    code: "app.use(express.json());\n\napp.post('/usuarios', (req, res) => {\n  const nuevoUsuario = crearUsuario(req.body);\n  res.status(201).json(nuevoUsuario);\n});",
-                },
-                {
-                    titulo: 'Generar un JWT',
-                    detalle: 'Firmar un token con una clave secreta fuera del código y un tiempo de expiración.',
-                    lang: 'javascript',
-                    code: "const jwt = require('jsonwebtoken');\n\nconst token = jwt.sign(\n  { id: usuario.id },\n  process.env.JWT_SECRET,\n  { expiresIn: '1h' }\n);",
-                },
-            ],
-        },
-    ];
-
-    /* ============ Preguntas del miniexamen ============ */
-    const quizData = [
-        {
-            modulo: 'Módulo 2',
-            titulo: 'Fundamentos de Desarrollo Front-End',
-            preguntas: [
-                {
-                    q: '¿Qué media query aplica estilos únicamente entre 768px y 1024px de ancho?',
-                    opciones: [
-                        '@media (min-width: 768px) and (max-width: 1024px)',
-                        '@media (width: 768px, 1024px)',
-                        '@media (min-width: 768px) or (max-width: 1024px)',
-                        '@media screen (768px - 1024px)',
-                    ],
-                    correcta: 0,
-                    explica: 'Las condiciones se combinan con and; or no existe como operador en media queries.',
-                },
-                {
-                    q: '¿Qué propiedad convierte una imagen de 150x150px en un círculo perfecto?',
-                    opciones: ['border-radius: 50%', 'overflow: hidden', 'object-fit: cover', 'clip-path: inset(50%)'],
-                    correcta: 0,
-                    explica: 'El 50% del ancho y alto genera la curvatura completa; object-fit solo controla el recorte interno.',
-                },
-                {
-                    q: '¿Qué comando trae los cambios del remoto sin fusionarlos en tu rama actual?',
-                    opciones: ['git fetch', 'git pull', 'git clone', 'git merge'],
-                    correcta: 0,
-                    explica: 'git pull equivale a fetch más merge; fetch por sí solo no altera tu rama de trabajo.',
-                },
-            ],
-        },
-        {
-            modulo: 'Módulo 3',
-            titulo: 'Fundamentos de Programación en JavaScript',
-            preguntas: [
-                {
-                    q: 'En un switch, ¿qué ocurre si un case coincide y no incluye la sentencia break?',
-                    opciones: [
-                        'Se ejecutan también los case siguientes',
-                        'Lanza un SyntaxError en tiempo de ejecución',
-                        'Salta directamente al bloque default',
-                        'Sale del switch de igual forma',
-                    ],
-                    correcta: 0,
-                    explica: 'Es el comportamiento de caída o fall-through: la ejecución continúa hasta encontrar un break.',
-                },
-                {
-                    q: '¿Qué método recorre un arreglo y devuelve un único valor acumulado?',
-                    opciones: ['reduce()', 'map()', 'filter()', 'forEach()'],
-                    correcta: 0,
-                    explica: 'map y filter devuelven arreglos nuevos; forEach no devuelve nada.',
-                },
-                {
-                    q: '¿Qué devuelve [10, 20, 30].map(n => n * 2).filter(n => n > 40)?',
-                    opciones: ['[60]', '[40, 60]', '[20, 40, 60]', '[]'],
-                    correcta: 0,
-                    explica: 'map produce [20, 40, 60] y filter conserva solo los estrictamente mayores que 40.',
-                },
-            ],
-        },
-        {
-            modulo: 'Módulo 4',
-            titulo: 'Programación Avanzada en JavaScript',
-            preguntas: [
-                {
-                    q: 'Si una promesa del arreglo se rechaza, ¿qué hace Promise.all() con las demás?',
-                    opciones: [
-                        'Rechaza de inmediato y descarta los resultados',
-                        'Espera a todas y devuelve el estado de cada una',
-                        'Devuelve solo las que se cumplieron',
-                        'Reintenta automáticamente la promesa rechazada',
-                    ],
-                    correcta: 0,
-                    explica: 'Ese comportamiento de esperar a todas y reportar cada estado es propio de allSettled.',
-                },
-                {
-                    q: '¿Qué palabra clave invoca el constructor de la clase padre en JavaScript?',
-                    opciones: ['super', 'this', 'extends', 'prototype'],
-                    correcta: 0,
-                    explica: 'extends declara la herencia, pero es super() quien ejecuta el constructor heredado.',
-                },
-                {
-                    q: '¿Qué devuelve siempre una función async, sin importar el valor de su return?',
-                    opciones: ['Una promesa', 'El valor del return', 'undefined', 'Una función callback'],
-                    correcta: 0,
-                    explica: 'El valor retornado queda envuelto en una promesa resuelta de forma automática.',
-                },
-            ],
-        },
-        {
-            modulo: 'Módulo 5',
-            titulo: 'Fundamentos de Bases de Datos Relacionales',
-            preguntas: [
-                {
-                    q: '¿Qué consulta aumenta en 10% el precio de todos los productos de la tabla?',
-                    opciones: [
-                        'UPDATE productos SET precio = precio * 1.10;',
-                        'ALTER TABLE productos SET precio = precio + 10%;',
-                        'SELECT precio * 1.10 FROM productos;',
-                        'UPDATE productos SET precio = 10% WHERE precio > 0;',
-                    ],
-                    correcta: 0,
-                    explica: 'SELECT solo consulta sin modificar, y ALTER TABLE cambia la estructura, no los datos.',
-                },
-                {
-                    q: '¿Qué sentencia amplía un VARCHAR(100) a VARCHAR(255) sin perder los datos?',
-                    opciones: [
-                        'ALTER TABLE clientes MODIFY COLUMN correo VARCHAR(255);',
-                        'UPDATE clientes SET correo = VARCHAR(255);',
-                        'ALTER TABLE clientes DROP COLUMN correo;',
-                        'ALTER TABLE clientes RENAME COLUMN correo VARCHAR(255);',
-                    ],
-                    correcta: 0,
-                    explica: 'Ampliar el tamaño conserva el contenido; eliminar la columna lo destruiría.',
-                },
-                {
-                    q: 'En una relación de uno a muchos, ¿dónde se ubica la clave foránea?',
-                    opciones: [
-                        'En la tabla del lado "muchos"',
-                        'En la tabla del lado "uno"',
-                        'En ambas tablas por igual',
-                        'En una tabla intermedia obligatoria',
-                    ],
-                    correcta: 0,
-                    explica: 'La tabla intermedia corresponde a relaciones de muchos a muchos, no a 1:N.',
-                },
-            ],
-        },
-        {
-            modulo: 'Módulo 6',
-            titulo: 'Desarrollo de Aplicaciones Web Node Express',
-            preguntas: [
-                {
-                    q: '¿Qué error lanza Node al importar un módulo local si se omite el prefijo ./?',
-                    opciones: ['MODULE_NOT_FOUND', 'SyntaxError', 'TypeError', 'ReferenceError'],
-                    correcta: 0,
-                    explica: 'Sin ./ Node busca el módulo en node_modules en lugar del directorio del archivo.',
-                },
-                {
-                    q: 'En el patrón MVC, ¿cuál es la responsabilidad exacta del controlador?',
-                    opciones: [
-                        'Recibir la petición, coordinar el modelo y entregar la respuesta',
-                        'Definir la estructura y las reglas de los datos',
-                        'Renderizar el HTML que finalmente ve el usuario',
-                        'Abrir y administrar la conexión con la base de datos',
-                    ],
-                    correcta: 0,
-                    explica: 'Definir los datos corresponde al modelo y renderizar la salida corresponde a la vista.',
-                },
-                {
-                    q: '¿Qué distingue a app.use() de un middleware declarado en una ruta específica?',
-                    opciones: [
-                        'Se ejecuta en toda petición que coincida con la ruta base',
-                        'Solo funciona con peticiones de tipo GET',
-                        'Se ejecuta siempre después del middleware de ruta',
-                        'No puede invocar la función next()',
-                    ],
-                    correcta: 0,
-                    explica: 'El middleware de ruta se limita al endpoint declarado; app.use() es de alcance general.',
-                },
-            ],
-        },
-        {
-            modulo: 'Módulo 7',
-            titulo: 'Acceso a Datos en Aplicaciones Node',
-            preguntas: [
-                {
-                    q: '¿Cuál es la ventaja de un pool frente a abrir conexiones individuales?',
-                    opciones: [
-                        'Reutiliza conexiones abiertas y evita el costo de crearlas',
-                        'Cifra de forma automática todas las consultas SQL',
-                        'Elimina la necesidad de usar transacciones',
-                        'Permite consultar varias bases de datos a la vez',
-                    ],
-                    correcta: 0,
-                    explica: 'Abrir una conexión es costoso; el pool las mantiene disponibles y las recicla.',
-                },
-                {
-                    q: 'Si un UPDATE falla dentro de una transacción, ¿qué operación revierte los cambios?',
-                    opciones: ['ROLLBACK', 'COMMIT', 'DELETE', 'TRUNCATE'],
-                    correcta: 0,
-                    explica: 'COMMIT confirmaría los cambios; ROLLBACK devuelve la base al estado previo.',
-                },
-                {
-                    q: 'En Sequelize, ¿qué método se declara en el modelo que tiene la clave foránea?',
-                    opciones: ['belongsTo', 'hasMany', 'belongsToMany', 'hasOne'],
-                    correcta: 0,
-                    explica: 'hasMany y hasOne se declaran en el modelo padre; belongsToMany indica una relación N:M.',
-                },
-            ],
-        },
-        {
-            modulo: 'Módulo 8',
-            titulo: 'Implementación de API Backend Node Express',
-            preguntas: [
-                {
-                    q: 'Según REST, ¿cuál es el uso semántico correcto del verbo HTTP PUT?',
-                    opciones: [
-                        'Reemplazar por completo un recurso existente',
-                        'Crear un recurso nuevo sin conocer su identificador',
-                        'Modificar solo algunos campos del recurso',
-                        'Eliminar un recurso del servidor',
-                    ],
-                    correcta: 0,
-                    explica: 'La actualización parcial corresponde a PATCH y la creación sin id, a POST.',
-                },
-                {
-                    q: '¿Para qué sirve el middleware incorporado express.json() en una API?',
-                    opciones: [
-                        'Convierte el cuerpo JSON de la petición en un objeto en req.body',
-                        'Convierte la respuesta del servidor a formato JSON',
-                        'Valida el esquema del JSON que llega al servidor',
-                        'Habilita las peticiones provenientes de otros dominios',
-                    ],
-                    correcta: 0,
-                    explica: 'Sin este middleware, req.body llega vacío o indefinido al controlador.',
-                },
-                {
-                    q: '¿Qué buena práctica reduce el riesgo ante el robo de un JWT?',
-                    opciones: [
-                        'Definir expiración corta y guardar el secreto fuera del código',
-                        'Incluir la contraseña del usuario dentro del payload',
-                        'Firmar el token usando el algoritmo none',
-                        'Enviar el token como parámetro visible en la URL',
-                    ],
-                    correcta: 0,
-                    explica: 'El payload es legible por cualquiera y el algoritmo none anula por completo la firma.',
-                },
-            ],
-        },
-    ];
-
-    /* ============ Utilidades ============ */
-    const $ = (sel, scope = document) => scope.querySelector(sel);
-    const $$ = (sel, scope = document) => Array.from(scope.querySelectorAll(sel));
-
-    /** Escapa cualquier texto dinámico antes de insertarlo en el DOM. */
-    function esc(str) {
-        return String(str).replace(/[&<>"']/g, (c) => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-        }[c]));
-    }
-
-    function shuffle(array) {
-        const copy = array.slice();
-        for (let i = copy.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy;
-    }
-
-    /* ============ Mapa del examen ============ */
-    function renderRoadmap() {
-        $('#roadmap').innerHTML = modulesData
-            .map(
-                (m, i) => `
-      <a href="#modulo-${i}" class="bg-panel hover:bg-panel2 transition-colors p-6 flex flex-col gap-2">
-        <span class="font-mono text-[11px] text-mutedink">${esc(m.parte)}</span>
-        <span class="font-display font-bold text-jsyellow text-sm">${esc(m.modulo)}</span>
-        <span class="font-display font-semibold text-paper leading-snug text-sm">${esc(m.titulo)}</span>
-      </a>`
-            )
-            .join('');
-    }
-
-    /* ============ Módulos ============ */
-    function renderModules() {
-        $('#modules-list').innerHTML = modulesData
-            .map((m, i) => {
-                const temas = m.temas
-                    .map(
-                        (t) => `<li class="flex gap-3 text-sm text-muted leading-relaxed"><span class="text-jsyellow shrink-0">·</span><span>${esc(t)}</span></li>`
-                    )
-                    .join('');
-
-                const ejercicios = (m.ejercicios || [])
-                    .map((ej, j) => {
-                        const codeId = `code-${i}-${j}`;
-                        return `
-          <div class="${j > 0 ? 'mt-6' : ''}">
-            <p class="font-sans font-semibold text-sm text-paper">${esc(ej.titulo)}</p>
-            <p class="text-sm text-muted mt-1">${esc(ej.detalle)}</p>
-            <div class="mt-3 rounded-lg overflow-hidden border border-panel3">
-              <div class="flex items-center justify-between bg-panel2 px-4 py-2">
-                <span class="font-mono text-[11px] text-muted">${esc(ej.lang)}</span>
-                <button type="button" class="code-copy-btn font-mono text-[11px] text-muted hover:text-jsyellow transition-colors" data-target="${codeId}">Copiar</button>
-              </div>
-              <pre class="bg-ink px-4 py-4 overflow-x-auto"><code id="${codeId}" class="font-mono text-[12.5px] leading-6 text-paper/90">${esc(ej.code)}</code></pre>
-            </div>
-          </div>`;
-                    })
-                    .join('');
-
-                return `
-      <article id="modulo-${i}" class="scroll-mt-24 bg-panel border border-panel3 rounded-xl overflow-hidden">
-        <button type="button" class="module-toggle w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left" aria-expanded="false" aria-controls="panel-${i}">
-          <div class="flex items-center gap-4 min-w-0">
-            <span class="font-display font-bold text-jsyellow text-sm shrink-0 w-20">${esc(m.modulo)}</span>
-            <div class="min-w-0">
-              <h3 class="font-display font-bold text-base sm:text-lg text-paper leading-snug">${esc(m.titulo)}</h3>
-              <p class="text-xs text-mutedink font-mono mt-1">${esc(m.parte)} · ${esc(m.resumen)}</p>
-            </div>
-          </div>
-          <svg class="chevron w-5 h-5 text-jsyellow shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div id="panel-${i}" class="accordion-panel">
-          <div class="px-5 sm:px-6 pb-7 border-t border-panel3 pt-6">
-            <p class="font-mono text-[11px] text-mutedink mb-3">Temas evaluados</p>
-            <ul class="flex flex-col gap-2">${temas}</ul>
-            ${ejercicios ? `<p class="font-mono text-[11px] text-mutedink mt-7 mb-2">Código de ejemplo</p>${ejercicios}` : ''}
-          </div>
-        </div>
-      </article>`;
-            })
-            .join('');
-
-        $$('.module-toggle').forEach((btn) => {
-            btn.addEventListener('click', () => setModuleOpen(btn, btn.getAttribute('aria-expanded') !== 'true'));
-        });
-
-        $$('.code-copy-btn').forEach((btn) => {
-            btn.addEventListener('click', async () => {
-                const codeEl = document.getElementById(btn.dataset.target);
-                const original = btn.textContent;
-                try {
-                    await navigator.clipboard.writeText(codeEl.textContent);
-                    btn.textContent = 'Copiado';
-                } catch (error) {
-                    btn.textContent = 'No se pudo copiar';
-                }
-                setTimeout(() => {
-                    btn.textContent = original;
-                }, 1500);
-            });
-        });
-    }
-
-    function setModuleOpen(btn, open) {
-        const panel = document.getElementById(btn.getAttribute('aria-controls'));
-        btn.setAttribute('aria-expanded', String(open));
-        btn.parentElement.classList.toggle('is-open', open);
-        panel.classList.toggle('is-open', open);
-    }
-
-    function setupToggleAll() {
-        const btn = $('#toggle-all');
-        btn.addEventListener('click', () => {
-            const shouldOpen = btn.textContent.trim() === 'Abrir todos';
-            $$('.module-toggle').forEach((t) => setModuleOpen(t, shouldOpen));
-            btn.textContent = shouldOpen ? 'Cerrar todos' : 'Abrir todos';
-        });
-    }
-
-    /* ============ Miniexamen ============ */
-    const quizState = {respondidas: 0, correctas: 0, total: 0};
-
-    function renderQuiz() {
-        const container = $('#quiz');
-        let index = 0;
-
-        container.innerHTML = quizData
-            .map((grupo) => {
-                const preguntas = grupo.preguntas
-                    .map((p) => {
-                        const qid = `q${index++}`;
-                        const opciones = shuffle(p.opciones.map((texto, i) => ({texto, correcta: i === p.correcta})));
-                        const botones = opciones
-                            .map(
-                                (o) => `
-            <button type="button" class="quiz-option text-left w-full border border-panel3 rounded-lg px-4 py-3 text-sm text-paper/90 hover:border-jsyellow transition-colors"
-                    data-q="${qid}" data-correct="${o.correcta}">
-              ${esc(o.texto)}
-            </button>`
-                            )
-                            .join('');
-
-                        return `
-          <li class="bg-panel border border-panel3 rounded-xl p-5 sm:p-6" data-question="${qid}">
-            <p class="font-display font-bold text-paper leading-snug">${esc(p.q)}</p>
-            <div class="mt-4 grid gap-2">${botones}</div>
-            <p class="quiz-feedback hidden mt-4 text-sm text-muted border-l-2 border-jsyellow pl-3">${esc(p.explica)}</p>
-          </li>`;
-                    })
-                    .join('');
-
-                return `
-      <div>
-        <div class="flex items-baseline gap-3 mb-4">
-          <span class="font-display font-bold text-jsyellow text-sm">${esc(grupo.modulo)}</span>
-          <span class="font-display font-semibold text-paper">${esc(grupo.titulo)}</span>
-        </div>
-        <ul class="grid gap-4">${preguntas}</ul>
-      </div>`;
-            })
-            .join('');
-
-        quizState.total = index;
-
-        if (!container.dataset.bound) {
-            container.addEventListener('click', (event) => {
-                const btn = event.target.closest('.quiz-option');
-                if (!btn || btn.disabled) return;
-                answerQuestion(btn);
-            });
-            container.dataset.bound = 'true';
-        }
-
-        updateQuizProgress();
-    }
-
-    function answerQuestion(btn) {
-        const item = btn.closest('[data-question]');
-        const opciones = $$('.quiz-option', item);
-        const acerto = btn.dataset.correct === 'true';
-
-        opciones.forEach((o) => {
-            o.disabled = true;
-            if (o.dataset.correct === 'true') o.dataset.state = 'correct';
-            else if (o === btn) o.dataset.state = 'wrong';
-            else o.dataset.state = 'dimmed';
-        });
-
-        $('.quiz-feedback', item).classList.remove('hidden');
-
-        quizState.respondidas += 1;
-        if (acerto) quizState.correctas += 1;
-        updateQuizProgress();
-    }
-
-    function updateQuizProgress() {
-        const {respondidas, correctas, total} = quizState;
-        const pct = total === 0 ? 0 : Math.round((respondidas / total) * 100);
-        $('#progress-fill').style.width = pct + '%';
-        $('#progress-label').textContent = `${respondidas} / ${total} respondidas`;
-        $('#score-value').textContent = String(correctas);
-    }
-
-    function setupQuizReset() {
-        $('#reset-quiz').addEventListener('click', () => {
-            quizState.respondidas = 0;
-            quizState.correctas = 0;
-            renderQuiz();
-            $('#repaso').scrollIntoView({behavior: 'smooth', block: 'start'});
-        });
-    }
-
-    /* ============ Contadores del hero ============ */
-    function animateCounters() {
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        $$('[data-count]').forEach((el) => {
-            const target = Number(el.dataset.count);
-            if (reduce) {
-                el.textContent = String(target);
-                return;
-            }
-            let current = 0;
-            const step = Math.max(1, Math.round(target / 24));
-            const timer = setInterval(() => {
-                current = Math.min(target, current + step);
-                el.textContent = String(current);
-                if (current >= target) clearInterval(timer);
-            }, 45);
-        });
-    }
-
-    /* ============ Menú móvil ============ */
-    function setupMobileMenu() {
-        const toggle = $('#menu-toggle');
-        const menu = $('#mobile-menu');
-        toggle.addEventListener('click', () => {
-            const isOpen = toggle.getAttribute('aria-expanded') === 'true';
-            toggle.setAttribute('aria-expanded', String(!isOpen));
-            menu.classList.toggle('hidden', isOpen);
-        });
-        $$('.mobile-link', menu).forEach((link) =>
-            link.addEventListener('click', () => {
-                toggle.setAttribute('aria-expanded', 'false');
-                menu.classList.add('hidden');
-            })
-        );
-    }
-
-    /* ============ Sección activa ============ */
-    function setupScrollSpy() {
-        const links = $$('.nav-link');
-        const sections = ['mapa', 'modulos', 'repaso', 'consejos']
-            .map((id) => document.getElementById(id))
-            .filter(Boolean);
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    links.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id));
-                });
-            },
-            {rootMargin: '-45% 0px -50% 0px'}
-        );
-
-        sections.forEach((section) => observer.observe(section));
-    }
-
-    /* ============ Inicio ============ */
-    document.addEventListener('DOMContentLoaded', () => {
-        renderRoadmap();
-        renderModules();
-        setupToggleAll();
-        renderQuiz();
-        setupQuizReset();
-        setupMobileMenu();
-        setupScrollSpy();
-        animateCounters();
-        $('#year').textContent = String(new Date().getFullYear());
-    });
-</script>
+<script type="module" src="static/js/main.js"></script>
 
 </body>
 </html>

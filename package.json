@@ -1,0 +1,17 @@
+{
+  "name": "guia-certificacion-fullstack-js",
+  "version": "1.0.0",
+  "description": "Guia de estudio para el examen de certificacion del Bootcamp Desarrollador FullStack JavaScript de Talento Digital para Chile.",
+  "private": true,
+  "author": "Felipe Cuevas (https://felipecuevas.dev)",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./static/css/style.css --minify",
+    "serve": "npx serve .",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

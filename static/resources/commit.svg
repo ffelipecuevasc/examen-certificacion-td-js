@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+     viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
+    <path fill="currentColor"
+          d="M12 16.5q-1.748 0-2.985-1.137T7.504 12.5H3v-1h4.504q.273-1.725 1.51-2.863T12 7.5t2.995 1.138t1.501 2.862H21v1h-4.504q-.254 1.725-1.5 2.863Q13.747 16.5 12 16.5m0-1q1.442 0 2.471-1.029T15.5 12t-1.029-2.471T12 8.5T9.529 9.529T8.5 12t1.029 2.471T12 15.5"/>
+</svg>

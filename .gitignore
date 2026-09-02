@@ -35,6 +35,7 @@ lerna-debug.log*
 .cache/
 .parcel-cache/
 dist-ssr/
+src/input.css
 
 # ==========================================
 # WEBSTORM & JETBRAINS IDEs
