@@ -6,10 +6,11 @@
   "author": "Felipe Cuevas (https://felipecuevas.dev)",
   "license": "MIT",
   "scripts": {
-    "dev": "tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
-    "build": "tailwindcss -i ./src/input.css -o ./static/css/style.css --minify",
+    "dev": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
+    "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify",
     "serve": "npx serve .",
-    "start": "npm run dev"
+    "start": "npm run dev",
+    "icons": "node scripts/build-icons.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17"

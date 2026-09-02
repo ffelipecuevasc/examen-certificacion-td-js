@@ -39,11 +39,13 @@ export const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Devuelve el markup de un icono de static/resources/.
- * Usa mascaras CSS, por lo que el icono toma el color del texto del contenedor.
+ * Devuelve el markup de un icono.
+ * Las formas se generan en static/css/icons.css a partir de static/resources/
+ * mediante `npm run icons`, y se pintan con mascaras CSS: el icono toma el
+ * color del texto del contenedor.
  * @param {string} name  Nombre del archivo sin extension, por ejemplo 'database'.
  * @param {string} extra Clases de Tailwind adicionales, por ejemplo 'text-xl text-jsyellow'.
  */
 export function icon(name, extra = '') {
-  return `<span class="icon ${esc(extra)}" style="--icon:url('static/resources/${esc(name)}.svg')" aria-hidden="true"></span>`;
+  return `<span class="icon i-${esc(name)} ${esc(extra)}" aria-hidden="true"></span>`;
 }
