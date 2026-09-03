@@ -23,6 +23,19 @@ function mostrar(contenedor, nombreIcono, texto) {
   contenedor.classList.add('inline-flex');
 }
 
+/**
+ * Anuncia el entorno cuando NO es produccion.
+ *
+ * En produccion se calla: al estudiante no le aporta nada. En una vista previa o
+ * en local, en cambio, es la diferencia entre revisar lo que crees que estas
+ * revisando y revisar otra cosa. La regla es que el aviso aparezca solo, sin que
+ * nadie tenga que acordarse de mirarlo.
+ */
+function sufijoDeEntorno(entorno) {
+  if (!entorno || entorno === 'produccion') return '';
+  return ` · Entorno: ${entorno}.`;
+}
+
 export async function renderEstadoDatos() {
   const contenedor = $('#estado-datos');
   if (!contenedor) return;
@@ -51,5 +64,5 @@ export async function renderEstadoDatos() {
     ? 'Banco de preguntas: conectado, todavía sin contenido.'
     : `Banco de preguntas: conectado (${prueba.datos.length} registros de prueba).`;
 
-  mostrar(contenedor, 'database', texto);
+  mostrar(contenedor, 'database', texto + sufijoDeEntorno(estado.datos?.entorno));
 }

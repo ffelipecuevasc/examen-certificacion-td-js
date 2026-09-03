@@ -13,13 +13,31 @@
  */
 import { respuestaOk, soloLectura } from './_comun.js';
 
-export const onRequest = soloLectura(async ({ base }) => {
+/**
+ * Contra que entorno esta hablando esta respuesta.
+ *
+ * El nombre sale de la variable ENTORNO, declarada por separado en cada entorno
+ * dentro de wrangler.toml: `produccion` arriba, `pruebas` en el bloque de vista
+ * previa. El caso local no puede salir de ahi, porque el desarrollo local usa la
+ * configuracion de arriba con una base D1 local; se reconoce por el dominio de la
+ * peticion, que es el unico dato que lo distingue sin lugar a dudas.
+ */
+function nombreDelEntorno(request, env) {
+  const dominio = new URL(request.url).hostname;
+  if (dominio === 'localhost' || dominio === '127.0.0.1' || dominio === '[::1]') {
+    return 'local';
+  }
+  return env?.ENTORNO ?? 'desconocido';
+}
+
+export const onRequest = soloLectura(async ({ base, request, env }) => {
   // Consulta deliberadamente trivial: no depende de ninguna tabla, asi que
   // distingue «la base no contesta» de «la tabla no existe».
   const { results } = await base.prepare('SELECT 1 AS vivo').all();
 
   return respuestaOk({
     servicio: 'capa de datos',
+    entorno: nombreDelEntorno(request, env),
     enlace_d1: 'presente',
     consulta_d1: results?.[0]?.vivo === 1 ? 'correcta' : 'inesperada',
   });

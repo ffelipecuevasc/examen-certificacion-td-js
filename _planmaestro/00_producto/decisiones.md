@@ -484,3 +484,59 @@ sustituye por una ADR nueva.
 estable entre versiones de la herramienta. Un cambio de formato produciría un diff
 enorme que no corresponde a ningún cambio de contenido. Si ocurre, se acota el
 volcado o se normaliza antes de guardarlo; se sabrá en la primera exportación real.
+
+---
+
+## ADR-015 · Claude Code no ejecuta wrangler contra la cuenta de Cloudflare
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-03
+
+**Decisión.** Claude Code puede ejecutar wrangler **solo en local**. La regla es
+comprobable mirando el comando: todo lo que ejecute lleva `--local` explícito, y la
+única excepción es `wrangler pages dev`, que es local por definición. Todo lo demás
+—`--remote`, `d1 create`, `d1 delete`, `d1 export`, `d1 time-travel`,
+`pages deploy`, `login`, `secret`— lo **escribe** Claude Code y lo **ejecuta** el
+autor en su terminal.
+
+La regla vive además en `CLAUDE.md`, que es donde se lee al empezar cada sesión.
+Esta ADR guarda el motivo, que en `CLAUDE.md` no cabe.
+
+**Motivo.** Al incorporar wrangler (ADR-013) e iniciar sesión con `wrangler login`,
+**la herramienta quedó autorizada con permisos amplios sobre la cuenta**: crear y
+borrar bases de datos, leer y escribir su contenido, desplegar el sitio. Esa
+autorización no se puede acotar por comando ni distinguir quién teclea. Desde que
+existe, cualquier proceso que corra en ese equipo actúa como el autor.
+
+Eso cambia el significado de una regla que ya existía. «Claude Code no toca
+producción» era, hasta la iteración 12, una descripción de la realidad: no había
+manera de tocarla. Después de `wrangler login` pasó a ser una intención, y las
+intenciones no protegen nada. Un `--remote` de más, un nombre de base equivocado en
+un comando por lo demás correcto, y el daño ya ocurrió: `d1 execute --file` empieza
+con un `DROP TABLE`, y `d1 time-travel restore` sobrescribe la base en su lugar.
+
+La regla se escribe con un predicado —lleva `--local` o no lo lleva— justamente para
+que se pueda verificar mirando, sin interpretar la intención de nadie.
+
+**Alternativa descartada.** Crear un token de API acotado, de solo lectura, para uso
+de Claude Code. Se descarta por tres razones: sigue siendo una credencial que hay
+que crear, guardar y rotar, que es exactamente lo que la iteración 13 quiere
+reducir; las operaciones peligrosas no son las de lectura, así que un token de
+lectura no resolvería el problema que motiva esta ADR; y el trabajo diario no lo
+necesita, porque `--local` y `pages dev` cubren el desarrollo completo. Se puede
+reevaluar el día que haga falta automatizar lecturas remotas.
+
+**Consecuencia.** El ciclo es más lento en todo lo que toque la nube: Claude Code
+escribe el comando, el autor lo ejecuta y trae el resultado. Se asume a cambio de
+que ninguna operación irreversible ocurra sin que una persona la haya leído antes.
+
+**Consecuencia deseada.** Todo lo que se ejecutó contra la cuenta queda en un solo
+historial, el del terminal del autor, en vez de repartido entre sesiones de una
+herramienta. Cuando algo salga raro en la base, hay un único lugar donde mirar.
+
+**Consecuencia.** Los procedimientos de `90-manual/` dejan de ser documentación de
+respaldo y pasan a ser el camino normal de trabajo. Si están mal escritos, se nota
+enseguida, que es la mejor forma de mantenerlos vivos.
+
+**Límite explícito.** Esto no es una restricción sobre lo que Claude Code puede
+*proponer*: escribe los comandos completos, con sus banderas y su orden. Lo que no
+hace es apretar el gatillo.

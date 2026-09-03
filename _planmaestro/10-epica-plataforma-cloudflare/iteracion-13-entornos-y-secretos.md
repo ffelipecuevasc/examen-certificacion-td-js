@@ -64,23 +64,23 @@ entornos va antes que la prueba de restauración.
 
 ## Tareas
 
-- [ ] Crear la base D1 de pruebas. La crea el autor en el panel, salvo que la
+- [x] Crear la base D1 de pruebas. La crea el autor en el panel, salvo que la
   decisión 1 resuelva otra cosa.
-- [ ] Declarar el entorno de vista previa en `wrangler.toml` para que apunte a la
+- [x] Declarar el entorno de vista previa en `wrangler.toml` para que apunte a la
   base de pruebas.
-- [ ] Documentar cómo se sabe, sin ambigüedad, contra qué entorno se está
+- [x] Documentar cómo se sabe, sin ambigüedad, contra qué entorno se está
   trabajando: en el navegador, en la terminal y en el registro de despliegue.
-- [ ] Verificar que `.wrangler/` y `.dev.vars` siguen ignorados, con evidencia.
-- [ ] Establecer dónde viven las credenciales y confirmar que ninguna está en el
+- [x] Verificar que `.wrangler/` y `.dev.vars` siguen ignorados, con evidencia.
+- [x] Establecer dónde viven las credenciales y confirmar que ninguna está en el
   repositorio.
-- [ ] Escribir la ADR de la decisión 1 y reflejarla como regla en `CLAUDE.md`.
-- [ ] Escribir la ADR de la decisión 2.
-- [ ] Definir el procedimiento de respaldo: cada cuánto, dónde queda, cuánto dura y
+- [x] Escribir la ADR de la decisión 1 y reflejarla como regla en `CLAUDE.md`.
+- [x] Escribir la ADR de la decisión 2.
+- [x] Definir el procedimiento de respaldo: cada cuánto, dónde queda, cuánto dura y
   cómo se restaura.
 - [ ] Probar la restauración contra la base de pruebas.
-- [ ] Consolidar el manual de publicación en `90-manual/`. Ya existe material de las
+- [x] Consolidar el manual de publicación en `90-manual/`. Ya existe material de las
   iteraciones 11 y 12; el trabajo es unificarlo, no escribirlo de nuevo.
-- [ ] Revisar si los despliegues de vista previa quedan en direcciones públicas y,
+- [x] Revisar si los despliegues de vista previa quedan en direcciones públicas y,
   si es así, dejarlo anotado. El repositorio ya es público, así que no expone
   nada nuevo, pero conviene que esté dicho.
 
@@ -89,17 +89,18 @@ entornos va antes que la prueba de restauración.
 - [ ] Existen dos bases D1 separadas, y se demuestra que una escritura en pruebas no
   aparece en producción. La demostración es una consulta a ambas, no una
   afirmación.
-- [ ] Un despliegue de vista previa lee la base de pruebas, comprobado sobre una
+- [x] Un despliegue de vista previa lee la base de pruebas, comprobado sobre una
   dirección de vista previa real.
 - [ ] Está documentado cómo distinguir el entorno activo, y la señal es visible sin
-  abrir el panel de Cloudflare.
-- [ ] Ningún token, clave ni contraseña está en el repositorio. El `database_id` sí
+  abrir el panel de Cloudflare. · *Documentado y probado en local; la señal en la
+  nube se comprueba en el próximo despliegue.*
+- [x] Ningún token, clave ni contraseña está en el repositorio. El `database_id` sí
   está y es correcto que lo esté, según ADR-012.
-- [ ] Se verifica que un archivo de credenciales de Wrangler queda efectivamente
+- [x] Se verifica que un archivo de credenciales de Wrangler queda efectivamente
   ignorado, mostrando la comprobación.
-- [ ] La ADR de la decisión 1 está publicada y su regla aparece en `CLAUDE.md`.
-- [ ] La ADR de la decisión 2 está publicada y dice cuál es el respaldo oficial.
-- [ ] El procedimiento de respaldo está documentado, incluyendo cuánto tiempo hacia
+- [x] La ADR de la decisión 1 está publicada y su regla aparece en `CLAUDE.md`.
+- [x] La ADR de la decisión 2 está publicada y dice cuál es el respaldo oficial.
+- [x] El procedimiento de respaldo está documentado, incluyendo cuánto tiempo hacia
   atrás alcanza a cubrir.
 - [ ] Se restauró un respaldo con éxito contra la base de pruebas, con evidencia:
   qué dato se destruyó, qué se restauró y cómo se comprobó que volvió.
@@ -116,3 +117,90 @@ entornos va antes que la prueba de restauración.
 ## Notas de la iteración
 
 _Pendiente._
+
+## Avance · 2026-09-03
+
+### Decisiones cerradas
+
+- **ADR-015** · Claude Code no ejecuta wrangler contra la cuenta. Regla comprobable
+  —todo lo que ejecute lleva `--local`, salvo `wrangler pages dev`— reflejada en
+  `CLAUDE.md`. El motivo queda en la ADR: al iniciar sesión, la herramienta quedó
+  autorizada con permisos amplios sobre la cuenta, y «no toca producción» pasó de
+  ser una descripción de la realidad a ser una intención.
+- **ADR-014** · Dos respaldos con papeles distintos. Time Travel para el error
+  propio, con **7 días** en el plan gratuito; la exportación a
+  `d1/respaldo-banco.sql`, versionada, como respaldo oficial; exportación atada a
+  cada cambio de contenido; restauración ensayada siempre contra pruebas.
+
+### Decisión nueva, tomada sobre la marcha
+
+**La ruta oficial para crear una base es la línea de comandos, no el panel.** La
+tarea decía «la crea el autor en el panel, salvo que la decisión 1 resuelva otra
+cosa», y la práctica resolvió otra cosa: la base de pruebas se creó con
+`wrangler d1 create`. Se adopta esa ruta porque se copia, se repite idéntica para
+las dos bases y deja registro de qué se ejecutó y cuándo; el panel queda documentado
+como alternativa equivalente, para mirar o para cuando la herramienta no esté. Si el
+autor prefiere lo contrario, se cambia el paso 1 del manual y esta nota.
+
+### Lo que quedó hecho
+
+| | Dónde |
+|---|---|
+| Entorno de vista previa apuntando a la base de pruebas | `wrangler.toml`, bloque `[[env.preview.d1_databases]]` |
+| Señal de entorno | Variable `ENTORNO` por entorno; `/api/estado` la devuelve; el pie del cuestionario la muestra cuando no es producción |
+| Procedimiento de respaldo y restauración | `90-manual/respaldo-y-restauracion.md` |
+| Manual consolidado, con las dos bases y la ruta de creación resuelta | `90-manual/capa-de-datos-y-base-d1.md` |
+| Vistas previas públicas, anotado | Paso 5 del manual |
+
+### Evidencia
+
+**El entorno se distingue sin abrir el panel.** En local:
+
+```
+/api/estado → {"ok":true,"datos":{"servicio":"capa de datos","entorno":"local",
+               "enlace_d1":"presente","consulta_d1":"correcta"}, ... }
+```
+
+**Las vistas previas leen la base de pruebas.** Comprobado por el autor sobre la
+dirección de vista previa de la rama `prueba-i13`: `/api/prueba` devolvió el valor
+original del `saludo`, mientras producción tenía el valor cambiado a mano. Dos
+respuestas distintas para el mismo extremo, que es la demostración de que son dos
+bases.
+
+**Las credenciales no están en el repositorio.** Se puso un archivo de credenciales
+de verdad en cada ruta y se comprobó que git no lo ve:
+
+```
+.wrangler/config/default.toml    IGNORADO
+.dev.vars                        IGNORADO
+.dev.vars.produccion             IGNORADO
+.env                             IGNORADO
+```
+
+`git ls-files` no devuelve ningún archivo de credenciales versionado. La sesión de
+wrangler vive fuera del proyecto, en
+`%APPDATA%\xdg.config\.wrangler\config\default.toml`. Lo único de Cloudflare que se
+versiona son los identificadores de las bases, que nombran pero no dan acceso
+(ADR-012).
+
+**Las direcciones de vista previa son públicas.** Cualquiera con la dirección puede
+abrirlas. No expone nada nuevo —el repositorio ya es público y la base de pruebas
+solo tiene material de juguete—, pero queda dicho en el manual. Restringirlas es
+materia de la épica 50.
+
+### Qué falta para cerrar
+
+Todo lo que queda exige comandos contra la cuenta, que ejecuta el autor (ADR-015):
+
+1. **El ensayo de restauración contra pruebas**, destruyendo un dato de verdad. El
+   procedimiento paso a paso está en `90-manual/respaldo-y-restauracion.md`.
+2. **La primera exportación de producción** a `d1/respaldo-banco.sql`.
+3. **Comprobar que una escritura en pruebas no aparece en producción**, consultando
+   ambas bases. Es el primer criterio de aceptación y se cumple de paso durante el
+   ensayo.
+4. **Ver la señal de entorno en la nube.** La variable `ENTORNO` se añadió después
+   de la última verificación, así que todavía no se ha visto responder `produccion`
+   ni `pruebas` en una dirección real.
+5. **El ensayo completo del manual desde su paso 1**, que arrastra el criterio 7 de
+   la iteración 12. Las dos bases ya existen, así que este ensayo necesita una base
+   que todavía no exista: se hace la próxima vez que haya que crear una.

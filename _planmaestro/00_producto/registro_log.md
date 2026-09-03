@@ -22,12 +22,12 @@ Fuente única de verdad sobre qué falta. Ordenado por prioridad dentro de cada 
 | 🟢 | 12 | Desarrollo local contra una base D1 local                                    |
 | 🟢 | 12 | Verificar la capa de datos en la dirección pública, tras el primer despliegue con `wrangler.toml` |
 | ⚪ | 13 | Ensayar el manual entero, desde su paso 1, al crear la base de pruebas. Cierra el criterio 7 de la iteración 12: el procedimiento describe pasos que sí ocurrieron, pero nunca se ha seguido de principio a fin sobre una base que todavía no existe |
-| ⚪ | 13 | El manual documenta la creación de la base **por el panel** (su paso 1), pero la base de pruebas se creó por línea de comandos con `wrangler d1 create`, ruta que el manual no menciona. Decidir cuál es la ruta oficial y reescribir el paso 1 en consecuencia; si conviven las dos, decir cuándo se usa cada una |
-| ⚪ | 13 | El manual `90-manual/capa-de-datos-y-base-d1.md` está escrito para una base única: su paso 1 fija `examen-td-js-produccion` y todos sus comandos nombran esa base. Con dos entornos tiene que cubrir ambas y dejar claro cuál se está tocando en cada comando. **No se corrige hasta que el ensayo del manual traiga los huecos reales** |
-| 🔵 | 13 | Declarar `[env.preview]` con base propia. Declarado en `wrangler.toml`; falta comprobarlo en un despliegue de vista previa real |
-| ⚪ | 13 | Separar entorno de pruebas y producción                                      |
-| ⚪ | 13 | Gestión de credenciales fuera del repositorio                                |
-| ⚪ | 13 | Procedimiento de respaldo de la base, probado con una restauración           |
+| 🟢 | 13 | El manual documenta la creación de la base **por el panel** (su paso 1), pero la base de pruebas se creó por línea de comandos con `wrangler d1 create`, ruta que el manual no menciona. Decidir cuál es la ruta oficial y reescribir el paso 1 en consecuencia; si conviven las dos, decir cuándo se usa cada una |
+| 🟢 | 13 | El manual `90-manual/capa-de-datos-y-base-d1.md` está escrito para una base única: su paso 1 fija `examen-td-js-produccion` y todos sus comandos nombran esa base. Con dos entornos tiene que cubrir ambas y dejar claro cuál se está tocando en cada comando. **No se corrige hasta que el ensayo del manual traiga los huecos reales** |
+| 🟢 | 13 | Declarar `[env.preview]` con base propia. Verificado en un despliegue de vista previa real: leyó la base de pruebas |
+| 🔵 | 13 | Separar entorno de pruebas y producción. Falta demostrar que un cambio en pruebas no aparece en producción, que es lo que hace el ensayo de restauración |
+| 🟢 | 13 | Gestión de credenciales fuera del repositorio                                |
+| 🔵 | 13 | Procedimiento de respaldo escrito en `90-manual/respaldo-y-restauracion.md`. Falta ejecutar el ensayo de restauración contra pruebas |
 
 ## Épica 20 · Persistencia de preguntas
 

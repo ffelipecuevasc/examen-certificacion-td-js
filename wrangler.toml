@@ -27,6 +27,12 @@ binding = "BANCO"
 database_name = "examen-td-js-produccion"
 database_id = "cff1686b-3b24-4892-9a10-4306684e0127"
 
+# Nombre del entorno. Existe para que la respuesta de /api/estado pueda decir
+# contra que base esta hablando, y asi el error caro —creer que se mira pruebas
+# cuando se mira produccion— tenga que ser deliberado en vez de posible.
+[vars]
+ENTORNO = "produccion"
+
 # Base de pruebas, para los despliegues de vista previa.
 #
 # El bloque de arriba, sin prefijo de entorno, rige para produccion y para el
@@ -44,3 +50,8 @@ database_id = "cff1686b-3b24-4892-9a10-4306684e0127"
 binding = "BANCO"
 database_name = "examen-td-js-pruebas"
 database_id = "c01df3c9-c2a1-4379-ab2e-249e933cece4"
+
+# Las variables tampoco se heredan entre entornos. Si este bloque faltara, las
+# vistas previas se quedarian sin ENTORNO y /api/estado no sabria decir donde esta.
+[env.preview.vars]
+ENTORNO = "pruebas"
