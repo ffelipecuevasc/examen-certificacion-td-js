@@ -108,6 +108,22 @@ iteración 12 no reabra el asunto desde cero.
 
 ## Notas de la iteración
 
+Publicado en `examen-certificacion-td-js.pages.dev` el 3 de septiembre de 2026. El
+primer despliegue construyó con Node 22.16.0 tomado de `.nvmrc`, y el registro
+mostró las dos líneas esperadas: `3 entradas copiadas a dist/` y `15 recursos
+enlazados, ninguno roto`.
+
+ADR-010 resolvió compilar en el despliegue y sustituyó a ADR-005. H-005 quedó
+cerrado. El CSS compilado se sigue versionando por decisión del autor, aunque el
+sitio publicado ya no dependa de él; queda anotado como asunto sin asignar.
+
+La publicación en GitHub Pages se retiró el _(fecha)_ y el campo «About» del
+repositorio se actualizó a la dirección nueva.
+
+El registro dejó constancia de que no existe carpeta `functions` en la raíz, lo que
+confirma que Cloudflare la buscará ahí sin configuración adicional. Antecedente para
+la iteración 12.
+
 ### La decisión · 2026-09-02
 
 Se optó por **compilar en el despliegue y publicar solo `dist/`**. Queda como

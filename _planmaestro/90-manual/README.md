@@ -19,6 +19,7 @@ puede seguirse sin saber programar, está mal escrito.
 | Documento | Origen | Estado |
 |---|---|---|
 | [Publicar el sitio en Cloudflare Pages](publicacion-en-cloudflare-pages.md) | Iteración 11 | 🟢 Escrito |
+| [La capa de datos y la base D1](capa-de-datos-y-base-d1.md) | Iteración 12 | 🟢 Escrito |
 | Cómo editar el banco de preguntas | Iteración 11 | ⚪ Pendiente |
 | Cómo publicar una actualización del sitio | Iteración 41 | ⚪ Pendiente |
 | Configuración manual de Cloudflare | Iteraciones 42 y 43 | ⚪ Pendiente |

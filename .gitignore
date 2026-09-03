@@ -108,3 +108,14 @@ desktop.ini
 # Archivos de reportes de cobertura de tests (si en el futuro haces testing)
 coverage/
 .nyc_output/
+
+# ==========================================
+# CLOUDFLARE / WRANGLER
+# ==========================================
+# Estado local de wrangler: aca vive la base D1 local y la sesion iniciada contra
+# Cloudflare. No se versiona nunca. Ver iteracion 12 y el antecedente H-001.
+.wrangler/
+
+# Variables locales de las funciones. Equivale a un .env del lado del servidor.
+.dev.vars
+.dev.vars.*

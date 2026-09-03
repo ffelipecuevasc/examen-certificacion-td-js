@@ -21,6 +21,37 @@ import { join } from 'node:path';
 const DESTINO = 'dist';
 
 /**
+ * El directorio que Cloudflare publica lo declara wrangler.toml, no este script.
+ *
+ * Son dos archivos distintos diciendo la misma cosa, y por eso pueden discrepar:
+ * si alguien cambia uno y olvida el otro, la construccion armaria una carpeta que
+ * el despliegue no mira, y el sitio quedaria publicado vacio mientras las
+ * funciones siguen respondiendo. Comprobado a proposito: con el directorio
+ * equivocado en el archivo, /cuestionario responde 404 y /api/estado responde 200.
+ *
+ * El sintoma es lo bastante confuso como para justificar esta comprobacion, que
+ * detiene la construccion antes de que llegue a Cloudflare.
+ *
+ * La orden de construccion, en cambio, NO se puede fijar aca ni en wrangler.toml:
+ * vive solo en el panel. Ver el procedimiento en _planmaestro/90-manual/.
+ */
+function directorioDeclaradoEnWrangler() {
+  if (!existsSync('wrangler.toml')) return null;
+  const encontrado = readFileSync('wrangler.toml', 'utf8')
+    .match(/^\s*pages_build_output_dir\s*=\s*["']([^"']+)["']/m);
+  return encontrado ? encontrado[1].replace(/^\.\//, '').replace(/\/$/, '') : null;
+}
+
+const declarado = directorioDeclaradoEnWrangler();
+
+if (declarado !== null && declarado !== DESTINO) {
+  console.error(`ERROR: wrangler.toml publica "${declarado}" y este script arma "${DESTINO}".`);
+  console.error('Cloudflare publica lo que diga wrangler.toml, asi que el sitio saldria vacio.');
+  console.error('Deja los dos valores iguales antes de seguir.');
+  process.exit(1);
+}
+
+/**
  * Lo unico que se publica. Cualquier archivo del repositorio que no este aqui
  * dentro se queda fuera del sitio.
  *
@@ -53,6 +84,34 @@ for (const origen of LISTA_COPIA) {
   }
   cpSync(origen, join(DESTINO, origen), { recursive: true });
   copiados++;
+}
+
+// ---------------------------------------------------------------------------
+// Comprobacion: la capa de datos no puede terminar dentro de dist/
+// ---------------------------------------------------------------------------
+
+/**
+ * functions/ y wrangler.toml viven en la raiz del repositorio y ahi se quedan.
+ * Cloudflare compila functions/ por su cuenta, aparte del directorio de salida; su
+ * documentacion es explicita en que no debe estar dentro de el.
+ *
+ * Si alguno se colara en dist/ pasarian dos cosas, y la segunda es la grave: Pages
+ * dejaria de tratar la carpeta como codigo y la serviria como archivo estatico, o
+ * sea que el codigo de la capa de datos quedaria descargable en texto plano desde
+ * el sitio.
+ *
+ * Hoy no puede ocurrir, porque LISTA_COPIA no los nombra. La comprobacion existe
+ * para el dia en que alguien agregue una entrada a esa lista sin acordarse de esto.
+ */
+const PROHIBIDOS_EN_DESTINO = ['functions', 'wrangler.toml', '.dev.vars', '.wrangler'];
+
+const colados = PROHIBIDOS_EN_DESTINO.filter((nombre) => existsSync(join(DESTINO, nombre)));
+
+if (colados.length) {
+  console.error(`ERROR: ${colados.length} entrada(s) que no deben publicarse llegaron a ${DESTINO}/:`);
+  for (const c of colados) console.error(`  - ${c}`);
+  console.error('Revisa LISTA_COPIA en este mismo archivo. La capa de datos va en la raiz, no en el directorio de salida.');
+  process.exit(1);
 }
 
 // ---------------------------------------------------------------------------
@@ -127,3 +186,4 @@ if (rotos.length) {
 
 console.log(`${copiados} entradas copiadas a ${DESTINO}/`);
 console.log(`${comprobados} recursos enlazados, ninguno roto`);
+console.log(`capa de datos fuera de ${DESTINO}/, como corresponde`);

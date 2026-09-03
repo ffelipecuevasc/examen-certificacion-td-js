@@ -244,3 +244,149 @@ producción.
 
 **Límite explícito.** `dist/` es material desechable: se borra y se rehace entero en
 cada construcción. Nada debe escribirse ahí a mano, ni esperar sobrevivir allí.
+
+---
+
+## ADR-011 · La capa de datos son funciones del proyecto de Pages, en el mismo origen
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-03
+
+**Decisión.** La capa de datos no es un Worker desplegado aparte: son funciones del
+propio proyecto de Cloudflare Pages, escritas en `functions/` en la raíz del
+repositorio y servidas bajo `/api/` en el mismo dominio que las páginas.
+
+Junto con el lugar se cierra la forma. Tres cosas quedan fijadas acá y no se
+reabren en la épica 20:
+
+1. **Toda respuesta tiene la misma forma.** Correcta: `{ ok: true, datos, meta }`.
+   Fallida: `{ ok: false, error: { codigo, mensaje, usar_respaldo } }`.
+2. **«No hay datos» no es un error.** Una consulta sin filas responde 200 con
+   `ok: true`, la lista vacía y `meta.vacio = true`. Solo un `ok: false` con
+   `usar_respaldo: true` autoriza al sitio a cambiar a la instantánea de ADR-008.
+3. **Los nombres cruzan el límite sin traducirse**, en `snake_case`, a los dos
+   lados: `usar_respaldo` en la función y `usar_respaldo` en el navegador.
+
+**Motivo.** El mismo origen elimina CORS por completo: no hay dominio adicional que
+mantener, ni configuración de origen cruzado que revisar cada vez que se agregue un
+extremo. La documentación de Cloudflare exige que `functions/` esté en la raíz del
+proyecto y no dentro del directorio de salida; se cumple, y `scripts/build-dist.mjs`
+detiene la construcción si alguna vez llegara a colarse ahí. De otro modo Pages
+dejaría de compilarla y la serviría como archivo, o sea que el código de la capa de
+datos quedaría descargable en texto plano desde el sitio.
+
+El punto 2 existe porque confundir «vacío» con «caído» tiene una consecuencia
+concreta y silenciosa: el día que el banco se borre por accidente, el sitio
+serviría la instantánea sin decir nada y el error quedaría escondido detrás del
+respaldo, que es exactamente lo que ADR-008 no quiere.
+
+El punto 3 se decidió al ver que la capa respondía `usar_respaldo` y el navegador
+exponía `usarRespaldo`. Hoy es un campo; en la épica 20 serían decenas de columnas
+del banco traducidas una por una, con el riesgo de que un renombre olvidado
+devuelva `undefined` sin ningún error a la vista. Las filas de D1 llegan con el
+nombre de su columna y así se quedan. El código del navegador que no toca datos de
+la capa sigue en `camelCase`.
+
+**Consecuencia.** El despliegue del sitio y el de la capa de datos son el mismo
+acto: un `git push` publica ambos, y una construcción fallida deja las dos cosas en
+la versión anterior. No se pueden desplegar por separado.
+
+**Consecuencia.** Las direcciones bajo `/api/` quedan reservadas. Un archivo
+estático que se llamara igual no se serviría nunca.
+
+**Límite explícito.** Estas funciones son de solo lectura (ADR-009). Rechazan todo
+método que no sea `GET` o `HEAD` con `METODO_NO_PERMITIDO`, sin llegar a consultar
+la base.
+
+---
+
+## ADR-012 · El enlace con D1 se declara en `wrangler.toml` versionado
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-03 · **Modifica:** la regla de
+credenciales de `CLAUDE.md`
+
+**Decisión.** El enlace entre el proyecto de Pages y la base D1 se declara en un
+`wrangler.toml` versionado, con el nombre del enlace, el nombre de la base y su
+`database_id`. No se configura a mano en el panel.
+
+Esto **modifica la regla de `CLAUDE.md`** que prohibía todo identificador de base de
+datos en el código versionado. La regla pasa a distinguir dos cosas que antes
+trataba igual:
+
+- **Una credencial da acceso.** Un token de API, una clave, una contraseña. No se
+  versiona nunca, en ningún archivo, bajo ninguna circunstancia.
+- **Un identificador solo nombra.** El `database_id` de D1 es un UUID que dice
+  *cuál* base, no *quién* puede abrirla: sin un token de la cuenta no sirve de nada.
+
+La excepción es **específica para el `database_id` de D1 en `wrangler.toml`**. No es
+una licencia general para versionar cualquier cosa que parezca un identificador:
+cualquier otro caso necesita su propia ADR.
+
+**Motivo.** Cloudflare ya busca ese archivo en cada construcción —el registro de la
+iteración 11 lo dice: buscó configuración de Wrangler y no la encontró—, así que
+declararlo no fuerza nada, ocupa un lugar que la plataforma tenía previsto. A
+cambio, el enlace deja de vivir solo en un panel al que este repositorio no puede
+mirar: se revisa en un diff, se reconstruye desde un clon y se corrige con un commit
+en vez de con una sesión de clics recordada de memoria.
+
+**Consecuencia · el archivo manda sobre el panel.** Desde que existe, la
+documentación de Cloudflare es explícita: *«your Wrangler file is the source of
+truth (…) you will be able to see, but not edit, the same fields when you log into
+the Cloudflare dashboard»*. Los enlaces y las variables de ejecución que estén
+puestos en el panel dejan de aplicarse si no están en el archivo. Antes del primer
+despliegue con él hay que comprobar que el archivo dice lo mismo que decía el panel.
+
+**Consecuencia · el directorio de salida se declara acá, la orden de construcción
+no.** `pages_build_output_dir = "dist"` vive en el archivo y manda. La orden
+`npm run build` **no se puede declarar en él**: sigue siendo un ajuste del panel, y
+no hay forma de fijarla desde el repositorio. Queda como el único punto de la
+publicación que el control de versiones no cubre, y por eso está escrito en
+`90-manual/`.
+
+**Consecuencia.** Que el directorio se declare en dos lugares —`wrangler.toml` y
+`scripts/build-dist.mjs`— abre la puerta a que discrepen, y el síntoma engaña: el
+sitio se publica vacío mientras `/api/` sigue respondiendo con normalidad. El script
+compara ambos valores y detiene la construcción si no coinciden.
+
+**Consecuencia.** Los despliegues de vista previa heredan la base declarada mientras
+no exista un bloque `[env.preview]` propio. Hoy es inofensivo, porque la capa es de
+solo lectura; deja de serlo cuando haya contenido real. Es tarea de la iteración 13.
+
+---
+
+## ADR-013 · Wrangler como dependencia de desarrollo
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-03
+
+**Decisión.** Se incorpora `wrangler`, la herramienta de línea de comandos de
+Cloudflare, como **dependencia de desarrollo** con versión fijada. Es la primera
+dependencia nueva desde que se fijó el stack, y la autoriza esta ADR, tal como exige
+`CLAUDE.md`.
+
+**Motivo.** Sin ella hay tres cosas que no se pueden hacer, y ninguna es una
+comodidad:
+
+1. **Ejecutar `functions/` en el equipo del autor.** Un servidor de archivos
+   estáticos no ejecuta funciones. Sin wrangler, cada corrección de una coma sería
+   un push contra producción, que es justo lo que `CLAUDE.md` prohíbe.
+2. **Una base D1 local.** Es criterio de aceptación de la iteración 12.
+3. **Migraciones repetibles y respaldos exportables.** Son tareas de las iteraciones
+   21 y 13. La alternativa es pegar SQL a mano en una consola web: no versionable,
+   no repetible, no auditable.
+
+**Qué NO es.** No es una dependencia del sitio. Nada suyo llega al navegador de
+ningún estudiante: lo que se publica sigue siendo HTML, Tailwind compilado y módulos
+ES nativos. No compila el JavaScript del sitio, no empaqueta, no transpila.
+**ADR-003 queda intacta.**
+
+**Precisión.** La construcción de Cloudflare ejecuta `npm install`, que instala
+también las dependencias de desarrollo —es la misma vía por la que llega
+`tailwindcss`, que sí hace falta—. O sea que wrangler se descarga en la máquina de
+construcción aunque `npm run build` no la mencione ni la ejecute. El costo es tiempo
+de construcción, no superficie del sitio.
+
+**Consecuencia.** `.wrangler/` guarda la base local y la sesión iniciada contra
+Cloudflare: queda ignorado por git, junto con `.dev.vars`. El antecedente H-001
+enseñó que en este repositorio el `.gitignore` merece revisarse antes y no después.
+
+**Consecuencia.** Se va con la plataforma. Si algún día se abandona Cloudflare, esta
+dependencia se desinstala y no deja rastro en el código del sitio.

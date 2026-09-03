@@ -1,0 +1,33 @@
+# Configuracion del proyecto de Cloudflare Pages.
+#
+# Desde que este archivo existe, EL ARCHIVO MANDA: los enlaces y las variables de
+# ejecucion que se vean en el panel de Cloudflare quedan de solo lectura. Lo que se
+# quiera cambiar se cambia aca y se publica con un push. Ver ADR-012.
+#
+# Lo que NO se configura aca, porque pertenece al sistema de construccion y sigue
+# viviendo en el panel: la orden de construccion (`npm run build`) y la variable
+# NODE_VERSION. El directorio de salida si se declara aca, en
+# pages_build_output_dir, y ese valor manda sobre el del panel.
+
+name = "examen-certificacion-td-js"
+compatibility_date = "2026-09-03"
+pages_build_output_dir = "dist"
+
+# Base de datos del banco de preguntas.
+#
+# El nombre del enlace, BANCO, es el que ve el codigo de functions/ como
+# `env.BANCO`. Cambiarlo obliga a cambiar tambien functions/api/_comun.js.
+#
+# El identificador de abajo NO es una credencial: sin un token de la cuenta no
+# abre nada. Se versiona a proposito, y esa excepcion esta acotada por escrito en
+# ADR-012, que modifico la regla de CLAUDE.md para permitir exactamente esto y
+# nada mas. Un token de API jamas se escribe en este archivo.
+[[d1_databases]]
+binding = "BANCO"
+database_name = "examen-td-js-produccion"
+database_id = "cff1686b-3b24-4892-9a10-4306684e0127"
+
+# Pendiente para la iteracion 13: mientras no exista un bloque [env.preview] con
+# una base propia, los despliegues de vista previa heredan esta misma base, o sea
+# leen produccion. Hoy es inofensivo porque la capa de datos es de solo lectura
+# (ADR-009), pero deja de serlo en cuanto exista contenido real.

@@ -43,7 +43,7 @@ npm run serve   # levanta un servidor local
 
 El sitio usa módulos ES, por lo que **debe abrirse mediante un servidor local**. Al abrir `index.html` con doble clic, el navegador bloquea las importaciones.
 
-## Publicación en GitHub Pages
+## Publicación en Cloudflare
 
 El CSS compilado se versiona en el repositorio, así que el despliegue es directo:
 
@@ -54,7 +54,7 @@ git commit -m "Actualiza la guía"
 git push
 ```
 
-En **Settings → Pages**, selecciona la rama `main` y la carpeta raíz (`/`).
+La actualización de la rama `main` dispara la construcción en Cloudflare y el comando de construcción de Cloudflare Pages `npm run build` arma `dist/` que termina siendo la carpeta publicada.
 
 > Recuerda ejecutar `npm run build` cada vez que cambies estilos o agregues clases de Tailwind, ya que el CSS publicado se genera en tu equipo.
 

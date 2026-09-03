@@ -11,17 +11,20 @@ Fuente única de verdad sobre qué falta. Ordenado por prioridad dentro de cada 
 
 ## Épica 10 · Plataforma Cloudflare
 
-| Estado | Iteración | Tarea |
-|---|---|---|
-| 🔵 | 11 | Publicar el sitio en Cloudflare Pages sin regresiones |
+| Estado | Iteración | Tarea                                                                        |
+|---|---|------------------------------------------------------------------------------|
+| 🟢 | 11 | Desconectar GitHub Pages, que era el despliegue anterior                     |
+| 🟢 | 11 | Publicar el sitio en Cloudflare Pages sin regresiones                        |
 | 🟢 | 11 | Decidir si el despliegue compila o publica el repositorio tal cual (ADR-010) |
-| ⚪ | 12 | Crear la base D1 y el Worker de datos |
-| ⚪ | 12 | Decidir el dominio del Worker respecto al sitio |
-| ⚪ | 12 | Definir el formato de error del Worker, base del respaldo de ADR-008 |
-| ⚪ | 12 | Desarrollo local contra una base D1 local |
-| ⚪ | 13 | Separar entorno de pruebas y producción |
-| ⚪ | 13 | Gestión de credenciales fuera del repositorio |
-| ⚪ | 13 | Procedimiento de respaldo de la base, probado con una restauración |
+| 🟢 | 12 | Crear la base D1 y la capa de datos                                          |
+| 🟢 | 12 | Decidir el dominio del Worker (ADR-011)                                      |
+| 🟢 | 12 | Definir el formato de error del Worker, base del respaldo de ADR-008         |
+| 🟢 | 12 | Desarrollo local contra una base D1 local                                    |
+| ⚪ | 12 | Verificar la capa de datos en la dirección pública, tras el primer despliegue con `wrangler.toml` |
+| ⚪ | 13 | Declarar `[env.preview]` con base propia: hoy las vistas previas leen la base de producción |
+| ⚪ | 13 | Separar entorno de pruebas y producción                                      |
+| ⚪ | 13 | Gestión de credenciales fuera del repositorio                                |
+| ⚪ | 13 | Procedimiento de respaldo de la base, probado con una restauración           |
 
 ## Épica 20 · Persistencia de preguntas
 
@@ -39,8 +42,8 @@ Fuente única de verdad sobre qué falta. Ordenado por prioridad dentro de cada 
 | ⚪ | 23 | Implementarlo cumpliendo ADR-009: sin escritura pública |
 | ⚪ | 23 | Carga por lotes |
 | ⚪ | 23 | Regenerar la instantánea al editar |
-| ⚪ | 24 | Migrar las 105 preguntas actuales a D1 |
-| ⚪ | 24 | Ampliar el banco hasta ~300 preguntas |
+| ⚪ | 24 | Transformar los cuestionarios de los siete módulos a un formato estructurado y verificado, previo al esquema |
+| ⚪ | 24 | Cargar el banco transformado en D1, una vez definido el esquema de la iteración 21 |
 | ⚪ | 24 | Escribir la justificación de cada pregunta |
 
 ## Épica 30 · Cuestionario
@@ -100,6 +103,8 @@ se planifique la iteración que las incluya.
 | ⚪ | Auditoría | Comprobación automática de que el CSS compilado está al día |
 | ⚪ | ADR-007 | Evaluar si el Worker debe dejar de enviar la respuesta correcta al navegador durante el simulacro, y validar del lado del servidor |
 | ⚪ | ADR-007 | Definir qué ocurre con el proyecto si se agotan los límites del plan gratuito |
+| ⚪ | Iteración 12 | Cloudflare Pages responde **308** a `/cuestionario.html` y redirige a `/cuestionario`: quita la extensión por su cuenta. No rompe nada, porque el navegador sigue la redirección, pero todos los enlaces internos del sitio pagan un salto de más. Decidir si los enlaces pasan a escribirse sin extensión |
+| ⚪ | Iteración 12 | La orden de construcción (`npm run build`) no se puede declarar en `wrangler.toml`: es el único ajuste de la publicación que el repositorio no cubre y que vive solo en el panel. Si alguien la vacía ahí, ningún archivo del repositorio lo impide. Evaluar si una comprobación posterior al despliegue puede detectarlo |
 | ⚪ | Iteración 11 | `.gitattributes` que fije los finales de línea de `static/css/*.css` a LF. Con `core.autocrlf=true`, tras un checkout el archivo queda con CRLF y el generador lo reescribe con LF: `git status` marca los CSS como modificados aunque el contenido sea idéntico. Es ruido cosmético —`git diff` sale vacío y `npm run verificar` no da falsa alarma— pero enseña a ignorar avisos de git, que es justo lo que no conviene |
 | ⚪ | Iteración 11 | La tabla «Documentos previstos» de `90-manual/README.md` cita iteraciones 41, 42 y 43 para asuntos de Cloudflare. Son números de la planificación anterior, de cuando Cloudflare era la épica de cierre; con ADR-007 pasó a ser la épica 10. Corregirlos |
 
