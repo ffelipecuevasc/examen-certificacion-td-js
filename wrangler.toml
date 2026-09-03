@@ -27,7 +27,20 @@ binding = "BANCO"
 database_name = "examen-td-js-produccion"
 database_id = "cff1686b-3b24-4892-9a10-4306684e0127"
 
-# Pendiente para la iteracion 13: mientras no exista un bloque [env.preview] con
-# una base propia, los despliegues de vista previa heredan esta misma base, o sea
-# leen produccion. Hoy es inofensivo porque la capa de datos es de solo lectura
-# (ADR-009), pero deja de serlo en cuanto exista contenido real.
+# Base de pruebas, para los despliegues de vista previa.
+#
+# El bloque de arriba, sin prefijo de entorno, rige para produccion y para el
+# desarrollo local; este rige solo para las vistas previas. Es lo que impide que
+# una rama en construccion lea la base real.
+#
+# El nombre del enlace es el mismo, BANCO, a proposito: el codigo de functions/ no
+# sabe contra que entorno esta corriendo, y no tiene por que saberlo. Lo que cambia
+# es a que base apunta ese nombre.
+#
+# Cuidado si algun dia se agrega un enlace nuevo (otra base, una cola, un almacen):
+# los enlaces NO se heredan por entorno. En cuanto un entorno declara uno, tiene que
+# declararlos todos, o los que falten dejan de existir para ese entorno.
+[[env.preview.d1_databases]]
+binding = "BANCO"
+database_name = "examen-td-js-pruebas"
+database_id = "c01df3c9-c2a1-4379-ab2e-249e933cece4"

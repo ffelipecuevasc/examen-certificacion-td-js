@@ -90,6 +90,11 @@ se serviría como archivo descargable en vez de ejecutarse. El build lo comprueb
 - **Claude Code no hace commits ni push.** El repositorio es público y el control de versiones lo lleva el autor.
 - **Claude Code no toca producción.** El desarrollo ocurre contra el entorno de pruebas y una base D1 local. Lo que deba
   aplicarse en producción se documenta como procedimiento para que lo ejecute el autor.
+- **Claude Code no ejecuta wrangler contra la cuenta de Cloudflare.** La regla es comprobable mirando el comando:
+  todo lo que ejecute Claude Code lleva `--local` explícito, y la única excepción es `wrangler pages dev`, que es
+  local por definición. Todo lo demás —`--remote`, `d1 create`, `d1 delete`, `d1 export`, `d1 time-travel`,
+  `pages deploy`, `login`, `secret`— lo escribe Claude Code y lo ejecuta el autor en su terminal. Que haya una
+  sesión iniciada en el equipo **no es autorización**: es justamente lo que vuelve peligrosa la omisión.
 - **Claude Code no tiene acceso al panel de Cloudflare.** Lo que se configure ahí se documenta en
   `_planmaestro/90-manual/`, o se pierde.
 

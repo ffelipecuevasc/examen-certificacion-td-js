@@ -390,3 +390,97 @@ enseñó que en este repositorio el `.gitignore` merece revisarse antes y no des
 
 **Consecuencia.** Se va con la plataforma. Si algún día se abandona Cloudflare, esta
 dependencia se desinstala y no deja rastro en el código del sitio.
+
+---
+
+## ADR-014 · Dos respaldos con papeles distintos: Time Travel y la exportación versionada
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-03
+
+**Decisión.** La base D1 se protege con dos mecanismos que no compiten, porque
+cubren pérdidas distintas.
+
+1. **Time Travel es la recuperación inmediata ante un error propio.** Está siempre
+   activo, no se configura ni se mantiene, y en el plan gratuito de este proyecto
+   alcanza **7 días hacia atrás**, no 30. Los 30 días son del plan de pago, y es el
+   límite que se asume mal con más frecuencia.
+2. **La exportación a un archivo `.sql` es el respaldo oficial.** Vive versionada en
+   el repositorio, en `d1/respaldo-banco.sql`, como **un solo archivo que se
+   sobrescribe** en cada exportación.
+3. **Se exporta después de cada cambio de contenido, no por calendario.**
+4. **La restauración se ensaya contra la base de pruebas, nunca contra producción.**
+
+**Motivo · por qué dos y no uno.** Time Travel vive *dentro* de D1: sirve para
+deshacer un `DELETE` mal escrito diez minutos después, y no sirve para nada si se
+pierde la base, la cuenta o el acceso a Cloudflare. La exportación es lo contrario:
+no sirve para deshacer algo con cinco minutos de antigüedad, y es lo único que
+sobrevive a perderlo todo. Tratarlos como alternativas lleva a elegir mal; tratarlos
+como dos piezas con papeles distintos es lo que hace que el conjunto cubra.
+
+Tres detalles del comportamiento de Time Travel que conviene tener escritos, porque
+cambian cómo se usa:
+
+- **La restauración es destructiva y sobrescribe la base en su lugar.** No crea una
+  copia al lado. Es la razón por la que el punto 4 no es una precaución exagerada:
+  «probar» una restauración contra producción *es* destruir producción.
+- **Los marcadores anteriores sobreviven a una restauración**, así que una
+  restauración equivocada se puede deshacer.
+- **No hay nada que activar.** Ninguna tarea, ningún recordatorio, ninguna
+  configuración que se pueda olvidar.
+
+**Motivo · por qué el archivo vive en el repositorio.** La objeción evidente es que
+ADR-010 acababa de sacar del repositorio el contenido generado. No es lo que ADR-010
+hizo: sacó `dist/`, que es el artefacto publicable y desechable, y en la misma
+decisión mantuvo versionados `style.css` e `icons.css` con un argumento explícito
+—que el repositorio conserve la propiedad de ser, por sí solo, una copia completa y
+servible—. ADR-008 aplica esa misma idea al banco de preguntas. O sea que el
+repositorio ya es, por decisión tomada dos veces, el lugar donde vive la copia de
+respaldo de este proyecto. Esta ADR la continúa, no la contradice.
+
+Las dos copias del banco no se sustituyen entre sí y conviene no confundirlas:
+
+| | Para qué | Formato |
+|---|---|---|
+| Instantánea de ADR-008 | Que el **sitio** siga funcionando si la capa de datos cae | El que consume el navegador |
+| `d1/respaldo-banco.sql` | Que la **base** se pueda reconstruir si se pierde | Volcado de esquema y datos |
+
+Perder la cuenta de Cloudflare deja el sitio en pie gracias a la primera, y permite
+rehacer la base gracias al segundo.
+
+Lo demás pesa hacia el mismo lado: el banco no es secreto —las respuestas correctas
+ya viajan al navegador, cosa que ADR-001 asume desde el principio—; un disco propio
+es la única opción que falla sin avisar; y un servicio de almacenamiento aparte
+sería una pieza más que mantener, justo lo que ADR-001 protege.
+
+**Motivo · por qué un archivo sobrescrito y no una carpeta que crece.** Git ya es el
+historial: cada exportación queda como un commit, con su fecha y su diff. Una
+carpeta de respaldos fechados obliga a decidir cuándo podarla, y esa decisión se
+posterga hasta que se toma mal. Como efecto secundario útil, el diff de cada
+exportación muestra qué preguntas cambiaron entre una versión del banco y la
+siguiente: revisión editorial que no cuesta nada.
+
+**Motivo · por qué después de cada cambio y no por calendario.** Esta base no cambia
+sola: solo cambia cuando el autor edita el banco. Un calendario produciría respaldos
+idénticos entre sí durante semanas y, lo que es peor, daría sensación de cobertura
+justo en el intervalo en que el cambio reciente todavía no está respaldado. Atar la
+exportación a la edición hace que la ventana descubierta sea siempre corta, y que su
+único ocupante sea Time Travel.
+
+**Consecuencia.** La exportación deja de ser una tarea de mantención y pasa a ser
+parte del procedimiento de editar el banco, que se define en la iteración 23. Si ese
+procedimiento no la incluye, esta ADR queda incumplida aunque nadie lo note.
+
+**Consecuencia.** Un respaldo que no se ha restaurado nunca no es un respaldo. La
+restauración se ensaya contra `examen-td-js-pruebas`, que existe justamente para
+poder romper algo sin consecuencias.
+
+**Límite explícito.** Todo esto vale **mientras la base contenga solo el banco de
+preguntas**. El día que guarde cualquier dato de una persona —el «modo docente» y el
+«historial de intentos» ya están anotados como ideas—, un volcado en un repositorio
+público deja de ser admisible y esta decisión se cae entera. No se parchea: se
+sustituye por una ADR nueva.
+
+**Riesgo asumido.** El formato de salida de `wrangler d1 export` no está garantizado
+estable entre versiones de la herramienta. Un cambio de formato produciría un diff
+enorme que no corresponde a ningún cambio de contenido. Si ocurre, se acota el
+volcado o se normaliza antes de guardarlo; se sabrá en la primera exportación real.

@@ -157,18 +157,18 @@ funciones, el despliegue publicó el sitio sin capa de datos.
 
 Sobre `https://examen-certificacion-td-js.pages.dev`:
 
-- [ ] `/api/estado` responde **200** con `"ok": true` y `"enlace_d1": "presente"`.
-- [ ] `/api/prueba` responde **200** con las dos filas de la tabla de juguete.
-- [ ] Cambia un valor con el comando del paso 4 (con `--remote`) y vuelve a pedir
+- [x] `/api/estado` responde **200** con `"ok": true` y `"enlace_d1": "presente"`.
+- [x] `/api/prueba` responde **200** con las dos filas de la tabla de juguete.
+- [x] Cambia un valor con el comando del paso 4 (con `--remote`) y vuelve a pedir
       `/api/prueba`: tiene que aparecer el valor nuevo. Eso demuestra que el dato
       viene de la base y no del código.
-- [ ] `/cuestionario` carga, la consola del navegador no muestra ningún error, y en
+- [x] `/cuestionario` carga, la consola del navegador no muestra ningún error, y en
       el pie aparece la línea «Banco de preguntas: conectado (2 registros de
       prueba).»
-- [ ] En la pestaña **Red**, las peticiones a `/api/` salen hacia el mismo dominio
+- [x] En la pestaña **Red**, las peticiones a `/api/` salen hacia el mismo dominio
       del sitio. Si aparece otro dominio, algo se configuró mal: no debería haber
       ninguno.
-- [ ] `/api/no-existe` responde **404** en JSON, no la portada del sitio.
+- [x] `/api/no-existe` responde **404** en JSON, no la portada del sitio.
 
 ---
 

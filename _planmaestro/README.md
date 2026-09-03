@@ -8,15 +8,15 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 
 | Campo | Valor                                                             |
 |---|-------------------------------------------------------------------|
-| **Iteración** | `12-worker-y-base-d1.md`                                          |
+| **Iteración** | `13-entornos-y-secretos.md`                                        |
 | **Épica** | 10 · Plataforma Cloudflare                                        |
-| **Estado** | 🟢 Completada el 2026-09-03                                    |
-| **Archivo** | `10-epica-plataforma-cloudflare/iteracion-12-worker-y-base-d1.md` |
+| **Estado** | 🔵 En curso                                                       |
+| **Archivo** | `10-epica-plataforma-cloudflare/iteracion-13-entornos-y-secretos.md` |
 | **Iniciada** | 2026-09-03                                                        |
 
 ## Iteraciones completadas
 
-**🟢 Completada** | _Iteración 11: Publicación en Cloudflare Pages (`iteracion-11-publicacion-en-pages.md`)_
+**🟢 Completada** | _Iteración 12: Capa de datos y base D1 (`iteracion-12-worker-y-base-d1.md`)_
 
 | Iteración                            | Épica                      | Cierre     | Bitácora |
 |--------------------------------------|----------------------------|------------|---|
@@ -28,8 +28,8 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 
 | # | Épica | Estado | Entrega |
 |---|---|---|---|
-| 10 | Plataforma Cloudflare | 🟢 Completada | Sitio en Pages, Worker y base D1 operativos |
-| 20 | Persistencia de preguntas | 🔵 En curso | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
+| 10 | Plataforma Cloudflare | 🔵 En curso | Sitio en Pages, Worker y base D1 operativos |
+| 20 | Persistencia de preguntas | ⚪ No iniciada | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
 | 30 | Cuestionario | ⚪ No iniciada | `cuestionario.html` con el banco completo y barras horizontales |
 | 40 | Simulacro de examen | ⚪ No iniciada | `simulacro.html` cronometrado, 120 preguntas, resumen final |
 | 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos |
