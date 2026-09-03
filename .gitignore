@@ -26,8 +26,9 @@ lerna-debug.log*
 # COMPILACIÓN DE TAILWIND Y BUILDS
 # ==========================================
 # Directorios de salida (Si configuras Tailwind para exportar aquí)
-# Descomenta las siguientes líneas si usas un directorio dist/ o build/ en tu output
-# dist/
+# dist/ es el directorio que Cloudflare Pages publica. Lo arma scripts/build-dist.mjs
+# en cada construcción, así que no se versiona. Ver ADR-010.
+dist/
 # build/
 # out/
 

@@ -7,8 +7,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
-    "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify",
+    "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify && node scripts/build-dist.mjs",
+    "verificar": "npm run build && git diff --exit-code static/css/",
     "serve": "npx serve .",
+    "serve:dist": "npx serve dist",
     "start": "npm run dev",
     "icons": "node scripts/build-icons.mjs",
     "cuestionario": "python3 scripts/build-cuestionario.py"
