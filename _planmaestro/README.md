@@ -119,5 +119,5 @@ En ambos casos: muestra cómo quedaría, espera confirmación, y luego aplica.
 
 - **Fechas** en formato `AAAA-MM-DD`.
 - **Nombres de archivo** en minúsculas, sin tildes ni eñes, separando con guiones.
-- **Idioma:** español de Chile, en toda la documentación.
+- **Idioma:** español latino de Chile, en toda la documentación.
 - Cuando un documento se refiera a un archivo del proyecto, se escribe su ruta completa desde la raíz del repositorio.
