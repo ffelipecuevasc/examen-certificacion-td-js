@@ -204,6 +204,10 @@ quedaría tapado por el respaldo y nadie se enteraría.
 
 ## Si algo sale mal
 
+**`Couldn't find DB` o algo parecido al ejecutar un comando de D1.** El nombre de
+la base se escribe en español y sin tilde: `examen-td-js-produccion`, no
+`production`. Es un tropiezo real, ocurrió al aplicar el esquema por primera vez.
+
 **El sitio se publicó vacío, pero `/api/` responde.** Discrepan el directorio
 declarado en `wrangler.toml` y el que arma `scripts/build-dist.mjs`. Cloudflare
 publica lo que diga el archivo. `npm run build` detecta el caso y se detiene antes,

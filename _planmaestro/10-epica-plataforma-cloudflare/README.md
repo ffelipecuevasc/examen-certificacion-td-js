@@ -38,7 +38,7 @@ el mismo dominio, y el procedimiento documentado para reconstruirlo desde cero.
 | # | Iteración | Estado |
 |---|---|---|
 | 11 | Publicación en Pages | 🟢 Completada |
-| 12 | Capa de datos y base D1 | ⚪ No iniciada |
+| 12 | Capa de datos y base D1 | 🟢 Completada |
 | 13 | Entornos, secretos y procedimientos | ⚪ No iniciada |
 
 ## Reparto de tareas

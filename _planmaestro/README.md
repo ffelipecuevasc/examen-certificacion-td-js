@@ -10,7 +10,7 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 |---|-------------------------------------------------------------------|
 | **Iteración** | `12-worker-y-base-d1.md`                                          |
 | **Épica** | 10 · Plataforma Cloudflare                                        |
-| **Estado** | 🔵 En curso                                                       |
+| **Estado** | 🟢 Completada el 2026-09-03                                    |
 | **Archivo** | `10-epica-plataforma-cloudflare/iteracion-12-worker-y-base-d1.md` |
 | **Iniciada** | 2026-09-03                                                        |
 
@@ -21,6 +21,7 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 | Iteración                            | Épica                      | Cierre     | Bitácora |
 |--------------------------------------|----------------------------|------------|---|
 | 11 - Publicación en Cloudflare Pages | 10 - Plataforma Cloudflare | 2026-09-03 | 🟢 Completada |
+| 12 - Capa de datos y base D1         | 10 - Plataforma Cloudflare | 2026-09-03 | 🟢 Completada |
 | —                                    | —                          | —          | — |
 
 ## Épicas

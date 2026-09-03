@@ -20,7 +20,7 @@ Fuente única de verdad sobre qué falta. Ordenado por prioridad dentro de cada 
 | 🟢 | 12 | Decidir el dominio del Worker (ADR-011)                                      |
 | 🟢 | 12 | Definir el formato de error del Worker, base del respaldo de ADR-008         |
 | 🟢 | 12 | Desarrollo local contra una base D1 local                                    |
-| ⚪ | 12 | Verificar la capa de datos en la dirección pública, tras el primer despliegue con `wrangler.toml` |
+| 🟢 | 12 | Verificar la capa de datos en la dirección pública, tras el primer despliegue con `wrangler.toml` |
 | ⚪ | 13 | Declarar `[env.preview]` con base propia: hoy las vistas previas leen la base de producción |
 | ⚪ | 13 | Separar entorno de pruebas y producción                                      |
 | ⚪ | 13 | Gestión de credenciales fuera del repositorio                                |
@@ -30,6 +30,7 @@ Fuente única de verdad sobre qué falta. Ordenado por prioridad dentro de cada 
 
 | Estado | Iteración | Tarea |
 |---|---|---|
+| ⚪ | 21 | Borrar `prueba_tuberia` de la base de producción. La creó la iteración 12 para probar la tubería y sigue ahí: la primera migración del esquema real tiene que retirarla |
 | ⚪ | 21 | Diseñar el esquema del banco en D1 |
 | ⚪ | 21 | Decidir el modelado de las alternativas |
 | ⚪ | 21 | Decidir el tratamiento de las preguntas retiradas |

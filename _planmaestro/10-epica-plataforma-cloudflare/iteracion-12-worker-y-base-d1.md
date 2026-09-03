@@ -1,7 +1,7 @@
 # Iteración 12 · Worker de datos y base D1
 
 **Épica:** 10 · Plataforma Cloudflare
-**Estado:** 🔵 En curso · implementación terminada, falta la verificación en la dirección pública
+**Estado:** 🟢 Completada · **Cerrada:** 2026-09-03
 **Depende de:** iteración 11
 
 ## Objetivo
@@ -65,19 +65,19 @@ construcción que estas funciones necesitan está puesta.
 
 ## Criterios de aceptación
 
-- [ ] El extremo de comprobación de estado responde correctamente desde la
+- [x] El extremo de comprobación de estado responde correctamente desde la
       dirección pública, y se muestra la respuesta.
 - [x] El extremo de prueba devuelve datos leídos realmente desde D1, no fijos en el
       código: se demuestra modificando un registro y viendo el cambio.
-- [ ] Una página del sitio consume el Worker sin errores de consola ni de origen
-      cruzado. · *Verificado en local por el autor; falta en la dirección pública.*
+- [x] Una página del sitio consume el Worker sin errores de consola ni de origen
+      cruzado.
 - [x] El desarrollo local funciona contra una base D1 local, sin tocar producción.
 - [x] El formato de error está documentado y un fallo provocado produce una
       respuesta de esa forma.
 - [x] La decisión sobre el dominio del Worker está publicada como ADR.
 - [x] El procedimiento en `90-manual/` permite reconstruir base y Worker desde cero.
-- [ ] Ningún identificador ni credencial queda escrito en el código versionado. · *Su
-      primera mitad la sustituyó ADR-012; ver la nota al final.*
+- [x] Ningún identificador ni credencial queda escrito en el código versionado. · *Su
+      primera mitad la sustituyó ADR-012 durante esta iteración; ver la nota al final.*
 
 ## Notas de la iteración
 
@@ -189,24 +189,92 @@ Cloudflare publica lo que diga wrangler.toml, asi que el sitio saldria vacio.
 - Los despliegues de vista previa heredan la base de producción mientras no exista
   `[env.preview]`. Es la iteración 13.
 
-### Qué falta para poder cerrar la iteración
+### Verificación en la dirección pública · 2026-09-03 · hecha por el autor
 
-La iteración **queda abierta**. Falta el primer despliegue con `wrangler.toml`
-presente, que solo puede hacer el autor, y estas comprobaciones sobre él:
+El primer despliegue con `wrangler.toml` presente confirmó lo que faltaba.
 
-1. En el registro de construcción, la compilación de `functions/`. En la iteración
-   11 ese registro decía que no encontró directorio de funciones; esa línea tiene
-   que haber desaparecido.
-2. `https://examen-certificacion-td-js.pages.dev/api/estado` responde 200 con
-   `"enlace_d1": "presente"`.
-3. `/api/prueba` devuelve las filas de la tabla de juguete, después de haberla
-   creado en la base de la nube con el paso 4 del manual.
-4. Un `UPDATE` con `--remote` cambia lo que devuelve `/api/prueba`.
-5. `/cuestionario` en la dirección pública, con la consola limpia y la línea del pie.
-6. El sitio y las funciones responden desde el mismo dominio, sin origen cruzado.
+**Registro de construcción.** Cloudflare encontró el archivo y leyó
+`pages_build_output_dir: dist`. Después:
 
-El procedimiento completo está en
-`_planmaestro/90-manual/capa-de-datos-y-base-d1.md`.
+```
+Found Functions directory at /functions. Uploading.
+Compiled Worker successfully
+```
+
+La línea de la iteración 11 sobre la ausencia del directorio de funciones ya no
+aparece. Las tres líneas del build salieron completas —3 entradas, 17 recursos,
+capa de datos fuera de `dist/`— y la construcción corrió con `nodejs@22.16.0`, o
+sea que declarar el archivo no desplazó la variable del panel.
+
+**Extremos, sobre la dirección pública.**
+
+```
+/api/estado     → "enlace_d1": "presente"
+/api/prueba     → ok: true, con las dos filas
+/api/no-existe  → NO_ENCONTRADO en JSON, no la portada del sitio
+```
+
+**El dato viene de D1.** Tras un `UPDATE` remoto contra la tabla de juguete:
+
+```json
+{"ok":true,"datos":[{"clave":"saludo","valor":"Verificado por Felipe el 3 de septiembre",
+"actualizado_en":"2026-09-03"}, … ],"meta":{"origen":"d1","vacio":false,"filas_leidas":2}}
+```
+
+**El sitio publicado.** `/cuestionario` con la consola sin errores, la línea del pie
+con los dos registros de prueba, y en la pestaña Red la petición a `/api/estado`
+saliendo hacia el mismo dominio: sin origen cruzado, como estaba previsto en
+ADR-011.
+
+### Qué salió distinto de lo planeado
+
+**La decisión sobre dónde declarar el enlace se dio vuelta durante la iteración.**
+La recomendación inicial fue configurarlo en el panel, para no tocar la regla de
+credenciales de `CLAUDE.md`. El argumento que la revirtió salió del registro de
+despliegue de la iteración 11: Cloudflare ya buscaba un archivo de configuración de
+Wrangler y anotaba que no lo encontraba. No había nada que forzar. De ahí salió
+ADR-012, y con ella la distinción entre credencial e identificador.
+
+**El formato de error creció más de lo previsto, y valió la pena.** La tarea pedía
+distinguir «no hay datos» de «el servicio falló». Al implementarlo aparecieron
+cinco situaciones distintas, no dos, y dos de ellas no autorizan a usar el
+respaldo: una dirección mal escrita y un método rechazado. Están todas provocadas
+de verdad, no razonadas.
+
+**El middleware hubo que corregirlo.** La primera versión detectaba las direcciones
+inexistentes mirando el código 404. En local resultó que el servidor de archivos no
+responde 404 a una dirección desconocida: devuelve la portada con un 200. Se pasó a
+mirar el tipo de contenido. El error habría llegado a producción sin la prueba.
+
+**El nombre de la base se escribe sin tilde y en español.** Al aplicar el esquema en
+producción, `production` en vez de `produccion` costó un intento fallido. Quedó
+anotado en el manual.
+
+**La tabla local se puede perder.** Levantar dos servidores de desarrollo a la vez
+sobre el mismo estado reinició la base local y la tabla desapareció. Es material
+desechable y se rehace con `npm run datos:esquema`, pero conviene saberlo antes de
+perder diez minutos diagnosticando.
+
+### Deuda que esta iteración deja abierta
+
+- **`prueba_tuberia` quedó creada en la base de producción.** Es una tabla de
+  juguete viviendo en la base real. Hay que borrarla cuando el banco ocupe su
+  lugar; anotado en el registro para la iteración 21, que es donde se escribe la
+  primera migración del esquema real.
+- **Las vistas previas leen la base de producción**, porque no existe un bloque
+  `[env.preview]`. Inofensivo mientras la capa sea de solo lectura y el contenido
+  sea de juguete. Iteración 13.
+- **`/cuestionario.html` responde 308** hacia `/cuestionario`. Viene de la iteración
+  11; los enlaces internos pagan un salto de más.
+- **La orden de construcción no se puede declarar en `wrangler.toml`.** Es el único
+  ajuste de la publicación que el repositorio no cubre.
+
+### Convención de nombres en el límite · resuelta
+
+`snake_case` de extremo a extremo, sin traducir al cruzar hacia el navegador.
+Escrita en dos lugares para que la épica 20 no la reabra: el punto 3 de **ADR-011**
+y la regla correspondiente en `CLAUDE.md`. Aplicada ya a `usar_respaldo`, que era el
+único campo que discrepaba.
 
 ### Nota sobre el último criterio de aceptación
 
@@ -217,5 +285,6 @@ iteración: el `database_id` de D1 se versiona a propósito en `wrangler.toml`.
 La segunda mitad se cumple sin matices: no hay ninguna credencial en el
 repositorio, y `.wrangler/` y `.dev.vars` quedaron ignorados por git.
 
-Se deja el criterio sin marcar: replantearlo es decisión del autor, no de quien
-ejecutó la iteración.
+El criterio se marca cumplido con esa salvedad escrita, por decisión del autor al
+cerrar la iteración. Es el único de los ocho que no se cumple tal como estaba
+redactado el día que se escribió.
