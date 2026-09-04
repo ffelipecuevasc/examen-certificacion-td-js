@@ -598,3 +598,270 @@ después de esa revisión.
 porque el costo —perder 105 preguntas ya escritas y probadas— es inmediato y
 seguro, mientras que el beneficio —un solo formato de entrada— se paga una vez y se
 resuelve con código.
+
+---
+
+## ADR-017 · Los distractores evidentemente descartables se conservan: fidelidad al examen real
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-04
+
+**Decisión.** Las alternativas incorrectas que se descartan sin saber la materia
+—nombres de módulos, métodos o paquetes que no existen, respuestas absurdas—
+**no se corrigen**. Se conservan como están, y las preguntas que se escriban en
+adelante pueden tenerlas. Lo mismo vale para los enunciados que regalan parte de la
+respuesta.
+
+**Motivo.** Los testimonios de alumnos que rindieron el examen real de
+certificación de Talento Digital coinciden en que ese examen trae bastantes
+alternativas evidentemente descartables. Un banco de práctica con distractores
+impecables entrenaría para un examen que no es el que van a rendir: el estudiante
+llegaría acostumbrado a descartar solo por conocimiento, cuando en la prueba real
+va a poder descartar también por forma, y no habría ensayado nunca esa segunda
+habilidad. **La fidelidad al examen real pesa más que la calidad teórica del
+ítem.**
+
+**Esto no es un defecto que nadie alcanzó a arreglar. Es una elección.** El patrón
+saltó a la vista al comparar los dos bancos: el viejo compite contra alternativas
+que existen —`path`, `http`, `os`— y el nuevo inventa nombres que se caen solos
+—`path-directory (pd)`, `os-architecture`, `hasMultiple()`, `containsMany()`—. La
+reacción natural de quien lo vea es reescribirlos. **Quien llegue aquí con esa
+intención, que se detenga: corregirlo empeora la simulación.**
+
+**Dos casos concretos, para que se entienda el alcance.** En el par
+`m08#1 ↔ M8·1` sobre el principio *stateless*, la pregunta nueva dice en el
+enunciado «sin usar sesiones», que es media respuesta regalada, y la vieja no. Se
+quedó la nueva **sin modificarla**, por esta misma razón: si el examen real también
+da pistas en los enunciados, la nueva simula mejor esa realidad. Y en el par
+`m06#28 ↔ M6·10` se retiró la nueva —la de los módulos inventados— pero no por
+tener malos distractores: se retiró porque **una de las dos sobraba**, y entre dos
+preguntas equivalentes se conservó la que discrimina mejor. Elegir entre duplicados
+es otra cosa que corregir un ítem único.
+
+**Consecuencia · lo que esta decisión NO cubre.** Un ítem con **dos respuestas
+correctas** no es un distractor flojo: es un error, y se corrige. Ocurrió con
+`m07#21`, sobre el comando que abre un bloque transaccional en PostgreSQL: su
+alternativa (a) decía `START TRANSACTION`, que inicia una transacción igual que
+`BEGIN`. Se reemplazó por `SET TRANSACTION`, que existe, se parece mucho y **no
+abre nada**: fija las características de la transacción en curso y, sin un `BEGIN`
+previo, emite una advertencia y no hace nada más. Sus otras dos alternativas
+—`INIT` y `OPEN`— se dejaron flojas a propósito, que es justo lo que decide esta
+ADR. La frontera es esa: **se corrige lo que está mal, no lo que está fácil.**
+
+**Consecuencia · las herramientas no deben denunciarlo.** Ningún informe ni
+validación del proyecto puede marcar un distractor evidente como problema. Si
+alguna vez se automatiza una medida de calidad de ítems, esta ADR es la que dice
+dónde poner el umbral.
+
+**Consecuencia · la premisa es revisable, la decisión no se revierte sola.** Todo
+esto se sostiene sobre cómo es hoy el examen real. Si el examen cambia, cambia la
+premisa, y entonces se escribe una ADR nueva que sustituya a esta. Mientras tanto
+se deja como está.
+
+**Alternativa descartada.** Uniformar la calidad de los distractores de las 368
+preguntas, tomando el banco viejo como patrón. Se descarta porque el costo es alto
+—revisar y reescribir cientos de alternativas, con riesgo de introducir errores en
+preguntas que hoy funcionan— y porque el resultado sería un banco **más difícil que
+el examen que prepara**. Un simulacro que no se parece a la prueba mide otra cosa.
+
+---
+
+## ADR-018 · Las alternativas van en su propia tabla, no en cuatro columnas
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-04
+
+**Decisión.** Las alternativas de cada pregunta se guardan en una tabla
+`alternativa`, con una fila por alternativa y una llave foránea hacia `pregunta`.
+No se usan cuatro columnas `alternativa_a … alternativa_d`.
+
+**Motivo.** Cuatro columnas numeradas son un **grupo repetitivo**, que es
+exactamente lo que la primera forma normal prohíbe y exactamente lo que el módulo 5
+del plan formativo enseña. Este repositorio es público y el examen que prepara
+pregunta por normalización: un esquema que la viola en su tabla principal enseña lo
+contrario de lo que el sitio dice. Ese costo no lo paga el rendimiento, lo paga el
+producto. Con 368 preguntas ninguna de las dos formas se nota al consultar.
+
+**Motivo técnico, además del didáctico.** Dos cosas que el proyecto ya decidió
+dependen de que la alternativa sea una fila:
+
+- **Barajar (ADR-006).** Si la identidad de una alternativa es el nombre de su
+  columna, barajarlas obliga a armar una lista en JavaScript arrastrando la letra a
+  mano. Con filas, barajar es barajar filas.
+- **El caso de orden fijo.** Necesita una columna `orden`. En el modelo de columnas
+  el orden es implícito en los nombres, que es justo lo que impide tratar los dos
+  casos con el mismo mecanismo.
+
+**Consecuencia.** Toda lectura del banco lleva un `JOIN` y agrupa en el servidor, y
+editar una pregunta a mano pasa de tocar una fila a tocar cinco. Lo segundo lo
+resuelve el mecanismo de administración de la iteración 23.
+
+**Consecuencia · la base puede exigir bastante más de lo que parece.** Con
+`letra TEXT NOT NULL CHECK (letra IN ('a','b','c','d'))` y
+`UNIQUE (pregunta_id, letra)`, **la propia base garantiza que ninguna pregunta pase
+de cuatro alternativas**: solo hay cuatro letras posibles y cada una puede usarse
+una vez. Comprobado ejecutando las violaciones, no razonando sobre ellas.
+
+**El `NOT NULL` de `letra` sostiene esa garantía y no es decorativo.** Sin él, un
+`CHECK` sobre `NULL` no da falso sino `NULL`, y SQLite deja pasar la fila; y
+`UNIQUE` considera cada `NULL` distinto de los demás. Medido: con la misma tabla sin
+`NOT NULL`, se colaron **siete** alternativas en una sola pregunta. Quien alguna vez
+relaje esa columna abre la puerta sin darse cuenta.
+
+**Alternativa descartada · una columna JSON con las cuatro alternativas.** Es la
+peor de las tres para este proyecto: la base deja de poder validar nada —ni que sean
+cuatro, ni que haya una correcta, ni que las letras no se repitan— y el ejemplo
+didáctico pasa de «grupo repetitivo» a «aquí no usamos el modelo relacional».
+
+---
+
+## ADR-019 · La respuesta correcta es una bandera en la alternativa, con la unicidad forzada por un índice parcial
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-04
+
+**Decisión.** La respuesta correcta se marca con `alternativa.es_correcta`, y que
+haya como mucho una por pregunta lo garantiza un índice único parcial:
+
+```sql
+es_correcta INTEGER NOT NULL DEFAULT 0 CHECK (es_correcta IN (0, 1))
+
+CREATE UNIQUE INDEX alternativa_una_correcta
+    ON alternativa (pregunta_id) WHERE es_correcta = 1;
+```
+
+**Motivo.** ADR-006 obliga a barajar, y el sesgo de posición se corrige barajando
+(decisión del autor, 2026-09-04). Guardar «la correcta es la segunda» deja de
+significar nada cuando el orden cambia en cada carga: la corrección tiene que viajar
+pegada a su alternativa. Con la bandera, barajar no la afecta, y no hace falta ni
+una línea de código para conseguirlo.
+
+**El índice parcial no es un detalle de rendimiento, es la restricción.** Hace que
+la base **rechace** una segunda alternativa correcta. Vale la pena decir por qué
+importa: el par `m07#21 ↔ M7·8` tenía dos respuestas correctas y estuvo así hasta
+que una persona lo leyó. Esta restricción habría rechazado esa fila al cargarla.
+
+**Alternativa descartada · `pregunta.alternativa_correcta_id` como llave foránea.**
+Parece la opción más relacional y es peor. Crea una dependencia circular —insertar
+la pregunta, luego las alternativas, luego volver a actualizar la pregunta—, que
+complica las cargas por lotes y las migraciones repetibles; y una llave foránea
+simple no impide apuntar a una alternativa **de otra pregunta**. Evitarlo exige una
+llave compuesta y una columna redundante. La bandera con índice parcial consigue lo
+mismo sin nada de eso.
+
+**Consecuencia · `letra` y `orden` se conservan, pero son historia, no identidad.**
+`letra` es la que traía el origen —derivada del índice 0-3 en el banco viejo— y
+sirve para que un estudiante pueda reportar «la alternativa b está mal» y se
+encuentre. `orden` es el orden original. Ninguna de las dos decide qué es correcto.
+
+**Consecuencia · el orden fijo cuesta una rama, no cero.** `pregunta.orden_fijo`
+decide si el navegador ordena por `orden` o baraja. Es una decisión en un solo
+punto, la llamada a barajar, no un caso especial repartido por el código. Pero es
+una rama, y llamarlo «sin ramas» sería falso.
+
+**Consecuencia · habilita lo que ADR-007 dejó pendiente.** Con `es_correcta` en la
+tabla de alternativas, el extremo del simulacro puede seleccionar las alternativas
+**sin esa columna** y no enviar nunca la respuesta al navegador.
+
+**Lo que esta decisión NO garantiza.** El índice asegura «como mucho una correcta».
+«Al menos una» y «exactamente cuatro alternativas» quedan fuera del alcance del
+esquema y son responsabilidad de la consulta de verificación. La frontera completa
+está en `90-manual/esquema-del-banco.md`. Confundirla es el error previsible: la
+base no lo comprueba todo, y hay que saber qué parte no.
+
+---
+
+## ADR-020 · Las preguntas retiradas se marcan y se ocultan tras una vista, no se borran
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-04
+
+**Decisión.** `pregunta.estado` toma uno de tres valores —`borrador`, `activa`,
+`retirada`— y ninguna fila se borra nunca. El filtro no se repite en cada consulta:
+vive una sola vez, en una vista.
+
+```sql
+estado TEXT NOT NULL DEFAULT 'borrador'
+       CHECK (estado IN ('borrador', 'activa', 'retirada'))
+
+CREATE VIEW pregunta_activa AS SELECT ... FROM pregunta WHERE estado = 'activa';
+```
+
+**Motivo.** La objeción conocida —marcar obliga a filtrar en cada consulta— la
+responde la vista: se filtra una vez, en su definición. Ninguna lectura de
+`functions/api/` toca `pregunta` directamente; todas leen `pregunta_activa`. Una
+consulta futura no puede olvidar el filtro porque no lo escribe.
+
+Borrar las filas queda descartado por experiencia propia, no por teoría. Al aplicar
+los retiros por solapamiento, retirar `M8·11` disolvió una tabla del plan y corrió
+las posiciones de nueve preguntas más; incluso la pregunta de orden fijo pasó de la
+posición 13 a la 11. **Con filas que nunca se borran, los identificadores son
+estables para siempre** y ese problema no se repite.
+
+**Consecuencia · se guarda por qué se fue cada una.** `motivo_retiro`,
+`retirada_en` y `reemplazada_por` —llave foránea a otra pregunta— entran en la
+tabla. `reemplazada_por` es la que más vale: convierte los 34 pares de la revisión
+de solapamiento en un dato consultable. Dentro de un año, «¿por qué no está la
+pregunta del módulo `fs`?» se responde con una consulta y no con arqueología.
+
+**Consecuencia · la instantánea de respaldo se genera desde `pregunta_activa`.** Si
+se generara desde `pregunta`, el sitio degradado (ADR-008) mostraría al estudiante
+las preguntas que se decidió retirar.
+
+**Consecuencia · `borrador` no es adorno.** Las 368 llegan sin justificación y hay
+que redactarlas. `borrador` permite cargar una pregunta escrita pero no revisada sin
+que aparezca en el cuestionario, que es como se va a trabajar de verdad.
+
+**Consecuencia · lo que la base sí exige aquí.** Un `CHECK` obliga a que una
+pregunta `retirada` tenga motivo, y a que una que no lo esté no arrastre metadatos
+de retiro. Lo que la base **no** puede exigir es que cada pregunta tenga cuatro
+alternativas y al menos una correcta: eso lo comprueba `d1/verificar-banco.sql`
+después de cada carga, y falla ruidosamente.
+
+**Alternativa descartada · una tabla `pregunta_retirada` aparte.** Deja las
+consultas del banco limpias sin necesidad de vista, pero duplica el esquema entero,
+obliga a mover filas entre tablas para retirar o reponer una pregunta —con cambio de
+identificador incluido, que es justo lo que se quiere evitar— y rompe la llave
+foránea `reemplazada_por`.
+
+**Simplificación deliberada.** El estado de revisión y el de publicación son la
+misma columna. Se pueden separar; no vale la complejidad hasta que exista el
+mecanismo de administración de la iteración 23.
+
+---
+
+## ADR-021 · Los módulos son una tabla, y `pregunta.modulo` apunta a ella
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-04
+
+**Decisión.** Existe una tabla `modulo(numero, titulo, icono)` con las siete filas
+del plan formativo, y `pregunta.modulo` es una llave foránea hacia ella.
+
+**Motivo.** El título y el ícono de cada módulo son datos del banco y hoy no están
+en el banco: el origen viejo los trae por grupo, el nuevo solo trae el número, y en
+el sitio viven en `static/js/data/`. Si el esquema no les hace sitio, se pierden al
+migrar y el banco en D1 queda incompleto sin que nada avise.
+
+**Motivo · resuelve el problema de los dos formatos.** El banco viejo identifica el
+módulo como el texto `"Módulo 2"` y el nuevo como el entero `2`. Sin una tabla, esa
+diferencia se resuelve con una convención que alguien puede olvidar, y el mismo
+módulo entra dos veces. Con la llave foránea, **la base rechaza un módulo que no
+exista** en vez de dejar entrar un duplicado: el error aparece al cargar, no meses
+después al ver siete módulos convertidos en catorce.
+
+**Consecuencia.** Los siete módulos se cargan antes que cualquier pregunta, en la
+misma migración que crea el esquema. Son datos de referencia, no contenido variable:
+`numero` es la llave primaria, con `CHECK (numero BETWEEN 2 AND 8)`, porque el plan
+formativo empieza en el módulo 2.
+
+**Consecuencia.** Los títulos y los íconos dejan de estar duplicados entre
+`static/js/data/cuestionario.js` y `static/js/data/modules.js`. Cuál de los dos es
+la fuente después de la migración lo resuelve la iteración 31, al consumir el banco
+desde D1.
+
+**Alternativa descartada · repetir título e ícono en cada pregunta.** Es una
+dependencia transitiva de manual —el título depende del módulo, no de la pregunta— y
+la 3FN existe precisamente para eso. Además de incorrecto sería incoherente: el
+proyecto no puede evaluar la tercera forma normal en su banco de preguntas y
+violarla en la tabla que lo guarda.
+
+**Alternativa descartada · dejarlos en un archivo JavaScript del sitio.** Es lo que
+pasa hoy, y funciona mientras el banco venga del mismo repositorio. Deja de
+funcionar en cuanto el banco viene de D1: el sitio tendría que cruzar datos de dos
+fuentes distintas para dibujar el nombre de un módulo.

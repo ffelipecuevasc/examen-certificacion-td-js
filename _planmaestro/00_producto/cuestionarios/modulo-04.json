@@ -121,30 +121,6 @@
   },
   {
     "modulo": 4,
-    "numero": 6,
-    "enunciado": "¿Qué pilar de POO permite que objetos de distintas clases respondan al mismo método?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Polimorfismo."
-      },
-      {
-        "letra": "b",
-        "texto": "Encapsulamiento."
-      },
-      {
-        "letra": "c",
-        "texto": "Inyección de dependencias."
-      },
-      {
-        "letra": "d",
-        "texto": "Modularidad aislada."
-      }
-    ],
-    "correcta": "a"
-  },
-  {
-    "modulo": 4,
     "numero": 7,
     "enunciado": "Al instanciar un objeto con `new`, ¿qué función especial de la clase se ejecuta primero?",
     "alternativas": [
@@ -553,30 +529,6 @@
   },
   {
     "modulo": 4,
-    "numero": 24,
-    "enunciado": "¿Qué método previene la acción nativa por defecto de un evento (ej. envío de un formulario)?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "event.stopPropagation()"
-      },
-      {
-        "letra": "b",
-        "texto": "event.halt()"
-      },
-      {
-        "letra": "c",
-        "texto": "event.preventDefault()"
-      },
-      {
-        "letra": "d",
-        "texto": "event.cancelDefault()"
-      }
-    ],
-    "correcta": "c"
-  },
-  {
-    "modulo": 4,
     "numero": 25,
     "enunciado": "Si se asignan varios manejadores al mismo evento en un nodo con `addEventListener`, ¿qué pasa?",
     "alternativas": [
@@ -763,30 +715,6 @@
       {
         "letra": "d",
         "texto": "El motor de renderizado CSS."
-      }
-    ],
-    "correcta": "c"
-  },
-  {
-    "modulo": 4,
-    "numero": 33,
-    "enunciado": "¿Qué problema clásico de legibilidad estructural se produce al anidar excesivos callbacks?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Memory Leaks masivos."
-      },
-      {
-        "letra": "b",
-        "texto": "Bloqueo del Hilo Principal."
-      },
-      {
-        "letra": "c",
-        "texto": "Callback Hell (Pyramid of Doom)."
-      },
-      {
-        "letra": "d",
-        "texto": "Deadlocks en el servidor."
       }
     ],
     "correcta": "c"
@@ -1075,30 +1003,6 @@
       {
         "letra": "d",
         "texto": "response.objectify()"
-      }
-    ],
-    "correcta": "c"
-  },
-  {
-    "modulo": 4,
-    "numero": 46,
-    "enunciado": "Si una API externa responde con HTTP 404 a `fetch()`, ¿cómo se comporta la Promesa resultante?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "La promesa es rechazada (Rejected)."
-      },
-      {
-        "letra": "b",
-        "texto": "Entra al bloque catch ignorando el response."
-      },
-      {
-        "letra": "c",
-        "texto": "La promesa se resuelve exitosamente (Fulfilled)."
-      },
-      {
-        "letra": "d",
-        "texto": "Se lanza un error de red (TypeError) abortando."
       }
     ],
     "correcta": "c"

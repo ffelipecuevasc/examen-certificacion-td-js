@@ -962,24 +962,48 @@
   {
     "modulo": 3,
     "numero": 41,
-    "enunciado": "Al evaluar `typeof null` en el intérprete, ¿qué cadena retorna y por qué motivo histórico?",
+    "enunciado": "¿Qué recorre cada ciclo al aplicar `for...in` frente a `for...of` sobre un arreglo?",
     "alternativas": [
-      { "letra": "a", "texto": "Retorna \"null\", coherente con el valor primitivo evaluado." },
-      { "letra": "b", "texto": "Retorna \"undefined\", al carecer de asignación efectiva." },
-      { "letra": "c", "texto": "Lanza un TypeError por consultar un valor no inicializado." },
-      { "letra": "d", "texto": "Retorna \"object\", por un defecto heredado de las primeras versiones." }
+      {
+        "letra": "a",
+        "texto": "Ambos recorren los valores; solo cambia el orden de la iteración."
+      },
+      {
+        "letra": "b",
+        "texto": "`for...in` recorre los valores y `for...of` recorre las posiciones."
+      },
+      {
+        "letra": "c",
+        "texto": "Ambos recorren las claves; `for...of` además expone el arreglo completo."
+      },
+      {
+        "letra": "d",
+        "texto": "`for...in` recorre las claves del objeto y `for...of` recorre los valores."
+      }
     ],
     "correcta": "d"
   },
   {
     "modulo": 3,
     "numero": 42,
-    "enunciado": "¿Qué ocurre al intentar leer una variable declarada con `let` antes de la línea que la declara?",
+    "enunciado": "Al invocar `sort()` sin argumentos sobre el arreglo [10, 9, 100], ¿en qué orden queda y por qué?",
     "alternativas": [
-      { "letra": "a", "texto": "Se levanta un ReferenceError por la zona muerta temporal del bloque." },
-      { "letra": "b", "texto": "Se evalúa como undefined, igual que una declarada con var." },
-      { "letra": "c", "texto": "Se asigna automáticamente el valor null hasta alcanzar su declaración." },
-      { "letra": "d", "texto": "Se resuelve buscando la variable en el ámbito global inmediato." }
+      {
+        "letra": "a",
+        "texto": "[10, 100, 9], porque compara los elementos como texto y no como números."
+      },
+      {
+        "letra": "b",
+        "texto": "[9, 10, 100], porque el método detecta el tipo numérico automáticamente."
+      },
+      {
+        "letra": "c",
+        "texto": "[100, 10, 9], porque sin argumentos ordena de mayor a menor por omisión."
+      },
+      {
+        "letra": "d",
+        "texto": "[10, 9, 100], porque sin función comparadora conserva el orden original."
+      }
     ],
     "correcta": "a"
   },
@@ -988,10 +1012,22 @@
     "numero": 43,
     "enunciado": "En una estructura `switch`, ¿qué consecuencia acarrea omitir la sentencia `break` en un caso?",
     "alternativas": [
-      { "letra": "a", "texto": "El intérprete aborta la estructura completa lanzando SyntaxError." },
-      { "letra": "b", "texto": "El bloque se repite indefinidamente hasta cumplir la condición." },
-      { "letra": "c", "texto": "El control retorna al inicio del switch reevaluando la expresión." },
-      { "letra": "d", "texto": "La ejecución continúa en los casos siguientes hasta hallar un break." }
+      {
+        "letra": "a",
+        "texto": "El intérprete aborta la estructura completa lanzando SyntaxError."
+      },
+      {
+        "letra": "b",
+        "texto": "El bloque se repite indefinidamente hasta cumplir la condición."
+      },
+      {
+        "letra": "c",
+        "texto": "El control retorna al inicio del switch reevaluando la expresión."
+      },
+      {
+        "letra": "d",
+        "texto": "La ejecución continúa en los casos siguientes hasta hallar un break."
+      }
     ],
     "correcta": "d"
   },
@@ -1000,10 +1036,22 @@
     "numero": 44,
     "enunciado": "¿Cuál es la sintaxis correcta del operador condicional ternario para asignar un valor?",
     "alternativas": [
-      { "letra": "a", "texto": "let x = if (cond) ? valorA : valorB;" },
-      { "letra": "b", "texto": "let x = cond ? valorA | valorB;" },
-      { "letra": "c", "texto": "let x = cond ? valorA : valorB;" },
-      { "letra": "d", "texto": "let x = (cond) => valorA : valorB;" }
+      {
+        "letra": "a",
+        "texto": "let x = if (cond) ? valorA : valorB;"
+      },
+      {
+        "letra": "b",
+        "texto": "let x = cond ? valorA | valorB;"
+      },
+      {
+        "letra": "c",
+        "texto": "let x = cond ? valorA : valorB;"
+      },
+      {
+        "letra": "d",
+        "texto": "let x = (cond) => valorA : valorB;"
+      }
     ],
     "correcta": "c"
   },
@@ -1012,10 +1060,22 @@
     "numero": 45,
     "enunciado": "¿Qué delimitador y qué marcador exige una plantilla literal para interpolar una expresión?",
     "alternativas": [
-      { "letra": "a", "texto": "Comillas invertidas como delimitador y `${expresion}` como marcador." },
-      { "letra": "b", "texto": "Comillas dobles como delimitador y `#{expresion}` como marcador." },
-      { "letra": "c", "texto": "Comillas simples como delimitador y `%expresion%` como marcador." },
-      { "letra": "d", "texto": "Paréntesis como delimitador y `@{expresion}` como marcador." }
+      {
+        "letra": "a",
+        "texto": "Comillas invertidas como delimitador y `${expresion}` como marcador."
+      },
+      {
+        "letra": "b",
+        "texto": "Comillas dobles como delimitador y `#{expresion}` como marcador."
+      },
+      {
+        "letra": "c",
+        "texto": "Comillas simples como delimitador y `%expresion%` como marcador."
+      },
+      {
+        "letra": "d",
+        "texto": "Paréntesis como delimitador y `@{expresion}` como marcador."
+      }
     ],
     "correcta": "a"
   },
@@ -1024,10 +1084,22 @@
     "numero": 46,
     "enunciado": "Si a un arreglo de diez elementos se le asigna `length = 4`, ¿qué le sucede a su contenido?",
     "alternativas": [
-      { "letra": "a", "texto": "La asignación se ignora, pues length es una propiedad de solo lectura." },
-      { "letra": "b", "texto": "Los elementos sobrantes se desplazan al inicio conservando su valor." },
-      { "letra": "c", "texto": "Se lanza un RangeError por reducir la capacidad ya reservada." },
-      { "letra": "d", "texto": "El arreglo se trunca y los elementos posteriores al índice 3 se descartan." }
+      {
+        "letra": "a",
+        "texto": "La asignación se ignora, pues length es una propiedad de solo lectura."
+      },
+      {
+        "letra": "b",
+        "texto": "Los elementos sobrantes se desplazan al inicio conservando su valor."
+      },
+      {
+        "letra": "c",
+        "texto": "Se lanza un RangeError por reducir la capacidad ya reservada."
+      },
+      {
+        "letra": "d",
+        "texto": "El arreglo se trunca y los elementos posteriores al índice 3 se descartan."
+      }
     ],
     "correcta": "d"
   },
@@ -1036,10 +1108,22 @@
     "numero": 47,
     "enunciado": "Respecto al método `push()` sobre un arreglo, ¿dónde inserta y qué valor devuelve la llamada?",
     "alternativas": [
-      { "letra": "a", "texto": "Inserta al inicio y devuelve el elemento recién incorporado." },
-      { "letra": "b", "texto": "Inserta al final y devuelve la nueva longitud del arreglo." },
-      { "letra": "c", "texto": "Inserta al final y devuelve una copia superficial del arreglo." },
-      { "letra": "d", "texto": "Inserta al inicio y devuelve el índice asignado al elemento." }
+      {
+        "letra": "a",
+        "texto": "Inserta al inicio y devuelve el elemento recién incorporado."
+      },
+      {
+        "letra": "b",
+        "texto": "Inserta al final y devuelve la nueva longitud del arreglo."
+      },
+      {
+        "letra": "c",
+        "texto": "Inserta al final y devuelve una copia superficial del arreglo."
+      },
+      {
+        "letra": "d",
+        "texto": "Inserta al inicio y devuelve el índice asignado al elemento."
+      }
     ],
     "correcta": "b"
   },
@@ -1048,10 +1132,22 @@
     "numero": 48,
     "enunciado": "¿Cuál es la distinción sustantiva entre invocar `slice()` y aplicar `splice()` sobre un arreglo?",
     "alternativas": [
-      { "letra": "a", "texto": "slice devuelve una porción sin alterar el original; splice muta el arreglo." },
-      { "letra": "b", "texto": "slice muta el arreglo original; splice opera sobre una copia aislada." },
-      { "letra": "c", "texto": "Ambos mutan el original, diferenciándose solo en el orden de los índices." },
-      { "letra": "d", "texto": "slice actúa sobre cadenas exclusivamente y splice sobre arreglos." }
+      {
+        "letra": "a",
+        "texto": "slice devuelve una porción sin alterar el original; splice muta el arreglo."
+      },
+      {
+        "letra": "b",
+        "texto": "slice muta el arreglo original; splice opera sobre una copia aislada."
+      },
+      {
+        "letra": "c",
+        "texto": "Ambos mutan el original, diferenciándose solo en el orden de los índices."
+      },
+      {
+        "letra": "d",
+        "texto": "slice actúa sobre cadenas exclusivamente y splice sobre arreglos."
+      }
     ],
     "correcta": "a"
   },
@@ -1060,10 +1156,22 @@
     "numero": 49,
     "enunciado": "Al ejecutar `parseInt(\"08px\")`, ¿qué valor entrega el analizador y bajo qué criterio se detiene?",
     "alternativas": [
-      { "letra": "a", "texto": "Entrega NaN, porque la cadena mezcla dígitos con caracteres alfabéticos." },
-      { "letra": "b", "texto": "Entrega 0, deteniéndose ante el cero inicial interpretado como octal." },
-      { "letra": "c", "texto": "Entrega \"08\", conservando el tipo String de la cadena original." },
-      { "letra": "d", "texto": "Entrega 8, deteniéndose en el primer carácter no numérico hallado." }
+      {
+        "letra": "a",
+        "texto": "Entrega NaN, porque la cadena mezcla dígitos con caracteres alfabéticos."
+      },
+      {
+        "letra": "b",
+        "texto": "Entrega 0, deteniéndose ante el cero inicial interpretado como octal."
+      },
+      {
+        "letra": "c",
+        "texto": "Entrega \"08\", conservando el tipo String de la cadena original."
+      },
+      {
+        "letra": "d",
+        "texto": "Entrega 8, deteniéndose en el primer carácter no numérico hallado."
+      }
     ],
     "correcta": "d"
   },
@@ -1072,10 +1180,22 @@
     "numero": 50,
     "enunciado": "Si un objeto se declara con `const`, ¿qué operaciones permanecen permitidas sobre él?",
     "alternativas": [
-      { "letra": "a", "texto": "Ninguna: el objeto queda congelado y rechaza toda escritura posterior." },
-      { "letra": "b", "texto": "Solo la reasignación completa del identificador a otro objeto." },
-      { "letra": "c", "texto": "Modificar, agregar y eliminar propiedades, pero no reasignar el identificador." },
-      { "letra": "d", "texto": "Únicamente la lectura de propiedades ya existentes al momento de declararlo." }
+      {
+        "letra": "a",
+        "texto": "Ninguna: el objeto queda congelado y rechaza toda escritura posterior."
+      },
+      {
+        "letra": "b",
+        "texto": "Solo la reasignación completa del identificador a otro objeto."
+      },
+      {
+        "letra": "c",
+        "texto": "Modificar, agregar y eliminar propiedades, pero no reasignar el identificador."
+      },
+      {
+        "letra": "d",
+        "texto": "Únicamente la lectura de propiedades ya existentes al momento de declararlo."
+      }
     ],
     "correcta": "c"
   }

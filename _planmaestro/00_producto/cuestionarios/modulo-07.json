@@ -486,7 +486,7 @@
     "alternativas": [
       {
         "letra": "a",
-        "texto": "START TRANSACTION"
+        "texto": "SET TRANSACTION"
       },
       {
         "letra": "b",
@@ -502,30 +502,6 @@
       }
     ],
     "correcta": "b"
-  },
-  {
-    "modulo": 7,
-    "numero": 22,
-    "enunciado": "¿Qué propiedad fundamental ACID asegura que una transacción se aplique por completo o fracase?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Aislamiento"
-      },
-      {
-        "letra": "b",
-        "texto": "Consistencia"
-      },
-      {
-        "letra": "c",
-        "texto": "Durabilidad"
-      },
-      {
-        "letra": "d",
-        "texto": "Atomicidad"
-      }
-    ],
-    "correcta": "d"
   },
   {
     "modulo": 7,
@@ -862,30 +838,6 @@
       }
     ],
     "correcta": "a"
-  },
-  {
-    "modulo": 7,
-    "numero": 37,
-    "enunciado": "En una relación \"Uno a Muchos\" (1:N), ¿qué método de asociación define el modelo principal?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "hasMultiple()"
-      },
-      {
-        "letra": "b",
-        "texto": "hasMany()"
-      },
-      {
-        "letra": "c",
-        "texto": "containsMany()"
-      },
-      {
-        "letra": "d",
-        "texto": "includes()"
-      }
-    ],
-    "correcta": "b"
   },
   {
     "modulo": 7,

@@ -529,30 +529,6 @@
   },
   {
     "modulo": 6,
-    "numero": 23,
-    "enunciado": "En la sintaxis de Handlebars, ¿cómo se inyecta y renderiza una variable pasada por el servidor?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "{{ variable }}"
-      },
-      {
-        "letra": "b",
-        "texto": "<%= variable %>"
-      },
-      {
-        "letra": "c",
-        "texto": "${ variable }"
-      },
-      {
-        "letra": "d",
-        "texto": "{@ variable @}"
-      }
-    ],
-    "correcta": "a"
-  },
-  {
-    "modulo": 6,
     "numero": 24,
     "enunciado": "¿Qué concepto en Handlebars permite reutilizar bloques de código HTML, como un header o footer?",
     "alternativas": [
@@ -646,30 +622,6 @@
       }
     ],
     "correcta": "c"
-  },
-  {
-    "modulo": 6,
-    "numero": 28,
-    "enunciado": "¿Qué módulo nativo de Node.js es indispensable para interactuar con archivos planos del sistema?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "file-system (fs)"
-      },
-      {
-        "letra": "b",
-        "texto": "path-directory (pd)"
-      },
-      {
-        "letra": "c",
-        "texto": "os-architecture"
-      },
-      {
-        "letra": "d",
-        "texto": "input-output (io)"
-      }
-    ],
-    "correcta": "a"
   },
   {
     "modulo": 6,

@@ -21,28 +21,6 @@ export const cuestionario = [
         "fijo": false
       },
       {
-        "q": "¿Qué etiqueta HTML agrupa campos y etiquetas asociadas dentro de un formulario?",
-        "opciones": [
-          "<fieldset>",
-          "<section>",
-          "<hgroup>",
-          "<article>"
-        ],
-        "correcta": 0,
-        "fijo": false
-      },
-      {
-        "q": "En el modelo de cajas CSS, ¿qué propiedad incluye el padding y el border dentro del ancho total declarado?",
-        "opciones": [
-          "box-sizing: content-box;",
-          "box-sizing: border-box;",
-          "display: inline-block;",
-          "overflow: inner-box;"
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
         "q": "¿Cuál selector CSS posee mayor especificidad entre un ID, una clase, un elemento y un pseudo-elemento?",
         "opciones": [
           "El selector de elementos básicos.",
@@ -182,28 +160,6 @@ export const cuestionario = [
     "icono": "data-object",
     "preguntas": [
       {
-        "q": "¿Qué limitación estricta de seguridad tiene JavaScript al ejecutarse nativamente en el navegador web?",
-        "opciones": [
-          "No puede manipular el DOM asíncronamente.",
-          "No tiene acceso directo al sistema de archivos local del usuario.",
-          "Está bloqueado para realizar peticiones HTTP (AJAX).",
-          "No puede ejecutarse en la consola para depurar variables."
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Cuál es el motor de JavaScript que utiliza Google Chrome para su entorno de ejecución web?",
-        "opciones": [
-          "SpiderMonkey",
-          "ChakraCore",
-          "Motor V8",
-          "JavaScriptCore"
-        ],
-        "correcta": 2,
-        "fijo": false
-      },
-      {
         "q": "En condicionales, ¿qué sucede al evaluar una expresión con coerción de tipos estricta (===)?",
         "opciones": [
           "Convierte los tipos de datos antes de comparar sus valores.",
@@ -254,17 +210,6 @@ export const cuestionario = [
           "El ciclo interior modificará el contador del ciclo exterior.",
           "El navegador arroja un error de sintaxis bloqueante.",
           "Convierte automáticamente el arreglo iterado en un objeto."
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué característica define el comportamiento único del ciclo do/while respecto al ciclo while?",
-        "opciones": [
-          "Comprueba la condición antes de ejecutar el bloque interior.",
-          "Ejecuta el bloque al menos una vez sin evaluar la condición.",
-          "Solo permite iterar sobre objetos literales, no sobre arreglos.",
-          "Se utiliza exclusivamente para iterar respuestas asíncronas lentas."
         ],
         "correcta": 1,
         "fijo": false
@@ -322,17 +267,6 @@ export const cuestionario = [
           "objeto[metodo()]"
         ],
         "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué método del objeto Math retorna el valor de un número decimal redondeado al entero superior?",
-        "opciones": [
-          "Math.floor()",
-          "Math.round()",
-          "Math.ceil()",
-          "Math.trunc()"
-        ],
-        "correcta": 2,
         "fijo": false
       },
       {
@@ -526,17 +460,6 @@ export const cuestionario = [
     "icono": "database",
     "preguntas": [
       {
-        "q": "¿Qué propiedad de un RDBMS asegura que una transacción se complete totalmente o no se aplique en absoluto?",
-        "opciones": [
-          "Consistencia de datos.",
-          "Aislamiento (Isolation).",
-          "Atomicidad (Atomicity).",
-          "Durabilidad (Durability)."
-        ],
-        "correcta": 2,
-        "fijo": false
-      },
-      {
         "q": "¿Cuál es el propósito principal del \"journaling\" o registro de transacciones en un RDBMS?",
         "opciones": [
           "Optimizar la velocidad de lectura de las tablas indexadas.",
@@ -589,28 +512,6 @@ export const cuestionario = [
           "REVERT STATE"
         ],
         "correcta": 2,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué problema de concurrencia evita la propiedad de \"aislamiento\" (isolation) en las transacciones?",
-        "opciones": [
-          "Lecturas sucias y modificaciones fantasma no confirmadas.",
-          "Pérdida total de datos ante un corte de energía eléctrica.",
-          "El desbordamiento de memoria caché por consultas pesadas.",
-          "Duplicidad estricta de las llaves primarias de una tabla."
-        ],
-        "correcta": 0,
-        "fijo": false
-      },
-      {
-        "q": "Si ejecutas un DELETE sin cláusula WHERE, y logras hacer COMMIT, ¿qué efecto tiene en la tabla?",
-        "opciones": [
-          "La tabla es eliminada completamente de la base de datos.",
-          "Todos los registros se borran, pero la estructura queda.",
-          "El comando falla por violación estricta de seguridad.",
-          "Solo se borra el último registro ingresado a la tabla."
-        ],
-        "correcta": 1,
         "fijo": false
       },
       {
@@ -669,17 +570,6 @@ export const cuestionario = [
         "fijo": false
       },
       {
-        "q": "En un modelo relacional físico, ¿cómo se suele resolver una relación de \"muchos a muchos\"?",
-        "opciones": [
-          "Duplicando la llave primaria en ambas tablas directamente.",
-          "Utilizando arreglos JSON dentro de una sola celda de tabla.",
-          "Creando una tercera tabla intermedia que asocie ambas llaves.",
-          "Creando restricciones CHECK cruzadas entre las dos tablas."
-        ],
-        "correcta": 2,
-        "fijo": false
-      },
-      {
         "q": "¿Qué elemento central documenta formalmente las tablas, atributos, tipos de datos y sus restricciones?",
         "opciones": [
           "El mapa conceptual físico.",
@@ -717,17 +607,6 @@ export const cuestionario = [
           "Un proceso independiente para balanceo de carga."
         ],
         "correcta": 2,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué diferencia principal existe entre instrucciones \"blocking\" y \"non-blocking\" en el ciclo de Node?",
-        "opciones": [
-          "Las non-blocking detienen el flujo principal de ejecución.",
-          "Las blocking impiden que otras tareas se ejecuten en el hilo.",
-          "Las non-blocking consumen toda la memoria RAM disponible.",
-          "Las blocking delegan la tarea a un proceso Worker externo."
-        ],
-        "correcta": 1,
         "fijo": false
       },
       {
@@ -870,34 +749,12 @@ export const cuestionario = [
     "icono": "layers",
     "preguntas": [
       {
-        "q": "¿Cuál es la principal ventaja técnica de usar un \"Pool\" de conexiones frente a conexiones simples?",
-        "opciones": [
-          "Cifra automáticamente el tráfico hacia la base de datos.",
-          "Reutiliza conexiones activas evitando sobrecarga del servidor.",
-          "Permite ejecutar consultas SQL sin validación previa.",
-          "Elimina la necesidad de definir variables de entorno."
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
         "q": "¿Qué sucede internamente al invocar client.release() tras usar una conexión de un Pool con 'pg'?",
         "opciones": [
           "Se destruye físicamente la conexión con el servidor.",
           "Devuelve la conexión al pool para que sea reutilizada.",
           "Obliga a cerrar todas las transacciones pendientes.",
           "Borra la caché de consultas precompiladas del cliente."
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué técnica fundamental evita ataques de Inyección SQL en consultas utilizando el paquete 'pg'?",
-        "opciones": [
-          "Sanitizar variables usando expresiones regulares nativas.",
-          "Usar consultas parametrizadas o Prepared Statements.",
-          "Concatenar cadenas con el operador \"+\" estrictamente.",
-          "Bloquear todas las peticiones con sentencias DROP o DELETE."
         ],
         "correcta": 1,
         "fijo": false
@@ -947,34 +804,12 @@ export const cuestionario = [
         "fijo": false
       },
       {
-        "q": "¿Qué comando SQL marca el inicio formal de un bloque transaccional en PostgreSQL?",
-        "opciones": [
-          "START TRANSACTION",
-          "BEGIN",
-          "INIT TRANSACTION",
-          "OPEN SESSION"
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
         "q": "Si ocurre un error en la tercera consulta de una transacción, ¿qué instrucción debe ejecutarse?",
         "opciones": [
           "COMMIT PARCIAL",
           "ROLLBACK",
           "DROP TRANSACTION",
           "REVERT CACHE"
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué propiedad de las transacciones (ACID) garantiza que los datos no se modifiquen a medias?",
-        "opciones": [
-          "Consistencia (Consistency)",
-          "Atomicidad (Atomicity)",
-          "Aislamiento (Isolation)",
-          "Durabilidad (Durability)"
         ],
         "correcta": 1,
         "fijo": false
@@ -988,17 +823,6 @@ export const cuestionario = [
           "Una función genérica para crear vistas relacionales SQL."
         ],
         "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué método de Sequelize se utiliza típicamente para actualizar registros existentes en la BD?",
-        "opciones": [
-          "Model.saveChanges()",
-          "Model.modify()",
-          "Model.update()",
-          "Model.set()"
-        ],
-        "correcta": 2,
         "fijo": false
       },
       {
@@ -1042,17 +866,6 @@ export const cuestionario = [
     "icono": "shield-lock",
     "preguntas": [
       {
-        "q": "¿Qué principio arquitectónico REST dicta que cada petición debe contener toda la información para procesarse?",
-        "opciones": [
-          "Separación cliente-servidor estricta.",
-          "Interfaz uniforme con mensajes descriptivos.",
-          "Arquitectura sin estado (Stateless).",
-          "Sistema de capas jerárquicas en caché."
-        ],
-        "correcta": 2,
-        "fijo": false
-      },
-      {
         "q": "Según las buenas prácticas REST, ¿cómo debe estructurarse el endpoint para obtener un recurso específico?",
         "opciones": [
           "GET /obtenerUsuario?id=123",
@@ -1075,39 +888,6 @@ export const cuestionario = [
         "fijo": false
       },
       {
-        "q": "¿Qué código HTTP es el estándar para indicar que un recurso fue creado exitosamente mediante POST?",
-        "opciones": [
-          "200 OK",
-          "201 Created",
-          "202 Accepted",
-          "204 No Content"
-        ],
-        "correcta": 1,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué verbo HTTP debe utilizarse para reemplazar por completo la representación de un recurso existente?",
-        "opciones": [
-          "PATCH",
-          "POST",
-          "UPDATE",
-          "PUT"
-        ],
-        "correcta": 3,
-        "fijo": false
-      },
-      {
-        "q": "¿Qué familia de códigos de estado HTTP indica que la petición del cliente tiene errores de sintaxis?",
-        "opciones": [
-          "2XX (Éxito)",
-          "3XX (Redirección)",
-          "4XX (Error del cliente)",
-          "5XX (Error del servidor)"
-        ],
-        "correcta": 2,
-        "fijo": false
-      },
-      {
         "q": "En Express, ¿qué middleware estándar se usa comúnmente para parsear el cuerpo JSON de una petición POST?",
         "opciones": [
           "express.json()",
@@ -1116,17 +896,6 @@ export const cuestionario = [
           "express.raw()"
         ],
         "correcta": 0,
-        "fijo": false
-      },
-      {
-        "q": "Al manejar parámetros de ruta dinámicos en Express como /users/:id, ¿cómo se extrae el valor del id?",
-        "opciones": [
-          "req.query.id",
-          "req.params.id",
-          "req.body.id",
-          "req.header.id"
-        ],
-        "correcta": 1,
         "fijo": false
       },
       {
@@ -1149,17 +918,6 @@ export const cuestionario = [
           "Invocando path.resolve() directo al JSON."
         ],
         "correcta": 2,
-        "fijo": false
-      },
-      {
-        "q": "¿Por qué es crítico validar la extensión del archivo subido antes de guardarlo en el servidor Express?",
-        "opciones": [
-          "Para comprimir automáticamente las imágenes pesadas.",
-          "Para evitar la ejecución de código malicioso remoto.",
-          "Para convertir todos los archivos a formato PDF nativo.",
-          "Para asignar dinámicamente un tamaño en la base de datos."
-        ],
-        "correcta": 1,
         "fijo": false
       },
       {

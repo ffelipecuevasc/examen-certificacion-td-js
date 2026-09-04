@@ -889,30 +889,6 @@
   },
   {
     "modulo": 2,
-    "numero": 38,
-    "enunciado": "¿Qué capa metodológica abstracta añade el Pull Request de GitHub ausente en el core nativo de Git?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Interfaz gráfica de red para forzar descargas asíncronas remotas."
-      },
-      {
-        "letra": "b",
-        "texto": "Repositorio aislado temporal que purga la historia del nodo raíz."
-      },
-      {
-        "letra": "c",
-        "texto": "Foro técnico validado para auditar y debatir código antes de unir."
-      },
-      {
-        "letra": "d",
-        "texto": "Motor de inteligencia que solventa dependencias circulares solas."
-      }
-    ],
-    "correcta": "c"
-  },
-  {
-    "modulo": 2,
     "numero": 39,
     "enunciado": "En presencia de un Merge Conflict grave, ¿qué protocolo manual asume irrevocablemente el usuario?",
     "alternativas": [

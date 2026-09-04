@@ -1,0 +1,867 @@
+{
+  "banco_nuevo": [
+    {
+      "origen": "modulo-02.json",
+      "modulo": 2,
+      "numero": 38,
+      "par": "m02#38 vs M2-14",
+      "razon": "la nueva esta inflada y sus distractores no son plausibles",
+      "pregunta": {
+        "modulo": 2,
+        "numero": 38,
+        "enunciado": "¿Qué capa metodológica abstracta añade el Pull Request de GitHub ausente en el core nativo de Git?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Interfaz gráfica de red para forzar descargas asíncronas remotas."
+          },
+          {
+            "letra": "b",
+            "texto": "Repositorio aislado temporal que purga la historia del nodo raíz."
+          },
+          {
+            "letra": "c",
+            "texto": "Foro técnico validado para auditar y debatir código antes de unir."
+          },
+          {
+            "letra": "d",
+            "texto": "Motor de inteligencia que solventa dependencias circulares solas."
+          }
+        ],
+        "correcta": "c"
+      }
+    },
+    {
+      "origen": "modulo-04.json",
+      "modulo": 4,
+      "numero": 6,
+      "par": "m04#6 vs M4-3",
+      "razon": "la vieja compite contra pilares reales de POO",
+      "pregunta": {
+        "modulo": 4,
+        "numero": 6,
+        "enunciado": "¿Qué pilar de POO permite que objetos de distintas clases respondan al mismo método?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Polimorfismo."
+          },
+          {
+            "letra": "b",
+            "texto": "Encapsulamiento."
+          },
+          {
+            "letra": "c",
+            "texto": "Inyección de dependencias."
+          },
+          {
+            "letra": "d",
+            "texto": "Modularidad aislada."
+          }
+        ],
+        "correcta": "a"
+      }
+    },
+    {
+      "origen": "modulo-04.json",
+      "modulo": 4,
+      "numero": 24,
+      "par": "m04#24 vs M4-8",
+      "razon": "la vieja incluye stopImmediatePropagation(), la confusion real",
+      "pregunta": {
+        "modulo": 4,
+        "numero": 24,
+        "enunciado": "¿Qué método previene la acción nativa por defecto de un evento (ej. envío de un formulario)?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "event.stopPropagation()"
+          },
+          {
+            "letra": "b",
+            "texto": "event.halt()"
+          },
+          {
+            "letra": "c",
+            "texto": "event.preventDefault()"
+          },
+          {
+            "letra": "d",
+            "texto": "event.cancelDefault()"
+          }
+        ],
+        "correcta": "c"
+      }
+    },
+    {
+      "origen": "modulo-04.json",
+      "modulo": 4,
+      "numero": 33,
+      "par": "m04#33 vs M4-10",
+      "razon": "la vieja evalua un eslabon mas: el problema y que las promesas lo resuelven",
+      "pregunta": {
+        "modulo": 4,
+        "numero": 33,
+        "enunciado": "¿Qué problema clásico de legibilidad estructural se produce al anidar excesivos callbacks?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Memory Leaks masivos."
+          },
+          {
+            "letra": "b",
+            "texto": "Bloqueo del Hilo Principal."
+          },
+          {
+            "letra": "c",
+            "texto": "Callback Hell (Pyramid of Doom)."
+          },
+          {
+            "letra": "d",
+            "texto": "Deadlocks en el servidor."
+          }
+        ],
+        "correcta": "c"
+      }
+    },
+    {
+      "origen": "modulo-04.json",
+      "modulo": 4,
+      "numero": 46,
+      "par": "m04#46 vs M4-14",
+      "razon": "la correcta de la vieja anade que ok queda en falso",
+      "pregunta": {
+        "modulo": 4,
+        "numero": 46,
+        "enunciado": "Si una API externa responde con HTTP 404 a `fetch()`, ¿cómo se comporta la Promesa resultante?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "La promesa es rechazada (Rejected)."
+          },
+          {
+            "letra": "b",
+            "texto": "Entra al bloque catch ignorando el response."
+          },
+          {
+            "letra": "c",
+            "texto": "La promesa se resuelve exitosamente (Fulfilled)."
+          },
+          {
+            "letra": "d",
+            "texto": "Se lanza un error de red (TypeError) abortando."
+          }
+        ],
+        "correcta": "c"
+      }
+    },
+    {
+      "origen": "modulo-05.json",
+      "modulo": 5,
+      "numero": 5,
+      "par": "m05#5 vs M5-4",
+      "razon": "la vieja compite con clausulas SQL que existen",
+      "pregunta": {
+        "modulo": 5,
+        "numero": 5,
+        "enunciado": "¿Qué cláusula SQL permite filtrar registros evaluando el resultado de una función de agregación?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "CLÁUSULA WHERE"
+          },
+          {
+            "letra": "b",
+            "texto": "FILTER BY AGGREGATE"
+          },
+          {
+            "letra": "c",
+            "texto": "CLÁUSULA HAVING"
+          },
+          {
+            "letra": "d",
+            "texto": "GROUP BY CONDITION"
+          }
+        ],
+        "correcta": "c"
+      }
+    },
+    {
+      "origen": "modulo-05.json",
+      "modulo": 5,
+      "numero": 25,
+      "par": "m05#25 vs M5-10",
+      "razon": "la vieja nombra la integridad referencial y ofrece PRIMARY KEY",
+      "pregunta": {
+        "modulo": 5,
+        "numero": 25,
+        "enunciado": "¿Qué restricción asegura que el valor de un campo obligatoriamente exista como llave en otra tabla?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Restricción DEFAULT"
+          },
+          {
+            "letra": "b",
+            "texto": "Restricción UNIQUE"
+          },
+          {
+            "letra": "c",
+            "texto": "Restricción CHECK"
+          },
+          {
+            "letra": "d",
+            "texto": "Restricción FOREIGN KEY"
+          }
+        ],
+        "correcta": "d"
+      }
+    },
+    {
+      "origen": "modulo-06.json",
+      "modulo": 6,
+      "numero": 23,
+      "par": "m06#23 vs M6-7",
+      "razon": "la vieja evalua el escapado automatico y ofrece la triple llave",
+      "pregunta": {
+        "modulo": 6,
+        "numero": 23,
+        "enunciado": "En la sintaxis de Handlebars, ¿cómo se inyecta y renderiza una variable pasada por el servidor?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "{{ variable }}"
+          },
+          {
+            "letra": "b",
+            "texto": "<%= variable %>"
+          },
+          {
+            "letra": "c",
+            "texto": "${ variable }"
+          },
+          {
+            "letra": "d",
+            "texto": "{@ variable @}"
+          }
+        ],
+        "correcta": "a"
+      }
+    },
+    {
+      "origen": "modulo-06.json",
+      "modulo": 6,
+      "numero": 28,
+      "par": "m06#28 vs M6-10",
+      "razon": "la vieja compite contra modulos que existen (path, http, os)",
+      "pregunta": {
+        "modulo": 6,
+        "numero": 28,
+        "enunciado": "¿Qué módulo nativo de Node.js es indispensable para interactuar con archivos planos del sistema?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "file-system (fs)"
+          },
+          {
+            "letra": "b",
+            "texto": "path-directory (pd)"
+          },
+          {
+            "letra": "c",
+            "texto": "os-architecture"
+          },
+          {
+            "letra": "d",
+            "texto": "input-output (io)"
+          }
+        ],
+        "correcta": "a"
+      }
+    },
+    {
+      "origen": "modulo-07.json",
+      "modulo": 7,
+      "numero": 22,
+      "par": "cuarteto de atomicidad",
+      "razon": "sobrevive m05#17 en el modulo 5",
+      "pregunta": {
+        "modulo": 7,
+        "numero": 22,
+        "enunciado": "¿Qué propiedad fundamental ACID asegura que una transacción se aplique por completo o fracase?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Aislamiento"
+          },
+          {
+            "letra": "b",
+            "texto": "Consistencia"
+          },
+          {
+            "letra": "c",
+            "texto": "Durabilidad"
+          },
+          {
+            "letra": "d",
+            "texto": "Atomicidad"
+          }
+        ],
+        "correcta": "d"
+      }
+    },
+    {
+      "origen": "modulo-07.json",
+      "modulo": 7,
+      "numero": 37,
+      "par": "m07#37 vs M7-13",
+      "razon": "la vieja nombra Sequelize y compite con los cuatro metodos reales",
+      "pregunta": {
+        "modulo": 7,
+        "numero": 37,
+        "enunciado": "En una relación \"Uno a Muchos\" (1:N), ¿qué método de asociación define el modelo principal?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "hasMultiple()"
+          },
+          {
+            "letra": "b",
+            "texto": "hasMany()"
+          },
+          {
+            "letra": "c",
+            "texto": "containsMany()"
+          },
+          {
+            "letra": "d",
+            "texto": "includes()"
+          }
+        ],
+        "correcta": "b"
+      }
+    },
+    {
+      "origen": "modulo-08.json",
+      "modulo": 8,
+      "numero": 4,
+      "par": "m08#4 vs M8-3",
+      "razon": "la nueva nombra HATEOAS en el enunciado y luego pide su definicion",
+      "pregunta": {
+        "modulo": 8,
+        "numero": 4,
+        "enunciado": "¿Qué concepto REST provee enlaces hipermedia dinámicos para navegar por la API (HATEOAS)?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Versionamiento semántico estricto."
+          },
+          {
+            "letra": "b",
+            "texto": "Filtrado y paginación por query params."
+          },
+          {
+            "letra": "c",
+            "texto": "Inclusión de hipervínculos relacionados en la respuesta."
+          },
+          {
+            "letra": "d",
+            "texto": "Restricción de acceso mediante tokens criptográficos."
+          }
+        ],
+        "correcta": "c"
+      }
+    },
+    {
+      "origen": "modulo-08.json",
+      "modulo": 8,
+      "numero": 11,
+      "par": "m08#11 vs M8-7",
+      "razon": "la correcta de la nueva son dos respuestas en una",
+      "pregunta": {
+        "modulo": 8,
+        "numero": 11,
+        "enunciado": "Al crear un servidor REST en Express, ¿qué paquete parsea automáticamente el cuerpo (body) JSON?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "json-parser"
+          },
+          {
+            "letra": "b",
+            "texto": "body-parser o express.json()"
+          },
+          {
+            "letra": "c",
+            "texto": "rest-parser"
+          },
+          {
+            "letra": "d",
+            "texto": "payload-reader"
+          }
+        ],
+        "correcta": "b"
+      }
+    },
+    {
+      "origen": "modulo-08.json",
+      "modulo": 8,
+      "numero": 21,
+      "par": "m08#21 vs M8-9",
+      "razon": "la vieja compite contra paquetes de Express que existen",
+      "pregunta": {
+        "modulo": 8,
+        "numero": 21,
+        "enunciado": "¿Qué middleware de terceros se enseña comúnmente en Node para interceptar subida de archivos?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "express-fileupload"
+          },
+          {
+            "letra": "b",
+            "texto": "file-saver"
+          },
+          {
+            "letra": "c",
+            "texto": "fs-upload"
+          },
+          {
+            "letra": "d",
+            "texto": "node-uploader"
+          }
+        ],
+        "correcta": "a"
+      }
+    },
+    {
+      "origen": "modulo-08.json",
+      "modulo": 8,
+      "numero": 32,
+      "par": "m08#32 vs M8-12",
+      "razon": "la vieja ofrece Header/Body/Footer, el casi-acierto",
+      "pregunta": {
+        "modulo": 8,
+        "numero": 32,
+        "enunciado": "Estructuralmente, ¿cuáles son las tres partes separadas por puntos que componen un JWT?",
+        "alternativas": [
+          {
+            "letra": "a",
+            "texto": "Algoritmo, Metadatos, Base64."
+          },
+          {
+            "letra": "b",
+            "texto": "User, Password, Hash."
+          },
+          {
+            "letra": "c",
+            "texto": "Header, Payload, Signature."
+          },
+          {
+            "letra": "d",
+            "texto": "Token, Refresh, Expire."
+          }
+        ],
+        "correcta": "c"
+      }
+    }
+  ],
+  "banco_viejo": [
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 2",
+      "posicion_original": 2,
+      "par": "m02#10 vs M2-2",
+      "razon": "la nueva anade el angulo de accesibilidad y el distractor div role=form",
+      "pregunta": {
+        "q": "¿Qué etiqueta HTML agrupa campos y etiquetas asociadas dentro de un formulario?",
+        "opciones": [
+          "<fieldset>",
+          "<section>",
+          "<hgroup>",
+          "<article>"
+        ],
+        "correcta": 0,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 2",
+      "posicion_original": 3,
+      "par": "m02#15 vs M2-3",
+      "razon": "las cuatro alternativas de la nueva son valores de box-sizing",
+      "pregunta": {
+        "q": "En el modelo de cajas CSS, ¿qué propiedad incluye el padding y el border dentro del ancho total declarado?",
+        "opciones": [
+          "box-sizing: content-box;",
+          "box-sizing: border-box;",
+          "display: inline-block;",
+          "overflow: inner-box;"
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 3",
+      "posicion_original": 1,
+      "par": "m03#2 vs M3-1",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Qué limitación estricta de seguridad tiene JavaScript al ejecutarse nativamente en el navegador web?",
+        "opciones": [
+          "No puede manipular el DOM asíncronamente.",
+          "No tiene acceso directo al sistema de archivos local del usuario.",
+          "Está bloqueado para realizar peticiones HTTP (AJAX).",
+          "No puede ejecutarse en la consola para depurar variables."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 3",
+      "posicion_original": 2,
+      "par": "m03#1 vs M3-2",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Cuál es el motor de JavaScript que utiliza Google Chrome para su entorno de ejecución web?",
+        "opciones": [
+          "SpiderMonkey",
+          "ChakraCore",
+          "Motor V8",
+          "JavaScriptCore"
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 3",
+      "posicion_original": 8,
+      "par": "m03#20 vs M3-8",
+      "razon": "la correcta de la vieja es falsa: do/while si evalua la condicion, solo que despues",
+      "pregunta": {
+        "q": "¿Qué característica define el comportamiento único del ciclo do/while respecto al ciclo while?",
+        "opciones": [
+          "Comprueba la condición antes de ejecutar el bloque interior.",
+          "Ejecuta el bloque al menos una vez sin evaluar la condición.",
+          "Solo permite iterar sobre objetos literales, no sobre arreglos.",
+          "Se utiliza exclusivamente para iterar respuestas asíncronas lentas."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 3",
+      "posicion_original": 14,
+      "par": "m03#36 vs M3-14",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Qué método del objeto Math retorna el valor de un número decimal redondeado al entero superior?",
+        "opciones": [
+          "Math.floor()",
+          "Math.round()",
+          "Math.ceil()",
+          "Math.trunc()"
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 5",
+      "posicion_original": 1,
+      "par": "cuarteto de atomicidad",
+      "razon": "sobrevive m05#17 en el modulo 5",
+      "pregunta": {
+        "q": "¿Qué propiedad de un RDBMS asegura que una transacción se complete totalmente o no se aplique en absoluto?",
+        "opciones": [
+          "Consistencia de datos.",
+          "Aislamiento (Isolation).",
+          "Atomicidad (Atomicity).",
+          "Durabilidad (Durability)."
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 5",
+      "posicion_original": 7,
+      "par": "m05#19 vs M5-7",
+      "razon": "la nueva enumera los tres fenomenos y nombra el nivel Serializable",
+      "pregunta": {
+        "q": "¿Qué problema de concurrencia evita la propiedad de \"aislamiento\" (isolation) en las transacciones?",
+        "opciones": [
+          "Lecturas sucias y modificaciones fantasma no confirmadas.",
+          "Pérdida total de datos ante un corte de energía eléctrica.",
+          "El desbordamiento de memoria caché por consultas pesadas.",
+          "Duplicidad estricta de las llaves primarias de una tabla."
+        ],
+        "correcta": 0,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 5",
+      "posicion_original": 8,
+      "par": "m05#14 vs M5-8",
+      "razon": "la nueva distingue el borrado fila a fila y contrasta con TRUNCATE",
+      "pregunta": {
+        "q": "Si ejecutas un DELETE sin cláusula WHERE, y logras hacer COMMIT, ¿qué efecto tiene en la tabla?",
+        "opciones": [
+          "La tabla es eliminada completamente de la base de datos.",
+          "Todos los registros se borran, pero la estructura queda.",
+          "El comando falla por violación estricta de seguridad.",
+          "Solo se borra el último registro ingresado a la tabla."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 5",
+      "posicion_original": 14,
+      "par": "m05#31 vs M5-14",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "En un modelo relacional físico, ¿cómo se suele resolver una relación de \"muchos a muchos\"?",
+        "opciones": [
+          "Duplicando la llave primaria en ambas tablas directamente.",
+          "Utilizando arreglos JSON dentro de una sola celda de tabla.",
+          "Creando una tercera tabla intermedia que asocie ambas llaves.",
+          "Creando restricciones CHECK cruzadas entre las dos tablas."
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 6",
+      "posicion_original": 3,
+      "par": "m06#9 vs M6-3",
+      "razon": "la correcta de la nueva explica las dos mitades y nombra los callbacks",
+      "pregunta": {
+        "q": "¿Qué diferencia principal existe entre instrucciones \"blocking\" y \"non-blocking\" en el ciclo de Node?",
+        "opciones": [
+          "Las non-blocking detienen el flujo principal de ejecución.",
+          "Las blocking impiden que otras tareas se ejecuten en el hilo.",
+          "Las non-blocking consumen toda la memoria RAM disponible.",
+          "Las blocking delegan la tarea a un proceso Worker externo."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 7",
+      "posicion_original": 1,
+      "par": "m07#1 vs M7-1",
+      "razon": "la nueva situa la pregunta en pg con Node y nombra el costo de abrir conexiones",
+      "pregunta": {
+        "q": "¿Cuál es la principal ventaja técnica de usar un \"Pool\" de conexiones frente a conexiones simples?",
+        "opciones": [
+          "Cifra automáticamente el tráfico hacia la base de datos.",
+          "Reutiliza conexiones activas evitando sobrecarga del servidor.",
+          "Permite ejecutar consultas SQL sin validación previa.",
+          "Elimina la necesidad de definir variables de entorno."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 7",
+      "posicion_original": 3,
+      "par": "m07#7 vs M7-3",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Qué técnica fundamental evita ataques de Inyección SQL en consultas utilizando el paquete 'pg'?",
+        "opciones": [
+          "Sanitizar variables usando expresiones regulares nativas.",
+          "Usar consultas parametrizadas o Prepared Statements.",
+          "Concatenar cadenas con el operador \"+\" estrictamente.",
+          "Bloquear todas las peticiones con sentencias DROP o DELETE."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 7",
+      "posicion_original": 8,
+      "par": "m07#21 vs M7-8",
+      "razon": "empate resuelto por el autor: se queda la nueva, corregida",
+      "pregunta": {
+        "q": "¿Qué comando SQL marca el inicio formal de un bloque transaccional en PostgreSQL?",
+        "opciones": [
+          "START TRANSACTION",
+          "BEGIN",
+          "INIT TRANSACTION",
+          "OPEN SESSION"
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 7",
+      "posicion_original": 10,
+      "par": "cuarteto de atomicidad",
+      "razon": "sobrevive m05#17 en el modulo 5",
+      "pregunta": {
+        "q": "¿Qué propiedad de las transacciones (ACID) garantiza que los datos no se modifiquen a medias?",
+        "opciones": [
+          "Consistencia (Consistency)",
+          "Atomicidad (Atomicity)",
+          "Aislamiento (Isolation)",
+          "Durabilidad (Durability)"
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 7",
+      "posicion_original": 12,
+      "par": "m07#32 vs M7-12",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Qué método de Sequelize se utiliza típicamente para actualizar registros existentes en la BD?",
+        "opciones": [
+          "Model.saveChanges()",
+          "Model.modify()",
+          "Model.update()",
+          "Model.set()"
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 8",
+      "posicion_original": 1,
+      "par": "m08#1 vs M8-1",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Qué principio arquitectónico REST dicta que cada petición debe contener toda la información para procesarse?",
+        "opciones": [
+          "Separación cliente-servidor estricta.",
+          "Interfaz uniforme con mensajes descriptivos.",
+          "Arquitectura sin estado (Stateless).",
+          "Sistema de capas jerárquicas en caché."
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 8",
+      "posicion_original": 4,
+      "par": "m08#18 vs M8-4",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Qué código HTTP es el estándar para indicar que un recurso fue creado exitosamente mediante POST?",
+        "opciones": [
+          "200 OK",
+          "201 Created",
+          "202 Accepted",
+          "204 No Content"
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 8",
+      "posicion_original": 5,
+      "par": "m08#15 vs M8-5",
+      "razon": "la nueva evalua ademas la idempotencia",
+      "pregunta": {
+        "q": "¿Qué verbo HTTP debe utilizarse para reemplazar por completo la representación de un recurso existente?",
+        "opciones": [
+          "PATCH",
+          "POST",
+          "UPDATE",
+          "PUT"
+        ],
+        "correcta": 3,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 8",
+      "posicion_original": 6,
+      "par": "m08#13 vs M8-6",
+      "razon": "la vieja dice que 4xx indica errores de sintaxis, que es falso",
+      "pregunta": {
+        "q": "¿Qué familia de códigos de estado HTTP indica que la petición del cliente tiene errores de sintaxis?",
+        "opciones": [
+          "2XX (Éxito)",
+          "3XX (Redirección)",
+          "4XX (Error del cliente)",
+          "5XX (Error del servidor)"
+        ],
+        "correcta": 2,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 8",
+      "posicion_original": 8,
+      "par": "m08#16 vs M8-8",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "Al manejar parámetros de ruta dinámicos en Express como /users/:id, ¿cómo se extrae el valor del id?",
+        "opciones": [
+          "req.query.id",
+          "req.params.id",
+          "req.body.id",
+          "req.header.id"
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    },
+    {
+      "origen": "static/js/data/cuestionario.js",
+      "modulo": "Módulo 8",
+      "posicion_original": 11,
+      "par": "m08#24 vs M8-11",
+      "razon": "empate resuelto por el autor: se queda la nueva",
+      "pregunta": {
+        "q": "¿Por qué es crítico validar la extensión del archivo subido antes de guardarlo en el servidor Express?",
+        "opciones": [
+          "Para comprimir automáticamente las imágenes pesadas.",
+          "Para evitar la ejecución de código malicioso remoto.",
+          "Para convertir todos los archivos a formato PDF nativo.",
+          "Para asignar dinámicamente un tamaño en la base de datos."
+        ],
+        "correcta": 1,
+        "fijo": false
+      }
+    }
+  ]
+}

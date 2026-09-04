@@ -97,30 +97,6 @@
   },
   {
     "modulo": 5,
-    "numero": 5,
-    "enunciado": "¿Qué cláusula SQL permite filtrar registros evaluando el resultado de una función de agregación?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "CLÁUSULA WHERE"
-      },
-      {
-        "letra": "b",
-        "texto": "FILTER BY AGGREGATE"
-      },
-      {
-        "letra": "c",
-        "texto": "CLÁUSULA HAVING"
-      },
-      {
-        "letra": "d",
-        "texto": "GROUP BY CONDITION"
-      }
-    ],
-    "correcta": "c"
-  },
-  {
-    "modulo": 5,
     "numero": 6,
     "enunciado": "Si cruzas dos tablas con LEFT JOIN, ¿qué sucede con los registros huérfanos de la tabla izquierda?",
     "alternativas": [
@@ -574,30 +550,6 @@
       }
     ],
     "correcta": "a"
-  },
-  {
-    "modulo": 5,
-    "numero": 25,
-    "enunciado": "¿Qué restricción asegura que el valor de un campo obligatoriamente exista como llave en otra tabla?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Restricción DEFAULT"
-      },
-      {
-        "letra": "b",
-        "texto": "Restricción UNIQUE"
-      },
-      {
-        "letra": "c",
-        "texto": "Restricción CHECK"
-      },
-      {
-        "letra": "d",
-        "texto": "Restricción FOREIGN KEY"
-      }
-    ],
-    "correcta": "d"
   },
   {
     "modulo": 5,

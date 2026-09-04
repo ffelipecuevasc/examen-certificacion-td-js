@@ -73,30 +73,6 @@
   },
   {
     "modulo": 8,
-    "numero": 4,
-    "enunciado": "¿Qué concepto REST provee enlaces hipermedia dinámicos para navegar por la API (HATEOAS)?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Versionamiento semántico estricto."
-      },
-      {
-        "letra": "b",
-        "texto": "Filtrado y paginación por query params."
-      },
-      {
-        "letra": "c",
-        "texto": "Inclusión de hipervínculos relacionados en la respuesta."
-      },
-      {
-        "letra": "d",
-        "texto": "Restricción de acceso mediante tokens criptográficos."
-      }
-    ],
-    "correcta": "c"
-  },
-  {
-    "modulo": 8,
     "numero": 5,
     "enunciado": "En diseño REST, ¿cómo se versiona convencionalmente una API en su etapa inicial?",
     "alternativas": [
@@ -238,30 +214,6 @@
       }
     ],
     "correcta": "c"
-  },
-  {
-    "modulo": 8,
-    "numero": 11,
-    "enunciado": "Al crear un servidor REST en Express, ¿qué paquete parsea automáticamente el cuerpo (body) JSON?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "json-parser"
-      },
-      {
-        "letra": "b",
-        "texto": "body-parser o express.json()"
-      },
-      {
-        "letra": "c",
-        "texto": "rest-parser"
-      },
-      {
-        "letra": "d",
-        "texto": "payload-reader"
-      }
-    ],
-    "correcta": "b"
   },
   {
     "modulo": 8,
@@ -478,30 +430,6 @@
       }
     ],
     "correcta": "d"
-  },
-  {
-    "modulo": 8,
-    "numero": 21,
-    "enunciado": "¿Qué middleware de terceros se enseña comúnmente en Node para interceptar subida de archivos?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "express-fileupload"
-      },
-      {
-        "letra": "b",
-        "texto": "file-saver"
-      },
-      {
-        "letra": "c",
-        "texto": "fs-upload"
-      },
-      {
-        "letra": "d",
-        "texto": "node-uploader"
-      }
-    ],
-    "correcta": "a"
   },
   {
     "modulo": 8,
@@ -742,30 +670,6 @@
       }
     ],
     "correcta": "b"
-  },
-  {
-    "modulo": 8,
-    "numero": 32,
-    "enunciado": "Estructuralmente, ¿cuáles son las tres partes separadas por puntos que componen un JWT?",
-    "alternativas": [
-      {
-        "letra": "a",
-        "texto": "Algoritmo, Metadatos, Base64."
-      },
-      {
-        "letra": "b",
-        "texto": "User, Password, Hash."
-      },
-      {
-        "letra": "c",
-        "texto": "Header, Payload, Signature."
-      },
-      {
-        "letra": "d",
-        "texto": "Token, Refresh, Expire."
-      }
-    ],
-    "correcta": "c"
   },
   {
     "modulo": 8,

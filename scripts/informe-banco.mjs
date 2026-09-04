@@ -27,6 +27,7 @@ import { pathToFileURL } from 'node:url';
 
 const CARPETA_NUEVOS = '_planmaestro/00_producto/cuestionarios';
 const BANCO_VIEJO = 'static/js/data/cuestionario.js';
+const RETIRADAS = join('_planmaestro/00_producto/cuestionarios', 'retiradas.json');
 
 // ---------------------------------------------------------------------------
 // Auxiliares de texto
@@ -106,9 +107,32 @@ const sub = (t) => console.log(`\n--- ${t} ---`);
 
 titulo('1 · LECTURA DE LOS ARCHIVOS');
 
+/**
+ * Numeros retirados a proposito, para no confundirlos con huecos accidentales.
+ *
+ * Al aplicar los retiros por solapamiento (iteracion 24) se decidio NO renumerar:
+ * el `numero` es el identificador con el que el plan cita cada pregunta, y
+ * renumerar romperia todas esas referencias. La consecuencia es que la numeracion
+ * queda con huecos legitimos. Sin esta lectura, el informe los denunciaria en cada
+ * ejecucion y acabaria ensenando a ignorarlo.
+ */
+const retiradosPorModulo = new Map();
+
+if (existsSync(RETIRADAS)) {
+  try {
+    const doc = JSON.parse(readFileSync(RETIRADAS, 'utf8'));
+    for (const fila of doc.banco_nuevo ?? []) {
+      if (!retiradosPorModulo.has(fila.modulo)) retiradosPorModulo.set(fila.modulo, new Set());
+      retiradosPorModulo.get(fila.modulo).add(fila.numero);
+    }
+  } catch (error) {
+    anota('retiradas.json', `no se pudo leer: ${error.message}`);
+  }
+}
+
 const nuevas = [];
 const archivos = existsSync(CARPETA_NUEVOS)
-  ? readdirSync(CARPETA_NUEVOS).filter((n) => n.endsWith('.json')).sort()
+  ? readdirSync(CARPETA_NUEVOS).filter((n) => /^modulo-[0-9]+[.]json$/.test(n)).sort()
   : [];
 
 if (archivos.length === 0) anota('carpeta', `${CARPETA_NUEVOS} no tiene archivos .json`);
@@ -197,11 +221,15 @@ for (const [m] of [...porModuloNuevo].sort()) {
   const numeros = delModulo.map((p) => p.numero);
   const repetidos = numeros.filter((n, i) => numeros.indexOf(n) !== i);
   const validos = numeros.filter((n) => Number.isInteger(n));
+  const retirados = retiradosPorModulo.get(m) ?? new Set();
   const huecos = [];
+  const retiradosVistos = [];
 
   if (validos.length) {
     for (let n = Math.min(...validos); n <= Math.max(...validos); n++) {
-      if (!validos.includes(n)) huecos.push(n);
+      if (validos.includes(n)) continue;
+      if (retirados.has(n)) retiradosVistos.push(n);
+      else huecos.push(n);
     }
   }
 
@@ -211,7 +239,8 @@ for (const [m] of [...porModuloNuevo].sort()) {
   if (huecos.length) partes.push(`huecos: ${huecos.join(', ')}`);
 
   const rango = validos.length ? `${Math.min(...validos)}-${Math.max(...validos)}` : 'sin numeros';
-  console.log(`  modulo ${m}: ${rango} · ${partes.length ? partes.join(' · ') : 'correlativa, sin huecos ni repetidos'}`);
+  const nota = retiradosVistos.length ? ` · retiradas a proposito: ${retiradosVistos.join(', ')}` : '';
+  console.log(`  modulo ${m}: ${rango} · ${partes.length ? partes.join(' · ') : 'correlativa, sin huecos accidentales ni repetidos'}${nota}`);
   for (const parte of partes) anota(`modulo ${m}`, parte);
 }
 

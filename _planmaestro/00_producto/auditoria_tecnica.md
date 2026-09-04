@@ -259,3 +259,139 @@ hay que averiguar que. En orden de probabilidad:
 Lo que no corresponde es acostumbrarse a verla. La nota se escribio para que un caso
 conocido no se leyera como alarma; una vez cerrada la causa, pasa a ser justo lo
 contrario.
+
+---
+
+### H-013 · `verificar-banco` informaba «banco con problemas» cuando el problema era suyo
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 21 · **Fecha:** 2026-09-04
+
+**Síntoma.** `npm run datos:verificar-banco` respondía tres veces seguidas lo mismo
+—antes de romper nada, después de borrar una alternativa a mano y después de
+reinsertarla—:
+
+```
+BANCO CON PROBLEMAS  ***  1 ***
+  undefined -> undefined
+codigo de salida: 1
+```
+
+En una de esas corridas, wrangler había respondido `Unknown argument: remot`, junto
+con un `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c,
+line 94`.
+
+**Causa.** Son dos cosas distintas, y conviene no confundirlas, porque la primera
+hipótesis —que el script cortaba su propio argumento— resultó **falsa**.
+
+*Lo que no era.* El envoltorio no truncaba nada. Medido interceptando `npx` con un
+sustituto que registra lo que recibe, corriendo el script real, en el directorio
+real, desde PowerShell y con `npm run … -- --remote`:
+
+```
+[wrangler d1 execute examen-td-js-produccion --remote --json --file=d1/verificar-banco.sql]
+```
+
+El argumento llega entero. Se comprobó además cada tramo por separado —PowerShell →
+npm → node → `spawnSync` → cmd.exe → npx → wrangler— enviando `--remotex`,
+`--remotee` y `--xremote`: wrangler los reporta completos, letra por letra. Ninguna
+capa recorta. El `--remot` estaba en la línea de comandos tal como se escribió.
+
+*Lo que sí era.* El envoltorio no sabía distinguir **«el banco tiene problemas»** de
+**«no pude preguntarle nada al banco»**, y ante la duda anunciaba lo primero. Tres
+defectos encadenados, los tres reproducidos:
+
+1. **Buscaba el JSON con `bruto.indexOf('[')`**, el primer corchete que apareciera en
+   cualquier parte del texto. Cuando wrangler rechaza un argumento vuelca su pantalla
+   de ayuda, y ahí el primer corchete está dentro de `[string]`.
+2. **No miraba las filas por dentro.** Bastaba con que la respuesta se dejara
+   interpretar como un arreglo: cada elemento se daba por una fila y se imprimía
+   `f.comprobacion -> f.detalle` sin comprobar que esas columnas existieran. De ahí
+   el `undefined -> undefined`. Reproducido exactamente: una respuesta cuyo `results`
+   no sea un arreglo de filas produce, palabra por palabra, `BANCO CON PROBLEMAS ***
+   1 *** / undefined -> undefined` y código 1.
+3. **Tiraba el mensaje de error.** Sólo mostraba `stderr`, y wrangler escribe buena
+   parte de sus fallos en la salida normal: base no declarada en `wrangler.toml` y
+   tabla inexistente llegan como `{"error":{"text":…}}` por `stdout`, con `stderr`
+   vacío. El veredicto decía «Sin detalle de error» teniendo el detalle en la mano.
+
+A eso se suma que en Windows wrangler se cae al terminar —el `Assertion failed` de
+libuv— y devuelve `3221226505` en vez de un código legible, de modo que el código de
+salida tampoco es un buen único testigo.
+
+**Impacto.** Es el tercero de la misma familia que H-011 y H-012, y el más grave de
+los tres.
+
+- **H-011:** un script que hacía la mitad del trabajo y parecía haberlo hecho entero.
+- **H-012:** un script que daba la alarma sin que hubiera nada que denunciar.
+- **H-013:** un script que da la alarma **igual pase lo que pase**, y encima sobre lo
+  único que no puede autodefenderse.
+
+La diferencia de gravedad está en qué custodia cada uno. `verificar` cuida el CSS
+compilado: si se equivoca, el sitio se ve mal. `verificar-banco` cuida el contenido
+que estudia el alumno, y cubre justo lo que el esquema **no** puede exigir por su
+cuenta —cuatro alternativas, al menos una correcta, ninguna activa sin
+justificación, ningún módulo vacío—. El día que el banco tenga un problema de verdad
+lo iba a reportar con las mismas palabras que hoy, cuando no tiene ninguno, y para
+entonces nadie le habría hecho caso. Un aviso que suena siempre deja de ser un aviso.
+
+Y el corolario que ordena el arreglo: **un problema que no se puede describir no es
+un problema encontrado.** `undefined -> undefined` no es un hallazgo, es la ausencia
+de uno.
+
+**Resultado · 2026-09-04.** Reescrito `scripts/verificar-banco.mjs` sobre tres
+reglas, anotadas en su cabecera:
+
+1. **Un fallo de wrangler nunca es un problema del banco.** Sale por 2, rotulado `NO
+   SE PUDO VERIFICAR *** ESTO NO ES UN APROBADO ***`, diciendo con todas sus letras
+   que nadie llegó a mirar el banco y que eso no significa ni que esté bien ni que
+   esté mal. Se imprime el comando exacto que se ejecutó y lo que wrangler dijo por
+   **las dos** salidas, con el motivo primero y la ayuda después, porque al revés la
+   única línea que explica el fallo queda sepultada.
+2. **La forma de la respuesta se comprueba entera antes de creérsela:** que sea un
+   arreglo, que cada bloque traiga `results` como arreglo, que ningún bloque venga
+   con `error` o con `success: false`, y que cada fila traiga las dos columnas que
+   declara la consulta. Cualquier otra cosa es «no pude verificar», no «el banco
+   falla». La lista de columnas esperadas vive en la cabecera del script, junto a la
+   instrucción de cambiarla si cambia el SQL.
+3. **Se invoca el wrangler de `node_modules` con el mismo node que corre el script**,
+   sin `shell` y sin `npx`. Sin shell los argumentos viajan como arreglo y no hay
+   línea de comandos que armar; sin npx no puede descargarse una versión distinta si
+   la dependencia falta —antes, un `node_modules` a medias habría bajado otro
+   wrangler en silencio; ahora dice «corre `npm install`» y sale por 2—. La ruta del
+   SQL pasó a ser absoluta, derivada de la ubicación del script, para que no dependa
+   del directorio desde el que se invoque.
+
+*Los tres estados, provocados de verdad, en los dos terminales y desde un clon
+limpio en Windows* (la regla que dejó H-012), con `npm install` hecho en el clon:
+
+| Estado | Cómo se provocó | Veredicto | Código |
+|---|---|---|---|
+| Sano | banco de ejemplo recién cargado | `BANCO VERIFICADO` | 0 |
+| Con problemas | `DELETE FROM alternativa WHERE id = 40` | `BANCO CON PROBLEMAS *** 2 ***`, ambas filas descritas | 1 |
+| Sin veredicto | `-- --remot` | `NO SE PUDO VERIFICAR`, con `X [ERROR] Unknown argument: remot` visible | 2 |
+
+Provocados también, todos por 2 y todos con el motivo legible: base no declarada en
+`wrangler.toml`, base local sin tablas (`no such table: modulo`), `node_modules` sin
+wrangler, y el caso exacto que producía `undefined -> undefined` —renombrar una
+columna del SQL—, que ahora responde `Faltan, o no son texto: comprobacion / La fila
+trae: chequeo, detalle`.
+
+**Lo que este hallazgo deja como regla.** Un envoltorio que traduce la salida de otra
+herramienta tiene que tratar «no entendí la respuesta» como un tercer estado
+explícito. Dos estados —bien y mal— obligan a meter los fallos propios en uno de los
+dos, y siempre terminan en el de «mal», que es el que parece prudente y es el que
+enseña a ignorar la herramienta.
+
+**Hallazgo relacionado, no corregido aquí.** `scripts/verificar.mjs` tiene la misma
+confusión, más leve, y queda anotada en el registro como «Sin asignar» por estar
+fuera del alcance de la iteración 21. En la línea 237 hace `if (diff.status !== 0)
+→ DESFASADO`. `git diff --exit-code` devuelve 0 sin diferencias y 1 con diferencias:
+cualquier otro código es git fallando. Sólo se distingue el caso «no es un
+repositorio», por texto del `stderr`. Comprobado con un repositorio de índice
+corrupto: `git diff --exit-code` sale por **128** con `fatal: .git/index: index file
+smaller than expected`, que no coincide con ese texto y por lo tanto se anunciaría
+como `DESFASADO` —un problema del CSS— cuando el CSS no tiene nada que ver. El
+arreglo es tratar `status > 1` como `VERIFICACION PARCIAL`, que ya existe en ese
+archivo. En cambio, **el defecto de paso de argumentos no lo tiene**: sus dos usos de
+`shell: true` llevan argumentos fijos, y la llamada a git —la única con una ruta
+variable, que además puede contener espacios— va sin shell y con los argumentos en
+arreglo, que es la forma correcta.
