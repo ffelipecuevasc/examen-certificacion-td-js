@@ -15,7 +15,8 @@
     "datos:esquema": "wrangler d1 execute examen-td-js-produccion --local --file=d1/juguete.sql",
     "start": "npm run dev",
     "icons": "node scripts/build-icons.mjs",
-    "cuestionario": "python scripts/build-cuestionario.py"
+    "cuestionario": "python scripts/build-cuestionario.py",
+    "informe-banco": "node scripts/informe-banco.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",
