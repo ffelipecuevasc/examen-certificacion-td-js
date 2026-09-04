@@ -1,0 +1,962 @@
+[
+  {
+    "modulo": 6,
+    "numero": 1,
+    "enunciado": "¿Qué característica arquitectónica fundamental distingue al motor de Node.js?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Se basa en múltiples hilos bloqueantes (multi-thread)."
+      },
+      {
+        "letra": "b",
+        "texto": "Utiliza un único hilo de ejecución (single-thread) no bloqueante."
+      },
+      {
+        "letra": "c",
+        "texto": "Delega todo el procesamiento al navegador del cliente."
+      },
+      {
+        "letra": "d",
+        "texto": "Compila el código a lenguaje ensamblador en tiempo real."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 2,
+    "enunciado": "¿Qué motor interno utiliza Node.js para interpretar el código JavaScript?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "SpiderMonkey de Mozilla"
+      },
+      {
+        "letra": "b",
+        "texto": "JavaScriptCore de Apple"
+      },
+      {
+        "letra": "c",
+        "texto": "V8 de Google"
+      },
+      {
+        "letra": "d",
+        "texto": "Chakra de Microsoft"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 3,
+    "enunciado": "¿Cuál es el rol principal de Express dentro del ecosistema de Node.js?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Proveer una base de datos relacional nativa y segura."
+      },
+      {
+        "letra": "b",
+        "texto": "Ser un motor de plantillas exclusivo para frontend."
+      },
+      {
+        "letra": "c",
+        "texto": "Funcionar como un framework minimalista para infraestructura web."
+      },
+      {
+        "letra": "d",
+        "texto": "Ejecutar tareas en múltiples hilos paralelos independientes."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 4,
+    "enunciado": "En la arquitectura de Express, ¿qué es y qué hace un \"middleware\"?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Una función que intercepta peticiones HTTP y respuestas."
+      },
+      {
+        "letra": "b",
+        "texto": "Un motor de base de datos embebido en memoria."
+      },
+      {
+        "letra": "c",
+        "texto": "Un paquete exclusivo para renderizar CSS dinámico."
+      },
+      {
+        "letra": "d",
+        "texto": "Un módulo nativo de Node para comprimir archivos de texto."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 5,
+    "enunciado": "A diferencia de un servidor clásico, ¿cómo maneja Node.js las peticiones concurrentes?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Bloquea el proceso principal hasta resolver cada petición."
+      },
+      {
+        "letra": "b",
+        "texto": "Crea un nuevo hilo de sistema operativo por usuario."
+      },
+      {
+        "letra": "c",
+        "texto": "Delega las tareas a procesos asíncronos mediante callbacks."
+      },
+      {
+        "letra": "d",
+        "texto": "Rechaza peticiones si sobrepasan el límite del hardware."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 6,
+    "enunciado": "¿Qué tipo de arquitectura de ruteo promueve fuertemente el framework Express?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Ruteo imperativo anidado profundo."
+      },
+      {
+        "letra": "b",
+        "texto": "Ruteo estático compilado en binarios."
+      },
+      {
+        "letra": "c",
+        "texto": "Ruteo declarativo a través de métodos HTTP y URIs."
+      },
+      {
+        "letra": "d",
+        "texto": "Ruteo basado en variables de sesión globales de servidor."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 7,
+    "enunciado": "En el ciclo de vida de un proceso Node, ¿qué detiene la ejecución del programa de forma natural?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La finalización del hilo bloqueante principal tras 5 minutos."
+      },
+      {
+        "letra": "b",
+        "texto": "El vaciado total de la pila de eventos (Event Loop)."
+      },
+      {
+        "letra": "c",
+        "texto": "La ejecución constante del comando interno process.pause()."
+      },
+      {
+        "letra": "d",
+        "texto": "El renderizado de la primera vista en el cliente HTTP."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 8,
+    "enunciado": "Al instalar dependencias globales con Node, ¿dónde quedan disponibles los comandos binarios?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "En el archivo package.json del proyecto local exclusivamente."
+      },
+      {
+        "letra": "b",
+        "texto": "Solamente en la subcarpeta node_modules local del proyecto."
+      },
+      {
+        "letra": "c",
+        "texto": "En las variables de entorno PATH del sistema operativo subyacente."
+      },
+      {
+        "letra": "d",
+        "texto": "En el registro interno del navegador del desarrollador."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 9,
+    "enunciado": "¿Qué diferencia clave existe entre una instrucción \"blocking\" y \"non-blocking\" en Node?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Blocking pausa el hilo principal; non-blocking delega por callbacks."
+      },
+      {
+        "letra": "b",
+        "texto": "Non-blocking detiene la CPU; blocking usa excesiva memoria RAM."
+      },
+      {
+        "letra": "c",
+        "texto": "Blocking solo afecta a peticiones de red; non-blocking al disco."
+      },
+      {
+        "letra": "d",
+        "texto": "Node ignora las instrucciones blocking para evitar fallas crónicas."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 10,
+    "enunciado": "¿Cuál es el propósito del paquete `nodemon` durante el desarrollo de una aplicación Node?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Minimizar el código fuente a su versión más ligera de byte."
+      },
+      {
+        "letra": "b",
+        "texto": "Encriptar las peticiones HTTP mediante protocolos SSL/TLS."
+      },
+      {
+        "letra": "c",
+        "texto": "Reiniciar automáticamente el servidor al detectar cambios."
+      },
+      {
+        "letra": "d",
+        "texto": "Generar datos falsos masivos para probar la base de datos."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 11,
+    "enunciado": "¿Qué objeto global en Node.js provee información y control directo sobre la ejecución actual?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "system"
+      },
+      {
+        "letra": "b",
+        "texto": "process"
+      },
+      {
+        "letra": "c",
+        "texto": "globalApp"
+      },
+      {
+        "letra": "d",
+        "texto": "nodeEnv"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 12,
+    "enunciado": "¿Qué ocurre si un error no capturado (uncaught exception) alcanza la cima del Event Loop?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Node ignora el error silenciosamente y continúa iterando eventos."
+      },
+      {
+        "letra": "b",
+        "texto": "El proceso principal se interrumpe y la aplicación se cae por fallas."
+      },
+      {
+        "letra": "c",
+        "texto": "Se envía un reporte automático en XML al administrador del servidor."
+      },
+      {
+        "letra": "d",
+        "texto": "Express reinicia dinámicamente el hilo afectado sin afectar a otros."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 13,
+    "enunciado": "¿Qué archivo es imprescindible para que una carpeta se reconozca como proyecto Node/NPM?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "package.json"
+      },
+      {
+        "letra": "b",
+        "texto": "index.js"
+      },
+      {
+        "letra": "c",
+        "texto": "node_modules"
+      },
+      {
+        "letra": "d",
+        "texto": ".env config"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 14,
+    "enunciado": "Al instalar un paquete mediante `npm install`, ¿qué carpeta almacena sus archivos físicos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "/bin modules"
+      },
+      {
+        "letra": "b",
+        "texto": "/lib packages"
+      },
+      {
+        "letra": "c",
+        "texto": "node_modules"
+      },
+      {
+        "letra": "d",
+        "texto": "npm_packages_core"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 15,
+    "enunciado": "¿Qué comando NPM inicia el asistente interactivo para crear el archivo de configuración base?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "npm start"
+      },
+      {
+        "letra": "b",
+        "texto": "npm init"
+      },
+      {
+        "letra": "c",
+        "texto": "npm create"
+      },
+      {
+        "letra": "d",
+        "texto": "npm setup_project"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 16,
+    "enunciado": "¿Cómo se exporta correctamente un módulo personalizado en Node (CommonJS) para su reutilización?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "module.exports = { modulo }"
+      },
+      {
+        "letra": "b",
+        "texto": "export default modulo"
+      },
+      {
+        "letra": "c",
+        "texto": "return modulo_global"
+      },
+      {
+        "letra": "d",
+        "texto": "expose_module(modulo)"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 17,
+    "enunciado": "Al leer el archivo package.json, ¿qué indican los símbolos ^ o ~ en la versión de un paquete?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Definen estrictas políticas de actualizaciones automáticas permitidas."
+      },
+      {
+        "letra": "b",
+        "texto": "Indican que el paquete está obsoleto y será eliminado próximamente."
+      },
+      {
+        "letra": "c",
+        "texto": "Obligan a instalar forzosamente una versión pre-lanzamiento beta."
+      },
+      {
+        "letra": "d",
+        "texto": "Señalan que el paquete debe instalarse de forma global del sistema."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 18,
+    "enunciado": "¿Qué comando NPM debes ejecutar para ver qué paquetes tienen una nueva versión disponible?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "npm update-check"
+      },
+      {
+        "letra": "b",
+        "texto": "npm outdated"
+      },
+      {
+        "letra": "c",
+        "texto": "npm upgrade-list"
+      },
+      {
+        "letra": "d",
+        "texto": "npm list-old-versions"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 19,
+    "enunciado": "Para invocar funcionalidades de un módulo nativo o de terceros en CommonJS, ¿qué sentencia usas?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "import()"
+      },
+      {
+        "letra": "b",
+        "texto": "loadModule()"
+      },
+      {
+        "letra": "c",
+        "texto": "require()"
+      },
+      {
+        "letra": "d",
+        "texto": "fetchDependency()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 20,
+    "enunciado": "¿Qué ventaja ofrece usar dependencias de desarrollo (devDependencies) en el package.json?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Aceleran el tiempo de compilación nativa directamente en el servidor."
+      },
+      {
+        "letra": "b",
+        "texto": "No se instalan obligatoriamente al desplegar el proyecto en producción."
+      },
+      {
+        "letra": "c",
+        "texto": "Tienen mayor prioridad de carga en la memoria RAM del sistema base."
+      },
+      {
+        "letra": "d",
+        "texto": "Permiten ejecutar código asíncrono evadiendo el uso de callbacks."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 21,
+    "enunciado": "¿Qué directiva de Express se utiliza habitualmente para servir contenido estático (CSS, img)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "express.static()"
+      },
+      {
+        "letra": "b",
+        "texto": "express.publicContent()"
+      },
+      {
+        "letra": "c",
+        "texto": "app.useStaticFolder()"
+      },
+      {
+        "letra": "d",
+        "texto": "express.serveAssets()"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 22,
+    "enunciado": "¿Cuál es la función principal de un motor de plantillas como Handlebars en un servidor Express?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Generar esquemas y tablas de base de datos a partir del código JS."
+      },
+      {
+        "letra": "b",
+        "texto": "Renderizar HTML dinámico inyectando variables del backend al vuelo."
+      },
+      {
+        "letra": "c",
+        "texto": "Validar fuertemente los formularios HTTP antes de enviarlos a disco."
+      },
+      {
+        "letra": "d",
+        "texto": "Comprimir imágenes estáticas de forma asíncrona para el cliente."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 23,
+    "enunciado": "En la sintaxis de Handlebars, ¿cómo se inyecta y renderiza una variable pasada por el servidor?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "{{ variable }}"
+      },
+      {
+        "letra": "b",
+        "texto": "<%= variable %>"
+      },
+      {
+        "letra": "c",
+        "texto": "${ variable }"
+      },
+      {
+        "letra": "d",
+        "texto": "{@ variable @}"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 24,
+    "enunciado": "¿Qué concepto en Handlebars permite reutilizar bloques de código HTML, como un header o footer?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Middleware views component"
+      },
+      {
+        "letra": "b",
+        "texto": "Partials (Páginas parciales)"
+      },
+      {
+        "letra": "c",
+        "texto": "Injections (Inyecciones de DOM)"
+      },
+      {
+        "letra": "d",
+        "texto": "Layout fragments template"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 25,
+    "enunciado": "¿Qué método del objeto `res` en Express procesa una plantilla y la envía como HTML al cliente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "res.sendTemplateObject()"
+      },
+      {
+        "letra": "b",
+        "texto": "res.render()"
+      },
+      {
+        "letra": "c",
+        "texto": "res.htmlCompiler()"
+      },
+      {
+        "letra": "d",
+        "texto": "res.viewGenerator()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 26,
+    "enunciado": "Para que Express reconozca Handlebars como su motor base, ¿qué propiedad de `app.set` se define?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "'template engine base'"
+      },
+      {
+        "letra": "b",
+        "texto": "'view engine'"
+      },
+      {
+        "letra": "c",
+        "texto": "'render compile mode'"
+      },
+      {
+        "letra": "d",
+        "texto": "'html processor native'"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 27,
+    "enunciado": "En Handlebars, ¿qué es un \"Helper\" y cuál es su utilidad principal?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Una directiva de Express para comprimir el HTML antes de su salida."
+      },
+      {
+        "letra": "b",
+        "texto": "Un archivo CSS que aplica estilos responsivos por defecto en tablas."
+      },
+      {
+        "letra": "c",
+        "texto": "Una función JS que ejecuta lógica de presentación incrustada en vista."
+      },
+      {
+        "letra": "d",
+        "texto": "Un componente asíncrono que previene inyección de código tipo SQL."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 28,
+    "enunciado": "¿Qué módulo nativo de Node.js es indispensable para interactuar con archivos planos del sistema?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "file-system (fs)"
+      },
+      {
+        "letra": "b",
+        "texto": "path-directory (pd)"
+      },
+      {
+        "letra": "c",
+        "texto": "os-architecture"
+      },
+      {
+        "letra": "d",
+        "texto": "input-output (io)"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 29,
+    "enunciado": "Para leer el contenido de un archivo de texto de forma síncrona en Node, ¿qué método usarías?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "fs.readSyncFile()"
+      },
+      {
+        "letra": "b",
+        "texto": "fs.readFileSync()"
+      },
+      {
+        "letra": "c",
+        "texto": "fs.openSyncStream()"
+      },
+      {
+        "letra": "d",
+        "texto": "fs.loadTextSync()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 30,
+    "enunciado": "Al leer un archivo JSON plano con `fs`, el resultado es texto crudo. ¿Cómo lo conviertes a objeto?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "String.toObjectJS()"
+      },
+      {
+        "letra": "b",
+        "texto": "JSON.parse()"
+      },
+      {
+        "letra": "c",
+        "texto": "JSON.stringify()"
+      },
+      {
+        "letra": "d",
+        "texto": "ParseData.evaluate()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 31,
+    "enunciado": "¿Por qué el uso exclusivo de `fs.writeFileSync()` puede ser contraproducente en aplicaciones web?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Solo permite escribir archivos binarios, no strings de texto plano."
+      },
+      {
+        "letra": "b",
+        "texto": "Requiere permisos de administrador (root) absolutos para funcionar."
+      },
+      {
+        "letra": "c",
+        "texto": "Bloquea el hilo principal, paralizando la atención de otras peticiones."
+      },
+      {
+        "letra": "d",
+        "texto": "Borra automáticamente el archivo si falla la conexión HTTP entrante."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 6,
+    "numero": 32,
+    "enunciado": "Si deseas actualizar un registro dentro de un archivo JSON plano, ¿cuál es el flujo lógico correcto?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Buscar línea exacta por regex y sobrescribir el binario en memoria."
+      },
+      {
+        "letra": "b",
+        "texto": "Leer, parsear a objeto JS, modificar, pasarlo a string y reescribir."
+      },
+      {
+        "letra": "c",
+        "texto": "Usar fs.updateJSON() apuntando directo a la propiedad JS anidada."
+      },
+      {
+        "letra": "d",
+        "texto": "Inyectar una query SQL parametrizada mediante el módulo file-system."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 33,
+    "enunciado": "Al modularizar la persistencia en archivos planos, ¿cuál es una buena práctica de diseño de código?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Dejar toda la lógica de `fs` escrita directamente en los ruteadores HTTP."
+      },
+      {
+        "letra": "b",
+        "texto": "Crear funciones independientes orientadas y exportarlas como un módulo."
+      },
+      {
+        "letra": "c",
+        "texto": "Usar variables globales en el scope para compartir los datos en crudo."
+      },
+      {
+        "letra": "d",
+        "texto": "Ignorar el manejo de errores de escritura para no interrumpir el flujo."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 34,
+    "enunciado": "¿Qué ocurre si intentas usar `fs.writeFileSync()` sobre un archivo físico que aún no existe?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El proceso se detiene forzosamente arrojando un FileNotFoundError."
+      },
+      {
+        "letra": "b",
+        "texto": "Node crea el archivo automáticamente e inserta la data especificada."
+      },
+      {
+        "letra": "c",
+        "texto": "Node ignora el comando por seguridad y pasa a la siguiente instrucción."
+      },
+      {
+        "letra": "d",
+        "texto": "Solicita permisos de acceso interactivo en la consola del servidor base."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 35,
+    "enunciado": "¿Cómo pasas parámetros por línea de comandos al iniciar una aplicación mediante `node index.js`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "node index.js --param=valor"
+      },
+      {
+        "letra": "b",
+        "texto": "node index.js <param>valor</param>"
+      },
+      {
+        "letra": "c",
+        "texto": "node index.js [param: valor]"
+      },
+      {
+        "letra": "d",
+        "texto": "node index.js && param=valor_node"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 36,
+    "enunciado": "¿Dentro de qué estructura array de Node se alojan los argumentos pasados por la línea de comandos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "global.arguments"
+      },
+      {
+        "letra": "b",
+        "texto": "process.argv"
+      },
+      {
+        "letra": "c",
+        "texto": "console.params"
+      },
+      {
+        "letra": "d",
+        "texto": "node.cli_options"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 37,
+    "enunciado": "¿Qué dependencia de terceros se usa comúnmente en Node para parsear fácilmente los argumentos CLI?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "yargs"
+      },
+      {
+        "letra": "b",
+        "texto": "nodemon"
+      },
+      {
+        "letra": "c",
+        "texto": "morgan"
+      },
+      {
+        "letra": "d",
+        "texto": "underscore"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 6,
+    "numero": 38,
+    "enunciado": "Si una aplicación Node lanza un error y arroja un \"Stack Trace\", ¿qué te indica esta lectura?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El uso de memoria y carga de CPU exactos al momento del fallo interno."
+      },
+      {
+        "letra": "b",
+        "texto": "La traza y jerarquía de funciones llamadas que condujeron al fallo."
+      },
+      {
+        "letra": "c",
+        "texto": "Las variables de entorno de base de datos filtradas accidentalmente."
+      },
+      {
+        "letra": "d",
+        "texto": "El historial encolado de peticiones HTTP de los últimos diez minutos."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 39,
+    "enunciado": "¿Qué atajo de teclado detiene la ejecución activa de un servidor Node.js corriendo en la terminal?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Esc + :q"
+      },
+      {
+        "letra": "b",
+        "texto": "Ctrl + C (o Cmd + C)"
+      },
+      {
+        "letra": "c",
+        "texto": "Alt + F4"
+      },
+      {
+        "letra": "d",
+        "texto": "process.kill command"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 6,
+    "numero": 40,
+    "enunciado": "¿Cuál es el comando estándar para imprimir y evaluar el valor de variables en la consola de comandos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "print.value()"
+      },
+      {
+        "letra": "b",
+        "texto": "document.writeLog()"
+      },
+      {
+        "letra": "c",
+        "texto": "echo.terminal()"
+      },
+      {
+        "letra": "d",
+        "texto": "console.log()"
+      }
+    ],
+    "correcta": "d"
+  }
+]

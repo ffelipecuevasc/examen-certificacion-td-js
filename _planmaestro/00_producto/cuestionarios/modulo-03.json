@@ -1,0 +1,1082 @@
+[
+  {
+    "modulo": 3,
+    "numero": 1,
+    "enunciado": "¿Cuál es el motor principal que compila y ejecuta JavaScript dentro de Google Chrome?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "SpiderMonkey"
+      },
+      {
+        "letra": "b",
+        "texto": "V8 Engine"
+      },
+      {
+        "letra": "c",
+        "texto": "ChakraCore"
+      },
+      {
+        "letra": "d",
+        "texto": "JavaScriptCore"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 2,
+    "enunciado": "¿Qué limitación de seguridad crítica tiene JavaScript al ejecutarse nativamente en el navegador?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "No puede alterar el árbol DOM en tiempo de ejecución."
+      },
+      {
+        "letra": "b",
+        "texto": "Tiene prohibido el acceso al sistema de archivos local."
+      },
+      {
+        "letra": "c",
+        "texto": "No admite realizar peticiones asíncronas externas (AJAX)."
+      },
+      {
+        "letra": "d",
+        "texto": "Bloquea automáticamente todas las animaciones complejas."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 3,
+    "enunciado": "¿Para qué se utiliza principalmente la consola de comandos de JavaScript en el navegador?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para compilar el código fuente a lenguaje ensamblador local."
+      },
+      {
+        "letra": "b",
+        "texto": "Para diseñar de forma visual la interfaz gráfica de usuario."
+      },
+      {
+        "letra": "c",
+        "texto": "Para depurar, evaluar expresiones y revisar errores lógicos."
+      },
+      {
+        "letra": "d",
+        "texto": "Para configurar la conexión con la base de datos SQL."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 4,
+    "enunciado": "En un entorno de navegador, ¿qué objeto global actúa como el contexto raíz de ejecución?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "document"
+      },
+      {
+        "letra": "b",
+        "texto": "global"
+      },
+      {
+        "letra": "c",
+        "texto": "window"
+      },
+      {
+        "letra": "d",
+        "texto": "navigator"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 5,
+    "enunciado": "Al cargar un script en HTML, ¿qué atributo asegura que se ejecute tras parsear el documento?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "async"
+      },
+      {
+        "letra": "b",
+        "texto": "defer"
+      },
+      {
+        "letra": "c",
+        "texto": "load"
+      },
+      {
+        "letra": "d",
+        "texto": "wait"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 6,
+    "enunciado": "¿Qué ocurre si un script con errores sintácticos severos se ejecuta en el navegador?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El navegador corrige el error y continúa en silencio."
+      },
+      {
+        "letra": "b",
+        "texto": "El hilo se detiene, lanzando un SyntaxError en la consola."
+      },
+      {
+        "letra": "c",
+        "texto": "Se recarga la página automáticamente para intentar resolverlo."
+      },
+      {
+        "letra": "d",
+        "texto": "El código omite la línea defectuosa y sigue la ejecución."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 7,
+    "enunciado": "¿Cuál es el principal beneficio de aislar el código JavaScript en un archivo externo .js?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Aumenta la seguridad al encriptar el código fuente."
+      },
+      {
+        "letra": "b",
+        "texto": "Obliga al servidor a procesar el código antes del envío."
+      },
+      {
+        "letra": "c",
+        "texto": "Promueve la reutilización de código y el uso de caché web."
+      },
+      {
+        "letra": "d",
+        "texto": "Evita que los usuarios puedan descargar el código fuente."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 8,
+    "enunciado": "Según las herramientas del browser, ¿qué pestaña permite analizar el rendimiento del script?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Elements (Elementos)"
+      },
+      {
+        "letra": "b",
+        "texto": "Network (Red)"
+      },
+      {
+        "letra": "c",
+        "texto": "Performance (Rendimiento)"
+      },
+      {
+        "letra": "d",
+        "texto": "Application (Aplicación)"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 9,
+    "enunciado": "¿Qué provoca declarar una variable sin usar let, const o var en modo no estricto?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Genera un error de sintaxis que detiene el programa."
+      },
+      {
+        "letra": "b",
+        "texto": "Crea una propiedad implícita dentro del objeto global."
+      },
+      {
+        "letra": "c",
+        "texto": "Define una constante local inmutable en el bloque."
+      },
+      {
+        "letra": "d",
+        "texto": "Inicializa la variable como \"undefined\" pero de alcance local."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 10,
+    "enunciado": "Al evaluar la expresión `[] == false`, ¿qué resultado y por qué se produce en JavaScript?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "false, porque no son del mismo tipo de dato estructural."
+      },
+      {
+        "letra": "b",
+        "texto": "true, porque ambos valores son idénticos en memoria."
+      },
+      {
+        "letra": "c",
+        "texto": "true, debido a la coerción implícita de tipos hacia booleanos."
+      },
+      {
+        "letra": "d",
+        "texto": "Error, ya que un arreglo no puede compararse con un booleano."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 11,
+    "enunciado": "¿Qué valor asume una variable declarada con `let` pero que carece de inicialización explícita?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "null"
+      },
+      {
+        "letra": "b",
+        "texto": "NaN"
+      },
+      {
+        "letra": "c",
+        "texto": "0"
+      },
+      {
+        "letra": "d",
+        "texto": "undefined"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 12,
+    "enunciado": "¿Qué operador lógico retorna el primer operando falso o el último verdadero si todos lo son?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "|| (OR lógico)"
+      },
+      {
+        "letra": "b",
+        "texto": "&& (AND lógico)"
+      },
+      {
+        "letra": "c",
+        "texto": "! (NOT lógico)"
+      },
+      {
+        "letra": "d",
+        "texto": "?? (Nullish coalescing)"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 13,
+    "enunciado": "¿Cuál es la precedencia correcta, de mayor a menor, en los operadores aritméticos básicos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Suma, Resta, Multiplicación, División"
+      },
+      {
+        "letra": "b",
+        "texto": "Multiplicación/División, Suma/Resta"
+      },
+      {
+        "letra": "c",
+        "texto": "Suma/Resta, Multiplicación/División"
+      },
+      {
+        "letra": "d",
+        "texto": "Todas las operaciones tienen igual prioridad estricta."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 14,
+    "enunciado": "Si `a = 5` y evaluamos `b = a++`, ¿cuál es el valor final de `b` y `a` respectivamente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "b = 6, a = 6"
+      },
+      {
+        "letra": "b",
+        "texto": "b = 5, a = 5"
+      },
+      {
+        "letra": "c",
+        "texto": "b = 6, a = 5"
+      },
+      {
+        "letra": "d",
+        "texto": "b = 5, a = 6"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 15,
+    "enunciado": "En un condicional `if (\"0\")`, ¿el bloque interno se ejecuta o se omite?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Se omite, porque \"0\" se convierte algorítmicamente a false."
+      },
+      {
+        "letra": "b",
+        "texto": "Se ejecuta, ya que un string no vacío evalúa como truthy."
+      },
+      {
+        "letra": "c",
+        "texto": "Se omite, porque el motor detecta que carece de valor numérico."
+      },
+      {
+        "letra": "d",
+        "texto": "Lanza un error al evaluar un string sin usar un comparador."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 16,
+    "enunciado": "¿Qué diferencia clave existe entre los operadores relacionales == y === en JavaScript?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "== compara solo el tipo, === compara valor y referencia."
+      },
+      {
+        "letra": "b",
+        "texto": "== realiza coerción de tipos, === evalúa tipo y valor estricto."
+      },
+      {
+        "letra": "c",
+        "texto": "=== se usa solo para objetos, == para tipos primitivos."
+      },
+      {
+        "letra": "d",
+        "texto": "No existe diferencia real, ambos efectúan conversión de tipos."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 17,
+    "enunciado": "Si intentas asignar un valor a un índice fuera del límite actual de un arreglo, ¿qué sucede?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El motor lanza un RangeError crítico en tiempo de ejecución."
+      },
+      {
+        "letra": "b",
+        "texto": "El arreglo ignora la asignación y no muta su estructura."
+      },
+      {
+        "letra": "c",
+        "texto": "El arreglo se expande, rellenando los vacíos con \"undefined\"."
+      },
+      {
+        "letra": "d",
+        "texto": "El elemento se inserta al inicio desplazando los demás índices."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 18,
+    "enunciado": "¿Cómo afecta la modificación de un arreglo a sus referencias asignadas a otras variables?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Solo la variable original muta, el resto mantiene un clon."
+      },
+      {
+        "letra": "b",
+        "texto": "Todas las variables apuntando a esa referencia se actualizan."
+      },
+      {
+        "letra": "c",
+        "texto": "Rompe la referencia y genera un objeto completamente nuevo."
+      },
+      {
+        "letra": "d",
+        "texto": "Dispara una advertencia de mutabilidad en memoria dinámica."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 19,
+    "enunciado": "¿Cuál es el propósito principal de la sentencia `continue` dentro de un ciclo `for`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Finalizar completamente la ejecución del bucle envolvente."
+      },
+      {
+        "letra": "b",
+        "texto": "Retornar inmediatamente el valor iterado a la función padre."
+      },
+      {
+        "letra": "c",
+        "texto": "Saltar el resto de la iteración actual y avanzar a la siguiente."
+      },
+      {
+        "letra": "d",
+        "texto": "Reiniciar el contador del ciclo desde su valor inicial base."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 20,
+    "enunciado": "¿Qué diferencia conceptual rige entre un ciclo `while` y un bucle `do/while`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "while solo admite variables locales en su bloque de ejecución."
+      },
+      {
+        "letra": "b",
+        "texto": "do/while asegura al menos una ejecución del bloque interno."
+      },
+      {
+        "letra": "c",
+        "texto": "do/while no admite dependencias evaluadas como booleanas."
+      },
+      {
+        "letra": "d",
+        "texto": "while itera exclusivamente sobre propiedades de objetos."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 21,
+    "enunciado": "En el contexto de arreglos asociativos simulados, ¿qué tipo subyacente de estructura son?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Arreglos indexados secuencialmente con claves hash."
+      },
+      {
+        "letra": "b",
+        "texto": "Objetos puros, donde el índice string es el nombre de propiedad."
+      },
+      {
+        "letra": "c",
+        "texto": "Matrices bidimensionales almacenadas en el heap de memoria."
+      },
+      {
+        "letra": "d",
+        "texto": "Tuplas inmutables de longitud estricta y predefinida."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 22,
+    "enunciado": "¿Por qué es una mala práctica declarar funciones internamente dentro de un bucle extenso?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Sobrescribe la declaración iterativa perdiendo el índice."
+      },
+      {
+        "letra": "b",
+        "texto": "Genera un error de sintaxis bloqueando la compilación V8."
+      },
+      {
+        "letra": "c",
+        "texto": "Instancia en memoria múltiples copias de la función sin necesidad."
+      },
+      {
+        "letra": "d",
+        "texto": "Fuerza la conversión de variables locales a constantes globales."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 23,
+    "enunciado": "¿Qué principio rige en las convenciones de \"código limpio\" (Clean Code) para nombrar variables?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Usar siglas breves para minimizar el uso de memoria RAM."
+      },
+      {
+        "letra": "b",
+        "texto": "Emplear nombres descriptivos que revelen su real intención."
+      },
+      {
+        "letra": "c",
+        "texto": "Usar notación húngara combinada con índices alfanuméricos."
+      },
+      {
+        "letra": "d",
+        "texto": "Mantener nombres en mayúsculas ignorando su alcance base."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 24,
+    "enunciado": "En un ciclo iterativo, ¿qué sucede si la condición de salida jamás se evalúa como falsa?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El motor de JavaScript detiene el proceso tras mil iteraciones."
+      },
+      {
+        "letra": "b",
+        "texto": "Se desencadena un bucle infinito colapsando el navegador."
+      },
+      {
+        "letra": "c",
+        "texto": "El compilador optimiza el ciclo ignorando la condición estricta."
+      },
+      {
+        "letra": "d",
+        "texto": "El ciclo termina retornando un valor \"undefined\" implícito."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 25,
+    "enunciado": "¿Qué comportamiento describe la capacidad de alojar una función anónima dentro de una variable?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Herencia prototípica de instancias base y constructores."
+      },
+      {
+        "letra": "b",
+        "texto": "Conversión explícita de tipos abstractos dinámicos."
+      },
+      {
+        "letra": "c",
+        "texto": "Manejo de funciones como ciudadanos de primera clase."
+      },
+      {
+        "letra": "d",
+        "texto": "Resolución asíncrona mediante un bucle de eventos activo."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 26,
+    "enunciado": "Si una función ejecuta un bloque de código pero omite la instrucción `return`, ¿qué devuelve?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "null"
+      },
+      {
+        "letra": "b",
+        "texto": "0"
+      },
+      {
+        "letra": "c",
+        "texto": "false"
+      },
+      {
+        "letra": "d",
+        "texto": "undefined"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 27,
+    "enunciado": "¿Qué sucede si pasas menos argumentos a una función de los definidos en sus parámetros?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Los parámetros faltantes asumen automáticamente el valor undefined."
+      },
+      {
+        "letra": "b",
+        "texto": "La ejecución falla lanzando un TypeError crítico en consola."
+      },
+      {
+        "letra": "c",
+        "texto": "La función bloquea el hilo esperando que se provean datos."
+      },
+      {
+        "letra": "d",
+        "texto": "Los argumentos no provistos toman el valor booleano false."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 28,
+    "enunciado": "¿Por qué el uso excesivo de variables globales está catalogado como un antipatrón riesgoso?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Ocupan menos espacio pero fragmentan el heap del cliente."
+      },
+      {
+        "letra": "b",
+        "texto": "Aumentan drásticamente el riesgo de colisiones y fallas."
+      },
+      {
+        "letra": "c",
+        "texto": "Solo permiten almacenar datos primitivos temporalmente."
+      },
+      {
+        "letra": "d",
+        "texto": "Son inaccesibles en bloques de ciclos o condicionales."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 29,
+    "enunciado": "¿Qué regla determina el acceso a variables dentro de funciones anidadas (lexical scoping)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La función interna no puede acceder a variables de la externa."
+      },
+      {
+        "letra": "b",
+        "texto": "Solo puede acceder a variables globales, ignorando a su padre."
+      },
+      {
+        "letra": "c",
+        "texto": "Accede a su propio scope, al entorno superior y al alcance global."
+      },
+      {
+        "letra": "d",
+        "texto": "Las variables del scope superior colapsan al ejecutar la interna."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 30,
+    "enunciado": "¿Qué efecto tiene declarar un parámetro con el mismo nombre que una variable global del scope?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Shadowing: el parámetro prioriza su valor sobre la variable global."
+      },
+      {
+        "letra": "b",
+        "texto": "Error de compilación por conflicto de nombres duplicados."
+      },
+      {
+        "letra": "c",
+        "texto": "Se sobrescribe el valor de la variable global de forma permanente."
+      },
+      {
+        "letra": "d",
+        "texto": "La función fusiona ambos valores en un dato compuesto iterativo."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 31,
+    "enunciado": "¿Qué palabra clave nativa y reservada da acceso dinámico a todos los parámetros en una función?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "arguments"
+      },
+      {
+        "letra": "b",
+        "texto": "args"
+      },
+      {
+        "letra": "c",
+        "texto": "params"
+      },
+      {
+        "letra": "d",
+        "texto": "inputs"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 32,
+    "enunciado": "¿Qué ocurre con la memoria de las variables locales al concluir la ejecución de su función?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Permanecen en el heap hasta reiniciar el navegador por completo."
+      },
+      {
+        "letra": "b",
+        "texto": "Se exportan al entorno global para asegurar retención de datos."
+      },
+      {
+        "letra": "c",
+        "texto": "Son descartadas y liberadas por el recolector de basura nativo."
+      },
+      {
+        "letra": "d",
+        "texto": "Se almacenan en LocalStorage como respaldo del proceso actual."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 33,
+    "enunciado": "Al acceder a una propiedad dinámica cuyo nombre está en una variable, ¿qué notación es obligatoria?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Notación de flecha (objeto->propiedad)"
+      },
+      {
+        "letra": "b",
+        "texto": "Notación de punto (objeto.propiedad)"
+      },
+      {
+        "letra": "c",
+        "texto": "Notación de corchetes (objeto[variable])"
+      },
+      {
+        "letra": "d",
+        "texto": "Notación de guion (objeto-variable)"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 34,
+    "enunciado": "¿Qué define estrictamente a un \"método\" en el paradigma orientado a objetos de JavaScript?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Una variable primitiva almacenada en el entorno global del DOM."
+      },
+      {
+        "letra": "b",
+        "texto": "Una propiedad de un objeto cuyo valor alojado es una función."
+      },
+      {
+        "letra": "c",
+        "texto": "Un ciclo iterativo configurado dentro del constructor padre."
+      },
+      {
+        "letra": "d",
+        "texto": "Una constante matemática protegida contra sobreescritura local."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 35,
+    "enunciado": "Si intentas consultar una propiedad que no existe dentro de un objeto literal, ¿qué evalúa JS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "undefined"
+      },
+      {
+        "letra": "b",
+        "texto": "null"
+      },
+      {
+        "letra": "c",
+        "texto": "false"
+      },
+      {
+        "letra": "d",
+        "texto": "Lanza un ReferenceError inmediato al compilar."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 36,
+    "enunciado": "¿Qué función del objeto Math permite redondear un decimal hacia el entero superior más cercano?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Math.floor()"
+      },
+      {
+        "letra": "b",
+        "texto": "Math.round()"
+      },
+      {
+        "letra": "c",
+        "texto": "Math.ceil()"
+      },
+      {
+        "letra": "d",
+        "texto": "Math.trunc()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 37,
+    "enunciado": "Para generar un número seudoaleatorio decimal entre 0 y casi 1, ¿qué invocación es la correcta?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Math.rand()"
+      },
+      {
+        "letra": "b",
+        "texto": "Math.random()"
+      },
+      {
+        "letra": "c",
+        "texto": "Math.getSeed()"
+      },
+      {
+        "letra": "d",
+        "texto": "Math.rnd()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 38,
+    "enunciado": "¿Qué método de la instancia String extrae una porción de texto basada en índices de inicio y fin?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "splice()"
+      },
+      {
+        "letra": "b",
+        "texto": "extract()"
+      },
+      {
+        "letra": "c",
+        "texto": "slice()"
+      },
+      {
+        "letra": "d",
+        "texto": "split()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 39,
+    "enunciado": "Al invocar el método `String.prototype.indexOf()`, ¿qué se retorna si la subcadena no existe?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "undefined"
+      },
+      {
+        "letra": "b",
+        "texto": "false"
+      },
+      {
+        "letra": "c",
+        "texto": "null"
+      },
+      {
+        "letra": "d",
+        "texto": "-1"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 40,
+    "enunciado": "¿Cuál es la diferencia estructural entre crear un string primitivo y usar `new String()`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El primitivo muta; new String() bloquea cualquier modificación."
+      },
+      {
+        "letra": "b",
+        "texto": "new String() instancia un objeto explícito, no un tipo primitivo."
+      },
+      {
+        "letra": "c",
+        "texto": "No existe diferencia técnica, ambos compilan al mismo binario."
+      },
+      {
+        "letra": "d",
+        "texto": "El constructor soporta cifrado UTF-16, pero el primitivo carece."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 41,
+    "enunciado": "Al evaluar `typeof null` en el intérprete, ¿qué cadena retorna y por qué motivo histórico?",
+    "alternativas": [
+      { "letra": "a", "texto": "Retorna \"null\", coherente con el valor primitivo evaluado." },
+      { "letra": "b", "texto": "Retorna \"undefined\", al carecer de asignación efectiva." },
+      { "letra": "c", "texto": "Lanza un TypeError por consultar un valor no inicializado." },
+      { "letra": "d", "texto": "Retorna \"object\", por un defecto heredado de las primeras versiones." }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 42,
+    "enunciado": "¿Qué ocurre al intentar leer una variable declarada con `let` antes de la línea que la declara?",
+    "alternativas": [
+      { "letra": "a", "texto": "Se levanta un ReferenceError por la zona muerta temporal del bloque." },
+      { "letra": "b", "texto": "Se evalúa como undefined, igual que una declarada con var." },
+      { "letra": "c", "texto": "Se asigna automáticamente el valor null hasta alcanzar su declaración." },
+      { "letra": "d", "texto": "Se resuelve buscando la variable en el ámbito global inmediato." }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 43,
+    "enunciado": "En una estructura `switch`, ¿qué consecuencia acarrea omitir la sentencia `break` en un caso?",
+    "alternativas": [
+      { "letra": "a", "texto": "El intérprete aborta la estructura completa lanzando SyntaxError." },
+      { "letra": "b", "texto": "El bloque se repite indefinidamente hasta cumplir la condición." },
+      { "letra": "c", "texto": "El control retorna al inicio del switch reevaluando la expresión." },
+      { "letra": "d", "texto": "La ejecución continúa en los casos siguientes hasta hallar un break." }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 44,
+    "enunciado": "¿Cuál es la sintaxis correcta del operador condicional ternario para asignar un valor?",
+    "alternativas": [
+      { "letra": "a", "texto": "let x = if (cond) ? valorA : valorB;" },
+      { "letra": "b", "texto": "let x = cond ? valorA | valorB;" },
+      { "letra": "c", "texto": "let x = cond ? valorA : valorB;" },
+      { "letra": "d", "texto": "let x = (cond) => valorA : valorB;" }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 3,
+    "numero": 45,
+    "enunciado": "¿Qué delimitador y qué marcador exige una plantilla literal para interpolar una expresión?",
+    "alternativas": [
+      { "letra": "a", "texto": "Comillas invertidas como delimitador y `${expresion}` como marcador." },
+      { "letra": "b", "texto": "Comillas dobles como delimitador y `#{expresion}` como marcador." },
+      { "letra": "c", "texto": "Comillas simples como delimitador y `%expresion%` como marcador." },
+      { "letra": "d", "texto": "Paréntesis como delimitador y `@{expresion}` como marcador." }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 46,
+    "enunciado": "Si a un arreglo de diez elementos se le asigna `length = 4`, ¿qué le sucede a su contenido?",
+    "alternativas": [
+      { "letra": "a", "texto": "La asignación se ignora, pues length es una propiedad de solo lectura." },
+      { "letra": "b", "texto": "Los elementos sobrantes se desplazan al inicio conservando su valor." },
+      { "letra": "c", "texto": "Se lanza un RangeError por reducir la capacidad ya reservada." },
+      { "letra": "d", "texto": "El arreglo se trunca y los elementos posteriores al índice 3 se descartan." }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 47,
+    "enunciado": "Respecto al método `push()` sobre un arreglo, ¿dónde inserta y qué valor devuelve la llamada?",
+    "alternativas": [
+      { "letra": "a", "texto": "Inserta al inicio y devuelve el elemento recién incorporado." },
+      { "letra": "b", "texto": "Inserta al final y devuelve la nueva longitud del arreglo." },
+      { "letra": "c", "texto": "Inserta al final y devuelve una copia superficial del arreglo." },
+      { "letra": "d", "texto": "Inserta al inicio y devuelve el índice asignado al elemento." }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 3,
+    "numero": 48,
+    "enunciado": "¿Cuál es la distinción sustantiva entre invocar `slice()` y aplicar `splice()` sobre un arreglo?",
+    "alternativas": [
+      { "letra": "a", "texto": "slice devuelve una porción sin alterar el original; splice muta el arreglo." },
+      { "letra": "b", "texto": "slice muta el arreglo original; splice opera sobre una copia aislada." },
+      { "letra": "c", "texto": "Ambos mutan el original, diferenciándose solo en el orden de los índices." },
+      { "letra": "d", "texto": "slice actúa sobre cadenas exclusivamente y splice sobre arreglos." }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 3,
+    "numero": 49,
+    "enunciado": "Al ejecutar `parseInt(\"08px\")`, ¿qué valor entrega el analizador y bajo qué criterio se detiene?",
+    "alternativas": [
+      { "letra": "a", "texto": "Entrega NaN, porque la cadena mezcla dígitos con caracteres alfabéticos." },
+      { "letra": "b", "texto": "Entrega 0, deteniéndose ante el cero inicial interpretado como octal." },
+      { "letra": "c", "texto": "Entrega \"08\", conservando el tipo String de la cadena original." },
+      { "letra": "d", "texto": "Entrega 8, deteniéndose en el primer carácter no numérico hallado." }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 3,
+    "numero": 50,
+    "enunciado": "Si un objeto se declara con `const`, ¿qué operaciones permanecen permitidas sobre él?",
+    "alternativas": [
+      { "letra": "a", "texto": "Ninguna: el objeto queda congelado y rechaza toda escritura posterior." },
+      { "letra": "b", "texto": "Solo la reasignación completa del identificador a otro objeto." },
+      { "letra": "c", "texto": "Modificar, agregar y eliminar propiedades, pero no reasignar el identificador." },
+      { "letra": "d", "texto": "Únicamente la lectura de propiedades ya existentes al momento de declararlo." }
+    ],
+    "correcta": "c"
+  }
+]

@@ -104,7 +104,11 @@ entornos va antes que la prueba de restauración.
 - [x] Se restauró un respaldo con éxito contra la base de pruebas, con evidencia:
   qué dato se destruyó, qué se restauró y cómo se comprobó que volvió.
 - [x] El manual de `90-manual/` permite a alguien sin contexto previo publicar una
-  actualización desde un clon, sin preguntarle nada al autor.
+  actualización desde un clon, sin preguntarle nada al autor. · *Recorrido en frío
+  el 2026-09-04 por el autor, desde un clon limpio en una carpeta temporal: `git
+  clone`, `npm install` (104 paquetes) y `npm run verificar`. El script corrió
+  entero y dio veredicto. Terminó en `DESFASADO` sobre `icons.css`, que resultó ser
+  una falsa alarma por finales de línea: ver H-012.*
 
 ## Fuera de alcance
 
@@ -269,6 +273,18 @@ la simulación de un equipo donde git no aparece por ninguna vía.
 De paso apareció el mismo problema con otra herramienta: `npm run cuestionario`
 invocaba `python3`, que en Windows es un alias de Microsoft Store de cero bytes.
 Cambiado a `python`, con el intérprete esperado anotado en la cabecera del script.
+
+### El recorrido en frío, hecho de verdad · 2026-09-04
+
+El autor clonó el repositorio en una carpeta temporal, corrió `npm install` y
+`npm run verificar` sin tocar nada más. El recorrido completó: la construcción
+corrió entera —«3 entradas copiadas a dist/», «17 recursos enlazados, ninguno
+roto»— y el script entregó su veredicto en vez de reventar. Eso es lo que el
+criterio pedía comprobar.
+
+El veredicto fue `DESFASADO` sobre `static/css/icons.css`, y **no correspondía a
+un CSS desactualizado**: reproducido después en un clon local, el contenido es
+idéntico y lo único que cambia son los finales de línea. Queda como **H-012**.
 
 ### Deuda que esta iteración deja abierta
 

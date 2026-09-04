@@ -1,0 +1,962 @@
+[
+  {
+    "modulo": 7,
+    "numero": 1,
+    "enunciado": "¿Qué ventaja principal ofrece implementar un \"pool\" de conexiones en PostgreSQL con Node.js?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Encripta automáticamente todos los datos en tránsito hacia la DB."
+      },
+      {
+        "letra": "b",
+        "texto": "Reutiliza conexiones activas evitando el costo de crear nuevas."
+      },
+      {
+        "letra": "c",
+        "texto": "Ejecuta consultas SQL en un solo hilo bloqueando las demás."
+      },
+      {
+        "letra": "d",
+        "texto": "Duplica los datos en memoria RAM para lecturas más veloces."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 2,
+    "enunciado": "Al usar el paquete `pg`, ¿qué clase gestiona múltiples clientes conectados concurrentemente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "ClientManager"
+      },
+      {
+        "letra": "b",
+        "texto": "PgConnection"
+      },
+      {
+        "letra": "c",
+        "texto": "Pool"
+      },
+      {
+        "letra": "d",
+        "texto": "ConnectionCluster"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 3,
+    "enunciado": "¿Qué sucede si el \"pool\" de PostgreSQL alcanza su límite máximo de conexiones concurrentes?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Detiene el servidor Node arrojando un error fatal."
+      },
+      {
+        "letra": "b",
+        "texto": "Elimina las conexiones más antiguas sin previo aviso."
+      },
+      {
+        "letra": "c",
+        "texto": "Pone en cola las nuevas peticiones hasta que una se libere."
+      },
+      {
+        "letra": "d",
+        "texto": "Escala dinámicamente agregando nuevos procesos en el servidor."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 4,
+    "enunciado": "En el paquete `pg`, ¿qué método libera explícitamente un cliente de vuelta al pool tras su uso?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "client.disconnect()"
+      },
+      {
+        "letra": "b",
+        "texto": "client.release()"
+      },
+      {
+        "letra": "c",
+        "texto": "client.close()"
+      },
+      {
+        "letra": "d",
+        "texto": "pool.return(client)"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 5,
+    "enunciado": "¿Cuál es el riesgo de no liberar un cliente devuelto por `pool.connect()` tras usarlo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La base de datos elimina el registro recién insertado."
+      },
+      {
+        "letra": "b",
+        "texto": "Agotamiento del pool, provocando bloqueo en nuevas peticiones."
+      },
+      {
+        "letra": "c",
+        "texto": "Se genera una brecha de seguridad exponiendo las credenciales."
+      },
+      {
+        "letra": "d",
+        "texto": "El servidor Node se reinicia de manera automática e iterativa."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 6,
+    "enunciado": "Al configurar un Pool, ¿qué parámetro define el tiempo máximo de inactividad de una conexión?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "maxIdleTime"
+      },
+      {
+        "letra": "b",
+        "texto": "idleTimeoutMillis"
+      },
+      {
+        "letra": "c",
+        "texto": "connectionTimeout"
+      },
+      {
+        "letra": "d",
+        "texto": "keepAliveLimit"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 7,
+    "enunciado": "¿Qué técnica nativa en `pg` previene eficazmente ataques de inyección SQL (SQL Injection)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Concatenación estricta de strings validada con Regex."
+      },
+      {
+        "letra": "b",
+        "texto": "Configuración del firewall en el puerto 5432."
+      },
+      {
+        "letra": "c",
+        "texto": "Uso de consultas parametrizadas (Prepared Statements)."
+      },
+      {
+        "letra": "d",
+        "texto": "Bloqueo de direcciones IP maliciosas desde el cliente."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 8,
+    "enunciado": "En una consulta parametrizada con `pg`, ¿cómo se referencian los valores dinámicos en el texto?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Usando signos de interrogación (?, ?, ?)."
+      },
+      {
+        "letra": "b",
+        "texto": "Empleando interpolación directa (${var})."
+      },
+      {
+        "letra": "c",
+        "texto": "Mediante marcadores posicionales indexados ($1, $2, $3)."
+      },
+      {
+        "letra": "d",
+        "texto": "Agregando el prefijo de dos puntos (:id, :name)."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 9,
+    "enunciado": "¿Qué objeto JavaScript se debe pasar como argumento para ejecutar una consulta parametrizada?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Un arreglo conteniendo los valores en orden exacto."
+      },
+      {
+        "letra": "b",
+        "texto": "Un string codificado en formato base64 nativo."
+      },
+      {
+        "letra": "c",
+        "texto": "Un buffer binario de memoria compartida estricta."
+      },
+      {
+        "letra": "d",
+        "texto": "Un objeto de tipo Map mapeando cada índice con su llave."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 10,
+    "enunciado": "¿Cuál es el propósito principal de usar cursores al consultar la base de datos PostgreSQL?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Encriptar el flujo de datos entre el servidor y el cliente."
+      },
+      {
+        "letra": "b",
+        "texto": "Procesar grandes volúmenes de datos por lotes sin saturar la RAM."
+      },
+      {
+        "letra": "c",
+        "texto": "Modificar registros múltiples en una única transacción atómica."
+      },
+      {
+        "letra": "d",
+        "texto": "Transformar resultados a formato JSON nativo directamente."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 11,
+    "enunciado": "Usando el paquete `pg-cursor`, ¿qué método extrae un bloque específico de filas del cursor?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "cursor.read(cantidad, callback)"
+      },
+      {
+        "letra": "b",
+        "texto": "cursor.fetch(cantidad)"
+      },
+      {
+        "letra": "c",
+        "texto": "cursor.getNext(lote)"
+      },
+      {
+        "letra": "d",
+        "texto": "cursor.pull(cantidad, callback)"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 12,
+    "enunciado": "¿Qué propiedad del objeto resultado de `query()` contiene las filas retornadas por PostgreSQL?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "result.data"
+      },
+      {
+        "letra": "b",
+        "texto": "result.records"
+      },
+      {
+        "letra": "c",
+        "texto": "result.rows"
+      },
+      {
+        "letra": "d",
+        "texto": "result.dataset"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 13,
+    "enunciado": "Si usas `async/await` para una consulta SQL, ¿cómo manejas correctamente los fallos del motor?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Pasando un booleano `false` como tercer parámetro."
+      },
+      {
+        "letra": "b",
+        "texto": "Envolviendo la llamada en un bloque try/catch."
+      },
+      {
+        "letra": "c",
+        "texto": "Usando el evento `.on('fail')` encadenado a la promesa."
+      },
+      {
+        "letra": "d",
+        "texto": "Validando si el objeto de respuesta es nulo al final."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 14,
+    "enunciado": "En mitigación de inyección SQL, ¿por qué es inseguro armar sentencias concatenando variables?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Porque el motor PostgreSQL rechaza strings mayores a 255 bytes."
+      },
+      {
+        "letra": "b",
+        "texto": "Porque bloquea los hilos del pool al evaluar sintaxis compleja."
+      },
+      {
+        "letra": "c",
+        "texto": "Porque rompe la conexión al transformar datos a binario."
+      },
+      {
+        "letra": "d",
+        "texto": "Porque permite introducir e inyectar código SQL malicioso."
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 7,
+    "numero": 15,
+    "enunciado": "Al realizar un INSERT con `pg`, ¿qué cláusula SQL adicional devuelve el registro recién creado?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "WITH NEW DATA"
+      },
+      {
+        "letra": "b",
+        "texto": "RETURNING *"
+      },
+      {
+        "letra": "c",
+        "texto": "OUTPUT INSERTED"
+      },
+      {
+        "letra": "d",
+        "texto": "YIELD ALL"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 16,
+    "enunciado": "¿Qué propiedad del resultado de una consulta indica cuántos registros fueron alterados por DML?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "result.affectedRows"
+      },
+      {
+        "letra": "b",
+        "texto": "result.rowCount"
+      },
+      {
+        "letra": "c",
+        "texto": "result.modified"
+      },
+      {
+        "letra": "d",
+        "texto": "result.changes"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 17,
+    "enunciado": "Al actualizar datos con UPDATE, ¿por qué es imperativo capturar y procesar errores en Node?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para evitar bloqueos permanentes de tablas por fallos silenciados."
+      },
+      {
+        "letra": "b",
+        "texto": "Para compilar nuevamente la consulta en el motor de Chrome."
+      },
+      {
+        "letra": "c",
+        "texto": "Para reiniciar el paquete pg en caso de sintaxis incorrecta."
+      },
+      {
+        "letra": "d",
+        "texto": "Para impedir que las claves primarias cambien su valor nativo."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 18,
+    "enunciado": "Si envías un DELETE parametrizado sin valor en el parámetro ($1), ¿qué ocurre?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Se eliminan todos los registros de la tabla inmediatamente."
+      },
+      {
+        "letra": "b",
+        "texto": "Falla por parámetro faltante y rechaza la ejecución."
+      },
+      {
+        "letra": "c",
+        "texto": "La tabla se bloquea hasta reiniciar el pool de conexiones."
+      },
+      {
+        "letra": "d",
+        "texto": "El motor asume el valor nulo e ignora la sentencia DELETE."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 19,
+    "enunciado": "¿Cuál es el riesgo de ejecutar una instrucción UPDATE o DELETE sin una cláusula WHERE?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Crea duplicados exactos de cada registro de la tabla afectada."
+      },
+      {
+        "letra": "b",
+        "texto": "Alteración o eliminación accidental de todos los registros."
+      },
+      {
+        "letra": "c",
+        "texto": "Falla de sintaxis inmediata que detiene la base de datos."
+      },
+      {
+        "letra": "d",
+        "texto": "Generación de un error de memoria por límite de cursores."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 20,
+    "enunciado": "Al usar transacciones, si un INSERT falla en medio del proceso, ¿qué se debe hacer en el catch?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Realizar un COMMIT parcial."
+      },
+      {
+        "letra": "b",
+        "texto": "Ignorar el error y reintentar."
+      },
+      {
+        "letra": "c",
+        "texto": "Ejecutar la sentencia ROLLBACK."
+      },
+      {
+        "letra": "d",
+        "texto": "Cerrar la base de datos completa."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 21,
+    "enunciado": "¿Qué comando SQL inicia explícitamente un bloque de control transaccional en PostgreSQL?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "START TRANSACTION"
+      },
+      {
+        "letra": "b",
+        "texto": "BEGIN"
+      },
+      {
+        "letra": "c",
+        "texto": "INIT"
+      },
+      {
+        "letra": "d",
+        "texto": "OPEN"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 22,
+    "enunciado": "¿Qué propiedad fundamental ACID asegura que una transacción se aplique por completo o fracase?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Aislamiento"
+      },
+      {
+        "letra": "b",
+        "texto": "Consistencia"
+      },
+      {
+        "letra": "c",
+        "texto": "Durabilidad"
+      },
+      {
+        "letra": "d",
+        "texto": "Atomicidad"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 7,
+    "numero": 23,
+    "enunciado": "En Node, ¿por qué debes usar el mismo cliente del pool durante toda la transacción?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para no reventar la pila de memoria del Event Loop."
+      },
+      {
+        "letra": "b",
+        "texto": "Porque BEGIN, COMMIT y ROLLBACK dependen de la sesión activa."
+      },
+      {
+        "letra": "c",
+        "texto": "Porque los parámetros solo persisten en clientes asíncronos."
+      },
+      {
+        "letra": "d",
+        "texto": "Para mantener el cursor de lectura en la primera fila."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 24,
+    "enunciado": "¿Qué comando confirma y persiste de forma definitiva los cambios de una transacción activa?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "SAVEPOINT"
+      },
+      {
+        "letra": "b",
+        "texto": "END TRANSACTION"
+      },
+      {
+        "letra": "c",
+        "texto": "FLUSH"
+      },
+      {
+        "letra": "d",
+        "texto": "COMMIT"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 7,
+    "numero": 25,
+    "enunciado": "¿Qué operación anula todos los cambios realizados desde el comando BEGIN al detectar un error?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "TRUNCATE"
+      },
+      {
+        "letra": "b",
+        "texto": "ROLLBACK"
+      },
+      {
+        "letra": "c",
+        "texto": "UNDO ALL"
+      },
+      {
+        "letra": "d",
+        "texto": "REVERT"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 26,
+    "enunciado": "Al culminar un COMMIT o ROLLBACK usando un cliente del pool, ¿qué acción final es obligatoria?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Destruir el proceso principal de Node con process.exit()."
+      },
+      {
+        "letra": "b",
+        "texto": "Liberar el cliente usando el método release() correspondiente."
+      },
+      {
+        "letra": "c",
+        "texto": "Reiniciar el servidor de PostgreSQL para liberar los bloqueos."
+      },
+      {
+        "letra": "d",
+        "texto": "Limpiar manualmente la caché de DNS del servidor."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 27,
+    "enunciado": "¿Qué es el modo \"autocommit\" en los motores de base de datos relacionales?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Confirma cada sentencia SQL individual automáticamente si es exitosa."
+      },
+      {
+        "letra": "b",
+        "texto": "Revierte automáticamente si detecta cualquier uso intensivo de CPU."
+      },
+      {
+        "letra": "c",
+        "texto": "Bloquea tablas enteras hasta que un administrador confirme."
+      },
+      {
+        "letra": "d",
+        "texto": "Genera un volcado de memoria antes de cada inserción riesgosa."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 28,
+    "enunciado": "¿Qué problema principal busca resolver un mapeador objeto-relacional (ORM) como Sequelize?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La traducción de interfaces gráficas a comandos binarios."
+      },
+      {
+        "letra": "b",
+        "texto": "Eliminar la necesidad de usar bases de datos físicas."
+      },
+      {
+        "letra": "c",
+        "texto": "Vincular estructuras lógicas de la DB con objetos en el código."
+      },
+      {
+        "letra": "d",
+        "texto": "Acelerar el ancho de banda del servidor consumiendo menos red."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 29,
+    "enunciado": "En la arquitectura de Sequelize, ¿qué representa el concepto lógico de \"Modelo\"?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Un controlador de rutas API HTTP."
+      },
+      {
+        "letra": "b",
+        "texto": "Una clase JavaScript que mapea y abstrae una tabla de la DB."
+      },
+      {
+        "letra": "c",
+        "texto": "Un middleware para procesar cuerpos JSON."
+      },
+      {
+        "letra": "d",
+        "texto": "Una vista renderizada en el motor Handlebars."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 30,
+    "enunciado": "En Sequelize, ¿qué método de modelo se utiliza convencionalmente para insertar un nuevo registro?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Model.insert()"
+      },
+      {
+        "letra": "b",
+        "texto": "Model.save()"
+      },
+      {
+        "letra": "c",
+        "texto": "Model.create()"
+      },
+      {
+        "letra": "d",
+        "texto": "Model.buildRecord()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 31,
+    "enunciado": "Para recuperar múltiples registros desde la base de datos con Sequelize, ¿qué método se utiliza?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Model.selectAll()"
+      },
+      {
+        "letra": "b",
+        "texto": "Model.findAll()"
+      },
+      {
+        "letra": "c",
+        "texto": "Model.fetchMany()"
+      },
+      {
+        "letra": "d",
+        "texto": "Model.getRecords()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 32,
+    "enunciado": "¿Qué método en Sequelize se emplea para realizar la actualización (UPDATE) de registros?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Model.modify()"
+      },
+      {
+        "letra": "b",
+        "texto": "Model.put()"
+      },
+      {
+        "letra": "c",
+        "texto": "Model.update()"
+      },
+      {
+        "letra": "d",
+        "texto": "Model.change()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 33,
+    "enunciado": "¿Qué instrucción en Sequelize elimina (DELETE) físicamente un registro basado en condiciones?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Model.destroy()"
+      },
+      {
+        "letra": "b",
+        "texto": "Model.delete()"
+      },
+      {
+        "letra": "c",
+        "texto": "Model.remove()"
+      },
+      {
+        "letra": "d",
+        "texto": "Model.drop()"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 34,
+    "enunciado": "Al definir un modelo en Sequelize, ¿qué propiedad define el tipo de dato nativo de una columna?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "fieldType"
+      },
+      {
+        "letra": "b",
+        "texto": "type usando DataTypes"
+      },
+      {
+        "letra": "c",
+        "texto": "dbType"
+      },
+      {
+        "letra": "d",
+        "texto": "struct"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 35,
+    "enunciado": "En Sequelize, ¿qué función vincula un modelo \"A\" con un modelo \"B\" en relación Uno a Uno?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "A.belongsToOne(B)"
+      },
+      {
+        "letra": "b",
+        "texto": "A.hasOne(B)"
+      },
+      {
+        "letra": "c",
+        "texto": "A.relatesTo(B)"
+      },
+      {
+        "letra": "d",
+        "texto": "A.links(B)"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 36,
+    "enunciado": "Para completar la asociación inversa \"Uno a Uno\" o \"Uno a Muchos\", ¿qué método aplica el hijo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "belongsTo()"
+      },
+      {
+        "letra": "b",
+        "texto": "hasParent()"
+      },
+      {
+        "letra": "c",
+        "texto": "childOf()"
+      },
+      {
+        "letra": "d",
+        "texto": "ownsTo()"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 37,
+    "enunciado": "En una relación \"Uno a Muchos\" (1:N), ¿qué método de asociación define el modelo principal?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "hasMultiple()"
+      },
+      {
+        "letra": "b",
+        "texto": "hasMany()"
+      },
+      {
+        "letra": "c",
+        "texto": "containsMany()"
+      },
+      {
+        "letra": "d",
+        "texto": "includes()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 7,
+    "numero": 38,
+    "enunciado": "¿Qué requiere estrictamente una relación \"Muchos a Muchos\" (N:M) en bases de datos relacionales?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Duplicar todos los campos en ambos modelos."
+      },
+      {
+        "letra": "b",
+        "texto": "Declarar dos llaves primarias en una misma columna."
+      },
+      {
+        "letra": "c",
+        "texto": "Una tabla o modelo intermedio para alojar ambas llaves foráneas."
+      },
+      {
+        "letra": "d",
+        "texto": "Modificar los índices para admitir valores nulos múltiples."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 7,
+    "numero": 39,
+    "enunciado": "En Sequelize, ¿qué método establece una relación Muchos a Muchos indicando la tabla intermedia?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "belongsToMany() con la opción 'through'"
+      },
+      {
+        "letra": "b",
+        "texto": "hasManyToMany() con la opción 'via'"
+      },
+      {
+        "letra": "c",
+        "texto": "associatesWith() con la opción 'middle'"
+      },
+      {
+        "letra": "d",
+        "texto": "linksToMany() con la opción 'joinTable'"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 7,
+    "numero": 40,
+    "enunciado": "Al consultar modelos asociados en Sequelize, ¿qué parámetro se usa para cargar relaciones (JOIN)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "fetch"
+      },
+      {
+        "letra": "b",
+        "texto": "relations"
+      },
+      {
+        "letra": "c",
+        "texto": "include"
+      },
+      {
+        "letra": "d",
+        "texto": "populate"
+      }
+    ],
+    "correcta": "c"
+  }
+]

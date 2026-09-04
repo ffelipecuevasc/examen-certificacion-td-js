@@ -186,3 +186,70 @@ Los tres se provocaron de verdad antes de darlo por bueno. `npm run cuestionario
 pasó de `python3` a `python`, con el intérprete esperado anotado en la cabecera del
 script.
 
+### H-012 · `verificar` da falsa alarma en un clon recien bajado
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Fecha:** 2026-09-04
+
+**Síntoma.** En un clon limpio, `npm run verificar` responde `DESFASADO` sobre
+`static/css/icons.css` aunque nadie haya tocado nada.
+**Causa.** `core.autocrlf=true` y el repositorio no tiene `.gitattributes`: al clonar,
+los archivos se escriben con CRLF, y el generador produce LF. La comprobación nueva
+compara **bytes**, así que ve una diferencia donde solo hay saltos de línea distintos.
+Comprobado: normalizando los finales de línea, los dos archivos son idénticos; sin
+normalizar difieren en 41 bytes, todos CR.
+**Impacto.** Es una regresión del arreglo de H-011. El `git diff` anterior no tenía
+este problema porque git normaliza los saltos de línea al comparar; la comprobación
+por bytes ganó independencia del terminal y perdió esa normalización. Y el daño de una
+falsa alarma es peor que el de un aviso omitido: enseña a desconfiar del único
+mecanismo que avisa de verdad cuando el CSS sí está desactualizado.
+**Propuesta.** Dos cosas, en este orden. Primero, que `verificar` compare ignorando
+los finales de línea: son tres líneas y elimina la falsa alarma sin perder nada, porque
+un cambio real de CSS nunca consiste solo en CR. Segundo, añadir el `.gitattributes`
+que ya estaba anotado en el registro desde la iteración 11, fijando los generados a
+LF: ataca la causa en vez del síntoma.
+
+**Resultado · 2026-09-04.** Resuelto por los dos lados.
+
+*El síntoma:* `scripts/verificar.mjs` compara ignorando los finales de línea. Un
+archivo que solo cambia en CR ya no cuenta como desfase; se dice en el veredicto
+`VERIFICADO`, con su nota, en vez de callarlo. Comprobado con el caso exacto del
+clon: `icons.css` convertido a CRLF, 41 CR, antes daba `DESFASADO` y ahora da
+`VERIFICADO` con la nota. Y comprobado también que un cambio real de contenido
+sigue dando `DESFASADO`.
+
+*La causa:* `.gitattributes` con `* text=auto eol=lf`. Ensayado en un clon
+desechable: tras aplicarlo y refrescar el árbol, `icons.css` pasa de 41 CR a 0, y
+regenerarlo produce un archivo idéntico. El clon deja de dar falsa alarma en su
+raíz, no solo en el mensaje.
+
+**Corrección a lo que suponiamos.** Se esperaba que hiciera falta un commit de
+renormalización masiva. **No hace falta:** el historial ya estaba en LF. Medido
+sobre los objetos guardados, no sobre el disco: `icons.css` en el historial tiene 0
+bytes CR y 41 LF; en el disco, tras el checkout, 41 CR y 41 LF. `core.autocrlf=true`
+venía normalizando al guardar todo este tiempo. Lo que estaba mal no era lo
+guardado sino lo que el checkout escribía en el disco, y eso es justo lo que
+`.gitattributes` corrige. `git add --renormalize .` no encuentra nada que cambiar:
+comprobado, cero archivos.
+
+**Si la nota de finales de linea vuelve a aparecer, no es ruido conocido.** Con
+`.gitattributes` puesto y el arbol refrescado, el veredicto `VERIFICADO` no deberia
+volver a traer esa nota nunca: los clones salen en LF y los generadores escriben LF.
+Que reaparezca significa que algo cambio en la cadena que produce esos archivos, y
+hay que averiguar que. En orden de probabilidad:
+
+1. **La copia es anterior al refresco.** Un arbol que nunca se reescribio sigue
+   teniendo CRLF en el disco. Es el caso benigno y el unico que se arregla solo, con
+   los tres comandos de `90-manual/publicacion-en-cloudflare-pages.md`.
+2. **`.gitattributes` dejo de aplicarse:** se borro, se movio, o alguien acoto sus
+   patrones y dejo fuera la extension. Se comprueba con
+   `git check-attr text eol -- static/css/icons.css`, que debe responder `text: auto`
+   y `eol: lf`.
+3. **Un generador nuevo escribe CRLF.** Pasa al usar `os.EOL` en vez de un salto de
+   linea explicito, o al copiar codigo de otro proyecto. Es lo primero que hay que
+   mirar si la nota aparece justo despues de tocar `scripts/`.
+4. **Alguien edito a mano un archivo generado** y lo guardo con CRLF. Ademas de la
+   nota, eso viola la regla de no editar generados: se edita su generador.
+5. **El archivo entro fuera de git**, descomprimido de un ZIP hecho en Windows.
+
+Lo que no corresponde es acostumbrarse a verla. La nota se escribio para que un caso
+conocido no se leyera como alarma; una vez cerrada la causa, pasa a ser justo lo
+contrario.

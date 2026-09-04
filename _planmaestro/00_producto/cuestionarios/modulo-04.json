@@ -1,0 +1,1202 @@
+[
+  {
+    "modulo": 4,
+    "numero": 1,
+    "enunciado": "¿Qué pilar de POO oculta el estado interno de un objeto y exige métodos para alterarlo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Herencia múltiple."
+      },
+      {
+        "letra": "b",
+        "texto": "Encapsulamiento."
+      },
+      {
+        "letra": "c",
+        "texto": "Polimorfismo."
+      },
+      {
+        "letra": "d",
+        "texto": "Abstracción estructural."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 2,
+    "enunciado": "En JS pre-ES6, ¿qué mecanismo emula la herencia de clases tradicional?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La cadena de prototipos (prototype chain)."
+      },
+      {
+        "letra": "b",
+        "texto": "Clases abstractas puras."
+      },
+      {
+        "letra": "c",
+        "texto": "Mixins estáticos globales."
+      },
+      {
+        "letra": "d",
+        "texto": "Mutación directa de la memoria base."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 3,
+    "enunciado": "¿Qué método convierte un objeto literal de JavaScript a una cadena de texto en formato JSON?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "JSON.parse()"
+      },
+      {
+        "letra": "b",
+        "texto": "Object.toJSON()"
+      },
+      {
+        "letra": "c",
+        "texto": "JSON.stringify()"
+      },
+      {
+        "letra": "d",
+        "texto": "String.fromJSON()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 4,
+    "enunciado": "¿Qué restricción estricta de sintaxis aplica al estándar JSON que difiere de objetos JS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Las claves deben estar obligatoriamente entre comillas dobles."
+      },
+      {
+        "letra": "b",
+        "texto": "Permite comentarios multi-línea con la sintaxis /* */."
+      },
+      {
+        "letra": "c",
+        "texto": "Admite funciones como valores de las propiedades."
+      },
+      {
+        "letra": "d",
+        "texto": "Las claves no requieren comillas si son alfanuméricas."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 5,
+    "enunciado": "En POO, ¿qué término define a una entidad concreta creada a partir de una clase plantilla?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Prototipo."
+      },
+      {
+        "letra": "b",
+        "texto": "Interfaz."
+      },
+      {
+        "letra": "c",
+        "texto": "Método estático."
+      },
+      {
+        "letra": "d",
+        "texto": "Instancia."
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 4,
+    "numero": 6,
+    "enunciado": "¿Qué pilar de POO permite que objetos de distintas clases respondan al mismo método?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Polimorfismo."
+      },
+      {
+        "letra": "b",
+        "texto": "Encapsulamiento."
+      },
+      {
+        "letra": "c",
+        "texto": "Inyección de dependencias."
+      },
+      {
+        "letra": "d",
+        "texto": "Modularidad aislada."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 7,
+    "enunciado": "Al instanciar un objeto con `new`, ¿qué función especial de la clase se ejecuta primero?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "render()"
+      },
+      {
+        "letra": "b",
+        "texto": "init()"
+      },
+      {
+        "letra": "c",
+        "texto": "constructor()"
+      },
+      {
+        "letra": "d",
+        "texto": "super()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 8,
+    "enunciado": "En notación literal de objetos JS, ¿cómo defines un método interno correctamente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "method: function() {}"
+      },
+      {
+        "letra": "b",
+        "texto": "function method() {}"
+      },
+      {
+        "letra": "c",
+        "texto": "method => {}"
+      },
+      {
+        "letra": "d",
+        "texto": "def method() {}"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 9,
+    "enunciado": "¿Qué tipo de dato nativo JS no es válido para ser almacenado en una estructura JSON?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Booleano (true/false)."
+      },
+      {
+        "letra": "b",
+        "texto": "Número (enteros o flotantes)."
+      },
+      {
+        "letra": "c",
+        "texto": "Array (lista de elementos)."
+      },
+      {
+        "letra": "d",
+        "texto": "Función o método."
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 4,
+    "numero": 10,
+    "enunciado": "En el prototipo de JS, ¿qué propiedad apunta al objeto del cual hereda sus métodos base?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "__super__"
+      },
+      {
+        "letra": "b",
+        "texto": "__proto__"
+      },
+      {
+        "letra": "c",
+        "texto": "baseObject"
+      },
+      {
+        "letra": "d",
+        "texto": "parentClass"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 11,
+    "enunciado": "¿Qué característica fundamental diferencia a `let` frente a `var` en su ámbito de alcance?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "let tiene alcance global exclusivo."
+      },
+      {
+        "letra": "b",
+        "texto": "let posee alcance limitado al bloque (block scope)."
+      },
+      {
+        "letra": "c",
+        "texto": "let no permite cambiar el tipo de dato asignado."
+      },
+      {
+        "letra": "d",
+        "texto": "var se destruye automáticamente al salir de la función."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 12,
+    "enunciado": "¿Qué ocurre si intentas reasignar un nuevo valor escalar a una variable definida con `const`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Cambia el valor silenciosamente."
+      },
+      {
+        "letra": "b",
+        "texto": "Ignora el cambio manteniendo el primer valor."
+      },
+      {
+        "letra": "c",
+        "texto": "Lanza un TypeError crítico deteniendo la ejecución."
+      },
+      {
+        "letra": "d",
+        "texto": "Retorna false en la operación de asignación."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 13,
+    "enunciado": "¿Qué comportamiento léxico particular tienen las Arrow Functions (`=>`) respecto a `this`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Heredan `this` del contexto de ejecución circundante."
+      },
+      {
+        "letra": "b",
+        "texto": "Tienen su propio `this` inmutable."
+      },
+      {
+        "letra": "c",
+        "texto": "Apuntan siempre al objeto global `window`."
+      },
+      {
+        "letra": "d",
+        "texto": "Generan un error si se invoca `this` en su interior."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 14,
+    "enunciado": "¿Qué operador ES6 permite desestructurar un arreglo y agrupar el resto de sus elementos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Operador Spread (...)."
+      },
+      {
+        "letra": "b",
+        "texto": "Operador Rest (...)."
+      },
+      {
+        "letra": "c",
+        "texto": "Operador In (in)."
+      },
+      {
+        "letra": "d",
+        "texto": "Nullish Coalescing (??)."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 15,
+    "enunciado": "En clases ES6, ¿qué palabra clave invoca al constructor de la clase padre al usar herencia?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "parent()"
+      },
+      {
+        "letra": "b",
+        "texto": "extends()"
+      },
+      {
+        "letra": "c",
+        "texto": "super()"
+      },
+      {
+        "letra": "d",
+        "texto": "base()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 16,
+    "enunciado": "¿Qué mecanismo en ES6 permite expandir elementos de un arreglo dentro de otro arreglo nuevo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Array.concat()"
+      },
+      {
+        "letra": "b",
+        "texto": "Destructuring."
+      },
+      {
+        "letra": "c",
+        "texto": "Operador Spread (...)."
+      },
+      {
+        "letra": "d",
+        "texto": "String Interpolation."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 17,
+    "enunciado": "¿Cómo se define correctamente un método estático dentro de una clase en ES6?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "static nombreMetodo() {}"
+      },
+      {
+        "letra": "b",
+        "texto": "const nombreMetodo = () => {}"
+      },
+      {
+        "letra": "c",
+        "texto": "function static nombreMetodo() {}"
+      },
+      {
+        "letra": "d",
+        "texto": "@static nombreMetodo() {}"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 18,
+    "enunciado": "¿Qué palabra clave se usa en un módulo ES6 para exponer una función y usarla en otro archivo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "expose"
+      },
+      {
+        "letra": "b",
+        "texto": "module.exports"
+      },
+      {
+        "letra": "c",
+        "texto": "export"
+      },
+      {
+        "letra": "d",
+        "texto": "include"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 19,
+    "enunciado": "¿Cuál es la sintaxis correcta para importar un módulo exportado por defecto en ES6?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "import { Modulo } from './archivo.js';"
+      },
+      {
+        "letra": "b",
+        "texto": "import Modulo from './archivo.js';"
+      },
+      {
+        "letra": "c",
+        "texto": "require('./archivo.js');"
+      },
+      {
+        "letra": "d",
+        "texto": "fetch('./archivo.js').import;"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 20,
+    "enunciado": "¿Qué ventaja principal ofrece la interpolación de strings mediante template literals (` `)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Cifra el texto automáticamente."
+      },
+      {
+        "letra": "b",
+        "texto": "Ejecuta expresiones JS complejas incrustadas con ${}."
+      },
+      {
+        "letra": "c",
+        "texto": "Convierte strings a números de forma nativa."
+      },
+      {
+        "letra": "d",
+        "texto": "Compila el texto a binario para mayor velocidad."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 21,
+    "enunciado": "¿Qué representa la estructura subyacente jerárquica del DOM (Document Object Model)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Un arreglo lineal de cadenas HTML."
+      },
+      {
+        "letra": "b",
+        "texto": "Un árbol de nodos de objetos accesibles mediante JS."
+      },
+      {
+        "letra": "c",
+        "texto": "Un documento XML estático y no mutable."
+      },
+      {
+        "letra": "d",
+        "texto": "Una base de datos relacional del lado del cliente."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 22,
+    "enunciado": "¿Qué método estándar de JS añade un nuevo nodo hijo al final de un elemento padre en el DOM?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "appendChild()"
+      },
+      {
+        "letra": "b",
+        "texto": "insertAfter()"
+      },
+      {
+        "letra": "c",
+        "texto": "addChild()"
+      },
+      {
+        "letra": "d",
+        "texto": "pushNode()"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 23,
+    "enunciado": "En la fase de captura de eventos del DOM, ¿en qué dirección se propaga el evento?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Desde el elemento objetivo hacia la raíz del documento."
+      },
+      {
+        "letra": "b",
+        "texto": "Desde la raíz del documento hacia el elemento objetivo."
+      },
+      {
+        "letra": "c",
+        "texto": "Solo se ejecuta en los nodos hermanos adyacentes."
+      },
+      {
+        "letra": "d",
+        "texto": "El evento no se propaga, permanece estático en el nodo."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 24,
+    "enunciado": "¿Qué método previene la acción nativa por defecto de un evento (ej. envío de un formulario)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "event.stopPropagation()"
+      },
+      {
+        "letra": "b",
+        "texto": "event.halt()"
+      },
+      {
+        "letra": "c",
+        "texto": "event.preventDefault()"
+      },
+      {
+        "letra": "d",
+        "texto": "event.cancelDefault()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 25,
+    "enunciado": "Si se asignan varios manejadores al mismo evento en un nodo con `addEventListener`, ¿qué pasa?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El último manejador sobreescribe a todos los anteriores."
+      },
+      {
+        "letra": "b",
+        "texto": "Se ejecutan todos los manejadores en orden de registro."
+      },
+      {
+        "letra": "c",
+        "texto": "Genera un error de duplicidad de eventos."
+      },
+      {
+        "letra": "d",
+        "texto": "Solo se ejecuta el primero, bloqueando los subsiguientes."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 26,
+    "enunciado": "¿Qué propiedad del objeto evento (Event) identifica el nodo exacto que originó dicho evento?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "event.currentTarget"
+      },
+      {
+        "letra": "b",
+        "texto": "event.source"
+      },
+      {
+        "letra": "c",
+        "texto": "event.target"
+      },
+      {
+        "letra": "d",
+        "texto": "event.nodeOrigin"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 27,
+    "enunciado": "¿Qué método detiene la propagación (burbujeo) de un evento hacia sus nodos padres en el DOM?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "event.preventDefault()"
+      },
+      {
+        "letra": "b",
+        "texto": "event.stopPropagation()"
+      },
+      {
+        "letra": "c",
+        "texto": "event.cancelBubble()"
+      },
+      {
+        "letra": "d",
+        "texto": "event.stopBouncing()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 28,
+    "enunciado": "Para modificar las clases CSS de un nodo de forma segura y dinámica, ¿qué propiedad usarías?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "node.className"
+      },
+      {
+        "letra": "b",
+        "texto": "node.classList"
+      },
+      {
+        "letra": "c",
+        "texto": "node.style"
+      },
+      {
+        "letra": "d",
+        "texto": "node.cssProperties"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 29,
+    "enunciado": "¿Qué evento ocurre cuando el DOM inicial HTML es cargado y parseado completamente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "window.onload"
+      },
+      {
+        "letra": "b",
+        "texto": "document.onready"
+      },
+      {
+        "letra": "c",
+        "texto": "DOMContentLoaded"
+      },
+      {
+        "letra": "d",
+        "texto": "HTMLParsedEvent"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 30,
+    "enunciado": "¿Qué método altera dinámicamente el contenido de texto de un nodo omitiendo etiquetas HTML?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "innerHTML"
+      },
+      {
+        "letra": "b",
+        "texto": "outerHTML"
+      },
+      {
+        "letra": "c",
+        "texto": "textContent"
+      },
+      {
+        "letra": "d",
+        "texto": "value"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 31,
+    "enunciado": "¿Por qué JavaScript es considerado un lenguaje de un único hilo (single-threaded) por diseño?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Porque solo tiene un call stack para procesar instrucciones."
+      },
+      {
+        "letra": "b",
+        "texto": "Porque no permite ejecutar ciclos repetitivos continuos."
+      },
+      {
+        "letra": "c",
+        "texto": "Porque compila su código en una sola pasada."
+      },
+      {
+        "letra": "d",
+        "texto": "Porque restringe la ejecución a un único archivo fuente."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 32,
+    "enunciado": "En el contexto del Event Loop, ¿qué componente encola los callbacks de operaciones asíncronas?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El Call Stack (pila de llamadas)."
+      },
+      {
+        "letra": "b",
+        "texto": "El Memory Heap (montículo)."
+      },
+      {
+        "letra": "c",
+        "texto": "La Callback Queue (cola de tareas)."
+      },
+      {
+        "letra": "d",
+        "texto": "El motor de renderizado CSS."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 33,
+    "enunciado": "¿Qué problema clásico de legibilidad estructural se produce al anidar excesivos callbacks?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Memory Leaks masivos."
+      },
+      {
+        "letra": "b",
+        "texto": "Bloqueo del Hilo Principal."
+      },
+      {
+        "letra": "c",
+        "texto": "Callback Hell (Pyramid of Doom)."
+      },
+      {
+        "letra": "d",
+        "texto": "Deadlocks en el servidor."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 34,
+    "enunciado": "¿Qué estados fundamentales posee una Promesa en JavaScript durante su ciclo de vida lógico?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Started, Processing, Finished."
+      },
+      {
+        "letra": "b",
+        "texto": "Pending, Fulfilled, Rejected."
+      },
+      {
+        "letra": "c",
+        "texto": "Awaiting, Resolved, Catching."
+      },
+      {
+        "letra": "d",
+        "texto": "Null, Truthy, Falsy."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 35,
+    "enunciado": "¿Qué método de una Promesa se ejecuta siempre, sin importar si fue resuelta o rechazada?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": ".then()"
+      },
+      {
+        "letra": "b",
+        "texto": ".catch()"
+      },
+      {
+        "letra": "c",
+        "texto": ".finally()"
+      },
+      {
+        "letra": "d",
+        "texto": ".all()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 36,
+    "enunciado": "Al encadenar bloques `.then()`, ¿qué debe retornar el bloque actual para pasarlo al siguiente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Obligatoriamente una nueva Promesa."
+      },
+      {
+        "letra": "b",
+        "texto": "Un valor procesado o una nueva Promesa."
+      },
+      {
+        "letra": "c",
+        "texto": "El mismo evento capturado."
+      },
+      {
+        "letra": "d",
+        "texto": "Una función callback anidada."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 37,
+    "enunciado": "Si usas la palabra clave `await` dentro de una función, ¿qué requisito debe tener esa función?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Estar declarada como `async`."
+      },
+      {
+        "letra": "b",
+        "texto": "Ser un método estático de una clase."
+      },
+      {
+        "letra": "c",
+        "texto": "Estar dentro de un bloque try-catch estructural."
+      },
+      {
+        "letra": "d",
+        "texto": "Retornar estrictamente un valor primitivo booleano."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 38,
+    "enunciado": "¿Qué bloque atrapa correctamente una Promesa rechazada dentro de una función `async`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Un bloque .catch() encadenado."
+      },
+      {
+        "letra": "b",
+        "texto": "Una estructura try / catch estándar."
+      },
+      {
+        "letra": "c",
+        "texto": "Una declaración if(error) throw."
+      },
+      {
+        "letra": "d",
+        "texto": "El objeto global window.onerror."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 39,
+    "enunciado": "¿Qué método procesa un array de Promesas y falla si al menos una de las Promesas es rechazada?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Promise.race()"
+      },
+      {
+        "letra": "b",
+        "texto": "Promise.allSettled()"
+      },
+      {
+        "letra": "c",
+        "texto": "Promise.any()"
+      },
+      {
+        "letra": "d",
+        "texto": "Promise.all()"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 4,
+    "numero": 40,
+    "enunciado": "¿Qué retorna intrínsecamente cualquier función que ha sido declarada con el prefijo `async`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El valor evaluado final, pero bloqueando el proceso principal."
+      },
+      {
+        "letra": "b",
+        "texto": "Una nueva función generadora asíncrona."
+      },
+      {
+        "letra": "c",
+        "texto": "Siempre retorna una Promesa implícita resolviendo su valor."
+      },
+      {
+        "letra": "d",
+        "texto": "El tipo de dato devuelto por la sentencia return."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 41,
+    "enunciado": "En la API XHR (XMLHttpRequest), ¿qué estado numérico del `readyState` indica éxito completo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "1 (Opened)"
+      },
+      {
+        "letra": "b",
+        "texto": "2 (Headers_Received)"
+      },
+      {
+        "letra": "c",
+        "texto": "3 (Loading)"
+      },
+      {
+        "letra": "d",
+        "texto": "4 (Done)"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 4,
+    "numero": 42,
+    "enunciado": "Al realizar una petición con XHR, ¿qué evento detecta cambios en el estado de la comunicación?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "onstatechange"
+      },
+      {
+        "letra": "b",
+        "texto": "onreadystatechange"
+      },
+      {
+        "letra": "c",
+        "texto": "onloadend"
+      },
+      {
+        "letra": "d",
+        "texto": "onprogress"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 43,
+    "enunciado": "¿Qué código de estado HTTP 2xx devuelve habitualmente una API REST al responder con éxito?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "200 OK"
+      },
+      {
+        "letra": "b",
+        "texto": "201 Created"
+      },
+      {
+        "letra": "c",
+        "texto": "204 No Content"
+      },
+      {
+        "letra": "d",
+        "texto": "Todos los anteriores según la acción."
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 4,
+    "numero": 44,
+    "enunciado": "En contraposición a XHR, ¿qué estructura retorna por defecto el método `fetch()` en JavaScript?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Un objeto XMLHttpRequest instanciado."
+      },
+      {
+        "letra": "b",
+        "texto": "Una Promesa (Promise)."
+      },
+      {
+        "letra": "c",
+        "texto": "Un callback asíncrono puro."
+      },
+      {
+        "letra": "d",
+        "texto": "Un stream de datos binarios bloqueantes."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 45,
+    "enunciado": "Al usar `fetch()`, ¿qué método extrae el cuerpo de la respuesta asíncrona a un objeto JS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "response.toJSON()"
+      },
+      {
+        "letra": "b",
+        "texto": "response.parse()"
+      },
+      {
+        "letra": "c",
+        "texto": "response.json()"
+      },
+      {
+        "letra": "d",
+        "texto": "response.objectify()"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 46,
+    "enunciado": "Si una API externa responde con HTTP 404 a `fetch()`, ¿cómo se comporta la Promesa resultante?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La promesa es rechazada (Rejected)."
+      },
+      {
+        "letra": "b",
+        "texto": "Entra al bloque catch ignorando el response."
+      },
+      {
+        "letra": "c",
+        "texto": "La promesa se resuelve exitosamente (Fulfilled)."
+      },
+      {
+        "letra": "d",
+        "texto": "Se lanza un error de red (TypeError) abortando."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 47,
+    "enunciado": "¿Qué propiedad del objeto `Response` en `fetch()` indica si la solicitud HTTP fue un éxito (2xx)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "response.ok"
+      },
+      {
+        "letra": "b",
+        "texto": "response.success"
+      },
+      {
+        "letra": "c",
+        "texto": "response.valid"
+      },
+      {
+        "letra": "d",
+        "texto": "response.statusText"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 4,
+    "numero": 48,
+    "enunciado": "Para enviar datos POST mediante `fetch()`, ¿en qué parámetro incluyes el payload JSON?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "headers"
+      },
+      {
+        "letra": "b",
+        "texto": "mode"
+      },
+      {
+        "letra": "c",
+        "texto": "body"
+      },
+      {
+        "letra": "d",
+        "texto": "params"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 4,
+    "numero": 49,
+    "enunciado": "¿Qué cabecera HTTP (header) debes enviar para avisarle a la API que envías formato JSON?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Accept: application/json"
+      },
+      {
+        "letra": "b",
+        "texto": "Content-Type: application/json"
+      },
+      {
+        "letra": "c",
+        "texto": "Authorization: Bearer JSON"
+      },
+      {
+        "letra": "d",
+        "texto": "Data-Type: json"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 4,
+    "numero": 50,
+    "enunciado": "¿Qué riesgo de seguridad ocurre al consumir APIs ajenas sin validación de origen permitida?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Ataques de Inyección SQL locales."
+      },
+      {
+        "letra": "b",
+        "texto": "Fallas de XSS mutando el DOM."
+      },
+      {
+        "letra": "c",
+        "texto": "Bloqueo CORS por políticas del mismo origen."
+      },
+      {
+        "letra": "d",
+        "texto": "Sobrecarga de memoria del Event Loop."
+      }
+    ],
+    "correcta": "c"
+  }
+]

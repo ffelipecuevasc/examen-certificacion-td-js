@@ -1,6 +1,6 @@
 # Épica 10 · Plataforma Cloudflare
 
-**Estado:** 🔵 En curso
+**Estado:** 🟢 Completada · **Cerrada:** 2026-09-04
 **Bloquea a:** todas las demás épicas
 
 ## Por qué esta épica va primera
@@ -47,3 +47,15 @@ Buena parte de esta épica se configura en el panel de Cloudflare, al que Claude
 no tiene acceso. Su trabajo aquí es preparar los archivos de configuración que sí
 viven en el repositorio, redactar los procedimientos paso a paso para que los
 ejecute el autor, y verificar el resultado desde fuera una vez aplicados.
+
+## Deudas que la épica deja abiertas
+
+Las dos se cierran en la iteración 21, y por el mismo motivo: esa iteración crea la
+base del banco de preguntas, y al hacerlo obliga a pasar por donde estas dos deudas
+esperan.
+
+1. **El criterio 7 de la iteración 12**, aplazado explícitamente: recorrer el manual
+   de punta a punta desde su paso 1, sobre una base que todavía no exista.
+2. **Retirar `prueba_tuberia` de las dos bases de la nube**, produccion y pruebas. Es
+   una tabla de juguete viviendo en bases reales; la primera migración del esquema
+   real tiene que llevarsela.

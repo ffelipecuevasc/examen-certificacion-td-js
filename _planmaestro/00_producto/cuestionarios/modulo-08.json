@@ -1,0 +1,962 @@
+[
+  {
+    "modulo": 8,
+    "numero": 1,
+    "enunciado": "¿Qué principio REST estipula que cada petición contenga toda la info necesaria sin usar sesiones?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Interfaz uniforme estricta."
+      },
+      {
+        "letra": "b",
+        "texto": "Sistema de capas enrutadas."
+      },
+      {
+        "letra": "c",
+        "texto": "Comunicación sin estado (Stateless)."
+      },
+      {
+        "letra": "d",
+        "texto": "Arquitectura cliente-servidor."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 2,
+    "enunciado": "¿Qué ventaja técnica aporta la regla \"Cacheable\" en la arquitectura REST?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Encripta automáticamente el payload JSON del body."
+      },
+      {
+        "letra": "b",
+        "texto": "Elimina la necesidad de usar verbos HTTP."
+      },
+      {
+        "letra": "c",
+        "texto": "Reduce el consumo de ancho de banda y latencia."
+      },
+      {
+        "letra": "d",
+        "texto": "Bloquea peticiones de dominios no autorizados por CORS."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 3,
+    "enunciado": "Según las buenas prácticas REST, ¿cómo debe nombrarse convencionalmente un endpoint de recursos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Usando verbos de acción (ej. /getUsuarios)."
+      },
+      {
+        "letra": "b",
+        "texto": "Usando sustantivos en plural (ej. /usuarios)."
+      },
+      {
+        "letra": "c",
+        "texto": "Usando el método HTTP en el path (ej. /usuarios/post)."
+      },
+      {
+        "letra": "d",
+        "texto": "Usando identificadores binarios en la raíz (ej. /0101)."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 4,
+    "enunciado": "¿Qué concepto REST provee enlaces hipermedia dinámicos para navegar por la API (HATEOAS)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Versionamiento semántico estricto."
+      },
+      {
+        "letra": "b",
+        "texto": "Filtrado y paginación por query params."
+      },
+      {
+        "letra": "c",
+        "texto": "Inclusión de hipervínculos relacionados en la respuesta."
+      },
+      {
+        "letra": "d",
+        "texto": "Restricción de acceso mediante tokens criptográficos."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 5,
+    "enunciado": "En diseño REST, ¿cómo se versiona convencionalmente una API en su etapa inicial?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Pasando la versión en el body de cada POST."
+      },
+      {
+        "letra": "b",
+        "texto": "Incluyendo el prefijo /v1/ en la URL base del endpoint."
+      },
+      {
+        "letra": "c",
+        "texto": "Encriptando el número de versión en el JWT."
+      },
+      {
+        "letra": "d",
+        "texto": "Añadiendo la cabecera X-Version a cada petición."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 6,
+    "enunciado": "¿Qué restricción aplica el \"Sistema de Capas\" en una arquitectura RESTful estándar?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El cliente desconoce si se conecta al servidor final o a un proxy."
+      },
+      {
+        "letra": "b",
+        "texto": "Los datos viajan forzosamente en formato XML."
+      },
+      {
+        "letra": "c",
+        "texto": "Impide el uso de balanceadores de carga intermedios."
+      },
+      {
+        "letra": "d",
+        "texto": "Exige una conexión directa punto a punto por TCP/IP."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 8,
+    "numero": 7,
+    "enunciado": "¿Qué formato de salida se considera el estándar predominante al diseñar una API REST moderna?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "SOAP encapsulado."
+      },
+      {
+        "letra": "b",
+        "texto": "XML nativo estructurado."
+      },
+      {
+        "letra": "c",
+        "texto": "HTML renderizado."
+      },
+      {
+        "letra": "d",
+        "texto": "JSON (Notación de Objetos JavaScript)."
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 8,
+    "numero": 8,
+    "enunciado": "Según REST, ¿cuál es el mecanismo adecuado para realizar búsquedas y filtros en colecciones?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Parámetros de consulta (Query Parameters) en la URL."
+      },
+      {
+        "letra": "b",
+        "texto": "Enviar un archivo de texto con los filtros requeridos."
+      },
+      {
+        "letra": "c",
+        "texto": "Modificar los encabezados HTTP para cada filtro."
+      },
+      {
+        "letra": "d",
+        "texto": "Usar exclusivamente el verbo POST con un body detallado."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 8,
+    "numero": 9,
+    "enunciado": "¿Qué regla REST establece la separación estricta entre interfaz de usuario y almacenamiento?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Interfaz Uniforme (Uniform Interface)."
+      },
+      {
+        "letra": "b",
+        "texto": "Caché implícita."
+      },
+      {
+        "letra": "c",
+        "texto": "Cliente-Servidor (Client-Server)."
+      },
+      {
+        "letra": "d",
+        "texto": "Código bajo demanda (Code on demand)."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 10,
+    "enunciado": "En una API REST, ¿qué verbo HTTP se usa convencionalmente para actualizaciones parciales?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "PUT"
+      },
+      {
+        "letra": "b",
+        "texto": "UPDATE"
+      },
+      {
+        "letra": "c",
+        "texto": "PATCH"
+      },
+      {
+        "letra": "d",
+        "texto": "MODIFY"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 11,
+    "enunciado": "Al crear un servidor REST en Express, ¿qué paquete parsea automáticamente el cuerpo (body) JSON?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "json-parser"
+      },
+      {
+        "letra": "b",
+        "texto": "body-parser o express.json()"
+      },
+      {
+        "letra": "c",
+        "texto": "rest-parser"
+      },
+      {
+        "letra": "d",
+        "texto": "payload-reader"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 12,
+    "enunciado": "¿Qué verbo HTTP se utiliza idóneamente para la creación de un nuevo recurso en la base de datos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "GET"
+      },
+      {
+        "letra": "b",
+        "texto": "PUT"
+      },
+      {
+        "letra": "c",
+        "texto": "POST"
+      },
+      {
+        "letra": "d",
+        "texto": "ADD"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 13,
+    "enunciado": "Según el estándar HTTP, ¿qué familia de códigos de estado indica un error provocado por el cliente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "2xx (Éxito)"
+      },
+      {
+        "letra": "b",
+        "texto": "3xx (Redirección)"
+      },
+      {
+        "letra": "c",
+        "texto": "4xx (Error del Cliente)"
+      },
+      {
+        "letra": "d",
+        "texto": "5xx (Error del Servidor)"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 14,
+    "enunciado": "¿Qué código HTTP es el más preciso para retornar cuando un recurso no existe en el servidor?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "400 Bad Request"
+      },
+      {
+        "letra": "b",
+        "texto": "401 Unauthorized"
+      },
+      {
+        "letra": "c",
+        "texto": "403 Forbidden"
+      },
+      {
+        "letra": "d",
+        "texto": "404 Not Found"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 8,
+    "numero": 15,
+    "enunciado": "¿Qué verbo HTTP es idempotente y se usa generalmente para reemplazar un recurso completo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "POST"
+      },
+      {
+        "letra": "b",
+        "texto": "PATCH"
+      },
+      {
+        "letra": "c",
+        "texto": "PUT"
+      },
+      {
+        "letra": "d",
+        "texto": "REPLACE"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 16,
+    "enunciado": "En Express, ¿cómo accedes a un parámetro dinámico incrustado en la ruta (ej. /users/:id)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "req.query.id"
+      },
+      {
+        "letra": "b",
+        "texto": "req.params.id"
+      },
+      {
+        "letra": "c",
+        "texto": "req.body.id"
+      },
+      {
+        "letra": "d",
+        "texto": "req.headers.id"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 17,
+    "enunciado": "Si un endpoint Express responde exitosamente a un GET, ¿cómo defines el código 200 y envías JSON?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "res.status(200).json({ data })"
+      },
+      {
+        "letra": "b",
+        "texto": "res.send(200, { data })"
+      },
+      {
+        "letra": "c",
+        "texto": "res.json(200).send({ data })"
+      },
+      {
+        "letra": "d",
+        "texto": "res.code(200).return({ data })"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 8,
+    "numero": 18,
+    "enunciado": "¿Qué código HTTP indica que la solicitud fue exitosa y como resultado se creó un nuevo recurso?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "200 OK"
+      },
+      {
+        "letra": "b",
+        "texto": "201 Created"
+      },
+      {
+        "letra": "c",
+        "texto": "202 Accepted"
+      },
+      {
+        "letra": "d",
+        "texto": "204 No Content"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 19,
+    "enunciado": "Si el servidor falla internamente al procesar la ruta, ¿qué código HTTP se debe devolver?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "400 Bad Request"
+      },
+      {
+        "letra": "b",
+        "texto": "409 Conflict"
+      },
+      {
+        "letra": "c",
+        "texto": "500 Internal Server Error"
+      },
+      {
+        "letra": "d",
+        "texto": "503 Service Unavailable"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 20,
+    "enunciado": "¿Qué objeto de Express contiene los parámetros enviados por la URL tras un \"?\" (ej. ?sort=asc)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "req.params"
+      },
+      {
+        "letra": "b",
+        "texto": "req.body"
+      },
+      {
+        "letra": "c",
+        "texto": "req.url"
+      },
+      {
+        "letra": "d",
+        "texto": "req.query"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 8,
+    "numero": 21,
+    "enunciado": "¿Qué middleware de terceros se enseña comúnmente en Node para interceptar subida de archivos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "express-fileupload"
+      },
+      {
+        "letra": "b",
+        "texto": "file-saver"
+      },
+      {
+        "letra": "c",
+        "texto": "fs-upload"
+      },
+      {
+        "letra": "d",
+        "texto": "node-uploader"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 8,
+    "numero": 22,
+    "enunciado": "Al subir un archivo usando express-fileupload, ¿en qué objeto de la petición (req) se inyecta?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "req.body.files"
+      },
+      {
+        "letra": "b",
+        "texto": "req.files"
+      },
+      {
+        "letra": "c",
+        "texto": "req.upload"
+      },
+      {
+        "letra": "d",
+        "texto": "req.attachments"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 23,
+    "enunciado": "¿Qué validación inicial es crítica realizar en el servidor antes de procesar una subida?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Comprimir el archivo en formato ZIP."
+      },
+      {
+        "letra": "b",
+        "texto": "Verificar si el objeto req.files está presente y no es nulo."
+      },
+      {
+        "letra": "c",
+        "texto": "Encriptar el nombre original del archivo con bcrypt."
+      },
+      {
+        "letra": "d",
+        "texto": "Reiniciar el buffer de memoria del servidor Node."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 24,
+    "enunciado": "¿Por qué es vital validar la extensión del archivo subido en el backend de un servicio REST?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para evitar la ejecución de scripts maliciosos en el servidor."
+      },
+      {
+        "letra": "b",
+        "texto": "Para acelerar la descarga del archivo en el frontend."
+      },
+      {
+        "letra": "c",
+        "texto": "Porque express-fileupload rechaza archivos sin extensión."
+      },
+      {
+        "letra": "d",
+        "texto": "Para mantener el orden alfabético en el disco."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 8,
+    "numero": 25,
+    "enunciado": "¿Qué método provee express-fileupload sobre el archivo para trasladarlo a una carpeta destino?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "file.move()"
+      },
+      {
+        "letra": "b",
+        "texto": "file.mv()"
+      },
+      {
+        "letra": "c",
+        "texto": "file.save()"
+      },
+      {
+        "letra": "d",
+        "texto": "file.transfer()"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 26,
+    "enunciado": "¿Por qué se recomienda modificar o hashear el nombre del archivo al guardarlo en el servidor?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para reducir el tamaño físico del archivo en el disco duro."
+      },
+      {
+        "letra": "b",
+        "texto": "Para cumplir con el estándar XML de subidas binarias."
+      },
+      {
+        "letra": "c",
+        "texto": "Para evitar sobreescrituras por archivos con el mismo nombre."
+      },
+      {
+        "letra": "d",
+        "texto": "Porque Node.js no soporta espacios en nombres de archivo."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 27,
+    "enunciado": "Al procesar un upload exitoso, ¿qué debe retornar convencionalmente la API REST al cliente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El archivo binario completo como stream de vuelta."
+      },
+      {
+        "letra": "b",
+        "texto": "Un mensaje de éxito y la nueva URL/nombre del archivo."
+      },
+      {
+        "letra": "c",
+        "texto": "Un volcado de memoria con los metadatos del sistema."
+      },
+      {
+        "letra": "d",
+        "texto": "El código fuente del middleware procesador."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 28,
+    "enunciado": "¿Qué atributo interno del archivo provee express-fileupload para validar el peso del mismo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "file.size"
+      },
+      {
+        "letra": "b",
+        "texto": "file.weight"
+      },
+      {
+        "letra": "c",
+        "texto": "file.bytes"
+      },
+      {
+        "letra": "d",
+        "texto": "file.length"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 8,
+    "numero": 29,
+    "enunciado": "Si debes permitir solo imágenes, ¿qué propiedad del archivo revisas además de su extensión?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "file.name"
+      },
+      {
+        "letra": "b",
+        "texto": "file.mimetype (ej. image/png)"
+      },
+      {
+        "letra": "c",
+        "texto": "file.encoding"
+      },
+      {
+        "letra": "d",
+        "texto": "file.tempFilePath"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 30,
+    "enunciado": "Para borrar un archivo previamente subido al servidor, ¿qué módulo nativo de Node.js se emplea?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "http"
+      },
+      {
+        "letra": "b",
+        "texto": "os"
+      },
+      {
+        "letra": "c",
+        "texto": "fs (fs.unlinkSync)"
+      },
+      {
+        "letra": "d",
+        "texto": "path"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 31,
+    "enunciado": "¿Qué problema arquitectónico REST resuelve el uso de JSON Web Tokens (JWT)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Reemplaza la base de datos por archivos planos seguros."
+      },
+      {
+        "letra": "b",
+        "texto": "Mantiene la comunicación sin estado (stateless) segura."
+      },
+      {
+        "letra": "c",
+        "texto": "Evita inyecciones SQL en consultas asíncronas."
+      },
+      {
+        "letra": "d",
+        "texto": "Permite subir archivos binarios sin límite de tamaño."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 32,
+    "enunciado": "Estructuralmente, ¿cuáles son las tres partes separadas por puntos que componen un JWT?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Algoritmo, Metadatos, Base64."
+      },
+      {
+        "letra": "b",
+        "texto": "User, Password, Hash."
+      },
+      {
+        "letra": "c",
+        "texto": "Header, Payload, Signature."
+      },
+      {
+        "letra": "d",
+        "texto": "Token, Refresh, Expire."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 33,
+    "enunciado": "En un JWT, ¿qué contiene el elemento estandarizado \"iat\" (Issued At) dentro del Payload?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La dirección IP del servidor emisor."
+      },
+      {
+        "letra": "b",
+        "texto": "El algoritmo de encriptación utilizado."
+      },
+      {
+        "letra": "c",
+        "texto": "La fecha y hora exacta en que el token fue emitido."
+      },
+      {
+        "letra": "d",
+        "texto": "El tiempo máximo de vida antes de caducar."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 34,
+    "enunciado": "¿Qué formato de codificación se utiliza universalmente para representar el Header y Payload del JWT?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "UTF-8 crudo"
+      },
+      {
+        "letra": "b",
+        "texto": "Base64Url"
+      },
+      {
+        "letra": "c",
+        "texto": "Hexadecimal"
+      },
+      {
+        "letra": "d",
+        "texto": "Binario puro"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 35,
+    "enunciado": "¿Qué paquete de NPM se utiliza canónicamente para firmar y verificar tokens en Express?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "jwt-creator"
+      },
+      {
+        "letra": "b",
+        "texto": "express-auth"
+      },
+      {
+        "letra": "c",
+        "texto": "jsonwebtoken"
+      },
+      {
+        "letra": "d",
+        "texto": "node-tokens"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 36,
+    "enunciado": "¿Por qué es fundamental la \"clave secreta\" (secret key) guardada en el servidor al usar JWT?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para encriptar la conexión completa como lo hace TLS."
+      },
+      {
+        "letra": "b",
+        "texto": "Para firmar el token y validar que no fue alterado."
+      },
+      {
+        "letra": "c",
+        "texto": "Para ofuscar el código fuente de la aplicación Express."
+      },
+      {
+        "letra": "d",
+        "texto": "Para generar contraseñas automáticas a los usuarios."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 37,
+    "enunciado": "¿Dónde es vulnerable almacenar un JWT en el cliente si existe riesgo de ataques XSS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "En un disco duro externo."
+      },
+      {
+        "letra": "b",
+        "texto": "En memoria volátil de solo lectura."
+      },
+      {
+        "letra": "c",
+        "texto": "En LocalStorage o SessionStorage."
+      },
+      {
+        "letra": "d",
+        "texto": "En cookies configuradas como HttpOnly."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 38,
+    "enunciado": "¿Qué paquete middleware de Express evalúa automáticamente si el request tiene un JWT válido?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "jwt-validator"
+      },
+      {
+        "letra": "b",
+        "texto": "express-jwt"
+      },
+      {
+        "letra": "c",
+        "texto": "auth-parser"
+      },
+      {
+        "letra": "d",
+        "texto": "token-checker"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 8,
+    "numero": 39,
+    "enunciado": "Al invocar un endpoint protegido, ¿dónde se envía convencionalmente el JWT en la petición HTTP?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "En el body del JSON como \"token_key\"."
+      },
+      {
+        "letra": "b",
+        "texto": "Como query param obligatorio en la URL."
+      },
+      {
+        "letra": "c",
+        "texto": "En el header \"Authorization\" usando el esquema Bearer."
+      },
+      {
+        "letra": "d",
+        "texto": "En una cookie abierta sin cifrar."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 8,
+    "numero": 40,
+    "enunciado": "¿Qué riesgo de seguridad ocurre si se colocan contraseñas legibles en el Payload de un JWT?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El token será rechazado por exceder el tamaño límite de HTTP."
+      },
+      {
+        "letra": "b",
+        "texto": "El Payload se codifica en Base64, permitiendo que cualquiera lo lea."
+      },
+      {
+        "letra": "c",
+        "texto": "El servidor Node colapsará al intentar hashearlo doblemente."
+      },
+      {
+        "letra": "d",
+        "texto": "El paquete jsonwebtoken lanza un error interno al firmar."
+      }
+    ],
+    "correcta": "b"
+  }
+]

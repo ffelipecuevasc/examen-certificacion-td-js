@@ -1,0 +1,26 @@
+# Finales de linea
+#
+# Sin este archivo, git escribia CRLF al hacer el checkout en Windows
+# (core.autocrlf=true) mientras los generadores escriben LF. El resultado: un clon
+# recien bajado parecia tener el CSS desactualizado sin que nadie hubiera tocado
+# nada, porque `npm run verificar` comparaba bytes. Es el hallazgo H-012.
+#
+# Con esto, el repositorio y el disco usan LF, y lo que genera un equipo es igual
+# byte a byte a lo que genera otro.
+#
+# Ojo: este archivo NO corrige lo que ya esta guardado en el historial. Eso exige
+# renormalizar una vez, en un commit aparte que solo cambie finales de linea. El
+# procedimiento esta en _planmaestro/90-manual/publicacion-en-cloudflare-pages.md.
+
+* text=auto eol=lf
+
+# Binarios: que ningun filtro los toque
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf  binary

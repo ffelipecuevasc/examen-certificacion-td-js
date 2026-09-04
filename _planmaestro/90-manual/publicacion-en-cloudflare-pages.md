@@ -162,6 +162,43 @@ repositorio al día con la fuente.
 
 ---
 
+## Finales de linea, una sola vez
+
+El repositorio fija los finales de linea a LF con `.gitattributes`. Existe porque un
+clon recien bajado en Windows parecia tener el CSS desactualizado sin que nadie
+hubiera tocado nada: git escribia CRLF al hacer el checkout y los generadores
+escriben LF (hallazgo H-012).
+
+**No hay nada que renormalizar.** El historial ya estaba en LF; lo que estaba mal era
+lo que el checkout escribia en el disco. Comprobado sobre los objetos guardados:
+`icons.css` tiene 0 bytes CR en el historial y 41 en el disco tras el checkout.
+
+**En un clon nuevo no hay que hacer nada:** los archivos salen con LF y listo.
+
+**En una copia anterior al `.gitattributes`**, los archivos siguen en el disco con
+CRLF hasta que se reescriban. Con el arbol limpio, sin nada sin guardar:
+
+```powershell
+git status --short          # tiene que salir vacio antes de seguir
+git rm --cached -r -q .
+git reset --hard
+```
+
+El primero saca los archivos del indice sin borrarlos del disco; el segundo los
+vuelve a escribir aplicando los atributos nuevos. Para confirmar:
+
+```powershell
+npm run verificar
+```
+
+Tiene que decir `VERIFICADO`, y ya sin la nota sobre finales de linea.
+
+**Cuidado:** `git reset --hard` descarta lo que no este commiteado. Por eso el primer
+paso es comprobar que no hay nada pendiente, y por eso no conviene hacer esto con
+trabajo a medias.
+
+---
+
 ## Si algo sale mal
 
 **La construcción falla.** El sitio **no se cae**: Cloudflare sigue sirviendo el

@@ -29,7 +29,7 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 
 | # | Épica | Estado | Entrega |
 |---|---|---|---|
-| 10 | Plataforma Cloudflare | 🔵 En curso | Sitio en Pages, Worker y base D1 operativos |
+| 10 | Plataforma Cloudflare | 🟢 Completada | Sitio en Pages, capa de datos y dos bases D1 operativas |
 | 20 | Persistencia de preguntas | ⚪ No iniciada | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
 | 30 | Cuestionario | ⚪ No iniciada | `cuestionario.html` con el banco completo y barras horizontales |
 | 40 | Simulacro de examen | ⚪ No iniciada | `simulacro.html` cronometrado, 120 preguntas, resumen final |

@@ -41,6 +41,23 @@ const SIN_CONSTRUIR = 3;
 // Utilidades
 // ---------------------------------------------------------------------------
 
+/**
+ * Quita los retornos de carro para comparar solo contenido.
+ *
+ * Sin esto, un clon recien bajado en Windows daba DESFASADO sin que nadie hubiera
+ * tocado nada: git escribe los archivos con CRLF al hacer el checkout y el
+ * generador los reescribe con LF, asi que la comparacion por bytes veia un cambio
+ * donde solo habia saltos de linea distintos (hallazgo H-012). El `git diff` que
+ * habia antes no sufria esto porque git normaliza los finales de linea al comparar;
+ * al dejar de depender de git se perdio esa normalizacion, y hay que reponerla aca.
+ *
+ * Ignorar el CR no debilita la comprobacion: un cambio real de CSS nunca consiste
+ * solo en retornos de carro.
+ */
+function sinFinalesDeLinea(contenido) {
+  return contenido.toString('utf8').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
 /** Contenido actual de los .css, indexado por ruta. */
 function leerCss() {
   if (!existsSync(CARPETA_CSS)) return new Map();
@@ -142,10 +159,23 @@ if (!construir()) {
 
 const despues = leerCss();
 const cambiados = [];
+const soloFinalesDeLinea = [];
 
 for (const [ruta, contenido] of despues) {
   const previo = antes.get(ruta);
-  if (!previo || !previo.equals(contenido)) cambiados.push(ruta);
+
+  if (!previo) {
+    cambiados.push(ruta);
+    continue;
+  }
+  if (previo.equals(contenido)) continue;
+
+  // Distintos byte a byte, pero ¿distintos de verdad?
+  if (sinFinalesDeLinea(previo) === sinFinalesDeLinea(contenido)) {
+    soloFinalesDeLinea.push(ruta);
+  } else {
+    cambiados.push(ruta);
+  }
 }
 
 if (cambiados.length) {
@@ -221,6 +251,14 @@ veredicto(
   'VERIFICADO',
   [
     'El CSS corresponde a su fuente y coincide con lo commiteado.',
+    ...(soloFinalesDeLinea.length
+      ? [
+          '',
+          'Nota: se reescribieron con finales de linea distintos, con el mismo',
+          'contenido. No es un desfase. Ver H-012:',
+          ...soloFinalesDeLinea.map((r) => `  - ${r}`),
+        ]
+      : []),
     `git usado: ${git}`,
   ],
   VERIFICADO

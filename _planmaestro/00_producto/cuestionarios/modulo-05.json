@@ -1,0 +1,962 @@
+[
+  {
+    "modulo": 5,
+    "numero": 1,
+    "enunciado": "¿Qué característica fundamental distingue a un RDBMS de un sistema NoSQL documental?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Estructura flexible de esquemas dinámicos."
+      },
+      {
+        "letra": "b",
+        "texto": "Garantía estricta de propiedades ACID."
+      },
+      {
+        "letra": "c",
+        "texto": "Almacenamiento basado en grafos dirigidos."
+      },
+      {
+        "letra": "d",
+        "texto": "Ausencia de lenguaje estructurado de consultas."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 2,
+    "enunciado": "¿Cuál es el rol principal del motor relacional en la arquitectura de un RDBMS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Compilar el código SQL en binarios ejecutables nativos."
+      },
+      {
+        "letra": "b",
+        "texto": "Gestionar la interfaz gráfica de usuario final."
+      },
+      {
+        "letra": "c",
+        "texto": "Optimizar y ejecutar los planes de consulta sobre los datos."
+      },
+      {
+        "letra": "d",
+        "texto": "Exportar automáticamente backups en formato JSON."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 3,
+    "enunciado": "¿Qué protocolo se utiliza comúnmente para establecer la conexión a un motor RDBMS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "HTTP/REST puro"
+      },
+      {
+        "letra": "b",
+        "texto": "TCP/IP o Sockets locales"
+      },
+      {
+        "letra": "c",
+        "texto": "Protocolo SMTP/POP3"
+      },
+      {
+        "letra": "d",
+        "texto": "Transferencia FTP/SFTP"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 4,
+    "enunciado": "En el contexto de un RDBMS, ¿qué es un \"catálogo de sistema\"?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Una vista materializada con los logs de transacciones."
+      },
+      {
+        "letra": "b",
+        "texto": "Un conjunto de tablas que almacena metadatos de la base."
+      },
+      {
+        "letra": "c",
+        "texto": "El manual de usuario integrado en la consola SQL."
+      },
+      {
+        "letra": "d",
+        "texto": "El índice primario de la tabla principal de la base de datos."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 5,
+    "enunciado": "¿Qué cláusula SQL permite filtrar registros evaluando el resultado de una función de agregación?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "CLÁUSULA WHERE"
+      },
+      {
+        "letra": "b",
+        "texto": "FILTER BY AGGREGATE"
+      },
+      {
+        "letra": "c",
+        "texto": "CLÁUSULA HAVING"
+      },
+      {
+        "letra": "d",
+        "texto": "GROUP BY CONDITION"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 6,
+    "enunciado": "Si cruzas dos tablas con LEFT JOIN, ¿qué sucede con los registros huérfanos de la tabla izquierda?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Se omiten del resultado final."
+      },
+      {
+        "letra": "b",
+        "texto": "Se incluyen y los campos derechos se rellenan con NULL."
+      },
+      {
+        "letra": "c",
+        "texto": "Generan un error crítico de integridad referencial."
+      },
+      {
+        "letra": "d",
+        "texto": "Se rellenan con el valor por defecto de cada columna."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 7,
+    "enunciado": "¿Cuál es el propósito principal de utilizar una subconsulta correlacionada?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Evaluar independientemente la subconsulta una sola vez."
+      },
+      {
+        "letra": "b",
+        "texto": "Ejecutar la subconsulta por cada fila de la consulta principal."
+      },
+      {
+        "letra": "c",
+        "texto": "Bloquear la tabla principal hasta terminar la subconsulta."
+      },
+      {
+        "letra": "d",
+        "texto": "Combinar resultados usando operadores de conjunto (UNION)."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 8,
+    "enunciado": "¿Qué tipo de JOIN retorna únicamente los registros que tienen coincidencias en ambas tablas?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "FULL OUTER JOIN"
+      },
+      {
+        "letra": "b",
+        "texto": "CROSS JOIN NATURAL"
+      },
+      {
+        "letra": "c",
+        "texto": "INNER JOIN"
+      },
+      {
+        "letra": "d",
+        "texto": "RIGHT OUTER JOIN"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 9,
+    "enunciado": "En una consulta SELECT, ¿cuál es el orden lógico interno de evaluación del motor SQL?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "SELECT, FROM, WHERE, GROUP BY, HAVING"
+      },
+      {
+        "letra": "b",
+        "texto": "FROM, WHERE, GROUP BY, HAVING, SELECT"
+      },
+      {
+        "letra": "c",
+        "texto": "WHERE, FROM, GROUP BY, SELECT, HAVING"
+      },
+      {
+        "letra": "d",
+        "texto": "SELECT, WHERE, HAVING, GROUP BY, FROM"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 10,
+    "enunciado": "¿Qué operador SQL permite evaluar si un valor específico está dentro del resultado de una subconsulta?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "BETWEEN"
+      },
+      {
+        "letra": "b",
+        "texto": "EXISTS"
+      },
+      {
+        "letra": "c",
+        "texto": "IN"
+      },
+      {
+        "letra": "d",
+        "texto": "LIKE"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 11,
+    "enunciado": "Si usas GROUP BY, ¿qué restricción impone el estándar SQL sobre las columnas del SELECT?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Todas deben ser columnas de tipo numérico exclusivamente."
+      },
+      {
+        "letra": "b",
+        "texto": "Deben estar en el GROUP BY o dentro de una función agregada."
+      },
+      {
+        "letra": "c",
+        "texto": "Solo puede haber un máximo de 3 columnas seleccionadas."
+      },
+      {
+        "letra": "d",
+        "texto": "No se pueden utilizar alias lógicos en el resultado."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 12,
+    "enunciado": "¿Qué operador lógico utilizarías para buscar patrones de texto específicos ignorando mayúsculas?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "EQUALS IGNORE"
+      },
+      {
+        "letra": "b",
+        "texto": "ILIKE o combinaciones con UPPER/LOWER"
+      },
+      {
+        "letra": "c",
+        "texto": "MATCH TEXT EXACT"
+      },
+      {
+        "letra": "d",
+        "texto": "REGEXP_ONLY"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 13,
+    "enunciado": "¿Qué sentencia DML permite insertar filas directamente a partir de una consulta a otra tabla?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "INSERT INTO ... SELECT"
+      },
+      {
+        "letra": "b",
+        "texto": "CREATE TABLE ... AS"
+      },
+      {
+        "letra": "c",
+        "texto": "UPDATE ... FROM"
+      },
+      {
+        "letra": "d",
+        "texto": "MERGE INTO ... SELECT"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 5,
+    "numero": 14,
+    "enunciado": "Al ejecutar un DELETE sin cláusula WHERE, ¿qué impacto ocurre internamente en la base de datos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Se elimina la estructura completa y definitiva de la tabla."
+      },
+      {
+        "letra": "b",
+        "texto": "Se truncan los datos reseteando los identificadores."
+      },
+      {
+        "letra": "c",
+        "texto": "Se eliminan todos los registros fila a fila (logueado)."
+      },
+      {
+        "letra": "d",
+        "texto": "El motor bloquea la operación masiva por seguridad."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 15,
+    "enunciado": "¿Qué función principal asume una \"secuencia\" en el proceso de inserción de datos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Ordenar los registros insertados cronológicamente al disco."
+      },
+      {
+        "letra": "b",
+        "texto": "Generar valores únicos secuenciales para claves primarias."
+      },
+      {
+        "letra": "c",
+        "texto": "Encriptar contraseñas automáticamente antes de guardarlas."
+      },
+      {
+        "letra": "d",
+        "texto": "Agrupar inserciones masivas en bloques asíncronos."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 16,
+    "enunciado": "¿Qué sucede si una sentencia UPDATE viola una restricción de llave foránea (integridad referencial)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La fila infractora se actualiza forzosamente con NULL."
+      },
+      {
+        "letra": "b",
+        "texto": "El motor suspende la ejecución y pide confirmación manual."
+      },
+      {
+        "letra": "c",
+        "texto": "La sentencia DML falla y se rechazan las modificaciones."
+      },
+      {
+        "letra": "d",
+        "texto": "El sistema desactiva temporalmente la llave foránea impuesta."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 17,
+    "enunciado": "¿Qué propiedad ACID garantiza que una transacción fallida no deje registros parciales guardados?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Aislamiento (Isolation)."
+      },
+      {
+        "letra": "b",
+        "texto": "Durabilidad (Durability)."
+      },
+      {
+        "letra": "c",
+        "texto": "Consistencia (Consistency)."
+      },
+      {
+        "letra": "d",
+        "texto": "Atomicidad (Atomicity)."
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 5,
+    "numero": 18,
+    "enunciado": "¿Qué comando asegura la persistencia permanente de los datos tras un bloque de sentencias DML?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "SAVEPOINT"
+      },
+      {
+        "letra": "b",
+        "texto": "COMMIT"
+      },
+      {
+        "letra": "c",
+        "texto": "END TRANSACTION"
+      },
+      {
+        "letra": "d",
+        "texto": "FLUSH PRIVILEGES"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 19,
+    "enunciado": "¿Qué problema de concurrencia grave evita el máximo nivel de aislamiento (Serializable)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Lecturas sucias, lecturas no repetibles y lecturas fantasma."
+      },
+      {
+        "letra": "b",
+        "texto": "Exclusivamente el problema de lecturas sucias aisladas."
+      },
+      {
+        "letra": "c",
+        "texto": "Únicamente la sobreescritura de datos mediante deadlocks."
+      },
+      {
+        "letra": "d",
+        "texto": "Ninguno, permite alta concurrencia asíncrona incondicional."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 5,
+    "numero": 20,
+    "enunciado": "¿Qué efecto tiene el modo AUTOCOMMIT si se encuentra activado por defecto en la consola SQL?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Inicia un backup automático tras cada actualización masiva."
+      },
+      {
+        "letra": "b",
+        "texto": "Agrupa automáticamente todas las consultas del mismo usuario."
+      },
+      {
+        "letra": "c",
+        "texto": "Confirma inmediatamente cada sentencia DML que sea exitosa."
+      },
+      {
+        "letra": "d",
+        "texto": "Efectúa un rollback tras 30 segundos de inactividad de red."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 21,
+    "enunciado": "Si ejecutas ROLLBACK tras haber modificado 1000 filas sin hacer COMMIT, ¿qué pasa?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Se revierten solo las últimas 500 modificaciones por límite."
+      },
+      {
+        "letra": "b",
+        "texto": "Las 1000 modificaciones se deshacen, dejando datos previos."
+      },
+      {
+        "letra": "c",
+        "texto": "La base de datos queda bloqueada en modo recuperación."
+      },
+      {
+        "letra": "d",
+        "texto": "Solo se deshacen inserciones, dejando las actualizaciones."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 22,
+    "enunciado": "¿Qué comando DDL vacía los datos de una tabla sin registrar cada fila en el log de transacciones?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "DELETE ALL ROWS"
+      },
+      {
+        "letra": "b",
+        "texto": "DROP DATA"
+      },
+      {
+        "letra": "c",
+        "texto": "FORMAT TABLE"
+      },
+      {
+        "letra": "d",
+        "texto": "TRUNCATE TABLE"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 5,
+    "numero": 23,
+    "enunciado": "En la creación de tablas, ¿qué restricción impide tajantemente ingresar valores repetidos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "CONSTRAINT NOT NULL"
+      },
+      {
+        "letra": "b",
+        "texto": "PRIMARY KEY o UNIQUE"
+      },
+      {
+        "letra": "c",
+        "texto": "CONSTRAINT CHECK"
+      },
+      {
+        "letra": "d",
+        "texto": "CONSTRAINT FOREIGN KEY"
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 24,
+    "enunciado": "¿Qué instrucción DDL se utiliza convencionalmente para modificar el tipo de dato de una columna?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "ALTER TABLE ... ALTER COLUMN"
+      },
+      {
+        "letra": "b",
+        "texto": "UPDATE TABLE ... SET COLUMN"
+      },
+      {
+        "letra": "c",
+        "texto": "MODIFY STRUCTURE ... COLUMN"
+      },
+      {
+        "letra": "d",
+        "texto": "CHANGE DATA TYPE ... ON TABLE"
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 5,
+    "numero": 25,
+    "enunciado": "¿Qué restricción asegura que el valor de un campo obligatoriamente exista como llave en otra tabla?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Restricción DEFAULT"
+      },
+      {
+        "letra": "b",
+        "texto": "Restricción UNIQUE"
+      },
+      {
+        "letra": "c",
+        "texto": "Restricción CHECK"
+      },
+      {
+        "letra": "d",
+        "texto": "Restricción FOREIGN KEY"
+      }
+    ],
+    "correcta": "d"
+  },
+  {
+    "modulo": 5,
+    "numero": 26,
+    "enunciado": "¿Qué diferencia técnica crítica existe entre el comando DROP TABLE y TRUNCATE TABLE?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Ninguna, ambos comandos realizan la misma acción destructiva."
+      },
+      {
+        "letra": "b",
+        "texto": "DROP requiere un filtro WHERE, TRUNCATE borra sin condición."
+      },
+      {
+        "letra": "c",
+        "texto": "DROP elimina estructura y metadatos, TRUNCATE solo datos."
+      },
+      {
+        "letra": "d",
+        "texto": "TRUNCATE es un comando DML, mientras que DROP es puro DDL."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 27,
+    "enunciado": "Al agregar una restricción NOT NULL a una columna ya existente, ¿qué precondición debe cumplirse?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La columna debe haber sido definida como llave foránea."
+      },
+      {
+        "letra": "b",
+        "texto": "La tabla no debe contener registros nulos en dicha columna."
+      },
+      {
+        "letra": "c",
+        "texto": "Todos los registros de la tabla deben estar inactivos."
+      },
+      {
+        "letra": "d",
+        "texto": "La columna debe estar indexada como llave primaria antes."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 28,
+    "enunciado": "¿Qué palabra reservada se emplea para asignar un valor fijo automático si este se omite al insertar?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "AUTO_INSERT"
+      },
+      {
+        "letra": "b",
+        "texto": "FALLBACK_VAL"
+      },
+      {
+        "letra": "c",
+        "texto": "DEFAULT"
+      },
+      {
+        "letra": "d",
+        "texto": "INITIAL_DATA"
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 29,
+    "enunciado": "En el modelo conceptual, ¿cómo se representa idealmente la capacidad de abstracción de un problema?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Mediante código encapsulado de clases y métodos de Java."
+      },
+      {
+        "letra": "b",
+        "texto": "Mediante un diagrama Entidad-Relación y sus cardinalidades."
+      },
+      {
+        "letra": "c",
+        "texto": "Como un script de creación masiva de tablas DDL nativo."
+      },
+      {
+        "letra": "d",
+        "texto": "A través de documentación en crudo en formato XML puro."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 30,
+    "enunciado": "¿Qué característica define esencialmente a una \"Entidad Fuerte\" en el modelamiento conceptual?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Posee obligatoriamente atributos de tipo matriz anidada."
+      },
+      {
+        "letra": "b",
+        "texto": "Su existencia es dependiente de otra entidad principal."
+      },
+      {
+        "letra": "c",
+        "texto": "Tiene existencia propia e identificador único independiente."
+      },
+      {
+        "letra": "d",
+        "texto": "Se vincula de forma exclusiva mediante llaves foráneas."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 31,
+    "enunciado": "¿Cómo se resuelve una relación \"Muchos a Muchos\" (N:M) al transformar al modelo relacional?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Insertando una clave foránea en la tabla más pequeña del modelo."
+      },
+      {
+        "letra": "b",
+        "texto": "Creando una entidad intermedia que contenga ambas llaves."
+      },
+      {
+        "letra": "c",
+        "texto": "Almacenando los datos múltiples en un formato de texto largo."
+      },
+      {
+        "letra": "d",
+        "texto": "Fusionando ambas entidades fuertes en una sola gran tabla unida."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 32,
+    "enunciado": "¿Qué condición principal exige la Primera Forma Normal (1FN) al aplicarla en una tabla relacional?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La ausencia absoluta de claves foráneas hacia otras tablas."
+      },
+      {
+        "letra": "b",
+        "texto": "La dependencia transitiva de todos los atributos descriptivos."
+      },
+      {
+        "letra": "c",
+        "texto": "Que cada columna contenga valores atómicos (indivisibles)."
+      },
+      {
+        "letra": "d",
+        "texto": "La existencia estricta de al menos dos llaves candidatas."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 33,
+    "enunciado": "¿Qué tipo de dependencia se busca erradicar para alcanzar la Tercera Forma Normal (3FN)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La dependencia funcional parcial respecto a llaves compuestas."
+      },
+      {
+        "letra": "b",
+        "texto": "Dependencias transitivas lógicas entre atributos no clave."
+      },
+      {
+        "letra": "c",
+        "texto": "Las asociaciones lógicas circulares entre entidades débiles."
+      },
+      {
+        "letra": "d",
+        "texto": "Los atributos heredados a partir de funciones trigonométricas."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 34,
+    "enunciado": "¿Qué concepto representa fundamentalmente la cardinalidad en un modelo Entidad-Relación (MER)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El límite máximo de ocupación en bytes de cada registro guardado."
+      },
+      {
+        "letra": "b",
+        "texto": "El número de ocurrencias lógicas de una entidad vinculada a otra."
+      },
+      {
+        "letra": "c",
+        "texto": "El tipo de dato primitivo asociado explícitamente a una llave foránea."
+      },
+      {
+        "letra": "d",
+        "texto": "La suma total e inflexible de columnas que la tabla puede alojar."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 35,
+    "enunciado": "¿Por qué razón técnica de arquitectura podría llegar a justificarse una desnormalización de datos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para satisfacer los exigentes requisitos de la forma Boyce-Codd."
+      },
+      {
+        "letra": "b",
+        "texto": "Para reducir el tamaño total de toda la base de datos en el disco."
+      },
+      {
+        "letra": "c",
+        "texto": "Para optimizar el rendimiento y lectura de consultas muy repetitivas."
+      },
+      {
+        "letra": "d",
+        "texto": "Para prevenir la inserción maliciosa de valores nulos indeseados."
+      }
+    ],
+    "correcta": "c"
+  },
+  {
+    "modulo": 5,
+    "numero": 36,
+    "enunciado": "¿Qué herramienta o documento consolida los metadatos y definiciones del modelo de base de datos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El plan de ejecución visual de consultas nativo del motor."
+      },
+      {
+        "letra": "b",
+        "texto": "El Diccionario de Datos del sistema unificado de información."
+      },
+      {
+        "letra": "c",
+        "texto": "El log binario transaccional del servidor (archivos pg_xlog)."
+      },
+      {
+        "letra": "d",
+        "texto": "El archivo de volcado y compresión del esquema (database dump)."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 37,
+    "enunciado": "Al transformar una entidad débil al modelo relacional, ¿cómo se compone su llave primaria final?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Uniendo la llave de la entidad fuerte de la que depende con su propio ID."
+      },
+      {
+        "letra": "b",
+        "texto": "Creando y asignando un identificador global único e independiente."
+      },
+      {
+        "letra": "c",
+        "texto": "Omitiendo usar llaves primarias por diseño de esquema relacional."
+      },
+      {
+        "letra": "d",
+        "texto": "Replicando exactamente todos los atributos de la entidad dominante."
+      }
+    ],
+    "correcta": "a"
+  },
+  {
+    "modulo": 5,
+    "numero": 38,
+    "enunciado": "¿Cuál es el objetivo técnico primordial al aplicar el proceso de normalización en una base de datos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Acelerar radicalmente las operaciones DML sacrificando consistencia."
+      },
+      {
+        "letra": "b",
+        "texto": "Minimizar drásticamente la redundancia y erradicar anomalías de datos."
+      },
+      {
+        "letra": "c",
+        "texto": "Transformar arquitecturas SQL estrictas en modelos NoSQL de grafos."
+      },
+      {
+        "letra": "d",
+        "texto": "Borrar lógicamente el uso de FOREIGN KEY para liberar CPU y memoria."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 39,
+    "enunciado": "En el contexto de un modelo relacional estricto, ¿qué concepto matemático fundamenta a las tablas?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Topologías complejas derivadas de árboles binarios asimétricos."
+      },
+      {
+        "letra": "b",
+        "texto": "Relaciones lógicas entre conjuntos estructurados y sus dominios."
+      },
+      {
+        "letra": "c",
+        "texto": "Algoritmos heurísticos de agrupamiento en estructuras difusas."
+      },
+      {
+        "letra": "d",
+        "texto": "Tensores multidimensionales definidos por matrices ortogonales."
+      }
+    ],
+    "correcta": "b"
+  },
+  {
+    "modulo": 5,
+    "numero": 40,
+    "enunciado": "En el diseño de un modelo conceptual, ¿qué es y qué implica un atributo denominado \"derivado\"?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Una llave alfanumérica de auditoría impuesta por el motor SQL central."
+      },
+      {
+        "letra": "b",
+        "texto": "Un dato que no se almacena porque su valor se calcula a partir de otros."
+      },
+      {
+        "letra": "c",
+        "texto": "Una variable foránea que modifica su origen dependiendo de los accesos."
+      },
+      {
+        "letra": "d",
+        "texto": "Un registro replicado a partir de una tabla maestra del sistema matriz."
+      }
+    ],
+    "correcta": "b"
+  }
+]
