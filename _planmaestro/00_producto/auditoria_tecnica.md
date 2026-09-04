@@ -149,3 +149,40 @@ con un banco que solo puede editarse escribiendo consultas: peor que el punto de
 partida.
 **Propuesta.** Tratar la iteración 23 como parte indispensable de la épica 20, no
 como un extra.
+
+### H-011 · `npm run verificar` falla a la mitad según desde qué terminal se ejecute
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Fecha:** 2026-09-03
+
+**Síntoma.** Ejecutado desde PowerShell, `npm run verificar` termina con «git no se
+reconoce como un comando interno o externo».
+**Causa.** El script es `npm run build && git diff --exit-code static/css/`. En el
+equipo del autor, git está instalado en `C:\Program Files\Git\cmd\git.exe` pero **no
+en el PATH de PowerShell**: solo Git Bash lo tiene. npm lanza los scripts heredando
+el entorno del terminal, así que el mismo comando funciona en un terminal y falla en
+el otro.
+**Impacto.** El fallo es a mitad de camino y por eso engaña: la construcción corre
+entera y reescribe `static/css/` **antes** de que reviente el `git diff`. Quien mire
+el final ve un error de git; quien mire que el CSS se reconstruyó puede creer que
+verificó. Ninguna de las dos lecturas es correcta: la comprobación que da nombre al
+script no llegó a ejecutarse nunca. Y el manual de `90-manual/` indica ejecutarlo,
+con lo que el procedimiento documentado falla al seguirlo desde PowerShell.
+**Hallazgo relacionado.** `npm run cuestionario` invoca `python3`, que en este equipo
+resuelve al alias de Microsoft Store: un ejecutable de 0 bytes que devuelve el
+código 9009 sin hacer nada. El intérprete real es `python` (Anaconda). Es el mismo
+problema con otra herramienta.
+**Propuesta.** Convertir `verificar` en un script de Node que localice git por su
+cuenta, que nunca haga la mitad del trabajo en silencio y que diga con todas sus
+letras cuándo **no pudo** verificar. Arreglar el PATH del equipo es la solución de
+fondo, pero el script tiene que ser robusto igual: el proyecto no puede depender de
+la configuración de un terminal.
+
+**Resultado · 2026-09-04.** Resuelto. `verificar` pasó a ser `scripts/verificar.mjs`,
+que guarda el CSS, construye, compara y solo después busca git —en el PATH y, si no
+está, en las ubicaciones habituales derivadas de las variables del sistema—. La
+comprobación central ya no depende de git ni del terminal. Termina siempre con un
+veredicto explicito: `VERIFICADO` (0), `DESFASADO` (1) o `VERIFICACION PARCIAL` (2),
+este último rotulado «ESTO NO ES UN EXITO» y con código de salida distinto de cero.
+Los tres se provocaron de verdad antes de darlo por bueno. `npm run cuestionario`
+pasó de `python3` a `python`, con el intérprete esperado anotado en la cabecera del
+script.
+

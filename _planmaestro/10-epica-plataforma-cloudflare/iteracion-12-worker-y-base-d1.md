@@ -75,7 +75,13 @@ construcción que estas funciones necesitan está puesta.
 - [x] El formato de error está documentado y un fallo provocado produce una
       respuesta de esa forma.
 - [x] La decisión sobre el dominio del Worker está publicada como ADR.
-- [x] El procedimiento en `90-manual/` permite reconstruir base y Worker desde cero.
+- [ ] El procedimiento en `90-manual/` permite reconstruir base y Worker desde cero.
+      · *Falta solo el ensayo completo. Los pasos 4, 5 y 6 se ejecutaron siguiendo el
+      documento, y los pasos 1 y 2 quedaron escritos tal como ocurrieron —el 2 lo validó
+      un error real, un nombre de base mal escrito—. Lo que no se ha hecho nunca es
+      seguirlo de principio a fin sobre una base que todavía no existe. **Aplazado
+      explícitamente a la iteración 21**, que crea la base del banco de preguntas y por
+      lo tanto obliga a recorrerlo desde su paso 1. Anotado en `registro_log.md`.*
 - [x] Ningún identificador ni credencial queda escrito en el código versionado. · *Su
       primera mitad la sustituyó ADR-012 durante esta iteración; ver la nota al final.*
 

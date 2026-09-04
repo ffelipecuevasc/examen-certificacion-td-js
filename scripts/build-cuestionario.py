@@ -2,6 +2,13 @@
 
 Valida que cada pregunta tenga exactamente 4 alternativas y una respuesta
 correcta que coincida con una de ellas. Aborta si algo no calza.
+
+Interprete: Python 3, invocado como `python` (npm run cuestionario).
+
+Antes decia `python3`, y en Windows eso no es el interprete sino un alias de
+Microsoft Store: un ejecutable de cero bytes que no hace nada y devuelve
+«no encontrado». Es el mismo problema que el hallazgo H-011, con otra herramienta.
+Si en tu equipo `python` apunta a Python 2 —hoy es raro—, usa `py -3` en su lugar.
 """
 import json
 import re

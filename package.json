@@ -8,14 +8,14 @@
   "scripts": {
     "dev": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
     "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify && node scripts/build-dist.mjs",
-    "verificar": "npm run build && git diff --exit-code static/css/",
+    "verificar": "node scripts/verificar.mjs",
     "serve": "npx serve .",
     "serve:dist": "npx serve dist",
     "datos:dev": "npm run build && wrangler pages dev",
     "datos:esquema": "wrangler d1 execute examen-td-js-produccion --local --file=d1/juguete.sql",
     "start": "npm run dev",
     "icons": "node scripts/build-icons.mjs",
-    "cuestionario": "python3 scripts/build-cuestionario.py"
+    "cuestionario": "python scripts/build-cuestionario.py"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",

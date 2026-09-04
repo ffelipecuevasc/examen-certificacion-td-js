@@ -1,7 +1,7 @@
 # Iteración 13 · Entornos, secretos y procedimientos
 
 **Épica:** 10 · Plataforma Cloudflare
-**Estado:** 🔵 En curso · **Iniciada:** 2026-09-03
+**Estado:** 🟢 Completada · **Iniciada:** 2026-09-03 · **Cerrada:** 2026-09-04
 **Depende de:** iteración 12, cerrada el 2026-09-03.
 
 ## Objetivo
@@ -77,7 +77,7 @@ entornos va antes que la prueba de restauración.
 - [x] Escribir la ADR de la decisión 2.
 - [x] Definir el procedimiento de respaldo: cada cuánto, dónde queda, cuánto dura y
   cómo se restaura.
-- [ ] Probar la restauración contra la base de pruebas.
+- [x] Probar la restauración contra la base de pruebas.
 - [x] Consolidar el manual de publicación en `90-manual/`. Ya existe material de las
   iteraciones 11 y 12; el trabajo es unificarlo, no escribirlo de nuevo.
 - [x] Revisar si los despliegues de vista previa quedan en direcciones públicas y,
@@ -86,14 +86,13 @@ entornos va antes que la prueba de restauración.
 
 ## Criterios de aceptación
 
-- [ ] Existen dos bases D1 separadas, y se demuestra que una escritura en pruebas no
+- [x] Existen dos bases D1 separadas, y se demuestra que una escritura en pruebas no
   aparece en producción. La demostración es una consulta a ambas, no una
   afirmación.
 - [x] Un despliegue de vista previa lee la base de pruebas, comprobado sobre una
   dirección de vista previa real.
-- [ ] Está documentado cómo distinguir el entorno activo, y la señal es visible sin
-  abrir el panel de Cloudflare. · *Documentado y probado en local; la señal en la
-  nube se comprueba en el próximo despliegue.*
+- [x] Está documentado cómo distinguir el entorno activo, y la señal es visible sin
+  abrir el panel de Cloudflare.
 - [x] Ningún token, clave ni contraseña está en el repositorio. El `database_id` sí
   está y es correcto que lo esté, según ADR-012.
 - [x] Se verifica que un archivo de credenciales de Wrangler queda efectivamente
@@ -102,9 +101,9 @@ entornos va antes que la prueba de restauración.
 - [x] La ADR de la decisión 2 está publicada y dice cuál es el respaldo oficial.
 - [x] El procedimiento de respaldo está documentado, incluyendo cuánto tiempo hacia
   atrás alcanza a cubrir.
-- [ ] Se restauró un respaldo con éxito contra la base de pruebas, con evidencia:
+- [x] Se restauró un respaldo con éxito contra la base de pruebas, con evidencia:
   qué dato se destruyó, qué se restauró y cómo se comprobó que volvió.
-- [ ] El manual de `90-manual/` permite a alguien sin contexto previo publicar una
+- [x] El manual de `90-manual/` permite a alguien sin contexto previo publicar una
   actualización desde un clon, sin preguntarle nada al autor.
 
 ## Fuera de alcance
@@ -204,3 +203,80 @@ Todo lo que queda exige comandos contra la cuenta, que ejecuta el autor (ADR-015
 5. **El ensayo completo del manual desde su paso 1**, que arrastra el criterio 7 de
    la iteración 12. Las dos bases ya existen, así que este ensayo necesita una base
    que todavía no exista: se hace la próxima vez que haya que crear una.
+
+## Cierre · 2026-09-04
+
+### La verificación que faltaba, hecha por el autor
+
+**El ensayo de restauración, contra la base de pruebas.** Se destruyó un dato de
+verdad y se recuperó desde el archivo exportado:
+
+```
+tras el DELETE          pruebas: 1 fila (entorno)
+en el mismo momento     produccion: 2 filas, con saludo = "Verificado por Felipe el 3 de septiembre"
+tras DROP + importar    pruebas: 2 filas, con saludo = "La tuberia hasta D1 funciona."
+```
+
+La consulta a producción en medio del ensayo es lo que demuestra el aislamiento: la
+misma tabla, en el mismo instante, con contenidos distintos en cada base. No es una
+afirmación, son dos respuestas.
+
+**El respaldo oficial existe.** `d1/respaldo-banco.sql`, exportado desde producción
+y versionado en `main`, con su `PRAGMA`, su `CREATE TABLE` y los dos `INSERT`. El
+riesgo de formato ruidoso que ADR-014 dejaba anotado no se materializó en esta
+primera exportación.
+
+**La señal de entorno, en la nube:**
+
+```
+produccion    {"entorno":"produccion","enlace_d1":"presente","consulta_d1":"correcta"}
+vista previa  {"entorno":"pruebas","enlace_d1":"presente","consulta_d1":"correcta"}
+```
+
+**Time Travel.** `time-travel info` devuelve el marcador actual pero no menciona
+plazo, y la ayuda del comando dice «within the last 30 days», que es texto genérico:
+la herramienta no sabe en qué plan está la cuenta. Los 7 días del plan gratuito
+quedan confirmados contra la documentación de límites de D1, y ADR-014 lleva ahora
+un aviso explícito para que nadie la «corrija» con lo que dice el `--help`.
+
+### El hallazgo que salió al final, y su arreglo
+
+`npm run verificar` fallaba desde PowerShell, porque git no está en el PATH de ese
+terminal, y fallaba **a mitad de camino**: la construcción ya había reescrito el CSS
+cuando reventaba el `git diff`. Quedó como **H-011** en la auditoría técnica, y se
+resolvió dentro de esta misma iteración porque bloqueaba el último criterio: el
+manual manda ejecutar ese comando, y un procedimiento que falla según el terminal no
+se puede seguir sin conocimiento previo.
+
+`verificar` pasó a ser `scripts/verificar.mjs`. Guarda el CSS, construye, compara, y
+**solo después** busca git. La comprobación central —¿el CSS corresponde a su
+fuente?— ya no necesita git ni sabe en qué terminal está; git quedó como un extra
+que añade el segundo dato, si además está commiteado.
+
+Termina siempre con un veredicto en un recuadro:
+
+```
+VERIFICADO                                            codigo 0
+DESFASADO                                             codigo 1
+VERIFICACION PARCIAL  ***  ESTO NO ES UN EXITO  ***    codigo 2
+```
+
+Los tres se provocaron de verdad antes de darlos por buenos: el normal, uno con el
+CSS editado a mano, y uno ejecutado en un entorno vaciado —sin git en el PATH y sin
+las variables desde las que se derivan las rutas donde suele estar instalado—, o sea
+la simulación de un equipo donde git no aparece por ninguna vía.
+
+De paso apareció el mismo problema con otra herramienta: `npm run cuestionario`
+invocaba `python3`, que en Windows es un alias de Microsoft Store de cero bytes.
+Cambiado a `python`, con el intérprete esperado anotado en la cabecera del script.
+
+### Deuda que esta iteración deja abierta
+
+- **El ensayo completo del manual desde su paso 1**, que arrastra el criterio 7 de
+  la iteración 12. Las dos bases ya existen; el ensayo necesita una que no exista,
+  así que quedó **aplazado explícitamente a la iteración 21**, que crea la base del
+  banco de preguntas y obliga a recorrer el manual desde el principio.
+- **`prueba_tuberia` sigue en las dos bases de la nube.** La primera migración del
+  esquema real tiene que retirarla de ambas, no solo de producción.
+- **Las direcciones de vista previa son públicas.** Anotado; restringirlas es épica
+  50.

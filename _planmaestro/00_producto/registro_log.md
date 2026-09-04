@@ -21,19 +21,22 @@ Fuente única de verdad sobre qué falta. Ordenado por prioridad dentro de cada 
 | 🟢 | 12 | Definir el formato de error del Worker, base del respaldo de ADR-008         |
 | 🟢 | 12 | Desarrollo local contra una base D1 local                                    |
 | 🟢 | 12 | Verificar la capa de datos en la dirección pública, tras el primer despliegue con `wrangler.toml` |
-| ⚪ | 13 | Ensayar el manual entero, desde su paso 1, al crear la base de pruebas. Cierra el criterio 7 de la iteración 12: el procedimiento describe pasos que sí ocurrieron, pero nunca se ha seguido de principio a fin sobre una base que todavía no existe |
 | 🟢 | 13 | El manual documenta la creación de la base **por el panel** (su paso 1), pero la base de pruebas se creó por línea de comandos con `wrangler d1 create`, ruta que el manual no menciona. Decidir cuál es la ruta oficial y reescribir el paso 1 en consecuencia; si conviven las dos, decir cuándo se usa cada una |
 | 🟢 | 13 | El manual `90-manual/capa-de-datos-y-base-d1.md` está escrito para una base única: su paso 1 fija `examen-td-js-produccion` y todos sus comandos nombran esa base. Con dos entornos tiene que cubrir ambas y dejar claro cuál se está tocando en cada comando. **No se corrige hasta que el ensayo del manual traiga los huecos reales** |
 | 🟢 | 13 | Declarar `[env.preview]` con base propia. Verificado en un despliegue de vista previa real: leyó la base de pruebas |
-| 🔵 | 13 | Separar entorno de pruebas y producción. Falta demostrar que un cambio en pruebas no aparece en producción, que es lo que hace el ensayo de restauración |
+| 🟢 | 13 | Separar entorno de pruebas y producción. Demostrado consultando ambas bases en el mismo instante durante el ensayo de restauración |
 | 🟢 | 13 | Gestión de credenciales fuera del repositorio                                |
-| 🔵 | 13 | Procedimiento de respaldo escrito en `90-manual/respaldo-y-restauracion.md`. Falta ejecutar el ensayo de restauración contra pruebas |
+| 🟢 | 13 | Procedimiento de respaldo en `90-manual/respaldo-y-restauracion.md`, con la restauración ensayada contra pruebas destruyendo un dato real |
+
+| 🟢 | 13 | **H-011** · `npm run verificar` dependía del terminal y fallaba a mitad de camino. Reescrito como `scripts/verificar.mjs`, con tres veredictos y sin depender de git para la comprobación central |
+| 🟢 | 13 | Que el manual permita publicar desde un clon sin preguntarle nada al autor. Cerrado al resolver H-011: los manuales explican los tres veredictos y ya no dependen de qué terminal use quien los siga |
 
 ## Épica 20 · Persistencia de preguntas
 
 | Estado | Iteración | Tarea |
 |---|---|---|
-| ⚪ | 21 | Borrar `prueba_tuberia` de la base de producción. La creó la iteración 12 para probar la tubería y sigue ahí: la primera migración del esquema real tiene que retirarla |
+| ⚪ | 21 | Ensayar el manual entero, desde su paso 1, al crear la base del banco de preguntas. **Cierra el criterio 7 de la iteración 12, aplazado explícitamente hasta acá**: el procedimiento describe pasos que sí ocurrieron, pero nunca se ha seguido de principio a fin sobre una base que todavía no existe. La iteración 21 crea una, así que el ensayo ocurre solo |
+| ⚪ | 21 | Borrar `prueba_tuberia` de **las dos bases de la nube**, produccion y pruebas. La crearon las iteraciones 12 y 13 para probar la tubería y sigue ahí: la primera migración del esquema real tiene que retirarla de ambas |
 | ⚪ | 21 | Diseñar el esquema del banco en D1 |
 | ⚪ | 21 | Decidir el modelado de las alternativas |
 | ⚪ | 21 | Decidir el tratamiento de las preguntas retiradas |

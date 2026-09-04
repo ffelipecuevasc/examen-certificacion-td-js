@@ -195,9 +195,15 @@ comando largo obliga a leer lo que se está haciendo.
 ## Paso 5 · Publicar
 
 ```powershell
-npm run verificar   # reconstruye y avisa si el CSS quedó desfasado
+npm run verificar   # reconstruye el CSS y lo compara con lo que había
 git push
 ```
+
+`npm run verificar` termina con uno de tres veredictos: `VERIFICADO` (puedes
+publicar), `DESFASADO` (el CSS se reconstruyó, revísalo y commítealo) o
+`VERIFICACION PARCIAL` (comprobó el CSS pero no encontró git para comprobar si está
+commiteado; **no es un éxito**). Funciona igual desde PowerShell o desde Git Bash:
+busca git por su cuenta y, si no aparece, lo dice en vez de fallar a medias.
 
 El push a `main` publica producción. Un push a **cualquier otra rama** produce un
 despliegue de vista previa, que lee la base de pruebas.

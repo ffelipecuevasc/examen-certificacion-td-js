@@ -428,6 +428,13 @@ cambian cómo se usa:
 - **No hay nada que activar.** Ninguna tarea, ningún recordatorio, ninguna
   configuración que se pueda olvidar.
 
+**Aviso sobre los 30 días.** La ayuda del propio comando —`wrangler d1 time-travel
+restore --help`— dice «within the last 30 days», y `time-travel info` no menciona
+plazo alguno. Ese texto es genérico: la herramienta no sabe en qué plan está la
+cuenta. Los **7 días** de esta ADR salen de la documentación de límites de D1, que
+distingue Workers Paid (30) de plan gratuito (7). Queda escrito para que nadie
+«corrija» esta ADR con lo que dice la ayuda del comando.
+
 **Motivo · por qué el archivo vive en el repositorio.** La objeción evidente es que
 ADR-010 acababa de sacar del repositorio el contenido generado. No es lo que ADR-010
 hizo: sacó `dist/`, que es el artefacto publicable y desechable, y en la misma

@@ -17,6 +17,9 @@ Necesitas:
 - Una cuenta de Cloudflare (el plan gratuito alcanza de sobra).
 - El repositorio en GitHub, con la rama `main` al día.
 - Node.js instalado, para poder comprobar la construcción antes de publicar.
+- Git, para clonar y publicar. **No hace falta que esté en el PATH de tu terminal**:
+  los comandos de este manual funcionan igual, y `npm run verificar` lo busca solo.
+  Si aun así no lo encuentra, te lo dice en vez de fallar a medias.
 
 ---
 
@@ -145,8 +148,16 @@ Antes de cada push conviene:
 npm run verificar
 ```
 
-Reconstruye y falla si `static/css/` quedó distinto de lo versionado. No es
-obligatorio —el despliegue compila por su cuenta— pero mantiene la copia del
+Reconstruye el CSS y lo compara con lo que había. Termina siempre con **uno de
+estos tres veredictos**, en un recuadro imposible de pasar por alto:
+
+| Veredicto | Código | Qué significa |
+|---|---|---|
+| `VERIFICADO` | 0 | El CSS corresponde a la fuente y está commiteado. Puedes publicar |
+| `DESFASADO` | 1 | El CSS no correspondía: se acaba de reconstruir. Revisa y commitea |
+| `VERIFICACION PARCIAL` | 2 | Comprobó lo del CSS, pero **no** pudo comprobar si está commiteado, porque no encontró git. **No es un éxito** |
+
+No es obligatorio —el despliegue compila por su cuenta— pero mantiene la copia del
 repositorio al día con la fuente.
 
 ---

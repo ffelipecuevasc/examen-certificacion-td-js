@@ -10,18 +10,19 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 |---|-------------------------------------------------------------------|
 | **Iteración** | `13-entornos-y-secretos.md`                                        |
 | **Épica** | 10 · Plataforma Cloudflare                                        |
-| **Estado** | 🔵 En curso                                                       |
+| **Estado** | 🟢 Completada el 2026-09-04                                    |
 | **Archivo** | `10-epica-plataforma-cloudflare/iteracion-13-entornos-y-secretos.md` |
 | **Iniciada** | 2026-09-03                                                        |
 
 ## Iteraciones completadas
 
-**🟢 Completada** | _Iteración 12: Capa de datos y base D1 (`iteracion-12-worker-y-base-d1.md`)_
+**🟢 Completada** | _Iteración 13: Entornos, secretos y procedimientos (`iteracion-13-entornos-y-secretos.md`)_
 
 | Iteración                            | Épica                      | Cierre     | Bitácora |
 |--------------------------------------|----------------------------|------------|---|
 | 11 - Publicación en Cloudflare Pages | 10 - Plataforma Cloudflare | 2026-09-03 | 🟢 Completada |
 | 12 - Capa de datos y base D1         | 10 - Plataforma Cloudflare | 2026-09-03 | 🟢 Completada |
+| 13 - Entornos, secretos y procedim.  | 10 - Plataforma Cloudflare | 2026-09-04 | 🟢 Completada |
 | —                                    | —                          | —          | — |
 
 ## Épicas
