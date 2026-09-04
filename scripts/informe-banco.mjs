@@ -430,6 +430,97 @@ if (duplicados.length === 0) {
   }
 }
 
+titulo('6b · CARACTERES QUE HAY QUE ESCAPAR');
+
+console.log(`
+  Dos momentos distintos, y los dos importan:
+
+    al ENTRAR a la base   comillas y barras invertidas en una sentencia SQL
+    al SALIR al DOM       < > & " ' insertados con innerHTML
+
+  La regla de CLAUDE.md es de doble filo: se valida al escribir y se escapa al
+  insertar. Esta seccion cuenta con que se va a encontrar cada lado.
+`);
+
+const SIGNOS = [
+  ['comillas invertidas  `', /`/],
+  ['comillas dobles      "', /"/],
+  ['menor o mayor      < >', /[<>]/],
+  ["apostrofe            '", /'/],
+  ['ampersand            &', /&/],
+  ['barra invertida      \\', /[\\]/],
+];
+
+function cuentaSignos(lista, soloEnunciado, textos) {
+  const filas = [];
+  for (const [nombre, re] of SIGNOS) {
+    let enun = 0;
+    let total = 0;
+    for (const p of lista) {
+      const t = textos(p);
+      if (re.test(t.enunciado)) enun++;
+      if (re.test(t.enunciado) || t.alternativas.some((a) => re.test(a))) total++;
+    }
+    filas.push([nombre, enun, total]);
+  }
+  return filas;
+}
+
+sub(`banco nuevo (${nuevas.length} preguntas)`);
+console.log('                            solo enunciado   enunciado o alternativas');
+for (const [nombre, enun, total] of cuentaSignos(nuevas, true, (p) => ({
+  enunciado: p.enunciado ?? '',
+  alternativas: (p.alternativas ?? []).map((a) => a?.texto ?? ''),
+}))) {
+  console.log(`  ${nombre}   ${String(enun).padStart(10)}   ${String(total).padStart(22)}`);
+}
+
+sub(`banco viejo (${viejas.length} preguntas)`);
+console.log('                            solo enunciado   enunciado o alternativas');
+for (const [nombre, enun, total] of cuentaSignos(viejas, true, (p) => ({
+  enunciado: p.q ?? '',
+  alternativas: p.opciones ?? [],
+}))) {
+  console.log(`  ${nombre}   ${String(enun).padStart(10)}   ${String(total).padStart(22)}`);
+}
+
+sub('ejemplos, para ver a que se parece el problema');
+const conMayorMenor = viejas.filter((p) => /[<>]/.test(p.q) || (p.opciones ?? []).some((o) => /[<>]/.test(o)));
+for (const p of conMayorMenor.slice(0, 3)) {
+  const donde = (p.opciones ?? []).find((o) => /[<>]/.test(o)) ?? p.q;
+  console.log(`  viejo ${p._modulo} pos ${p._posicion}: ${donde.slice(0, 80)}`);
+}
+const conTilde = nuevas.filter((p) => (p.alternativas ?? []).some((a) => /`/.test(a?.texto ?? '')));
+for (const p of conTilde.slice(0, 2)) {
+  const a = (p.alternativas ?? []).find((x) => /`/.test(x?.texto ?? ''));
+  console.log(`  nuevo ${p._archivo} #${p.numero}: ${a.texto.slice(0, 80)}`);
+}
+
+// ---------------------------------------------------------------------------
+// Metadatos de modulo
+// ---------------------------------------------------------------------------
+
+titulo('6c · METADATOS DE MODULO');
+
+console.log(`
+  Los dos bancos identifican el modulo de forma distinta, y uno de ellos guarda
+  informacion que el otro no tiene. El esquema tiene que decidir donde vive.
+`);
+
+sub('banco viejo: numero, titulo e icono por modulo');
+for (const g of gruposViejos) {
+  console.log(`  ${String(g.modulo).padEnd(12)} icono: ${String(g.icono).padEnd(16)} ${g.titulo}`);
+}
+
+sub('banco nuevo: solo el numero');
+console.log(`  modulos presentes: ${[...porModuloNuevo.keys()].sort((a, b) => a - b).join(', ')}`);
+console.log('  no trae titulo ni icono');
+
+sub('como se nombra el modulo en cada banco');
+console.log(`  viejo: texto  ("${gruposViejos[0]?.modulo ?? ''}")`);
+console.log(`  nuevo: entero (${nuevas[0]?.modulo ?? ''})`);
+console.log('  hay que unificarlo al cargar, o el mismo modulo entra dos veces');
+
 // ---------------------------------------------------------------------------
 // Distribucion de la letra correcta
 // ---------------------------------------------------------------------------
@@ -554,9 +645,9 @@ const aListar = TODOS ? pares : pares.slice(0, 25);
 for (const { a, b, tri, pal, tec } of aListar) {
   console.log(`  [trigramas ${tri.toFixed(2)} · palabras ${pal.toFixed(2)}${tec.length ? ` · comparten: ${tec.slice(0, 4).join(', ')}` : ''}]`);
   console.log(`    ${a.etiqueta}`);
-  console.log(`      ${a.texto.slice(0, 100)}`);
+  console.log(`      ${a.texto}`);
   console.log(`    ${b.etiqueta}`);
-  console.log(`      ${b.texto.slice(0, 100)}\n`);
+  console.log(`      ${b.texto}\n`);
 }
 if (!TODOS && pares.length > 25) {
   console.log(`  ...y ${pares.length - 25} pares mas. Para verlos todos:`);

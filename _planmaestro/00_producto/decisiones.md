@@ -547,3 +547,54 @@ enseguida, que es la mejor forma de mantenerlos vivos.
 **Límite explícito.** Esto no es una restricción sobre lo que Claude Code puede
 *proponer*: escribe los comandos completos, con sus banderas y su orden. Lo que no
 hace es apretar el gatillo.
+
+---
+
+## ADR-016 · El banco nuevo suma al existente: 405 preguntas de dos orígenes
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-04
+
+**Decisión.** Las 300 preguntas nuevas **se suman** a las 105 que ya existían en
+`static/js/data/cuestionario.js`. El banco queda en **405 preguntas** provenientes de
+dos orígenes con formatos distintos, y el esquema de D1 tiene que recibir a los dos.
+El banco viejo no se descarta.
+
+**Motivo.** Los dos bancos cubren los mismos siete módulos, pero no se pisan:
+comprobado con `npm run informe-banco`, **ningún enunciado se repite** entre ellos,
+ni dentro de un mismo módulo. Son 105 preguntas escritas a mano, ya usadas por
+estudiantes, y descartarlas para quedarse con 300 sería tirar trabajo hecho y
+probado a cambio de nada. Sumarlas cuesta un esquema que acepte dos formas de
+entrada, una sola vez.
+
+**Consecuencia · dos formatos que hay que unificar al cargar.** No es solo que las
+claves se llamen distinto:
+
+| | banco viejo | banco nuevo |
+|---|---|---|
+| Identificador de módulo | texto, `"Módulo 2"` | entero, `2` |
+| Enunciado | `q` | `enunciado` |
+| Alternativas | `opciones`, lista de textos | `alternativas`, lista de `{letra, texto}` |
+| Respuesta correcta | `correcta`, **índice** 0-3 | `correcta`, **letra** `"a"`-`"d"` |
+| Orden fijo | `fijo` | no existe |
+| Título e ícono del módulo | sí, por grupo | no |
+
+Si el identificador de módulo no se unifica al cargar, el mismo módulo entra dos
+veces. Y los dos campos que solo existen en un lado —la marca `fijo` y los metadatos
+del módulo— se pierden en silencio si el esquema no les hace sitio.
+
+**Consecuencia · hay solapamiento de contenido, aunque no de enunciados.** Que
+ninguna pregunta esté repetida palabra por palabra no significa que no haya dos
+preguntas sobre el mismo punto. La revisión de los 82 pares candidatos que produjo
+el informe encontró coincidencias reales: mismo hecho evaluado con otra redacción.
+Eso importa para el simulacro, donde dos preguntas equivalentes en la misma sesión
+son una pregunta desperdiciada, y **se resuelve pregunta por pregunta con criterio
+editorial**, no con un script. Es trabajo de la iteración 24.
+
+**Consecuencia.** El total efectivo del banco será menor que 405 en la medida en que
+el autor decida retirar una de cada par solapado. El número final se sabe recién
+después de esa revisión.
+
+**Alternativa descartada.** Reemplazar el banco viejo por el nuevo. Se descarta
+porque el costo —perder 105 preguntas ya escritas y probadas— es inmediato y
+seguro, mientras que el beneficio —un solo formato de entrada— se paga una vez y se
+resuelve con código.

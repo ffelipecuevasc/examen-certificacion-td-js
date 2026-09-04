@@ -42,6 +42,23 @@ Ninguna es obvia. Resuélvelas con argumentos y documéntalas.
    relacionales: el esquema es material didáctico además de infraestructura.
 2. **Cómo se identifica la respuesta correcta.** Sin usar una posición fija, porque
    ADR-006 obliga a barajar.
+
+   **Decisión del autor, 2026-09-04, que deja esta pregunta casi cerrada:** el sesgo
+   de la respuesta correcta —la `b` se lleva el 41,7 % del banco nuevo y el 47,6 %
+   del viejo— **se corrige barajando, sin tocar el contenido de las preguntas**.
+   Reescribir 405 preguntas para equilibrar posiciones sería trabajo enorme con
+   riesgo de introducir errores, y el barajado ya neutraliza el efecto en pantalla.
+
+   De ahí se sigue lo que el esquema tiene que cumplir: **si se baraja, la
+   respuesta correcta no puede identificarse por su posición**. Guardar «la
+   correcta es la segunda» deja de significar nada en cuanto el orden cambia en
+   cada carga. La correcta tiene que estar atada a la alternativa, no al lugar.
+
+   **Con una excepción que el esquema también debe soportar:** la pregunta con
+   `fijo = true` —posición 13 del módulo 2, cuya alternativa (d) dice «Ambas B y C
+   son correctas»— **no se baraja**, y ahí la correcta sí depende del orden. Los
+   dos casos conviven en la misma tabla, así que el modelo tiene que resolver los
+   dos sin ramas especiales en el código del navegador.
 3. **Qué se hace con las preguntas retiradas.** Borrarlas rompería cualquier
    referencia guardada; marcarlas como retiradas obliga a filtrar en cada consulta.
 
