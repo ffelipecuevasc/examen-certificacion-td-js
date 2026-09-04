@@ -230,6 +230,12 @@ guardado sino lo que el checkout escribía en el disco, y eso es justo lo que
 `.gitattributes` corrige. `git add --renormalize .` no encuentra nada que cambiar:
 comprobado, cero archivos.
 
+**Confirmado en el escenario que fallaba · 2026-09-04.** El autor repitio el
+recorrido en frio desde un clon limpio —clonar, `npm install`, `npm run verificar`—
+y obtuvo `VERIFICADO` con codigo 0 y sin la nota de finales de linea. Es el mismo
+escenario donde antes salia `DESFASADO`. El hallazgo se cierra con esa prueba, no
+con el razonamiento de que deberia funcionar.
+
 **Si la nota de finales de linea vuelve a aparecer, no es ruido conocido.** Con
 `.gitattributes` puesto y el arbol refrescado, el veredicto `VERIFICADO` no deberia
 volver a traer esa nota nunca: los clones salen en LF y los generadores escriben LF.

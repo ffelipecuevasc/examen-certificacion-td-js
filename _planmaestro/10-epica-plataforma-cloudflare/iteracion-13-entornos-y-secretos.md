@@ -105,10 +105,12 @@ entornos va antes que la prueba de restauración.
   qué dato se destruyó, qué se restauró y cómo se comprobó que volvió.
 - [x] El manual de `90-manual/` permite a alguien sin contexto previo publicar una
   actualización desde un clon, sin preguntarle nada al autor. · *Recorrido en frío
-  el 2026-09-04 por el autor, desde un clon limpio en una carpeta temporal: `git
-  clone`, `npm install` (104 paquetes) y `npm run verificar`. El script corrió
-  entero y dio veredicto. Terminó en `DESFASADO` sobre `icons.css`, que resultó ser
-  una falsa alarma por finales de línea: ver H-012.*
+  dos veces, ambas por el autor y desde un clon limpio: `git clone`, `npm install`
+  (104 paquetes) y `npm run verificar`. El primero terminó en `DESFASADO` sobre
+  `icons.css`, que resultó ser una falsa alarma por finales de línea (H-012). El
+  segundo, **hecho después de poner el `.gitattributes`**, terminó en `VERIFICADO`
+  con código 0 y ya sin la nota de finales de línea, porque el clon ahora sale en
+  LF y no hay nada que normalizar. Mismo escenario, resultado limpio.*
 
 ## Fuera de alcance
 
@@ -284,7 +286,13 @@ criterio pedía comprobar.
 
 El veredicto fue `DESFASADO` sobre `static/css/icons.css`, y **no correspondía a
 un CSS desactualizado**: reproducido después en un clon local, el contenido es
-idéntico y lo único que cambia son los finales de línea. Queda como **H-012**.
+idéntico y lo único que cambia son los finales de línea. Quedó como **H-012**, y
+se resolvió dentro de esta misma iteración.
+
+**El recorrido se repitió después del arreglo**, en un clon limpio recién bajado:
+`VERIFICADO`, código 0, sin la nota de finales de línea. Es el mismo escenario
+donde la vez anterior salió `DESFASADO`, así que sirve de prueba de las dos cosas
+a la vez: que el criterio se cumple y que H-012 está cerrado de verdad.
 
 ### Deuda que esta iteración deja abierta
 
