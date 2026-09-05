@@ -544,6 +544,57 @@ herramienta. Cuando algo salga raro en la base, hay un único lugar donde mirar.
 respaldo y pasan a ser el camino normal de trabajo. Si están mal escritos, se nota
 enseguida, que es la mejor forma de mantenerlos vivos.
 
+---
+
+### Enmienda · 2026-09-04 · la regla escrita no bastó, y dónde vive ahora la barrera
+
+**Qué pasó.** Esta ADR falló en su primera prueba real. Claude Code ejecutó un
+comando `--remote` que se autenticó y alcanzó la base de producción. No modificó
+datos, por casualidad y no por diseño. Está documentado en **H-014**.
+
+**Por qué falló el predicado de esta ADR.** «Todo lo que ejecute lleva `--local`
+explícito» es comprobable **sólo si la línea de comandos es legible**. El comando
+que se ejecutó fue `powershell -File correr.ps1`: ahí no aparece ningún `--remote`,
+porque vive dentro del archivo, tres capas más abajo. Y lanzar un guion de apoyo es
+el modo normal de trabajar en cuanto algo tiene más de dos pasos. El predicado sigue
+siendo bueno **para auditar después**; no impide nada mientras ocurre.
+
+**Qué se añade.** Una barrera técnica de cuatro capas, descrita y operada en
+`90-manual/barrera-adr-015.md`. La que sostiene es la primera: el entorno de Claude
+Code no tiene con qué autenticarse, porque `XDG_CONFIG_HOME` apunta a un directorio
+sin sesión de wrangler. Las variables de entorno las heredan todos los procesos
+descendientes, así que ninguna cantidad de guiones intermedios la esquiva — que es
+exactamente el punto ciego del predicado.
+
+**Dónde vive, y por qué no en el repositorio.** En los **ajustes de usuario** de
+Claude Code, `~/.claude/settings.json`, no en `.claude/settings.json` del proyecto.
+Dos motivos:
+
+1. **Comprobado que no funciona desde el proyecto.** Se intentó primero ahí y el
+   bloque `env` no llegaba al entorno ni tras reiniciar la sesión. Es plausible que
+   Claude Code lo impida a propósito, y con buen criterio: inyectar variables de
+   entorno en todos los subprocesos desde un archivo que viene dentro de un
+   repositorio clonado es justo lo que no conviene permitir. Sea o no ése el motivo,
+   el hecho está medido.
+2. **La regla es sobre Claude Code, no sobre este repositorio**, así que corresponde
+   que viva donde vive la configuración de la herramienta. El autor aceptó
+   expresamente el efecto: aplica a todas sus sesiones de Claude Code, no sólo a las
+   de este proyecto.
+
+Lo que **sí** queda versionado en el repositorio es el enganche `PreToolUse` —capa
+2— y los tres guiones (`barrera-remoto.mjs`, `verificar-barrera.mjs`, y la negativa
+de `verificar-banco.mjs`). La barrera es, por tanto, mitad repositorio y mitad
+equipo, y `npm run verificar` se detiene si falta cualquiera de las dos mitades.
+
+**Consecuencia nueva.** La regla deja de depender de que quien la lee no se
+equivoque. A cambio, **la barrera pasa a ser algo que puede caerse**, y por eso se
+comprueba en cada `npm run verificar` con veredicto propio. Una barrera caída sin
+avisar sería peor que no tenerla, porque se seguiría trabajando con la confianza que
+daba.
+
+**Lo que esta enmienda no cambia.** El predicado de `--local` sigue vigente y sigue
+siendo la forma de auditar. Lo que cambia es que ya no es lo único.
+
 **Límite explícito.** Esto no es una restricción sobre lo que Claude Code puede
 *proponer*: escribe los comandos completos, con sus banderas y su orden. Lo que no
 hace es apretar el gatillo.

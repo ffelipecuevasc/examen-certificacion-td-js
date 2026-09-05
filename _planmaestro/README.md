@@ -8,11 +8,11 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 
 | Campo | Valor                                                             |
 |---|-------------------------------------------------------------------|
-| **Iteración** | `13-entornos-y-secretos.md`                                        |
-| **Épica** | 10 · Plataforma Cloudflare                                        |
-| **Estado** | 🟢 Completada el 2026-09-04                                    |
-| **Archivo** | `10-epica-plataforma-cloudflare/iteracion-13-entornos-y-secretos.md` |
-| **Iniciada** | 2026-09-03                                                        |
+| **Iteración** | `21-modelo-de-datos.md`                                           |
+| **Épica** | 20 · Persistencia de preguntas                                    |
+| **Estado** | 🔵 Los siete criterios cumplidos con evidencia. **El cierre formal lo hace el autor** |
+| **Archivo** | `20-epica-persistencia-preguntas/iteracion-21-modelo-de-datos.md` |
+| **Iniciada** | 2026-09-04                                                        |
 
 ## Iteraciones completadas
 
@@ -30,7 +30,7 @@ Planificación del proyecto. Esta carpeta **es parte del repositorio** y se vers
 | # | Épica | Estado | Entrega |
 |---|---|---|---|
 | 10 | Plataforma Cloudflare | 🟢 Completada | Sitio en Pages, capa de datos y dos bases D1 operativas |
-| 20 | Persistencia de preguntas | ⚪ No iniciada | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
+| 20 | Persistencia de preguntas | 🔵 En curso | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
 | 30 | Cuestionario | ⚪ No iniciada | `cuestionario.html` con el banco completo y barras horizontales |
 | 40 | Simulacro de examen | ⚪ No iniciada | `simulacro.html` cronometrado, 120 preguntas, resumen final |
 | 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos |

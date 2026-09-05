@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
     "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify && node scripts/build-dist.mjs",
-    "verificar": "node scripts/verificar.mjs",
+    "verificar": "node scripts/verificar-barrera.mjs && node scripts/verificar.mjs",
     "serve": "npx serve .",
     "serve:dist": "npx serve dist",
     "datos:dev": "npm run build && wrangler pages dev",
@@ -19,7 +19,8 @@
     "start": "npm run dev",
     "icons": "node scripts/build-icons.mjs",
     "cuestionario": "python scripts/build-cuestionario.py",
-    "informe-banco": "node scripts/informe-banco.mjs"
+    "informe-banco": "node scripts/informe-banco.mjs",
+    "verificar:barrera": "node scripts/verificar-barrera.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",

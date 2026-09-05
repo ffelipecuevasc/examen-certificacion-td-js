@@ -119,3 +119,7 @@ coverage/
 # Variables locales de las funciones. Equivale a un .env del lado del servidor.
 .dev.vars
 .dev.vars.*
+
+# Ajustes locales de Claude Code. Traen rutas de esta maquina: la barrera de
+# ADR-015 (H-014) se declara aca, no en el archivo versionado.
+.claude/settings.local.json

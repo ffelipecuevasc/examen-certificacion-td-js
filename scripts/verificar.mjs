@@ -216,8 +216,15 @@ const diff = spawnSync(git, ['diff', '--exit-code', '--', CARPETA_CSS], {
   encoding: 'utf8',
 });
 
+// `git diff --exit-code` solo usa dos codigos para responder la pregunta: 0 si no hay
+// diferencias y 1 si las hay. Cualquier otro es git fallando, y un fallo de git no es
+// un CSS desfasado. Confundirlos es el mismo error que costo H-013 en el otro script:
+// hasta el 2026-09-04 aca se hacia `if (diff.status !== 0) -> DESFASADO`, con lo que
+// un indice corrupto —codigo 128— se anunciaba como un problema del CSS.
+
 // Sin repositorio no hay nada con que comparar: pasa en una copia descargada como
-// ZIP. No es un fallo del proyecto, pero tampoco es una verificacion completa.
+// ZIP. Es el unico fallo de git con causa conocida y benigna, y por eso tiene su
+// propio mensaje en vez de caer en el generico de abajo.
 const sinRepositorio =
   diff.status !== 0 && /not a git repository/i.test(`${diff.stderr ?? ''}`);
 
@@ -234,7 +241,30 @@ if (sinRepositorio) {
   );
 }
 
-if (diff.status !== 0) {
+// Cualquier otro fallo de git: no se pudo preguntar, asi que no hay respuesta. Se
+// muestra lo que dijo git, porque sin eso el aviso no se puede accionar.
+if (diff.error || (diff.status !== 0 && diff.status !== 1)) {
+  const dijo = `${diff.stderr ?? ''}`.trim() || `${diff.stdout ?? ''}`.trim();
+
+  veredicto(
+    'VERIFICACION PARCIAL  ***  ESTO NO ES UN EXITO  ***',
+    [
+      'Comprobado : el CSS corresponde a su fuente.',
+      `NO comprobado: si esta commiteado. git fallo con el codigo ${diff.status}.`,
+      '',
+      'Esto NO es un CSS desfasado: es git que no pudo responder.',
+      '',
+      'Lo que dijo git:',
+      ...(diff.error ? [`  ${diff.error.message}`] : []),
+      ...(dijo ? dijo.split('\n').map((l) => `  ${l}`) : ['  (no dijo nada)']),
+      '',
+      `git usado: ${git}`,
+    ],
+    PARCIAL
+  );
+}
+
+if (diff.status === 1) {
   veredicto(
     'DESFASADO',
     [

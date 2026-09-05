@@ -1,6 +1,6 @@
 # Épica 20 · Persistencia de preguntas
 
-**Estado:** ⚪ No iniciada
+**Estado:** 🔵 En curso
 **Depende de:** épica 10
 
 ## Problema
@@ -37,7 +37,7 @@ instantánea versionada.
 
 | # | Iteración | Estado |
 |---|---|---|
-| 21 | Modelo de datos del banco | ⚪ No iniciada |
+| 21 | Modelo de datos del banco | 🔵 Criterios cumplidos, cierre formal pendiente |
 | 22 | Lectura, validación e instantánea | ⚪ No iniciada |
 | 23 | Administración del contenido | ⚪ No iniciada |
 | 24 | Migración y ampliación | ⚪ No iniciada |
@@ -49,3 +49,34 @@ la sustituye por D1. La ventaja que motivaba la hoja —editar sin tocar código
 conserva, pero se traslada a la iteración 23: con una base de datos, esa comodidad
 ya no viene incluida y hay que construirla deliberadamente. Es el principal costo
 del cambio y conviene tenerlo presente.
+
+## Estado de la épica, al 2026-09-05
+
+La **iteración 21** tiene sus siete criterios de aceptación cumplidos con evidencia,
+la última de ella producida por el ensayo remoto contra la base de pruebas del
+2026-09-05, que cerró los tres veredictos de `verificar-banco`. El cierre formal lo
+hace el autor.
+
+Lo que la iteración 21 deja hecho y que las siguientes dan por sentado:
+
+- El esquema del banco existe, versionado en `d1/migraciones/001-banco-de-preguntas.sql`
+  y documentado campo por campo en `90-manual/esquema-del-banco.md`.
+- Los dos orígenes caben en él sin pérdida: la columna `origen` distingue `json_2026`
+  de `js_2026`, y la correcta se identifica igual viniendo de una letra o de un
+  índice (ADR-019).
+- La vista `pregunta_activa` es lo único que leerá `functions/api/`. El filtro por
+  estado vive ahí, así que ninguna consulta puede olvidarlo. **La iteración 22 lee de
+  la vista, no de las tablas.**
+- Hay un guardián con tres veredictos, `verificar-banco`, probado en local y en la
+  nube.
+
+Lo que **no** deja hecho, y que hay que tener presente al planificar:
+
+- **El esquema no está aplicado en producción**, y `prueba_tuberia` sigue ahí. Va en
+  la iteración 24, y la migración 001 **no** borra esa tabla: hace falta un `DROP`
+  escrito a mano.
+- **El banco real no está cargado.** Hay diez filas de ejemplo. Las 368 preguntas se
+  cargan en la iteración 24, así que la iteración 22 trabajará contra un banco de
+  juguete.
+- **Ninguna pregunta tiene justificación escrita.** La columna existe y admite nulo a
+  propósito.

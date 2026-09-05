@@ -45,7 +45,7 @@
  *      npm run datos:verificar-banco -- --remote        (lo ejecuta el autor)
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -114,11 +114,119 @@ const base = conBase ? conBase.slice('--base='.length) : BASE_POR_OMISION;
 const extra = argumentos.filter((a) => a !== conBase);
 const destino = extra.some((a) => a === '--remote' || a === '--local') ? extra : ['--local', ...extra];
 
-const parametros = ['d1', 'execute', base, ...destino, '--json', `--file=${CONSULTA}`];
+// ---------------------------------------------------------------------------
+// El nombre de la base tiene que estar declarado en wrangler.toml (H-015)
+//
+// En remoto, wrangler NO usa wrangler.toml como limite: si el nombre no esta ahi,
+// lo busca en la cuenta y lo encuentra igual. O sea que el archivo no acota nada y
+// lo unico que decide contra que base se escribe es lo que se teclea. Una errata en
+// el nombre no rebota contra nada.
+//
+// Aca se le devuelve ese papel de limite, al menos en los caminos que pasan por el
+// proyecto: solo se aceptan los `database_name` declarados. Se lee con una
+// expresion regular en vez de un analizador de TOML porque una dependencia nueva
+// necesita ADR, y lo que hay que reconocer es una linea de forma fija.
+//
+// La salida explicita es PERMITIR_BASE_NO_DECLARADA=1, y su caso de uso legitimo
+// esta escrito en 90-manual/esquema-del-banco.md: provocar el veredicto
+// NO SE PUDO VERIFICAR con un nombre que no existe en la cuenta.
+// ---------------------------------------------------------------------------
+
+const CONFIGURACION = join(RAIZ, 'wrangler.toml');
+
+if (process.env.PERMITIR_BASE_NO_DECLARADA !== '1') {
+  let declaradas = [];
+
+  try {
+    declaradas = [...readFileSync(CONFIGURACION, 'utf8').matchAll(/^\s*database_name\s*=\s*"([^"]+)"/gm)].map(
+      (m) => m[1]
+    );
+  } catch (error) {
+    sinVeredicto(`No pude leer ${CONFIGURACION} para comprobar el nombre de la base: ${error.message}`, [], null);
+  }
+
+  if (declaradas.length === 0) {
+    sinVeredicto(
+      `No encontre ningun \`database_name\` en ${CONFIGURACION}.`,
+      ['Sin esa lista no puedo comprobar que la base pedida sea una de las del proyecto.'],
+      null
+    );
+  }
+
+  if (!declaradas.includes(base)) {
+    veredicto(
+      'BASE NO DECLARADA  ***  H-015  ***',
+      [
+        `Pediste la base «${base}», que no esta declarada en wrangler.toml.`,
+        '',
+        `Declaradas: ${declaradas.join(', ')}`,
+        '',
+        'Wrangler la aceptaria igual en remoto —busca el nombre en la cuenta— y por',
+        'eso este envoltorio se planta antes: una errata en el nombre no rebota',
+        'contra ninguna otra cosa. Ver H-015.',
+        '',
+        'Si el nombre es el que querias y sabes lo que haces:',
+        '',
+        '  PowerShell:  $env:PERMITIR_BASE_NO_DECLARADA=1',
+        '  Git Bash:    PERMITIR_BASE_NO_DECLARADA=1 npm run ...',
+        '',
+        'No se comprobo nada del banco.',
+      ],
+      SIN_VEREDICTO
+    );
+  }
+}
+
+// Capa 3 de la barrera de ADR-015 (H-014): este envoltorio es el camino
+// documentado hacia la nube, asi que es por donde se cometen los errores normales.
+// Se niega salvo que quien lo corre lo pida a proposito con una variable, que es
+// justo lo que un andamiaje equivocado no hace.
+if (destino.includes('--remote') && process.env.PERMITIR_REMOTO !== '1') {
+  veredicto(
+    'ME NIEGO A CORRER ESTO  ***  ADR-015  ***',
+    [
+      'Pediste --remote, que habla con la cuenta de Cloudflare.',
+      '',
+      'Claude Code no ejecuta wrangler contra la cuenta: los comandos remotos los',
+      'escribe, y los ejecuta el autor en su terminal. Ver ADR-015 y H-014.',
+      '',
+      'Si eres el autor y esto es tu terminal, vuelve a lanzarlo asi:',
+      '',
+      '  PowerShell:  $env:PERMITIR_REMOTO=1; npm run datos:verificar-banco -- --remote',
+      '  Git Bash:    PERMITIR_REMOTO=1 npm run datos:verificar-banco -- --remote',
+      '',
+      'No se comprobo nada del banco.',
+    ],
+    SIN_VEREDICTO
+  );
+}
+
+// La consulta se envia como texto con `--command`, no con `--file`.
+//
+// No es un detalle de estilo. Contra una base remota, `wrangler d1 execute --file=`
+// sube el archivo por el extremo de IMPORTACION —el camino de escritura— y wrangler
+// avisa de que la base puede quedar sin servir consultas mientras dura. Para una
+// consulta que solo lee, eso es tomar la puerta equivocada. `--command` va por el
+// extremo de consulta. Se descubrio al reconstruir el incidente de H-014, cuyo
+// registro muestra dos POST contra `/import` para ejecutar un unico SELECT.
+//
+// Los argumentos viajan como arreglo y sin shell, asi que el texto de la consulta
+// —con sus saltos de linea y sus comillas— llega intacto.
+let consulta;
+
+try {
+  consulta = readFileSync(CONSULTA, 'utf8');
+} catch (error) {
+  sinVeredicto(`No pude leer la consulta en ${CONSULTA}: ${error.message}`, [], null);
+}
+
+const parametros = ['d1', 'execute', base, ...destino, '--json', `--command=${consulta}`];
 
 // Solo para mostrarlo cuando algo falle. No se ejecuta: los argumentos van como
-// arreglo, nunca como texto.
+// arreglo, nunca como texto. La consulta entera se resume: son dos mil caracteres
+// que taparian el resto, y lo que hay que poder leer de un vistazo son los flags.
 const comando = [process.execPath, WRANGLER, ...parametros]
+  .map((t) => (t.startsWith('--command=') ? `--command=<${CONSULTA}>` : t))
   .map((t) => (/\s/.test(t) ? `"${t}"` : t))
   .join(' ');
 

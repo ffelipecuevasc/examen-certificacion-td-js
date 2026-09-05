@@ -22,6 +22,7 @@ puede seguirse sin saber programar, está mal escrito.
 | [La capa de datos y las bases D1](capa-de-datos-y-base-d1.md) | Iteraciones 12 y 13 | 🟢 Escrito |
 | [Respaldo y restauración de la base](respaldo-y-restauracion.md) | Iteración 13 | 🟢 Escrito |
 | [Esquema del banco de preguntas en D1](esquema-del-banco.md) | Iteración 21 | 🟢 Escrito |
+| [La barrera de ADR-015](barrera-adr-015.md) | Iteración 21 (H-014) | 🟢 Escrito |
 | Cómo editar el banco de preguntas | Iteración 11 | ⚪ Pendiente |
 | Cómo publicar una actualización del sitio | Iteración 41 | ⚪ Pendiente |
 | Configuración manual de Cloudflare | Iteraciones 42 y 43 | ⚪ Pendiente |

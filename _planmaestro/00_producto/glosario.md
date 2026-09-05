@@ -94,3 +94,57 @@ la clase `icon` que aporta el mecanismo. Ambas son necesarias.
 
 **Panel fijo.** Mitad izquierda de `cuestionario.html`, que permanece a la vista
 mientras la mitad derecha se desplaza.
+
+## Del esquema del banco en D1
+
+*Añadidos en la iteración 21, al cerrar el modelo de datos.*
+
+**Origen.** De qué banco viene una pregunta: `json_2026` son los siete
+`modulo-0N.json` escritos en 2026, `js_2026` es el banco viejo de
+`static/js/data/cuestionario.js`. Se guarda porque los dos siguen conviviendo
+(ADR-016) y porque sin él no se puede rastrear una pregunta hasta su archivo.
+
+**Número de origen.** El número que la pregunta tenía en su archivo de procedencia:
+el `numero` del JSON o la posición en el archivo viejo. No es su identidad —esa es
+el `id` de D1— pero es lo que permite encontrarla en la fuente.
+
+**Estado de una pregunta.** `borrador`, `activa` o `retirada`. Solo las activas se
+muestran. Una retirada nunca se borra: conserva su motivo y su fecha (ADR-020).
+
+**Retirada.** Pregunta que sale del banco sin salir de la base. Lleva
+`motivo_retiro` obligatorio y puede apuntar a la que la reemplaza.
+
+**Vista `pregunta_activa`.** Única cosa que leen las funciones de `functions/api/`.
+Trae la pregunta cruzada con su módulo y sin los metadatos de retiro. El filtro por
+estado vive en la vista, así que ninguna consulta puede olvidarlo.
+
+**Bandera de correcta.** La columna `es_correcta` de la alternativa. La correcta
+está atada a la alternativa, no a su letra ni a su posición, que es lo que permite
+barajar (ADR-019).
+
+**Índice único parcial.** Índice con `WHERE` que solo cubre parte de las filas. Aquí
+fuerza que haya como mucho una alternativa correcta por pregunta, sin impedir que
+haya tres incorrectas.
+
+## De la verificación y la barrera
+
+*Añadidos en la iteración 21, tras H-013 y H-014.*
+
+**Veredicto.** Salida de un guion de verificación: una palabra clara y un código de
+salida. Todos los guiones del proyecto tienen **tres**, nunca dos, porque «no pude
+comprobarlo» no es ni un aprobado ni un rechazo (regla de H-013).
+
+**No-veredicto.** El tercer estado: `NO SE PUDO VERIFICAR`, `VERIFICACION PARCIAL`,
+`NO SE PUDO COMPROBAR`. Dice que nadie llegó a mirar. **No es un aprobado.**
+
+**Barrera de ADR-015.** Conjunto de cuatro capas técnicas que impiden que Claude
+Code alcance la cuenta de Cloudflare. La que sostiene es el entorno sin
+credenciales; las demás avisan. Documentada en `90-manual/barrera-adr-015.md`.
+
+**Testigo.** Archivo con la hora que un guion deja al correr, para que otro pueda
+comprobar que de verdad se ejecutó. `.wrangler/barrera-ultimo-uso.txt` lo usa para
+distinguir un enganche **declarado** de uno **vivo**.
+
+**Salida explícita.** Variable de entorno de nombre largo que desactiva a propósito
+una comprobación: `PERMITIR_REMOTO`, `PERMITIR_BASE_NO_DECLARADA`. Existen para que
+saltarse la regla sea un acto deliberado y no una inercia.
