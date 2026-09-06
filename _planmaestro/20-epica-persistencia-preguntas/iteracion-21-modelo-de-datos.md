@@ -1,7 +1,7 @@
 # Iteración 21 · Modelo de datos del banco
 
 **Épica:** 20 · Persistencia de preguntas
-**Estado:** 🔵 En curso · los siete criterios cumplidos con evidencia; el cierre formal lo hace el autor
+**Estado:** 🟢 Completada · **Cerrada:** 2026-09-05
 **Depende de:** épica 10 cerrada
 
 ## Objetivo

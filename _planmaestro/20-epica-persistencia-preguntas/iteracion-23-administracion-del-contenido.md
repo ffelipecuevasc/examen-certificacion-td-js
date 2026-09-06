@@ -35,6 +35,43 @@ Hay al menos tres caminos, y ninguno es evidentemente mejor:
 Evalúa cada uno contra el escenario real de uso y contra ADR-009. Si eliges el
 panel, la autenticación es parte del alcance de esta iteración, no un pendiente.
 
+## Dependencia de la iteración 24, anotada el 2026-09-05 antes de empezar
+
+Se mantiene el orden **23 y después 24**, por decisión del autor. La consecuencia se
+escribe aquí para que no aparezca al final como un olvido.
+
+**La herramienta de administración se construye y se prueba contra diez filas de
+juguete.** El banco real se carga en la iteración 24, así que todo lo que esta
+iteración demuestre —editar una pregunta, cargar un lote, rechazar contenido
+inválido, registrar la fecha de modificación— se demuestra sobre un banco de ejemplo
+y contra la base local o la de pruebas. Es el mismo riesgo asumido que ADR-024 dejó
+escrito para la iteración 22, y vale igual aquí: con diez filas se prueba que el
+mecanismo existe, no que aguante el banco real.
+
+**Y hay una cosa que directamente no se puede cerrar en esta iteración:** el
+procedimiento en un solo bloque que encarga ADR-023 —editar, exportar
+`d1/respaldo-banco.sql`, regenerar la instantánea, publicar— **no se puede recorrer de
+punta a punta**, porque su último tramo toca producción y producción no tiene ni
+esquema ni banco hasta la 24. El bloque se escribe aquí; se **camina** allá.
+
+De ahí sale una dependencia explícita sobre dos criterios de esta iteración:
+
+| Criterio | Qué sí se cierra aquí | Qué queda dependiendo de la 24 |
+|---|---|---|
+| «El autor puede corregir una pregunta y ver el cambio en el sitio sin publicar el repositorio» | Que el mecanismo escribe en la base y que el sitio lee el cambio sin ningún despliegue, comprobado contra la base local o la de pruebas | Que ocurra sobre el **sitio publicado y el banco real**. Hoy `main` está retenido y producción está vacía |
+| «La instantánea queda actualizada tras una edición, y se demuestra» | Que editar dispara la regeneración y que el archivo cambia, con su sello | Que la instantánea regenerada sea la del **banco real**, generada desde producción. Es el mismo criterio que la iteración 22 ya aplazó a la 24 |
+
+**Cómo se cierra sin trampa.** Los dos criterios se marcan en esta iteración con la
+evidencia que sí existe —el mecanismo, sobre el banco de juguete— y con el tramo
+pendiente nombrado en la propia casilla, igual que se hizo en la 22. El recorrido
+completo del procedimiento es la última tarea de la iteración 24, junto con la
+publicación.
+
+**Lo que no vale**: dar por comprobado el bloque de ADR-023 porque esté escrito. Un
+procedimiento que nadie ha recorrido entero es una hipótesis con formato de lista, y
+esta es exactamente la ADR que se advirtió a sí misma que quedaría incumplida sin que
+nadie lo notara.
+
 ## Tareas
 
 - [ ] Resolver el mecanismo de administración y documentarlo como ADR, con las

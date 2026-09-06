@@ -38,6 +38,14 @@ Sequelize».
 - [ ] Rendir otro intento produce una selección distinta.
 - [ ] Un intento en que se agota el tiempo total llega igualmente a un resumen
       coherente.
+- [ ] **Ninguna palabra de esta pantalla sugiere validez de certificación.** De
+      **ADR-022**: no aparece «puntaje oficial», «nota», «calificación», «aprobado» ni
+      «reprobado». Sí aparecen los aciertos, el desglose por módulo y el tiempo. Se
+      comprueba leyendo el texto de la pantalla, no el código. **El motivo no se
+      escribe en pantalla**: es una decisión interna —el simulacro no puede garantizar
+      que nadie haya visto las respuestas antes de responder— y el estudiante no tiene
+      por qué cargar con un descargo antes de estudiar. Lo que la decisión produce es
+      este límite de vocabulario, y nada más.
 
 ## Notas de la iteración
 

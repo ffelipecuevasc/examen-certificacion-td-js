@@ -64,6 +64,27 @@ ser de origen externo y el escapado deja de ser una precaución para volverse un
 requisito de seguridad. La regla es de doble filo: validar al escribir en la base y
 escapar al insertar en el DOM.
 
+**Actualización del 2026-09-05 (iteración 22) · la protección del ícono pasó de
+accidental a deliberada, y hay que dejarlo dicho.**
+
+Al probar el escapado contra contenido hostil apareció un caso que el enunciado de este
+hallazgo no cubría: el **nombre del ícono del módulo** es el único dato del banco que se
+dibuja **dentro de un atributo HTML** (`class="icon i-…"`) y no como texto. Ahí el
+carácter peligroso no es `<` sino la comilla doble, porque quien la controle cierra el
+atributo y abre otro.
+
+Lo cubre `icon()`, que escapa su argumento. **Pero lo cubría por una decisión tomada en
+otra iteración y por otro motivo** —una precaución de presentación, de cuando los datos
+venían del propio repositorio—, así que hasta ahora era una protección accidental: nadie
+la había puesto ahí pensando en una inyección, y nadie la habría echado de menos al
+quitarla.
+
+Desde el 2026-09-05 ya no lo es. El guardián `scripts/probar-escapado.mjs` prueba ese
+caso explícitamente, con el ícono envenenado en la base, y falla nombrándolo si el
+escapado de `icon()` desaparece. **Queda escrito para que nadie toque `icon()` creyendo
+que sólo afecta a la presentación: su escapado es parte de la barrera de seguridad**, y
+el sitio de esa advertencia dirigida a personas es `90-manual/escapado-del-banco.md`.
+
 ### H-004 · Sesgo en la posición de la respuesta correcta
 **Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Fecha:** 2026-09-02
 
@@ -874,3 +895,254 @@ Fue una decisión de H-013 tomada por otro motivo, y aquí se cobró sola.
 **Propuesta.** Ninguna acción sobre el código. Se convive con él. Si algún guion nuevo
 envuelve a wrangler, la regla es la misma: **el código de salida se mira, pero no
 decide**. Si algún día wrangler lo corrige, esta entrada se puede cerrar sin más.
+
+### H-017 · El guardián del escapado dejaba el contenido hostil dentro de la base local
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 22 · **Fecha:** 2026-09-05
+
+**Síntoma.** Después de provocar a propósito el veredicto `NO SE PUDO PROBAR` —apuntando
+el guardián a un puerto sin servidor—, la base D1 **local** se quedó con la pregunta
+hostil 900, sus cuatro alternativas y el ícono del módulo 2 envenenado
+(`devices" onload="…`). Comprobado consultando la base al día siguiente de esa corrida:
+la fila seguía dentro.
+
+**Causa.** `process.exit()` **no ejecuta los bloques `finally`**. La limpieza vivía en un
+`finally`, y la salida sin veredicto era un `process.exit(2)` escrito **dentro del
+`try`**, después de haber cargado el contenido hostil. El archivo estaba bien pensado y
+mal ordenado: cada vez que la prueba se cortaba sin veredicto —que es justo el caso que
+más se repite, porque basta con no tener el servidor levantado— el veneno se quedaba.
+
+**Impacto.** Sólo local; el guardián nunca toca la nube. Pero el momento en que se
+descubrió dice el daño: el autor iba a abrir el navegador para cerrar el criterio de que
+«`cuestionario.html` muestra las preguntas de D1», y se habría encontrado una pregunta
+de ataque y un ícono roto **sin que nada se lo anunciara**. Habría dudado del sitio, que
+estaba bien, en vez de dudar de la prueba, que era la que ensuciaba.
+
+Y es peor que un error de una vez, porque es del tipo que se esconde: la corrida
+siguiente vuelve a cargar el contenido hostil, así que el rastro se pisa solo y parece
+que nunca pasó.
+
+**Resolución.** Tres cambios, y ninguno de los tres es «acordarse de limpiar»:
+
+1. **El sondeo del servidor va antes de cargar nada.** Si no hay con qué probar, no se
+   ensucia la base: no hay veneno que retirar y el veredicto 2 es inofensivo por
+   construcción, no por cuidado.
+2. **`sinVeredicto()` lanza, no sale.** El `process.exit()` quedó fuera de todo `try`,
+   en un único sitio al final del guion, así que el `finally` siempre corre.
+3. **La limpieza se comprueba, no se supone.** Después de aplicar el `.sql` de limpieza,
+   el guardián consulta la base y confirma que la fila 900, sus alternativas y el ícono
+   quedaron como estaban. Si no, hay un cuarto veredicto —`BASE SUCIA`, código 3— que lo
+   dice a gritos y explica cómo retirarlo a mano. Y si no se pudo **preguntar**, dice eso
+   y no afirma que esté limpia: es la distinción de H-013 aplicada a su propia limpieza.
+
+**Reglas que deja.**
+
+- **Un `finally` no garantiza nada si en el mismo bloque hay un `process.exit()`.** Vale
+  para cualquier guion futuro de este proyecto que tenga que deshacer lo que hizo.
+- **Limpiar no es lo mismo que estar limpio.** Lo primero es haber lanzado un comando; lo
+  segundo es un hecho sobre la base, y se comprueba preguntándole a la base. Es la misma
+  diferencia entre «enganche declarado» y «enganche vivo» que costó un día en H-014.
+- **Una prueba que ensucia el entorno tiene que dejar peor rastro que el que borra.** Si
+  el fallo de la prueba se disfraza de fallo del sitio, la prueba pasa a costar más de lo
+  que protege.
+
+### H-018 · El respaldo no se activaba si el que contestaba devolvía un error en JSON ajeno
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 22 · **Fecha:** 2026-09-05
+
+**Síntoma.** Provocando la caída de la capa de datos con `npm run serve:dist` —el sitio
+servido como archivos estáticos, sin funciones—, el cuestionario **no cargó la
+instantánea**: dibujó cero preguntas, sin aviso de respaldo, y el pie dijo «No se pudo
+contactar la capa de datos». O sea: el respaldo existía, estaba bien generado, el sitio
+lo tenía a mano, y no se usó.
+
+**Causa.** El cliente daba por hecho que todo JSON que llegara de `/api/` era **su** JSON.
+`servicios/datos.js` filtraba por `content-type` —esa parte estaba bien y su comentario
+nombra este mismo escenario— y después leía `usar_respaldo` del cuerpo:
+
+```js
+usar_respaldo: Boolean(cuerpo?.error?.usar_respaldo)
+```
+
+`serve` mira la cabecera `accept` y responde su 404 en JSON:
+`{"error":{"code":"not_found","message":"..."}}`. Ese sobre pasa el filtro de
+`content-type`, trae un `error` que no es el nuestro, y no trae `usar_respaldo`.
+`Boolean(undefined)` es `false`, así que el sitio concluía **«esto no es un fallo del
+servicio»** y se quedaba sin banco y sin respaldo.
+
+Lo afinado del caso es de dónde salía el `false`: no de un error, sino de un valor
+ausente convertido a booleano. La expresión se lee como una precaución —«si no lo dice,
+no lo asumas»— y en este sentido la precaución estaba al revés.
+
+**Impacto.** El modo degradado de ADR-008 no se activaba ante cualquier intermediario
+que conteste JSON sin seguir el contrato de `functions/api/_comun.js`: un servidor de
+archivos estáticos, un proxy, la página de error de una plataforma. Es la promesa
+central de ADR-008 —que el estudiante no se quede ante una página vacía— fallando
+exactamente el día que tenía que cumplirse. Y fallando en silencio: en el camino feliz
+todo funciona igual, así que sin provocar la caída no se ve nunca.
+
+**Resolución.** Un sobre que no es el nuestro significa que **no llegamos a la capa de
+datos**, y eso ya tenía nombre: `SIN_RESPUESTA`, con `usar_respaldo: true`. Se reconoce
+el sobre propio por sus tres marcas —`ok: false`, un `codigo` de texto y un
+`usar_respaldo` booleano— y cualquier otra cosa cae en el respaldo. Sólo se lee
+`usar_respaldo` de quien lo declara.
+
+**Reglas que deja.**
+
+- **Reconocer el sobre antes de leerlo por dentro.** Vale para todo lo que llegue de
+  fuera: comprobar la forma completa antes de creérsela es la regla 2 de H-013, y aquí
+  se cobró en el cliente en vez de en un guion.
+- **Un valor ausente no es un `false`.** `Boolean(x?.y)` mezcla «dijo que no» con «no
+  dijo nada», y son decisiones distintas. Cuando la diferencia decide si se activa un
+  respaldo, hay que separarlas a mano.
+- **Lo encontró provocar la caída, no leer el código.** El criterio de la iteración 22
+  decía «se demuestra provocando la caída» justamente por esto, y el defecto llevaba
+  escrito desde la iteración 12 sin que ninguna lectura lo viera.
+
+### H-019 · El generador tapaba el error de wrangler con un fallo de sintaxis propio
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 22 · **Fecha:** 2026-09-05
+
+**Síntoma.** Primera ejecución del generador contra la nube, por el autor, idéntica en
+PowerShell y en Git Bash:
+
+```
+NO SE PUDO GENERAR *** ESTO NO ES UN APROBADO ***
+No pude interpretar la respuesta de wrangler: Unexpected non-whitespace character
+after JSON at position 99 (line 5 column 6)
+```
+
+**Lo que se pensó primero, y por qué no era eso.** La primera lectura —del autor, y
+razonable— fue que el generador manda dos consultas en un solo comando y wrangler
+devuelve un documento JSON por cada una, uno detrás de otro. **Comprobado, y no es así:**
+
+- En el código de wrangler hay **una sola** impresión, `logger.log(JSON.stringify(response, null, 2))`
+  (`wrangler-dist/cli.js:223739`), y la comparten el camino local y el remoto: `executeSql`
+  devuelve un valor y el que manda a imprimir es el mismo para los dos.
+- Comprobado también en local con las mismas dos consultas del generador: llega **un
+  arreglo con dos bloques**, no dos documentos.
+
+Queda escrito porque la hipótesis era plausible y habría llevado a escribir un
+interpretador de varios documentos que no hacía falta, dejando el defecto real dentro.
+
+**Causa.** Con `--json`, wrangler tiene **dos formas legítimas de respuesta y las dos
+salen por la salida normal**: el arreglo de resultados cuando la consulta funciona, y un
+objeto de error cuando no. Lo segundo, reproducido en local:
+
+```
+$ wrangler d1 execute … --local --json --command="SELECT id FROM tabla_que_no_existe;"
+{
+  "error": {
+    "text": "no such table: tabla_que_no_existe: SQLITE_ERROR"
+  }
+}
+```
+
+El generador conocía sólo la primera forma. Y para encontrarla hacía algo que parecía
+prudente y no lo era: **empezar a interpretar desde el primer `[` de la salida.** Contra
+la nube el fallo llega como `APIError`, que además de `text` trae `notes`, que es un
+**arreglo**; ese `[` es el primero de la salida, así que el interpretador arrancaba
+dentro del error, se comía el arreglo de notas y reventaba en la coma siguiente.
+Reproducido con un sobre de `APIError` armado igual que el de `cli.js:223743`:
+
+```
+primer [ en la posicion 111 -> cae dentro de notes
+ERROR: Unexpected non-whitespace character after JSON at position 77 (line 5 column 6)
+```
+
+**La misma línea y la misma columna que reportó el autor.** La posición difiere sólo
+porque el texto de la nota no es idéntico.
+
+**Impacto.** Ninguno sobre los datos: el guion falló bien —no escribió nada y dejó
+intacta la instantánea anterior—. El daño fue de otro tipo y es el que importa: **el
+mensaje que explicaba todo se perdió.** Lo que wrangler había dicho era `no such table:
+…`, es decir «esa base no tiene el esquema», que es exactamente el diagnóstico; lo que
+llegó a la pantalla fue un error de sintaxis sobre un carácter en la posición 99. Es la
+familia de H-013 —un envoltorio que anuncia su propio fallo como si fuera del sistema—
+cometida otra vez, en un envoltorio nuevo, después de haberla catalogado.
+
+**Resolución.**
+
+1. **Se interpreta la salida entera**, no desde el primer corchete. Con `--json`
+   wrangler baja su propio nivel de registro, así que la salida normal trae un único
+   documento y nada más: buscar dónde empieza era resolver un problema que no existía.
+2. **Se reconoce el sobre de error** y se muestra su `text` y todas sus `notes` como lo
+   primero de la pantalla, antes del párrafo de siempre. Con una pista añadida: si dice
+   «no such table», esa base todavía no tiene el esquema.
+3. **Si no se entiende nada, se muestra crudo lo que wrangler dijo** por las dos salidas.
+   Antes, en ese camino sólo se veía el mensaje de la excepción.
+
+Reproducido de punta a punta borrando la vista `pregunta_activa` de la base local:
+`no such table: pregunta_activa: SQLITE_ERROR`, con su pista. Vista repuesta después
+desde la migración, y comprobado que vuelve a devolver las 8 activas.
+
+**Reglas que deja.**
+
+- **Un envoltorio tiene que conocer todas las formas en que su herramienta puede
+  contestar, y la forma del error es una de ellas.** Se conocía la buena y se dio por
+  hecho que no había otra.
+- **No se empieza a interpretar «desde donde parezca que empieza».** Buscar el primer
+  corchete es adivinar; si la respuesta viene de una herramienta que documenta su
+  formato, se interpreta entera o no se interpreta.
+- **Y la que más cuesta: se prueban los fallos que la herramienta puede entregar, no
+  sólo los que uno inventa.** El generador se entregó con «tres veredictos provocados»,
+  y los tres eran situaciones inventadas por mí —banco vacío, instantánea que se
+  pisaría—. **La consulta que falla no la probé ni una vez, y era reproducible en local
+  desde el primer día.** No fue que las pruebas locales no pudieran ver esto: fue que no
+  se hicieron.
+
+### H-020 · `package.json` no declara `"type": "module"`, y Node reinterpreta cada módulo del sitio
+**Gravedad:** 🟡 · **Estado:** ⚪ Abierto · **Detectado en:** iteración 22 · **Fecha:** 2026-09-05
+
+**Síntoma.** Todo guion de Node que importa código del sitio imprime, antes de su
+salida real:
+
+```
+(node:21288) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///…/functions/api/preguntas.js
+is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to …\package.json
+```
+
+Aparece en las dos corridas del generador contra la nube, en PowerShell y en Git Bash,
+y también en el guardián del escapado.
+
+**Causa.** El proyecto escribe **módulos ES** en todas partes: las páginas los cargan con
+`<script type="module">`, los guiones usan `import`, y la capa de datos también. Pero
+`package.json` no lo declara, así que para Node cada archivo `.js` es CommonJS **hasta
+que se demuestre lo contrario**: intenta interpretarlo como tal, falla, detecta sintaxis
+de módulo y lo vuelve a interpretar. El aviso es Node diciendo que hizo el trabajo dos
+veces.
+
+Es una **inconsistencia entre lo que el proyecto es y lo que declara ser**: se decidió
+JavaScript ES6+ con módulos ES como stack (CLAUDE.md, y sin ADR que lo contradiga), y el
+archivo que anuncia el paquete sigue sin decirlo.
+
+**Impacto.** Ninguno sobre el sitio: el navegador no mira `package.json`, y Cloudflare
+compila `functions/` por su cuenta. Sólo afecta a los guiones que corren en Node —el
+guardián del escapado y el generador de la instantánea— y el costo directo es una
+segunda pasada de análisis por archivo importado, que es despreciable.
+
+**El impacto real es otro, y es el que justifica anotarlo:** es un aviso que sale
+**siempre**, encima de la salida de dos guardianes cuyo valor depende de que su salida se
+lea. Este proyecto ya tiene catalogado ese daño —H-012, y la regla de que un aviso que
+aparece en cada corrida enseña a ignorar los avisos—. Un veredicto importante escondido
+detrás de cuatro líneas de ruido rutinario es exactamente la forma en que se dejan de
+leer los veredictos.
+
+**Propuesta.** Adoptar en la declaración lo que ya se practica en el código:
+
+1. Añadir `"type": "module"` a `package.json`.
+2. Renombrar `tailwind.config.js` a **`tailwind.config.cjs`**. Es el **único** archivo
+   CommonJS del proyecto —comprobado el 2026-09-05 buscando `module.exports` y `require(`
+   en la raíz y en `scripts/`— y bajo `"type": "module"` dejaría de cargarse. Tailwind
+   3.4 descubre `tailwind.config.cjs` por su cuenta, y ningún comando del proyecto lo
+   nombra con `--config`: sólo lo menciona `README.md`, en el árbol de archivos, que hay
+   que actualizar en la misma pasada.
+3. Los `scripts/*.mjs` no se tocan: la extensión ya declara lo que son.
+
+**Cómo se comprueba que quedó bien.** `npm run build`, `npm run verificar` y
+`npm run probar:escapado` corren sin el aviso y con los mismos veredictos que antes. Si
+Tailwind no encontrara su configuración, el CSS saldría sin la paleta del proyecto y
+`verificar` lo vería como un desfase: el fallo sería ruidoso, no silencioso.
+
+**Por qué no se hizo al detectarlo.** Queda fuera del alcance de la iteración 22 —toca la
+construcción, no la persistencia de preguntas— y el autor pidió expresamente no tocarlo
+en esa iteración. Anotado también en el registro.

@@ -39,7 +39,27 @@ en la iteración 42.
 
 - Guardar el historial de intentos. Está en `registro_log.md` como idea futura.
 - Cualquier forma de impedir que el estudiante inspeccione las respuestas: el sitio
-  es estático y eso es una consecuencia asumida en ADR-001.
+  es estático y eso es una consecuencia asumida en ADR-001. **Confirmado y cerrado
+  por ADR-022 el 2026-09-05:** la instantánea de respaldo incluye las respuestas
+  correctas, así que esto ya no es una limitación que algún día se levante — es
+  definitivo mientras exista el respaldo.
+
+## Restricción de vocabulario, vinculante para toda la épica
+
+*De ADR-022, 2026-09-05.* El simulacro es un **instrumento de estudio**, no un
+instrumento de evaluación con validez: no puede garantizar que nadie haya visto las
+respuestas antes de responder, porque viajan en un archivo versionado de un
+repositorio público.
+
+Eso **no** se le advierte al estudiante en pantalla. Se aplica como límite de lo que la
+interfaz puede prometer:
+
+> **Ninguna pantalla de esta épica llama a su resultado «puntaje oficial», «nota»,
+> «calificación», «aprobado», «reprobado» ni ninguna fórmula que sugiera validez de
+> certificación.** Sí puede decir cuántas acertó, en qué módulos falló y cuánto tardó.
+
+Está escrito como una lista de palabras y no como un principio porque quien redacte esa
+pantalla puede no haber leído la ADR, y un principio no lo detiene.
 
 ## Iteraciones
 

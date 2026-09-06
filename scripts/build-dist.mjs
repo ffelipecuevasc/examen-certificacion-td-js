@@ -146,7 +146,16 @@ function resolver(desde, rel) {
 function referencias(ruta, texto) {
   const crudas = ruta.endsWith('.html')
     ? [...texto.matchAll(/(?:src|href)="([^"]+)"/g)].map((m) => m[1])
-    : [...texto.matchAll(/import\s+(?:[^'"]*?from\s+)?['"]([^'"]+)['"]/g)].map((m) => m[1]);
+    : [
+        // Import normal: `import x from './y.js'` o `import './y.js'`.
+        ...texto.matchAll(/import\s+(?:[^'"]*?from\s+)?['"]([^'"]+)['"]/g),
+        // Import dinamico: `await import('./y.js')`. Se sigue desde la iteracion
+        // 22 por la instantanea de respaldo, que solo se carga asi. Es el camino
+        // que corre unicamente el dia que la capa de datos cae, o sea el dia en
+        // que una errata en la ruta no se puede arreglar: si no se comprueba
+        // aqui, no se comprueba en ninguna parte.
+        ...texto.matchAll(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/g),
+      ].map((m) => m[1]);
 
   return crudas
     .map((r) => r.split('#')[0].split('?')[0])
@@ -182,6 +191,36 @@ if (rotos.length) {
   for (const r of rotos) console.error(`  - ${r}`);
   console.error('La construccion se detiene: publicar asi dejaria recursos rotos en el sitio.');
   process.exit(1);
+}
+
+// ---------------------------------------------------------------------------
+// Aviso: de donde salio la instantanea que se va a publicar
+//
+// La instantanea es lo que ve el estudiante cuando la capa de datos cae. Generada
+// desde D1 local trae el banco de juguete, y publicarla asi es el fallo silencioso
+// que describe ADR-023: todo verde, archivo generado, y el error visible solo el
+// dia de la caida.
+//
+// No detiene la construccion a proposito: en desarrollo la instantanea local es la
+// normal, y fallar aqui dejaria el proyecto sin poder construirse. Lo que hace es
+// no dejar que pase inadvertido.
+// ---------------------------------------------------------------------------
+
+const INSTANTANEA = join(DESTINO, 'static', 'js', 'data', 'instantanea-banco.js');
+
+if (existsSync(INSTANTANEA)) {
+  const sello = readFileSync(INSTANTANEA, 'utf8').match(/"entorno":\s*"([^"]+)"/);
+
+  if (!sello) {
+    console.warn('AVISO: la instantanea no dice contra que base se genero (ADR-023).');
+  } else if (sello[1] !== 'nube') {
+    console.warn('');
+    console.warn('  AVISO  la instantanea del banco se genero desde la base LOCAL.');
+    console.warn('         Publicada asi, el respaldo del sitio es el banco de juguete.');
+    console.warn('         Regenerala contra la nube antes de publicar: el comando esta');
+    console.warn('         en la cabecera de scripts/generar-instantanea.mjs. Ver ADR-023.');
+    console.warn('');
+  }
 }
 
 console.log(`${copiados} entradas copiadas a ${DESTINO}/`);

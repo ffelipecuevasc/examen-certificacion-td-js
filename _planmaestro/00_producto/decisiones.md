@@ -28,6 +28,10 @@ lectura de datos y exige que el sitio siga siendo utilizable si esa capa cae.
 para quien inspeccione el código. ADR-007 abre la puerta a cambiar esto, pero
 mientras no se decida lo contrario, se asume.
 
+**Actualización · 2026-09-05.** Ya se decidió, y se decidió que no cambia: **ADR-022**
+cierra esa puerta a propósito. Las respuestas correctas son visibles, van a seguir
+siéndolo, y el simulacro no puede garantizar lo contrario.
+
 ---
 
 ## ADR-002 · Tailwind CSS compilado localmente, nunca por CDN
@@ -147,6 +151,13 @@ tratan en ADR-008, en el hallazgo H-008 y en la iteración 22 respectivamente.
 **Límite explícito.** El Worker sirve datos. No renderiza páginas, no gestiona
 sesiones ni identifica estudiantes. Ampliar su rol requiere una ADR nueva.
 
+**Actualización · 2026-09-05.** Esta ADR dejó abierta la pregunta de si el Worker
+debía dejar de enviar la respuesta correcta al navegador durante el simulacro, y
+validar del lado del servidor. **Esa pregunta quedó resuelta en contra por ADR-022**,
+que decide que la instantánea de respaldo incluya las respuestas correctas y, con
+ello, hace imposible ocultarlas. El pendiente no sigue abierto: está cerrado, y lo que
+se pierde está escrito en ADR-022. Lo demás de esta ADR sigue vigente.
+
 ---
 
 ## ADR-008 · Instantánea local de respaldo del banco
@@ -169,6 +180,11 @@ cuando se está usando el respaldo, nunca en silencio.
 
 **Consecuencia deseada.** El sitio conserva la propiedad de seguir siendo útil por
 sí solo, que es lo que ADR-001 protegía.
+
+**Actualización · 2026-09-05.** Dos decisiones de la iteración 22 desarrollan esta ADR
+en lo que dejaba sin decir: **ADR-022** fija que la instantánea incluye las respuestas
+correctas —sin ellas el modo degradado no puede corregir— y **ADR-023** fija que se
+genera desde la base de la nube y en el mismo acto que el respaldo de ADR-014.
 
 ---
 
@@ -916,3 +932,238 @@ violarla en la tabla que lo guarda.
 pasa hoy, y funciona mientras el banco venga del mismo repositorio. Deja de
 funcionar en cuanto el banco viene de D1: el sitio tendría que cruzar datos de dos
 fuentes distintas para dibujar el nombre de un módulo.
+
+---
+
+## ADR-022 · La instantánea incluye las respuestas correctas, y con eso el simulacro deja de poder ocultarlas
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-05 · **Sustituye a:** el pendiente abierto
+por ADR-007 sobre dejar de enviar la respuesta correcta al navegador durante el
+simulacro
+
+**Decisión.** La instantánea versionada de ADR-008 contiene el banco **completo**,
+incluida la respuesta correcta de cada pregunta. Y, como parte de la misma decisión y
+no como efecto colateral: **queda descartada** la idea —abierta por ADR-007 y anotada
+desde entonces en el registro— de que el Worker deje de enviar la respuesta correcta
+durante el simulacro y valide del lado del servidor. No se aplaza: se descarta, y esta
+ADR sustituye ese pendiente.
+
+**Motivo.** Un modo degradado que no puede corregir no sirve para nada. Sin la
+respuesta correcta, la instantánea deja al estudiante leyendo preguntas sin saber si
+acertó, que es exactamente el momento en que el respaldo tenía que salvarlo. El
+público de este sitio estudia desde el teléfono y con conexión irregular: la caída no
+es un escenario de laboratorio, es una tarde cualquiera.
+
+**Motivo · por qué esto obliga a matar el pendiente de ADR-007, en vez de convivir con
+él.** Si las respuestas viajan dentro de un archivo versionado en un repositorio
+**público**, ocultarlas durante el simulacro es imposible: basta abrir el archivo. Un
+servidor que se niegue a enviarlas mientras el repositorio las publica no protege
+nada; añade complejidad, una validación remota en el camino crítico del simulacro, y
+—lo peor— la impresión de que el simulacro es a prueba de trampa. Dos decisiones que
+se contradicen y conviven son peores que una decisión costosa que se sabe tomada.
+Mientras ese pendiente siguiera en pie, cualquiera podía leerlo dentro de seis meses y
+creer que el problema estaba abierto cuando en realidad estaba resuelto en contra.
+
+**Lo que se pierde, dicho con todas sus letras.** **El simulacro no puede garantizar
+que nadie vea las respuestas antes de responder.** Cualquiera que abra el repositorio,
+o las herramientas de desarrollo del navegador, tiene el banco entero con sus
+correctas. No hay forma de arreglar eso sin romper el respaldo.
+
+De ahí se sigue lo que el simulacro **es** y lo que **no es**:
+
+- **Es** un instrumento de estudio: sirve para que el estudiante mida su preparación
+  en condiciones parecidas a las del examen real, porque quien estudia no tiene
+  motivo para hacerse trampa.
+- **No es** un instrumento de evaluación con validez. Su puntaje no puede sustentar
+  una nota, una certificación ni una decisión sobre nadie. Si algún día hiciera falta
+  eso, esta decisión se cae entera y hay que sustituirla por una ADR nueva: no se
+  parchea añadiendo validación de servidor, porque el archivo público seguiría ahí.
+
+**Restricción sobre lo que el sitio puede prometer.** *Precisión del autor,
+2026-09-05.* Lo anterior es una decisión **interna**: no se convierte en una
+advertencia en pantalla ni en un descargo que el estudiante tenga que leer antes de
+empezar. Se convierte en un **límite de vocabulario**, y ese límite es vinculante:
+
+**La interfaz del simulacro no puede llamar a su resultado «puntaje oficial», «nota»,
+«calificación», «aprobado/reprobado» ni ninguna fórmula que sugiera validez de
+certificación.** Puede decir cuántas acertó, en qué módulos falló y cuánto tardó, que
+es lo que de verdad sirve. No puede sugerir que ese número valga fuera de la pantalla
+donde aparece.
+
+Está escrito así, como una regla sobre las palabras y no como un principio, por un
+motivo concreto: **la persona que redacte esa pantalla puede no haber leído esta ADR.**
+Un principio general no la detiene; una lista de palabras prohibidas, sí. Es la misma
+lógica por la que CLAUDE.md formula ADR-015 como «mira el comando, tiene que llevar
+`--local`» en vez de «no toques producción».
+
+**Consecuencia.** Queda como criterio de aceptación de la **épica 40**, anotado en su
+README y en la iteración 44, que es la que redacta la pantalla de resultados. No basta
+con que viva aquí: esta ADR se lee al empezar una iteración, y la pantalla se redacta
+al final de otra.
+
+**Consecuencia.** Se confirma y se cierra la línea que ADR-001 dejó abierta —«las
+respuestas correctas que llegan al navegador son visibles para quien inspeccione el
+código; ADR-007 abre la puerta a cambiar esto, pero mientras no se decida lo contrario,
+se asume»—. Ya está decidido: se asume, y no se va a cambiar.
+
+**Consecuencia.** La fila del registro «Evaluar si el Worker debe dejar de enviar la
+respuesta correcta al navegador durante el simulacro, y validar del lado del servidor»
+queda marcada como descartada, apuntando a esta ADR. No se borra.
+
+**Consecuencia.** La iteración 41, al construir el motor del simulacro, no tiene que
+diseñar ninguna defensa contra la inspección del banco. Es tiempo que no se gasta.
+
+**Alternativa descartada · instantánea sin respuestas correctas.** Es la que protege
+el simulacro, y es la que rompe el respaldo: el estudiante en modo degradado
+respondería sin retroalimentación. Convierte el respaldo en un adorno que se puede
+mostrar en una demostración y no sirve la noche antes del examen, que es cuando se
+usa.
+
+**Alternativa descartada · respuestas ofuscadas o con un resumen criptográfico en la
+instantánea.** Da seguridad aparente y ninguna real: con cuatro alternativas por
+pregunta, comprobar cuál corresponde a cada resumen es probar cuatro veces. Costaría
+código, complicaría el diff del archivo versionado —que ADR-014 usa como revisión
+editorial— y no detendría a nadie que se moleste diez minutos.
+
+**Alternativa descartada · validar el simulacro en el servidor y renunciar al modo
+degradado sólo ahí.** El simulacro sería el único punto del sitio que deja de
+funcionar cuando cae la capa de datos. Contradice ADR-008 justo en la página más
+larga y menos interrumpible del sitio: una caída a mitad de un intento de 60 minutos
+lo perdería entero.
+
+---
+
+## ADR-023 · La instantánea se genera desde la base de la nube, en el mismo acto que el respaldo de ADR-014
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-05 · **Complementa a:** ADR-008 y ADR-014
+
+**Decisión.** La instantánea de ADR-008 se genera **desde la base de la nube**, no
+desde la base D1 local. De ahí se siguen dos cosas que forman parte de la decisión:
+
+1. **Sólo la genera el autor**, por ADR-015. Claude Code escribe el generador y lo
+   prueba contra D1 local; la instantánea que se versiona la produce el autor
+   ejecutando el comando en su terminal.
+2. **Se genera en el mismo procedimiento y en el mismo momento que la exportación de
+   `d1/respaldo-banco.sql`**, atado al mismo disparador que ADR-014 ya fijó: **después
+   de cada cambio de contenido, nunca por calendario.** Un solo paso produce las dos
+   cosas, o no produce ninguna.
+
+**Motivo · por qué desde la nube.** La instantánea es lo que ve el estudiante cuando
+la capa de datos cae. Generada desde D1 local reflejaría la base de juguete del
+equipo del autor —hoy, diez filas de ejemplo— y el sitio publicaría eso como respaldo
+del banco real. El fallo sería **silencioso**: todo verde, archivo generado, commit
+hecho, y el error visible sólo el día de la caída, que es precisamente el día en que
+no se puede arreglar. Es la familia de H-011, H-012 y H-013: algo que falla pareciendo
+que funciona.
+
+**Motivo · por qué atada al respaldo y no como paso aparte.** Las dos copias salen del
+mismo dato, en el mismo instante, y se quedan atrás por el mismo motivo: alguien editó
+el banco y no volvió a correr nada. Separarlas es garantizar que una de las dos se
+quede atrás, y sería la instantánea: **el respaldo duele cuando se pierde la base, un
+evento raro pero ruidoso; la instantánea duele cuando cae el Worker, un evento raro y
+mudo**, que el autor puede no ver nunca aunque le esté pasando a los estudiantes. La
+que menos se nota es la que más necesita ir amarrada a la otra.
+
+**Consecuencia.** El generador tiene que **dejar escrito dentro del archivo generado
+contra qué base corrió y cuándo**. Sin eso no hay forma de saber si la instantánea
+está al día, y la promesa de ADR-008 —avisar al estudiante de que el respaldo puede
+estar desfasado— se queda sin el dato que la sostiene. *Ratificada expresamente por el
+autor el 2026-09-05, con ese mismo argumento: sin ese dato, el aviso de desfase no se
+apoya en nada.* Es decir que el sello no es metadato decorativo, es **la fuente del
+aviso**: lo que la página le muestra al estudiante sale de ahí.
+
+**Consecuencia.** Claude Code **no puede verificar** que la instantánea versionada
+corresponda a la base de la nube. Puede comprobar que el generador funciona, que el
+archivo tiene la forma esperada y que el sitio lo consume bien; la correspondencia con
+la nube la comprueba el autor. Un criterio de aceptación que diga «coincide con lo que
+hay en D1» sólo puede cerrarlo él.
+
+**Consecuencia.** El procedimiento único —editar, exportar, regenerar, publicar— se
+escribe en el manual como **un solo bloque**, y le toca a la iteración 23, que es
+donde se define cómo se edita el banco. Vale aquí la misma advertencia que ADR-014 se
+hizo a sí misma: si ese procedimiento no las junta, esta ADR queda incumplida aunque
+nadie lo note.
+
+**Alternativa descartada · generar desde D1 local.** Es la barata: no pasa por
+ADR-015, la puede correr Claude Code, y cerraría el criterio sin depender de nadie.
+Produce una instantánea de la base de juguete y no avisa de ello. Justamente por
+barata es la que se habría adoptado sin pensarlo, y por eso queda escrito que se
+descartó.
+
+**Alternativa descartada · generarla automáticamente en el despliegue.** Exigiría
+credenciales de escritura sobre el repositorio dentro del proceso de publicación y un
+commit automático, ampliando la superficie que ADR-015 acaba de cerrar. Además ataría
+la instantánea al calendario de publicaciones en vez de al cambio de contenido, que es
+exactamente lo que ADR-014 rechazó con argumento propio.
+
+**Alternativa descartada · regenerarla por calendario o por recordatorio.** Mismo
+motivo que ADR-014 ya dio: produce archivos idénticos durante semanas y da sensación
+de cobertura justo en la ventana en que el cambio reciente todavía no está reflejado.
+
+---
+
+## ADR-024 · La iteración 22 se verifica con las diez filas de juguete, y el escapado no queda probado a escala hasta la 24
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-05
+
+**Decisión.** La iteración 22 se implementa y se verifica contra las **diez filas de
+ejemplo** de `d1/ejemplo-banco.sql`. **No se adelanta la carga de las 368 preguntas**,
+que sigue siendo trabajo de la iteración 24.
+
+**Motivo.** Son dos superficies distintas y cada una falla por su cuenta: la 22 es
+leer, validar, escapar y sobrevivir a la caída; la 24 es transformar y cargar. Si se
+mezclan y algo falla, el primer trabajo es averiguar cuál de las dos fue, y ese trabajo
+se paga entero antes de poder arreglar nada. Con diez filas conocidas de memoria,
+cualquier diferencia entre lo que hay en la base y lo que aparece en pantalla se ve a
+simple vista.
+
+**Riesgo asumido, y es el punto de esta ADR.** **Diez filas no ejercitan ni el volumen
+ni los caracteres del banco real.** El banco que llegará en la 24 trae preguntas con
+comillas invertidas y con comillas dobles en abundancia:
+
+| Corte medido | Con comillas invertidas | Con comillas dobles escapadas |
+|---|---|---|
+| Banco nuevo, 285 activas | 57 | 35 |
+| Banco viejo, 83 activas | 0 | 11 |
+| **Las 368 que se van a cargar** | **57** | **46** |
+
+El autor las cifró en 58 y 37. **Las dos cuentas son correctas y no se contradicen**:
+las suyas salen de las 300 del banco nuevo **antes** de los retiros por solapamiento, y
+las de la tabla salen de las 285 que quedaron activas más las 83 del banco viejo.
+*Zanjado por el autor el 2026-09-05: el corte válido es el de la tabla*, porque el
+riesgo lo corren las **368 que se van a cargar**, no las que se retiraron. Y en
+cualquiera de los dos cortes son decenas de preguntas, no dos.
+
+Y ese riesgo cae justo sobre lo más delicado de la épica: en esta iteración el
+escapado **deja de ser higiene y pasa a ser una barrera de seguridad**, porque el
+contenido empieza a venir de fuera del repositorio (H-003, y el «contexto de
+seguridad» de la propia iteración 22). Con diez filas se prueba que el mecanismo
+existe; no se prueba que aguante el banco real.
+
+**Consecuencia.** **El escapado no queda probado a escala hasta la iteración 24.** Esa
+iteración hereda un criterio de aceptación que no nació suyo: con las 368 cargadas, la
+página se recorre entera buscando texto que se haya salido de su tarjeta o roto el
+diseño. Queda anotado en el registro para que no se pierda entre la carga y la
+justificación.
+
+**Consecuencia.** Como el volumen no se puede probar todavía, **al menos los
+caracteres sí**: las filas de prueba de la 22 tienen que incluir a propósito un
+enunciado con `<div>` —criterio que la iteración ya tenía—, y además comillas
+invertidas, comillas dobles y una comilla simple. Que el caso exista aunque la escala
+no.
+
+**Consecuencia.** La 22 tampoco puede decir nada sobre el rendimiento: si dibujar 368
+preguntas de golpe es un problema, se descubrirá en la 24 o en la 31, no aquí. La
+iteración 31 ya tiene anotado el renderizado por módulo justamente por eso.
+
+**Alternativa descartada · adelantar la carga de las 368 a la 22.** Cerraría el riesgo
+de una vez, y a cambio junta las dos superficies que esta ADR separa. Además la carga
+depende de decisiones que la 24 todavía no ha tomado —transformación, justificaciones,
+ubicación definitiva de los JSON— y adelantarla obligaría a tomarlas a medias.
+
+**Alternativa descartada · generar filas sintéticas con caracteres raros a escala.**
+Es la salida barata para cerrar el riesgo antes: 400 filas inventadas con comillas de
+todo tipo prueban el escapado sin esperar a la 24. Se descarta **para esta iteración**
+porque el dato real llega en dos iteraciones y el trabajo se tiraría; pero queda
+escrito como la salida disponible **si la 24 se retrasa** y el sitio fuera a publicarse
+antes con el banco real cargado a mano.

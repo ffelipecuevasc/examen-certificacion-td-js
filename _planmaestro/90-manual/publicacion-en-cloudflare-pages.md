@@ -148,17 +148,23 @@ Antes de cada push conviene:
 npm run verificar
 ```
 
-Reconstruye el CSS y lo compara con lo que había. Termina siempre con **uno de
-estos tres veredictos**, en un recuadro imposible de pasar por alto:
+Desde la iteración 22 corre **tres comprobaciones** —la barrera de ADR-015, el CSS y
+el escapado del banco de preguntas— y termina con un solo veredicto, en un recuadro
+imposible de pasar por alto:
 
 | Veredicto | Código | Qué significa |
 |---|---|---|
-| `VERIFICADO` | 0 | El CSS corresponde a la fuente y está commiteado. Puedes publicar |
-| `DESFASADO` | 1 | El CSS no correspondía: se acaba de reconstruir. Revisa y commitea |
-| `VERIFICACION PARCIAL` | 2 | Comprobó lo del CSS, pero **no** pudo comprobar si está commiteado, porque no encontró git. **No es un éxito** |
+| `VERIFICADO` | 0 | Las tres se hicieron y están en verde. Puedes publicar |
+| `VERIFICACION FALLIDA` | 1 | Al menos una encontró algo mal. El resumen dice cuál |
+| `VERIFICACION INCOMPLETA` | 2 | Ninguna falló, pero alguna **no se pudo hacer**. No es un éxito: es una casilla en blanco |
+
+El resumen final nombra las tres con su estado. Lo más habitual en `INCOMPLETA` es
+que el escapado no se pudiera probar porque falta levantar `npm run datos:dev` en
+otra terminal; la propia línea lo dice y trae el comando.
 
 No es obligatorio —el despliegue compila por su cuenta— pero mantiene la copia del
-repositorio al día con la fuente.
+repositorio al día con la fuente, y es lo único que comprueba que el escapado del
+banco sigue en pie.
 
 ---
 
