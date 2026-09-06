@@ -1,0 +1,1406 @@
+[
+  {
+    "modulo": 2,
+    "numero_origen": 1,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué limita estrictamente al Front-End en comparación con el Back-End en la arquitectura web?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "No interactuar directo con el sistema de archivos del servidor.",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "No puede renderizar estilos dinámicos del lado del usuario.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "No admite la visualización directa de código ofuscado.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Requiere obligatoriamente un framework de interfaz de usuario.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 2,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Cuál es el rol fundamental del protocolo HTTP en la comunicación entre capas de desarrollo web?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Dar estilo visual avanzado a la página web renderizada en cliente.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Permitir comunicación sin estado entre el cliente y el servidor.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "Compilar el código JavaScript antes de su envío a producción.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Gestionar sesiones de usuario de forma nativa en la base de datos.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 3,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "En una arquitectura Fullstack clásica, ¿qué componente intermedio separa la lógica Front y Back?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El motor de renderizado del navegador del cliente.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "La Interfaz de Programación de Aplicaciones (API).",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "El sistema de control de versiones centralizado.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "El modelo de cajas jerárquico del CSS.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 4,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Para qué usaría primariamente el inspector del navegador un desarrollador Front-End al depurar?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Para compilar código fuente directamente a WebAssembly en consola.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Para estructurar entidades y tablas en la base de datos remota.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Para modificar el DOM en vivo y auditar peticiones HTTP de red.",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "Para reiniciar o purgar la caché del servidor web de backend.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 5,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Según la tríada de desarrollo web, ¿qué rol técnico fundamental asume JavaScript en cliente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Definir la semántica y jerarquía de nodos en la vista web.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Especificar reglas de diseño, colorimetría y adaptabilidad.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Controlar el comportamiento lógico y mutación dinámica del DOM.",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "Ejecutar consultas nativas SQL sobre los datos locales en disco.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 6,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "En un formulario HTML5, ¿qué atributo del form define la URI destino al procesar datos enviados?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "enctype",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "action",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "target",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "rel",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 7,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Cuál es la función semántica estricta de la etiqueta `<aside>` según los estándares de HTML5?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Demarcar un contenido fundamental que debe leerse primero.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Contener información periférica conectada al flujo principal.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "Aislar scripts externos del cuerpo de la página en el header.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Declarar legalmente los datos de autoría en el pie de página.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 8,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué combinación de etiquetas HTML5 es correcta para instanciar un menú de opciones nativo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "`<select>` como contenedor lógico de múltiples opciones `<option>`.",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "`<dropdown>` inicializando múltiples atributos `<item>` internos.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "`<datalist>` anidando colecciones estáticas de nodos `<list>`.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "`<menu>` controlando estructuralmente subetiquetas `<input>`.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 9,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Dónde deben declararse semánticamente los links a hojas de estilos externas y metadatos vitales?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Exclusivamente como hijos directos dentro del contenedor `<head>`.",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "Justo antes del cierre del `</body>` para acelerar el renderizado.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Anidados en el primer nodo `<header>` del documento.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Como metadatos configurados en atributos de la etiqueta `<html>`.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 10,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Para lograr accesibilidad, ¿qué etiqueta asocia lógicamente grupos de controles de formulario?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "`<form-section>`",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "`<fieldset>`",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "`<control-group>`",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "`<div role=\"form\">`",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 11,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué atributo HTML asegura vincular explícita y unívocamente una etiqueta `<label>` con un input?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "href",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "name",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "for",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "form",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 12,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "En el modelo de cajas CSS, ¿qué propiedad añade espacio transparente externo perimetral al borde?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "outline",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "margin",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "border-spacing",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "padding",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 13,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Según el cálculo de especificidad CSS, ¿cuál de los siguientes selectores prevalece en conflicto?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "form input.active:hover",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "header nav.main-menu ul li",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "#main-container .btn-primary",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "article > p::first-line",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 14,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué atajo media query CSS restringe la regla exclusivamente a Viewports de mínimo 1024px?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "@media screen and (max-width: 1024px)",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "@media (min-width: 1024px)",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "@media only (width >= 1024px)",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "@media viewport (size > 1024px)",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 15,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué declaración box-sizing engloba el padding y el border en el cálculo del width total asignado?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "margin-box",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "padding-box",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "border-box",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "content-box",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 16,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Ante la colisión de múltiples orígenes, ¿qué estilo CSS impone mayor prioridad jerárquica?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Selectores inyectados mediante archivos externos al final del head.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Bloques embebidos en una etiqueta style sin directiva important.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "El estilo incrustado directamente utilizando el atributo en línea.",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "Directivas del navegador cliente definidas por el usuario.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 17,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué operador relacional CSS filtra afectando solo a los descendientes de primer grado (hijos)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Espacio general ( )",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Signo más (+)",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Tilde general (~)",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Signo mayor que (>)",
+        "orden": 4,
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 18,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Cuántas fracciones equitativas articulan como límite la arquitectura del grid de Bootstrap?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "8 bloques.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "12 columnas.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "16 sectores.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "24 celdillas.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 19,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué sufijo responsivo activa modificaciones de diseño en Bootstrap al superar el breakpoint grande?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": ".col-md-",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": ".col-xl-",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": ".col-lg-",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": ".col-sm-",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 20,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué clase central de Bootstrap estabiliza el margen limitando y centrando el ancho del contenido?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": ".container-fluid",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": ".container",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": ".wrapper-box",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": ".col-centered",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 21,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "En el sistema de utilidades, ¿qué clase induce a un nodo tipo block a ocupar el 100% de su padre?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": ".w-100",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": ".full-width",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": ".d-max",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": ".btn-fill",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 22,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué propósito canónico de interfaz soluciona el clásico componente jumbotron en Bootstrap?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Controlar migraciones asíncronas de datos en formato modal.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Crear un cajón semántico envolvente resaltando contenido maestro.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "Generar alertas automáticas colapsables en la esquina del viewport.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Formatear validaciones cruzadas en sub-formularios anidados.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 23,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Bajo qué doctrina base se estructura algorítmicamente el flujo responsivo en Bootstrap por defecto?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Desktop First, degradando reglas complejas.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Mobile First, escalando media queries en aumento.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "Fluid First, forzando dimensiones relativas al 100%.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Media First, aislando impresión y lectura interactiva.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 24,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "En evaluación nativa de JavaScript, ¿qué método atrapa de forma veloz a un único nodo por su ID?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "document.getElementById()",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "document.querySelector(\"[id]\")",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "document.getElementsByName()[0]",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "document.findAll()",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 25,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "A nivel de memoria y asignación, ¿por qué es crítico utilizar \"let\" sobre \"var\" al iterar ciclos?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "let previene fugas de alcance limitando la variable al bloque léxico.",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "\"var\" causa desbordamiento de memoria por sobreescritura estricta.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "\"let\" desactiva por completo el motor de recolección de basura.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "\"var\" restringe mutaciones en tipos compuestos como arreglos.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 26,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué detonante de evento del DOM percibe mutaciones confirmadas cuando el elemento pierde el foco?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "onkeyup",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "onsubmit",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "onchange",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "oninput",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 27,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Considerando la sintaxis funcional ES6, ¿qué sentencia declara una arrow function correctamente?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "const run = function() => {}",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "const run = () => {}",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "let run => function() {}",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "var run = arrow() {}",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 28,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Si mutas violentamente una referencia directa constante, ¿qué mecanismo se dispara en el runtime JS?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Una evasión pasiva, alterando solo la copia profunda local.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Una interrupción global por ReferenceError inalcanzable.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Un corte forzado de ejecución levantando un TypeError.",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "El sistema ignora y anula silenciosamente los cambios aplicados.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 29,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Durante la fase de coerción implícita, ¿qué entrega la ejecución de la sentencia binaria \"3\" + 3?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "El tipo Number 6, sumando el logaritmo binario subyacente.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Un fallo inminente evaluado como NaN irremediable.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Un SyntaxError al mezclar primitivas incompatibles por diseño.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "El tipo String '33', priorizando concatenación sobre adición.",
+        "orden": 4,
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 30,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué atajo sintáctico universal reconoce automáticamente el motor del DOM al inicializar jQuery?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "La doble directiva jQ().",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "El prefijo subrayado _.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "El símbolo monetario $.",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "El apuntador simbólico &.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 31,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Cuál es el patrón estandarizado para adjuntar manejadores \"click\" en nodos asíncronos vía jQuery?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "$(\"#nodo\").on(\"click\", function() {});",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "document.getElementById(\"nodo\").click();",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "$(\".nodo\").bindClick(function() {});",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "$(\"#nodo\").eventListener(\"click\");",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 32,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué directriz bloquea la ejecución de scripts en jQuery hasta asegurar que el árbol DOM está listo?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "$(window).loadHandler(function() {});",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "$(document).ready(function() {});",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "$.initDOM(function() {});",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "$(html).awaitComplete(function() {});",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 33,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Al parsear datos, ¿qué función encapsula jQuery para forzar la lectura del contenido de un `<input>`?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": ".contentNode()",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": ".text()",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": ".html()",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": ".val()",
+        "orden": 4,
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 34,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué técnica animada nativa de jQuery altera gradualmente la opacidad hasta colapsar el nodo visual?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": ".hide()",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": ".collapse()",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": ".fadeOut()",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": ".slideUp()",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 35,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Qué mutación estructural consolida temporalmente 'git add' en la topología de un flujo versionado?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Indexa cambios brutos del working directory hacia el Staging Area.",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "Persiste instantáneas en el repositorio local (HEAD).",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Traslada ramas paralelas sobre la estructura del código matriz.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Proyecta deltas de código directamente al clúster remoto.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 36,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Al gatillar 'git commit' careciendo de archivos indexados previos, ¿qué respuesta retorna Git CLI?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Consolida instantáneamente un bypass guardando el working copy.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Aborta bloqueando la firma al no existir cambios en staging.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "Imprime un log de aviso mientras fusiona el repositorio origen.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Sobrescribe los metadatos forzando un historial completamente vacío.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 37,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "Frente a múltiples vectores de desarrollo, ¿qué previene tácticamente el aislamiento en ramas (branch)?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Saturar el disco local con instantáneas redundantes e inservibles.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Bloqueos de red al empujar datos corruptos hacia GitHub server.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "Rupturas y colisiones críticas al inyectar código no verificado.",
+        "orden": 3,
+        "es_correcta": 1
+      },
+      {
+        "letra": "d",
+        "texto": "Extravío criptográfico de las claves SHA-1 vinculadas al commit.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 39,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "En presencia de un Merge Conflict grave, ¿qué protocolo manual asume irrevocablemente el usuario?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "Resetear remotamente borrando su clon local mediante flag --hard.",
+        "orden": 1,
+        "es_correcta": 0
+      },
+      {
+        "letra": "b",
+        "texto": "Intervenir los archivos conflictivos y sellar con un nuevo commit.",
+        "orden": 2,
+        "es_correcta": 1
+      },
+      {
+        "letra": "c",
+        "texto": "Evadir marcas de conflicto forzando subidas push --force locales.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Abortar la rama y delegar dependencias mediante directivas stash.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "modulo": 2,
+    "numero_origen": 40,
+    "origen": "legacy_v1",
+    "justificacion": "Pendiente de redacción",
+    "dificultad": "difícil",
+    "orden_fijo": 0,
+    "estado": "activa",
+    "enunciado": "¿Cuál es la disparidad motriz exacta entre invocar \"git fetch\" frente a procesar un \"git pull\"?",
+    "alternativas": [
+      {
+        "letra": "a",
+        "texto": "'fetch' descarga al caché remoto; 'pull' integra eso a tu trabajo.",
+        "orden": 1,
+        "es_correcta": 1
+      },
+      {
+        "letra": "b",
+        "texto": "'fetch' sobrescribe tu historia local; 'pull' solo lee punteros.",
+        "orden": 2,
+        "es_correcta": 0
+      },
+      {
+        "letra": "c",
+        "texto": "'pull' revierte fallas de red; 'fetch' reconstruye commits rotos.",
+        "orden": 3,
+        "es_correcta": 0
+      },
+      {
+        "letra": "d",
+        "texto": "Son estrictamente sinónimos, ejecutando idéntica rutina binaria.",
+        "orden": 4,
+        "es_correcta": 0
+      }
+    ]
+  }
+]
