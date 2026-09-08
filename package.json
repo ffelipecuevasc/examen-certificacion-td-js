@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --watch",
     "build": "npm run icons && tailwindcss -i ./src/input.css -o ./static/css/style.css --minify && node scripts/build-dist.mjs",
-    "verificar": "node scripts/verificar-barrera.mjs && node scripts/verificar.mjs",
+    "verificar": "node scripts/verificar-todo.mjs",
     "serve": "npx serve .",
     "serve:dist": "npx serve dist",
     "datos:dev": "npm run build && wrangler pages dev",
@@ -16,11 +16,14 @@
     "datos:migrar": "wrangler d1 execute examen-td-js-produccion --local --file=d1/migraciones/001-banco-de-preguntas.sql",
     "datos:ejemplo": "wrangler d1 execute examen-td-js-produccion --local --file=d1/ejemplo-banco.sql",
     "datos:verificar-banco": "node scripts/verificar-banco.mjs",
+    "datos:instantanea": "node scripts/generar-instantanea.mjs",
     "start": "npm run dev",
     "icons": "node scripts/build-icons.mjs",
     "cuestionario": "python scripts/build-cuestionario.py",
     "informe-banco": "node scripts/informe-banco.mjs",
-    "verificar:barrera": "node scripts/verificar-barrera.mjs"
+    "verificar:barrera": "node scripts/verificar-barrera.mjs",
+    "verificar:css": "node scripts/verificar.mjs",
+    "probar:escapado": "node scripts/probar-escapado.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",

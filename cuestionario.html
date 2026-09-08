@@ -129,6 +129,11 @@
 
       <!-- ============ CUESTIONARIO ============ -->
       <div class="px-5 sm:px-8 xl:px-12 py-10 lg:py-12">
+        <!-- Aviso de respaldo (ADR-008). Vacio y oculto salvo que el sitio este
+             sirviendo la instantanea versionada porque la capa de datos no
+             respondio. Va aqui arriba y no en el pie a proposito: el estudiante
+             tiene que enterarse antes de ponerse a estudiar, no despues. -->
+        <div id="aviso-respaldo" class="hidden mb-8" role="status" aria-live="polite"></div>
         <div id="cuestionario" class="flex flex-col gap-12"></div>
       </div>
   </div>

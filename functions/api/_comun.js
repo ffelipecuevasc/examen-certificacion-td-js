@@ -47,6 +47,14 @@ export const ERRORES = {
     usar_respaldo: false,
     mensaje: 'El recurso solicitado no existe.',
   },
+  // usar_respaldo en false a proposito: el problema es lo que se pidio, no la
+  // base. Cambiar a la instantanea escondería un error del sitio detras del
+  // respaldo, que es justo lo que la cabecera de este archivo advierte.
+  PETICION_INVALIDA: {
+    estado: 400,
+    usar_respaldo: false,
+    mensaje: 'La petición no es válida.',
+  },
   METODO_NO_PERMITIDO: {
     estado: 405,
     usar_respaldo: false,

@@ -32,6 +32,56 @@ de las que falten.
       `--env preview` es obligatorio para `examen-td-js-pruebas`, que sólo está
       declarada bajo `[[env.preview.d1_databases]]`. Arrastra consigo el borrado de
       `prueba_tuberia` en ambas bases, anotado desde la iteración 12.
+
+      > **Aviso pegado a este paso, escrito el 2026-09-05. Aplicar el esquema NO borra
+      > `prueba_tuberia`.** Comprobado: `d1/migraciones/001-banco-de-preguntas.sql` no
+      > la menciona en ninguna línea. Correr la migración y dar la tabla por retirada
+      > es el error que este aviso existe para evitar. Hace falta un `DROP` escrito a
+      > mano, y **antes de escribirlo hay que confirmar contra qué base apunta**, con
+      > `npx wrangler d1 info <base>`, comparando el uuid: pruebas es
+      > `c01df3c9-c2a1-4379-ab2e-249e933cece4` y producción es
+      > `cff1686b-3b24-4892-9a10-4306684e0127`. Por **H-015**, el nombre que se teclea
+      > es lo único que decide dónde cae el comando —`wrangler.toml` no acota nada en
+      > remoto— y el uuid es la única red que existe. Si lo que se toca es producción,
+      > el respaldo de `90-manual/respaldo-y-restauracion.md` va antes, no después.
+      >
+      > **En la base de pruebas ya no está**: la retiró el vaciado del ensayo remoto
+      > del 2026-09-05. Lo que queda pendiente es **sólo producción**.
+      >
+      > Y una corrección al párrafo de arriba, que se dejó escrita en vez de borrada:
+      > dice que `--env preview` «es obligatorio» para `examen-td-js-pruebas`. **En
+      > remoto no lo es**, y creerlo fue justamente lo que produjo H-015: wrangler
+      > busca el nombre en la cuenta y encuentra la base igual sin ese argumento. En
+      > local sí es obligatorio, porque allá resuelve sólo desde `wrangler.toml`. Se
+      > sigue escribiendo siempre, por higiene y para que el comando diga a qué
+      > entorno pertenece, pero **no protege de nada**: no lo trates como una barrera.
+
+      > **Dependencia heredada de la iteración 22, escrita el 2026-09-05. Al terminar
+      > la carga hay que generar la instantánea, y recién ahí se cierra un criterio
+      > que la 22 no pudo cerrar.**
+      >
+      > El criterio es «existe la instantánea versionada y su contenido coincide con lo
+      > que hay en D1», y viene aplazado desde la iteración 22. **No se aplazó porque
+      > la prueba fallara: se aplazó porque todavía no hay nada que copiar.** ADR-023
+      > manda generarla desde la base de la nube, y la base de producción está vacía
+      > justamente porque este paso —aplicar el esquema— no se ha ejecutado. Aunque el
+      > generador funcionara perfecto, la consulta caería con `no such table: modulo`.
+      > Comprobado en la primera ejecución real contra la nube, que es lo que destapó
+      > H-019: lo que wrangler dijo fue exactamente eso.
+      >
+      > De modo que el orden es: esquema → carga del banco → **generar la instantánea
+      > desde producción** → commit del archivo generado. Con `npm run datos:instantanea`
+      > y el modo remoto, que lo ejecuta el autor por ADR-015.
+      >
+      > **Y no vale generarla desde `examen-td-js-pruebas` como sustituto.** Sería una
+      > copia del banco de pruebas presentada como el respaldo del banco real, con el
+      > sello diciendo que viene de la nube, que es el fallo silencioso que ADR-023
+      > existe para evitar. El generador se niega a escribirla desde cualquier base que
+      > no sea la del enlace principal de `wrangler.toml`; para probar contra pruebas
+      > está `--ensayo`, que lee, valida, informa y no escribe nada.
+      >
+      > Mientras esto no ocurra, lo que hay versionado sale de la base **local** —el
+      > banco de juguete— y `npm run build` lo avisa en cada construcción.
 - [ ] Migrar las 105 preguntas actuales a D1, conservando módulo, alternativas,
       respuesta correcta y marca de orden fijo.
 - [ ] Verificar la migración comparando lo que hay en D1 contra los datos actuales:
@@ -47,10 +97,39 @@ de las que falten.
       respuestas correctas.
 - [ ] Acompañar la ampliación hasta ~300: validar cada lote que el autor cargue e
       informar los problemas encontrados.
+- [ ] **Generar la instantánea desde producción al terminar la carga**, y commitear
+      el archivo. Cierra el criterio que la iteración 22 dejó aplazado. Lo ejecuta el
+      autor, por ADR-023 y ADR-015.
 - [ ] Comprobar el comportamiento del sitio con el banco completo, incluida la
       instantánea de respaldo, que ahora pesa bastante más.
 - [ ] Retirar `static/js/data/cuestionario.js` y `scripts/build-cuestionario.py` una
       vez confirmada la migración, dejando constancia en la bitácora.
+
+- [ ] **Publicar. Va la última, y eso es parte de la tarea.** Heredado de la iteración
+      22, que se cerró con esta condición escrita: **`git push` a `main` dispara la
+      construcción y publica solo** —está en `90-manual/publicacion-en-cloudflare-pages.md`—
+      así que empujar **es** publicar, y `main` no se toca hasta llegar aquí.
+
+      El motivo es concreto, no una precaución genérica: desde la iteración 22 el
+      cuestionario se sirve de D1, y **producción no tiene banco hasta que esta
+      iteración lo cargue**. Publicar antes deja el sitio en modo degradado —la
+      instantánea, con su aviso amarillo— y hoy esa instantánea trae el banco de
+      juguete. El estudiante vería ocho preguntas de ejemplo presentadas como una copia
+      guardada, sin que nada esté roto y sin que nadie se entere.
+
+      Antes de empujar, en este orden:
+
+      1. Esquema aplicado en producción y banco cargado (los pasos de arriba).
+      2. `npm run datos:verificar-banco` contra producción, en verde.
+      3. **Instantánea regenerada desde producción** y commiteada. Su sello tiene que
+         decir `"entorno": "nube"` y el nombre de la base publicada; mientras diga
+         `local`, `npm run build` lo avisa en cada construcción.
+      4. `d1/respaldo-banco.sql` exportado **en el mismo acto** que la instantánea
+         (ADR-023): un solo paso produce las dos cosas, o no produce ninguna.
+      5. `npm run verificar` terminando en `VERIFICADO`.
+
+      Si algo de esto no está, no se empuja: se anota qué falta y se empuja después.
+
 
 ## Criterios de aceptación
 
@@ -87,6 +166,9 @@ de las que falten.
 - [ ] El banco supera las 250 preguntas válidas y ninguna válida carece de
       justificación.
 - [ ] `cuestionario.html` funciona con el banco completo sin degradación perceptible.
+- [ ] **Existe la instantánea versionada y su contenido coincide con lo que hay en
+      D1.** Criterio **heredado de la iteración 22**, que no pudo cerrarlo porque la
+      base de producción todavía no tenía esquema: no había nada que copiar.
 - [ ] La instantánea con el banco completo se genera correctamente y su peso está
       medido y documentado.
 

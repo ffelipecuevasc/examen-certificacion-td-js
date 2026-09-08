@@ -37,8 +37,8 @@ instantánea versionada.
 
 | # | Iteración | Estado |
 |---|---|---|
-| 21 | Modelo de datos del banco | 🔵 Criterios cumplidos, cierre formal pendiente |
-| 22 | Lectura, validación e instantánea | ⚪ No iniciada |
+| 21 | Modelo de datos del banco | 🟢 Completada |
+| 22 | Lectura, validación e instantánea | 🟢 Completada |
 | 23 | Administración del contenido | ⚪ No iniciada |
 | 24 | Migración y ampliación | ⚪ No iniciada |
 
@@ -50,7 +50,7 @@ conserva, pero se traslada a la iteración 23: con una base de datos, esa comodi
 ya no viene incluida y hay que construirla deliberadamente. Es el principal costo
 del cambio y conviene tenerlo presente.
 
-## Estado de la épica, al 2026-09-05
+## Estado de la épica, al cerrar la iteración 21
 
 La **iteración 21** tiene sus siete criterios de aceptación cumplidos con evidencia,
 la última de ella producida por el ensayo remoto contra la base de pruebas del
@@ -80,3 +80,37 @@ Lo que **no** deja hecho, y que hay que tener presente al planificar:
   juguete.
 - **Ninguna pregunta tiene justificación escrita.** La columna existe y admite nulo a
   propósito.
+
+## Estado de la épica, al cerrar la iteración 22
+
+Cerrada el 2026-09-05 con **nueve criterios con evidencia y uno aplazado**. El banco ya viaja desde D1 hasta
+`cuestionario.html`, validado al salir de la base y escapado al entrar al DOM, y el sitio sobrevive a la caída de la
+capa de datos cargando la instantánea y **diciéndoselo al estudiante**.
+
+Lo que la iteración 22 deja hecho y que las siguientes dan por sentado:
+
+- **Los extremos de lectura** `GET /api/preguntas` y `?modulo=N`, que leen de la vista `pregunta_activa` y nunca de las
+  tablas. Sus dos consultas están **exportadas** y las importa el generador de la instantánea, para que el respaldo no
+  pueda divergir del extremo.
+- **La validación de `functions/api/_validacion.js`**, que descarta la pregunta rota sin tumbar la respuesta y deja el
+  motivo en `meta.validacion`, siempre, también cuando está vacío.
+- **El escapado convertido en barrera comprobable**: `npm run probar:escapado` carga contenido hostil real en la base
+  local, corre el componente y comprueba el HTML. Corre además como tercer paso de `npm run verificar`, que ahora es un
+  coordinador con un solo veredicto y con la distinción entre «falló» y «no se pudo comprobar».
+- **La instantánea de ADR-008**, con su generador sellado (contra qué base y cuándo), el respaldo en el sitio y el aviso
+  visible arriba del banco. El aviso saca su fecha del sello, que es lo que ADR-023 obliga a escribir dentro.
+
+Lo que **no** deja hecho, y que hay que tener presente al planificar:
+
+- **La instantánea versionada sale de la base local**, o sea del banco de juguete, y su sello lo dice. Regenerarla desde
+  producción es de la iteración 24, y con eso se cierra el criterio aplazado.
+- **`main` está retenido.** Empujar publica, y publicar hoy dejaría el sitio en modo degradado con ocho preguntas de
+  ejemplo. Es la última tarea de la iteración 24.
+- **El escapado no está probado a escala** (ADR-024): diez filas de juguete no son 368. Lo hereda la iteración 24.
+- Sigue en pie todo lo que la iteración 21 dejó pendiente: esquema sin aplicar en producción, `prueba_tuberia` viva
+  allá, banco real sin cargar y ninguna justificación escrita.
+
+**Cuatro hallazgos**, todos encontrados provocando situaciones y no leyendo código: H-017 (la prueba del escapado
+dejaba el veneno dentro de la base), H-018 (el respaldo no se activaba ante un error en JSON ajeno, defecto que venía
+de la iteración 12), H-019 (el generador tapaba el error de wrangler con un fallo propio) y H-020 (`package.json` no
+declara `"type": "module"`, menor y abierto).
