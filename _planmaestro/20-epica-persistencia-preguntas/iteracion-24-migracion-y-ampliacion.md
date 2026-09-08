@@ -44,6 +44,38 @@ de las que falten.
       > es lo único que decide dónde cae el comando —`wrangler.toml` no acota nada en
       > remoto— y el uuid es la única red que existe. Si lo que se toca es producción,
       > el respaldo de `90-manual/respaldo-y-restauracion.md` va antes, no después.
+
+      > **Segundo aviso pegado a este paso, escrito el 2026-09-08. El orden importa, y
+      > es invertible sin darse cuenta: la comprobación del modo degradado va ANTES de
+      > aplicar el esquema en producción.** Hay dos formas de que producción esté
+      > «vacía» y dan resultados opuestos. **Sin esquema**, `/api/preguntas` lanza
+      > `no such table: pregunta_activa`, la capa lo convierte en `FALLO_CONSULTA` con
+      > `usar_respaldo: true`, y el sitio cambia a la instantánea y muestra el aviso:
+      > eso es la prueba del modo degradado de ADR-008. **Con esquema y tablas vacías**,
+      > el extremo responde `200` con `datos: []` y `meta.vacio: true` —correcto, porque
+      > «no hay datos» no es un error (`functions/api/_comun.js`)—, el sitio dice
+      > «todavía sin contenido» y **no hay aviso de respaldo que ver**. Aplicar el
+      > esquema primero cierra la ventana, y la única prueba real del modo degradado
+      > sobre el sitio publicado se pierde hasta la próxima caída de verdad, que nadie
+      > elige cuándo ocurre. Comprobado el 2026-09-08 provocando las dos formas contra
+      > una base local recién creada, no razonando sobre el código.
+      >
+      > **Qué tiene que verse exactamente, para no confundir lo correcto con un fallo.**
+      > Sobre el sitio publicado con producción sin esquema:
+      >
+      > | Dónde | Qué debe decir |
+      > |---|---|
+      > | `/api/estado` | `200` · `ok: true` · `enlace_d1: "presente"`. Responde porque solo corre `SELECT 1`; que esté vivo **no** contradice lo de abajo |
+      > | `/api/preguntas` | `503` · `codigo: "FALLO_CONSULTA"` · `usar_respaldo: true`. Si dice `SIN_ENLACE`, no es una base vacía: es el enlace a D1 sin aplicar, y eso es un fallo de configuración |
+      > | Registro del despliegue | `no such table: pregunta_activa`. El SQL se queda ahí y no viaja al navegador |
+      > | Arriba del banco en `cuestionario.html` | El aviso de ADR-008: «Estás viendo una copia guardada del banco de preguntas», con la fecha del sello |
+      > | El cuestionario | **8 preguntas dibujadas**, las del banco de juguete |
+      > | Línea del pie | «copia guardada en el sitio (**8** preguntas). Sin conexión con el servidor.» |
+      >
+      > **Son 8, no 9.** La instantánea que se publicó primero traía 9 por la pregunta
+      > intrusa de la herramienta de Antigravity; se reconstruyó el 2026-09-08 y el sello
+      > quedó en 8. Ver la fila de la iteración 22 en el registro. **Un 9 en la página ya
+      > no es lo esperado: es la señal de que se publicó la instantánea vieja.**
       >
       > **En la base de pruebas ya no está**: la retiró el vaciado del ensayo remoto
       > del 2026-09-05. Lo que queda pendiente es **sólo producción**.
@@ -100,6 +132,29 @@ de las que falten.
 - [ ] **Generar la instantánea desde producción al terminar la carga**, y commitear
       el archivo. Cierra el criterio que la iteración 22 dejó aplazado. Lo ejecuta el
       autor, por ADR-023 y ADR-015.
+
+      > **Incumplimiento consciente de ADR-023, declarado el 2026-09-08 por Felipe
+      > Cuevas. Este paso es el que lo subsana, y por eso queda escrito aquí.**
+      >
+      > ADR-023 exige que la instantánea se genere **desde la base de la nube**. La que
+      > se publica hoy con la iteración 22 salió de la **base local**: su sello lo dice
+      > sin ambigüedad —`"entorno": "local"`, `"base": "examen-td-js-produccion"`,
+      > generada el 2026-09-08— y `npm run build` lo avisa en cada compilación.
+      >
+      > **Motivo:** producción está vacía hasta esta iteración. No hay nube desde la
+      > cual generar, así que la alternativa a incumplir era no publicar, y se decidió
+      > publicar. Es una decisión tomada, no un olvido y no un pendiente que alguien
+      > vaya a descubrir después.
+      >
+      > **Alcance de lo que se acepta:** mientras dure, el respaldo que ve un estudiante
+      > si la capa de datos cae es el **banco de juguete**, no el banco real. El aviso
+      > de ADR-008 aparece igual y dice la verdad —«copia guardada», con su fecha—, así
+      > que el estudiante no queda engañado, pero sí queda con un banco que no le sirve.
+      >
+      > **Se subsana aquí y solo aquí.** Hasta que este paso se ejecute y su archivo se
+      > commitee, ADR-023 sigue incumplida. No se marca esta casilla con una instantánea
+      > generada en local: sería repetir el incumplimiento y borrar el rastro de que
+      > alguna vez lo fue.
 - [ ] Comprobar el comportamiento del sitio con el banco completo, incluida la
       instantánea de respaldo, que ahora pesa bastante más.
 - [ ] Retirar `static/js/data/cuestionario.js` y `scripts/build-cuestionario.py` una

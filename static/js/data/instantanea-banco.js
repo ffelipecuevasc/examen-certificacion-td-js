@@ -17,8 +17,8 @@
 export const SELLO = {
   "base": "examen-td-js-produccion",
   "entorno": "local",
-  "generada_en": "2026-09-06T02:43:29.805Z",
-  "preguntas": 9,
+  "generada_en": "2026-09-08T19:28:41.209Z",
+  "preguntas": 8,
   "descartadas": 0
 };
 
@@ -100,46 +100,6 @@ export const PREGUNTAS = [
         "letra": "d",
         "orden": 4,
         "texto": "Ambas B y C son correctas.",
-        "es_correcta": 1
-      }
-    ]
-  },
-  {
-    "id": 11,
-    "modulo": 2,
-    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
-    "modulo_icono": "devices",
-    "enunciado": "Prueba de carga transaccional CLI (Editado).",
-    "justificacion": "No hace falta justificar prueba.",
-    "dificultad": "media",
-    "orden_fijo": 0,
-    "alternativas": [
-      {
-        "id": 41,
-        "letra": "a",
-        "orden": 1,
-        "texto": "Incorrecto editado!!",
-        "es_correcta": 0
-      },
-      {
-        "id": 42,
-        "letra": "b",
-        "orden": 2,
-        "texto": "Me parece que incorrecto",
-        "es_correcta": 0
-      },
-      {
-        "id": 43,
-        "letra": "c",
-        "orden": 3,
-        "texto": "Totalmente falso",
-        "es_correcta": 0
-      },
-      {
-        "id": 44,
-        "letra": "d",
-        "orden": 4,
-        "texto": "Absolutamente verdadero",
         "es_correcta": 1
       }
     ]
