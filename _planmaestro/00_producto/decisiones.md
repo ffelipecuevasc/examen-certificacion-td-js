@@ -1167,3 +1167,130 @@ todo tipo prueban el escapado sin esperar a la 24. Se descarta **para esta itera
 porque el dato real llega en dos iteraciones y el trabajo se tiraría; pero queda
 escrito como la salida disponible **si la 24 se retrasa** y el sitio fuera a publicarse
 antes con el banco real cargado a mano.
+
+## ADR-025 · La administración del banco es una herramienta local de línea de comandos, sin panel
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-08 · **Cumple:** ADR-009 · **Sujeta a:** ADR-015
+
+**Decisión.** El banco de preguntas se edita con una **herramienta de línea de comandos
+que corre en el computador del autor**. No hay panel de administración, no hay página
+autenticada y **no se expone ningún extremo de escritura en el Worker**: la capa de
+datos publicada sigue siendo de sólo lectura, como manda ADR-009.
+
+La herramienta se apoya en cuatro reglas que forman parte de la decisión, no del
+detalle de implementación:
+
+1. **Todo o nada.** Cada operación se aplica entera o no se aplica. Si algo falla a
+   mitad de un lote, la base queda como estaba. No existe el estado a medias.
+
+   > **Corrección del 2026-09-08, comprobada contra D1 antes de implementar nada.** La
+   > primera redacción de esta regla decía «se ejecuta como una transacción única», y eso
+   > invita a escribir `BEGIN` / `COMMIT`. **No se debe.** D1 rechaza las transacciones
+   > explícitas: ante un `BEGIN` responde *«To execute a transaction, please use the
+   > state.storage.transaction() … APIs instead of the SQL BEGIN TRANSACTION or SAVEPOINT
+   > statements»*, y el lote entero no se aplica.
+   >
+   > **El efecto que esta regla pide se obtiene solo, y precisamente por no escribirlo:**
+   > `wrangler d1 execute --file=<archivo>` aplica el archivo **como un lote atómico**.
+   > Provocado el 2026-09-08 sobre una tabla de juguete: con la base sembrada con dos
+   > filas, un lote de tres —dos válidas y una que viola un `UNIQUE`— dejó la base con las
+   > dos filas originales. Las dos válidas **se insertaron y se revirtieron**; no fue un
+   > aborto previo a empezar.
+   >
+   > De modo que la forma correcta es **una operación, un archivo `.sql`, sin `BEGIN` ni
+   > `COMMIT`**. Quien añada un `BEGIN` creyendo que refuerza la regla la rompe.
+   >
+   > Sigue en pie el límite: esto está comprobado **en local**. Que D1 se comporte igual en
+   > remoto es de la iteración 24, y lo comprueba el autor.
+2. **`INSERT` estricto, sin sobrescritura implícita.** Una colisión de identificador
+   aborta el lote entero en vez de actualizar en silencio. Actualizar es una operación
+   distinta, que se pide a propósito.
+3. **La entrada es JSON, y es un encargo, no una fuente.** La herramienta recibe el
+   trabajo en archivos JSON, que se pueden revisar antes de cargarlos y volver a correr
+   igual. **La base sigue siendo la única fuente de verdad**: el JSON se consume y deja
+   de importar. No se mantiene sincronizado con la base ni se consulta para saber qué
+   hay en el banco. Es la diferencia con la planilla que esta misma ADR descarta más
+   abajo, y conviene no confundirlas.
+4. **La validación es la misma que la de lectura.** Se reutilizan las reglas de
+   `functions/api/_validacion.js`, de modo que quien escribe y quien lee no puedan
+   discrepar sobre qué es una pregunta válida. El contenido inválido se rechaza
+   **antes** de tocar la base.
+5. **La instantánea se regenera dentro del mismo acto.** Editar el banco y dejar el
+   respaldo de ADR-008 desfasado no puede ser dos pasos, porque el segundo se olvida.
+
+**Motivo · por qué local y no panel.** El escenario que originalmente justificaba el
+panel —corregir una errata desde el teléfono— **queda descartado por decisión del autor
+el 2026-09-08**: el trabajo sobre el proyecto ocurre siempre desde su computador. Sin
+ese escenario, el panel paga autenticación, gestión de identidad y una superficie de
+escritura nueva a cambio de una comodidad que nadie va a usar.
+
+**Motivo · por qué una herramienta y no SQL a mano.** Escribir consultas directamente
+deja el trabajo entero en manos de la atención del autor: un identificador repetido, una
+restricción rota, una alternativa correcta duplicada. Las reglas que ADR-018, ADR-019 y
+ADR-021 dejaron en el esquema existen precisamente porque ese error es esperable, y una
+herramienta puede comprobarlas antes en vez de dejar que las descubra la base a mitad de
+camino.
+
+**Consecuencia · el contenido sólo se edita desde el computador del autor.** Es el costo
+aceptado. No hay forma de corregir el banco desde otro equipo sin clonar el repositorio
+y tener las credenciales de la cuenta de Cloudflare.
+
+**Consecuencia · un JSON cargado no dice lo que hay en la base.** Si alguien conserva el
+archivo con el que cargó un lote y lo lee después para saber cómo quedó el banco, se va a
+equivocar: entremedio pudo haber correcciones que no pasaron por ese archivo. Para saber
+qué hay en la base se consulta la base, o la exportación de `d1/respaldo-banco.sql` que
+sale de ella (ADR-014).
+
+**Consecuencia · la barrera de ADR-015 es condición de entrada, no trabajo posterior.**
+La herramienta habla con wrangler, así que hereda entera la restricción: usa el wrangler
+de `node_modules` y no `npx` (lección de H-013), trabaja contra la base local por
+omisión, y cualquier camino hacia la nube exige el gesto explícito que ADR-015 definió.
+Una herramienta de escritura que pueda alcanzar producción por descuido es peor que no
+tener herramienta.
+
+**Consecuencia · los errores de la base se traducen antes de mostrarse.** El autor no
+tiene por qué leer `UNIQUE constraint failed: alternativa.pregunta_id, alternativa.letra`
+para entender que puso dos veces la misma letra. La traducción es parte de la
+herramienta, no un adorno.
+
+**Lo que esta ADR no da por probado.** Que la transacción todo o nada **funcione** a
+través de wrangler contra D1 es una afirmación que hay que **provocar**, no describir:
+interrumpir un lote a mitad y comprobar que la base quedó como antes. Mientras esa
+evidencia no exista, la regla 1 es una intención. Vale lo mismo que ADR-024 dejó escrito
+para el escapado: el mecanismo se demuestra sobre el banco de juguete, y aguantar el
+banco real es cosa de la iteración 24.
+
+**Actualización · 2026-09-08.** Esa evidencia ya existe **en local**, y está resumida en
+la corrección de la regla 1: el lote a medias revirtió. Lo que sigue sin probarse es el
+mismo comportamiento **en remoto**, que es de la iteración 24.
+
+**Consecuencia · el éxito se decide leyendo lo que wrangler dijo y volviendo a preguntarle
+a la base, no por cómo terminó el proceso.** El motivo es **H-016**, que ya está
+catalogado: en Windows wrangler se cae al terminar y devuelve códigos sin sentido, así que
+su código de salida no es un testigo fiable. Vale igual al escribir, y ahí duele más: una
+lectura que se cree exitosa devuelve una lista vacía y el respaldo de ADR-008 la cubre;
+una **escritura** que se cree exitosa deja al autor creyendo que su lote entró, y si la
+herramienta regenera la instantánea a continuación, la regenera desde una base que no
+cambió y el archivo versionado confirma el error con apariencia de comprobación. Es
+criterio de aceptación de la iteración 23.
+
+**Alternativa descartada · panel de administración protegido.** Una página aparte,
+autenticada con Cloudflare Access, con escritura desde el navegador. Se descarta porque
+su única ventaja real era el escenario móvil que el autor retiró, y a cambio traía
+gestión de identidad, una superficie de escritura publicada y la obligación de defenderla
+para siempre. Queda escrita como la salida disponible **si algún día la edición tiene que
+ocurrir fuera del computador del autor**, que hoy no es el caso.
+
+**Alternativa descartada · mantener una fuente en planilla y volcarla a D1.** Conserva la
+comodidad de edición que la migración a base de datos quitó, pero deja dos copias del
+banco pudiendo discrepar y devuelve el ciclo de desarrollador que toda la épica 20 existe
+para eliminar. Además reintroduce el problema que ADR-023 acaba de cerrar: una fuente de
+verdad que no es la base, y un archivo que se queda atrás sin que nadie se entere.
+
+**Origen.** El mecanismo se exploró primero con otro agente en la rama `antigravity`
+(2026-09-06). **Se conserva la idea; se descarta su código**, por saltarse la barrera de
+ADR-015, usar `npx wrangler` y determinar el éxito de una forma que no aguanta el fallo
+de wrangler en Windows (H-013, H-016). Su archivo
+`d1/migraciones/002-fecha-modificacion.sql` **no se rescata**: la migración que registra
+la fecha de modificación se escribe desde cero en la iteración 23, y se registra en la
+tabla `migracion`, cosa que aquella no hizo.

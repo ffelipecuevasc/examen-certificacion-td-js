@@ -11,13 +11,13 @@ decisiones vale tanto como el código que las implementa.
   |---------------|--------------------------------------------------------------------------------|                                                                                               
 | **Iteración** | `23-administracion-del-contenido.md`                                           |                                                                                               
 | **Épica**     | 20 · Persistencia de preguntas                                                 |                                                                                               
-| **Estado**    | ⚪ No iniciada                                                                 |                                                                                              
+| **Estado**    | 🟢 Completada · dos criterios abiertos                                                                 |                                                                                              
 | **Archivo**   | `20-epica-persistencia-preguntas/iteracion-23-administracion-del-contenido.md` |                                                                                   
-| **Iniciada**  | —                                                                              |                                                                                              
+| **Iniciada**  | 2026-09-08 · cerrada 2026-09-08                                                                            |                                                                                              
 
 ## Iteraciones completadas
 
-**🟢 Completada** | _Iteración 22: Lectura, validación e instantánea (`iteracion-22-lectura-e-instantanea.md`)_
+**🟢 Completada** | _Iteración 23: Administración del contenido (`iteracion-23-administracion-del-contenido.md`)_
 
 | Iteración                              | Épica                       | Cierre     | Bitácora      |                                                                                      
   |----------------------------------------|-----------------------------|------------|---------------|                                                                                             
@@ -25,7 +25,8 @@ decisiones vale tanto como el código que las implementa.
 | 12 - Capa de datos y base D1           | 10 - Plataforma Cloudflare  | 2026-09-03 | 🟢 Completada |                                                                                 
 | 13 - Entornos, secretos y procedim.    | 10 - Plataforma Cloudflare  | 2026-09-04 | 🟢 Completada |                                                                                 
 | 21 - Modelo de datos del banco         | 20 - Persistencia preguntas | 2026-09-05 | 🟢 Completada |                                                                                 
-| 22 - Lectura, validación e instantánea | 20 - Persistencia preguntas | 2026-09-05 | 🟢 Completada |                                                                               
+| 22 - Lectura, validación e instantánea | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |
+| 23 - Administración del contenido      | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |                                                                               
 | —                                      | —                           | —          | —             |       
 
 ## Épicas

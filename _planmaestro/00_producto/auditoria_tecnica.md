@@ -1146,3 +1146,43 @@ Tailwind no encontrara su configuración, el CSS saldría sin la paleta del proy
 **Por qué no se hizo al detectarlo.** Queda fuera del alcance de la iteración 22 —toca la
 construcción, no la persistencia de preguntas— y el autor pidió expresamente no tocarlo
 en esa iteración. Anotado también en el registro.
+
+### H-021 · RETIRADO · No era un hallazgo, era una medición mal hecha
+**Gravedad:** — · **Estado:** ❌ Retirado el mismo día · **Detectado en:** iteración 23 · **Fecha:** 2026-09-08
+
+**Lo que se afirmó, y es falso.** Que `wrangler d1 execute` terminaba con **código de
+salida 0** llevando un `[ERROR]` dentro de su salida, sin haber aplicado nada.
+
+**Por qué se afirmó.** La medición fue así:
+
+```
+node .../wrangler.js d1 execute ... --file=... 2>&1 | tail -12
+echo "codigo de salida de wrangler: $?"
+```
+
+`$?` después de una tubería devuelve el código del **último** comando de la tubería. Lo
+que se midió fue `tail`, que efectivamente termina en 0 casi siempre. Wrangler nunca dijo 0.
+
+**Lo que hace wrangler de verdad**, medido sin tubería, capturando el código directo:
+
+| Caso | Código |
+|---|---|
+| `BEGIN TRANSACTION` rechazado por D1 | **1** |
+| `UNIQUE constraint failed` | **1** |
+| Consulta correcta | **0** |
+
+Es el comportamiento correcto y esperable. No hay nada que arreglar ni que documentar
+como defecto.
+
+**Por qué queda escrito en vez de borrado.** La trampa es real y es del tipo que este
+proyecto ya persigue: **H-011**, **H-013** y **H-016** giran los tres alrededor de códigos
+de salida mal interpretados. Este suma un cuarto filo que no estaba anotado: **`$?` no
+mide lo que uno cree cuando hay una tubería de por medio**, y una medición mal hecha
+produce un hallazgo con toda la apariencia de estar comprobado —con su salida pegada, su
+fecha y su número— que después se cita como si fuera cierto. Se detectó porque al
+reproducirlo para la evidencia de la iteración 23 el número no volvió a salir.
+
+**Lo que NO cambia.** `scripts/administrar-banco.mjs` sigue sin fiarse del código de
+salida de wrangler: interpreta lo que dijo y vuelve a preguntarle a la base. Eso lo
+justifica **H-016**, que está comprobado por el autor contra la nube y no depende de esta
+retirada.

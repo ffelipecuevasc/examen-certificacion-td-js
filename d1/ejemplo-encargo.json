@@ -1,0 +1,33 @@
+{
+  "_comentario": [
+    "Encargo de ejemplo para scripts/administrar-banco.mjs (ADR-025, iteracion 23).",
+    "",
+    "Sirve para tres cosas: como plantilla al escribir un encargo de verdad, como",
+    "archivo con el que probar la herramienta sin inventarse uno, y como entrada de",
+    "las dos comprobaciones de la barrera de ADR-015, que lo rechazan antes de leerlo.",
+    "",
+    "Este archivo NO dice lo que hay en el banco. Un encargo es un encargo: se carga",
+    "y deja de importar. Para saber que hay en el banco se consulta la base.",
+    "",
+    "Las claves que empiezan por guion bajo se ignoran; el resto tiene que llamarse",
+    "igual que su columna en la base (ADR-011)."
+  ],
+  "preguntas": [
+    {
+      "modulo": 3,
+      "origen": "json_2026",
+      "numero_origen": 999,
+      "enunciado": "Ejemplo de d1/ejemplo-encargo.json: cual de estas es una pregunta de mentira?",
+      "justificacion": "Esta pregunta existe solo como plantilla del formato de encargo. Si aparece en el banco de verdad, alguien cargo el archivo de ejemplo sin querer.",
+      "dificultad": "baja",
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        { "letra": "a", "orden": 1, "texto": "Esta misma, que es la plantilla.", "es_correcta": true },
+        { "letra": "b", "orden": 2, "texto": "Ninguna, todas son de verdad.", "es_correcta": false },
+        { "letra": "c", "orden": 3, "texto": "Solo las del modulo 8.", "es_correcta": false },
+        { "letra": "d", "orden": 4, "texto": "Las que no traen justificacion.", "es_correcta": false }
+      ]
+    }
+  ]
+}

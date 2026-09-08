@@ -45,6 +45,31 @@ de las que falten.
       > remoto— y el uuid es la única red que existe. Si lo que se toca es producción,
       > el respaldo de `90-manual/respaldo-y-restauracion.md` va antes, no después.
 
+      > **Tercer aviso pegado a este paso, escrito el 2026-09-08. Ya no es una
+      > migración: son DOS, y van en orden.** La iteración 23 añadió
+      > `d1/migraciones/002-fecha-de-modificacion.sql`, que agrega la columna
+      > `fecha_modificacion` a `pregunta`. Al crear el esquema en la nube hay que
+      > aplicar **`001` y después `002`**, en ese orden, en las dos bases.
+      >
+      > **Y hay que comprobar que las dos queden registradas**, no darlo por hecho:
+      >
+      > ```
+      > SELECT * FROM migracion;
+      > ```
+      >
+      > Tiene que devolver **dos filas**: `001-banco-de-preguntas` y
+      > `002-fecha-de-modificacion`. Si sale solo una, el esquema real y el libro de
+      > migraciones acaban de divergir, y esa divergencia es muda: la columna existe
+      > o no existe, y nada lo dice. Es exactamente lo que pasó en la rama
+      > `antigravity`, donde una migración 002 distinta —`002-fecha-modificacion.sql`,
+      > que nunca entró a `main`— se aplicó sin registrarse.
+      >
+      > **La `002` no es repetible**, a diferencia de la `001`: SQLite no admite
+      > `IF NOT EXISTS` en `ALTER TABLE ADD COLUMN`, así que correrla dos veces
+      > responde `duplicate column name: fecha_modificacion`. El fallo es seguro
+      > —el lote es atómico y no aplica nada, ni vuelve a tocar `migracion`—, pero
+      > conviene mirar `migracion` antes en vez de descubrirlo por el error.
+
       > **Segundo aviso pegado a este paso, escrito el 2026-09-08. El orden importa, y
       > es invertible sin darse cuenta: la comprobación del modo degradado va ANTES de
       > aplicar el esquema en producción.** Hay dos formas de que producción esté

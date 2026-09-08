@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los tres comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los cuatro comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -9,7 +9,7 @@
  *
  * 1. `&&` corta en el primer codigo distinto de 0, asi que un aviso —«no se pudo
  *    probar»— impediria correr lo que venia despues, como si fuera un fallo.
- * 2. `&&` deja como codigo final el del ultimo que corrio. Con tres
+ * 2. `&&` deja como codigo final el del ultimo que corrio. Con varios
  *    comprobadores y tres clases de resultado, ese numero deja de significar
  *    nada.
  *
@@ -27,18 +27,24 @@
  *
  * QUE CORRE, Y EN QUE ORDEN
  *
- *   1. verificar-barrera.mjs   ADR-015 sigue en pie (H-014)
- *   2. verificar.mjs           el CSS versionado corresponde a su fuente
- *   3. probar-escapado.mjs     el escapado del banco aguanta contenido hostil
+ *   1. verificar-barrera.mjs      ADR-015 sigue en pie (H-014)
+ *   2. verificar.mjs              el CSS versionado corresponde a su fuente
+ *   3. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
+ *   4. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
- * puede llegar a la cuenta de Cloudflare, y ninguna de las otras dos merece
- * correrse antes de reponerla. Las otras dos corren siempre, aunque la anterior
- * haya fallado: son independientes entre si, y parar en la primera esconderia el
- * estado de las demas.
+ * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
+ * antes de reponerla. Las demas corren siempre, aunque la anterior haya fallado:
+ * son independientes entre si, y parar en la primera esconderia el estado de las
+ * otras.
+ *
+ * Las dos ultimas necesitan la base D1 LOCAL con su esquema, y las dos saben
+ * decir «no pude probar» en vez de fingir un veredicto. En un clon recien hecho
+ * las dos van a avisar, y el resultado sera VERIFICACION INCOMPLETA: es correcto,
+ * y es la diferencia entre una casilla en blanco y una marcada sin mirar.
  *
  * Codigos de salida:
- *   0  VERIFICADO             las tres comprobaciones hechas y en verde
+ *   0  VERIFICADO             las cuatro comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -59,7 +65,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los tres comprobadores, con la traduccion de sus codigos.
+ * Los cuatro comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -99,6 +105,18 @@ const COMPROBADORES = [
         'NO SE PUDO PROBAR. Para cerrarlo: `npm run datos:dev` en otra terminal y repetir',
       ],
       3: [FALLO, 'BASE SUCIA: el contenido hostil quedo dentro de la base local'],
+    },
+  },
+  {
+    nombre: 'restricciones',
+    guion: 'probar-restricciones.mjs',
+    codigos: {
+      0: [OK, 'las nueve restricciones del esquema rechazaron lo que debian'],
+      1: [FALLO, 'RESTRICCION CAIDA: el esquema dejo pasar algo que tenia que rechazar'],
+      2: [
+        AVISO,
+        'NO SE PUDO PROBAR. Para cerrarlo: `npm run datos:migrar`, `datos:migrar-002` y repetir',
+      ],
     },
   },
 ];
@@ -153,11 +171,11 @@ const sinCorrer = COMPROBADORES.filter((c) => !resultados.some((r) => r.nombre =
 console.log(`\n${LINEA}\n${titulo}\n${LINEA}`);
 
 for (const r of resultados) {
-  console.log(`  ${r.nombre.padEnd(10)} ${r.clase.padEnd(6)} ${r.texto}`);
+  console.log(`  ${r.nombre.padEnd(14)} ${r.clase.padEnd(6)} ${r.texto}`);
 }
 
 for (const c of sinCorrer) {
-  console.log(`  ${c.nombre.padEnd(10)} ${'-'.padEnd(6)} no se ejecuto`);
+  console.log(`  ${c.nombre.padEnd(14)} ${'-'.padEnd(6)} no se ejecuto`);
 }
 
 if (cortado) {
@@ -168,8 +186,15 @@ if (cortado) {
 }
 
 if (hayAviso && !hayFallo) {
-  console.log('\nNinguna comprobacion encontro nada mal. Lo que hay es una que no se');
-  console.log('pudo hacer, y eso no es un aprobado: es una casilla en blanco.');
+  // El plural cuesta nada y evita una duda tonta: un texto que dice «una» con dos
+  // avisos a la vista hace pensar que el guion no esta contando bien.
+  const avisos = resultados.filter((r) => r.clase === AVISO).length;
+  console.log(
+    avisos === 1
+      ? '\nNinguna comprobacion encontro nada mal. Lo que hay es una que no se pudo'
+      : `\nNinguna comprobacion encontro nada mal. Lo que hay son ${avisos} que no se pudieron`
+  );
+  console.log('hacer, y eso no es un aprobado: es una casilla en blanco.');
 }
 
 console.log(`\ncodigo de salida: ${codigoFinal}\n`);

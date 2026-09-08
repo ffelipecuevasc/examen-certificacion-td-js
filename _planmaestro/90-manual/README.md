@@ -24,7 +24,7 @@ puede seguirse sin saber programar, está mal escrito.
 | [Esquema del banco de preguntas en D1](esquema-del-banco.md) | Iteración 21 | 🟢 Escrito |
 | [La barrera de ADR-015](barrera-adr-015.md) | Iteración 21 (H-014) | 🟢 Escrito |
 | [El escapado del banco de preguntas](escapado-del-banco.md) | Iteración 22 (H-003) | 🟢 Escrito |
-| Cómo editar el banco de preguntas | Iteración 11 | ⚪ Pendiente |
+| [Cómo editar el banco de preguntas](administrar-el-banco.md) | Iteración 23 | 🟢 Escrito |
 | Cómo publicar una actualización del sitio | Iteración 41 | ⚪ Pendiente |
 | Configuración manual de Cloudflare | Iteraciones 42 y 43 | ⚪ Pendiente |
 | Cómo leer las métricas | Iteración 43 | ⚪ Pendiente |

@@ -14,16 +14,21 @@
     "datos:dev": "npm run build && wrangler pages dev",
     "datos:esquema": "wrangler d1 execute examen-td-js-produccion --local --file=d1/juguete.sql",
     "datos:migrar": "wrangler d1 execute examen-td-js-produccion --local --file=d1/migraciones/001-banco-de-preguntas.sql",
+    "datos:migrar-002": "wrangler d1 execute examen-td-js-produccion --local --file=d1/migraciones/002-fecha-de-modificacion.sql",
     "datos:ejemplo": "wrangler d1 execute examen-td-js-produccion --local --file=d1/ejemplo-banco.sql",
     "datos:verificar-banco": "node scripts/verificar-banco.mjs",
     "datos:instantanea": "node scripts/generar-instantanea.mjs",
+    "banco:revisar": "node scripts/administrar-banco.mjs revisar",
+    "banco:insertar": "node scripts/administrar-banco.mjs insertar",
+    "banco:actualizar": "node scripts/administrar-banco.mjs actualizar",
     "start": "npm run dev",
     "icons": "node scripts/build-icons.mjs",
     "cuestionario": "python scripts/build-cuestionario.py",
     "informe-banco": "node scripts/informe-banco.mjs",
     "verificar:barrera": "node scripts/verificar-barrera.mjs",
     "verificar:css": "node scripts/verificar.mjs",
-    "probar:escapado": "node scripts/probar-escapado.mjs"
+    "probar:escapado": "node scripts/probar-escapado.mjs",
+    "probar:restricciones": "node scripts/probar-restricciones.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",
