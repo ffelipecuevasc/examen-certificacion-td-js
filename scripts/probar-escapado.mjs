@@ -398,7 +398,7 @@ try {
         'Se lanzo d1/prueba-escapado-limpiar.sql, pero no pude leer la base para',
         'confirmar que quedo limpia. Compruebalo a mano antes de abrir el sitio:',
         '',
-        '  npx wrangler d1 execute examen-td-js-produccion --local ' +
+        '  node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local ' +
           `--command="SELECT * FROM pregunta WHERE id = ${ID_HOSTIL};"`,
       ]);
     } else if (
@@ -418,7 +418,7 @@ try {
         '',
         'Retiralo a mano:',
         '',
-        '  npx wrangler d1 execute examen-td-js-produccion --local ' +
+        '  node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local ' +
           '--file=d1/prueba-escapado-limpiar.sql',
       ]);
     } else {

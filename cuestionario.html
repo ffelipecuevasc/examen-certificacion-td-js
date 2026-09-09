@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cuestionario de Práctica - Certificación FullStack JavaScript | Felipe Cuevas</title>
-<meta name="description" content="Cuestionario de práctica con 105 preguntas de los módulos 2 al 8 para preparar el examen de certificación de Talento Digital para Chile.">
+<meta name="description" content="Cuestionario de práctica con preguntas de los módulos 2 al 8 para preparar el examen de certificación de Talento Digital para Chile.">
 <meta name="author" content="Felipe Cuevas">
 
 <link rel="icon" type="image/svg+xml" href="static/resources/js-logo.svg">
@@ -56,9 +56,12 @@
       <!-- ============ PANEL FIJO ============ -->
       <div class="lg:h-[calc(100vh-4rem)] lg:sticky lg:top-16 lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-panel3 px-5 sm:px-8 xl:px-12 py-10 lg:py-12 flex flex-col">
 
-        <span class="inline-flex self-start items-center gap-2 border border-jsyellow/40 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow">
-          <span class="icon i-quiz text-base" aria-hidden="true"></span>105 preguntas · 7 módulos
-        </span>
+        <!-- Contador del banco. Vacio y oculto hasta que haya preguntas dibujadas:
+             lo llena components/cuestionario.js con lo que de verdad se dibujo, y
+             si no se dibujo nada no aparece. Estuvo escrito a mano —«105 preguntas
+             · 7 modulos»— y el 2026-09-08 la pantalla decia 105 arriba y 8 en el
+             pie al mismo tiempo. Ningun numero es mejor que un numero falso. -->
+        <span id="contador-banco" class="hidden self-start items-center gap-2 border border-jsyellow/40 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow"></span>
 
         <h1 class="mt-6 font-display font-bold text-4xl xl:text-5xl leading-[1.02] tracking-tight">
           Cuestionario de<br><span class="text-jsyellow">práctica</span>

@@ -8,6 +8,11 @@ Cloudflare (ADR-015): escribe los comandos, los ejecuta el autor.
 
 **De dónde sale la decisión:** ADR-014.
 
+**Por qué los comandos no dicen `npx wrangler`.** Corregido el 2026-09-09. Se
+escriben con el wrangler de `node_modules` porque `npx` puede traerse otra versión
+y después no se sabe cuál corrió: es la lección de **H-013**, y no tenía sentido que
+la regla del proyecto la prohibiera mientras este manual la enseñaba.
+
 ---
 
 ## Dos mecanismos, dos pérdidas distintas
@@ -35,7 +40,7 @@ cambia sola: solo cambia cuando editas el banco, así que el momento de respalda
 es justo después de haberlo hecho.
 
 ```powershell
-npx wrangler d1 export examen-td-js-produccion --remote --output=d1/respaldo-banco.sql
+node node_modules/wrangler/bin/wrangler.js d1 export examen-td-js-produccion --remote --output=d1/respaldo-banco.sql
 ```
 
 Siempre el mismo archivo, siempre sobrescrito: el historial lo lleva git. Después
@@ -61,8 +66,8 @@ que intentar: no necesita archivos ni depende de que alguien se acordara de
 exportar.
 
 ```powershell
-npx wrangler d1 time-travel info examen-td-js-produccion
-npx wrangler d1 time-travel restore examen-td-js-produccion --help
+node node_modules/wrangler/bin/wrangler.js d1 time-travel info examen-td-js-produccion
+node node_modules/wrangler/bin/wrangler.js d1 time-travel restore examen-td-js-produccion --help
 ```
 
 El primero dice hasta dónde se puede volver. El segundo muestra las banderas
@@ -85,8 +90,8 @@ Tres cosas que hay que saber antes de usarlo:
 Cuando la base ya no existe, o el error tiene más de 7 días.
 
 ```powershell
-npx wrangler d1 execute <base> --remote --command "DROP TABLE IF EXISTS prueba_tuberia;"
-npx wrangler d1 execute <base> --remote --file=d1/respaldo-banco.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute <base> --remote --command "DROP TABLE IF EXISTS prueba_tuberia;"
+node node_modules/wrangler/bin/wrangler.js d1 execute <base> --remote --file=d1/respaldo-banco.sql
 ```
 
 **Por qué hay que borrar antes.** El archivo que produce `d1 export` contiene
@@ -113,7 +118,7 @@ repite cada vez que cambie el procedimiento o la herramienta.
 es el de producción, y no queremos que un volcado de juguete lo pise.
 
 ```powershell
-npx wrangler d1 export examen-td-js-pruebas --remote --output=$env:TEMP\respaldo-pruebas.sql
+node node_modules/wrangler/bin/wrangler.js d1 export examen-td-js-pruebas --remote --output=$env:TEMP\respaldo-pruebas.sql
 Get-Content $env:TEMP\respaldo-pruebas.sql -TotalCount 20
 ```
 
@@ -121,8 +126,8 @@ Get-Content $env:TEMP\respaldo-pruebas.sql -TotalCount 20
 que están ahí.
 
 ```powershell
-npx wrangler d1 execute examen-td-js-pruebas --remote --command "DELETE FROM prueba_tuberia WHERE clave='saludo';"
-npx wrangler d1 execute examen-td-js-pruebas --remote --command "SELECT clave, valor FROM prueba_tuberia ORDER BY id;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --command "DELETE FROM prueba_tuberia WHERE clave='saludo';"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --command "SELECT clave, valor FROM prueba_tuberia ORDER BY id;"
 ```
 
 Tiene que quedar **una sola fila**, `entorno`. Si quieres verlo desde afuera, la
@@ -132,14 +137,14 @@ registro.
 **3 · Restaurar desde el archivo.**
 
 ```powershell
-npx wrangler d1 execute examen-td-js-pruebas --remote --command "DROP TABLE IF EXISTS prueba_tuberia;"
-npx wrangler d1 execute examen-td-js-pruebas --remote --file=$env:TEMP\respaldo-pruebas.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --command "DROP TABLE IF EXISTS prueba_tuberia;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --file=$env:TEMP\respaldo-pruebas.sql
 ```
 
 **4 · Comprobar que volvió.**
 
 ```powershell
-npx wrangler d1 execute examen-td-js-pruebas --remote --command "SELECT clave, valor FROM prueba_tuberia ORDER BY id;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --command "SELECT clave, valor FROM prueba_tuberia ORDER BY id;"
 ```
 
 Tienen que estar las **dos filas**, con `saludo` de vuelta y su valor original.

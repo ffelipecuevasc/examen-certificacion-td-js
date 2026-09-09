@@ -1186,3 +1186,67 @@ reproducirlo para la evidencia de la iteración 23 el número no volvió a salir
 salida de wrangler: interpreta lo que dijo y vuelve a preguntarle a la base. Eso lo
 justifica **H-016**, que está comprobado por el autor contra la nube y no depende de esta
 retirada.
+
+### H-022 · Los dos extremos se contradijeron sobre el mismo hecho, y el que mentía era el de diagnóstico
+**Gravedad:** 🔴 · **Estado:** 🟢 Cerrado · **Detectado en:** iteración 24 · **Fecha:** 2026-09-09
+
+**Síntoma.** Con el esquema recién aplicado en producción y el banco todavía en cero,
+sobre el sitio publicado y en el mismo minuto:
+
+```
+/api/preguntas   200 · datos [] · meta.vacio TRUE  · filas_leidas 1
+/api/estado      200 · consulta_d1 «correcta»      · meta.vacio FALSE
+```
+
+Comprobado en las **dos direcciones**: el alias del despliegue
+`2934ad82.examen-certificacion-td-js.pages.dev` y la canónica
+`examen-certificacion-td-js.pages.dev`, con resultado idéntico. Se repitió en la
+canónica a propósito, porque un alias puede quedar apuntando a un despliegue viejo y
+una evidencia tomada sólo del alias no prueba qué está sirviendo el sitio.
+
+**Causa.** `respuestaOk()` calculaba `meta.vacio` así:
+
+```js
+const vacio = Array.isArray(datos) ? datos.length === 0 : datos == null;
+```
+
+`/api/estado` entrega un **objeto**, no una lista. Un objeto no es un arreglo y no es
+nulo, así que esa expresión daba **`false` siempre**, pasara lo que pasara con el
+banco. El campo no medía nada y aun así se leía como una medición.
+
+**Por qué es más grave que el punto ciego que ya estaba anotado.** El punto ciego
+—`SELECT 1` no puede fallar— hacía que `/api/estado` **callara** un problema. Esto
+hacía que lo **negara**. Y lo negaba en el único extremo al que alguien acude
+justamente cuando sospecha que algo anda mal: un diagnóstico que calla es inútil, uno
+que afirma lo contrario de la verdad es peor que no tenerlo, porque quien lo consulta
+se va tranquilo.
+
+**Corrección.** Dos cambios, ninguno cosmético:
+
+1. `functions/api/_comun.js` · **`meta.vacio` sólo aparece cuando `datos` es una
+   lista.** Se quita el campo en vez de darle otro valor: un extremo que no entrega
+   una lista no tiene por qué opinar sobre listas.
+2. `functions/api/estado.js` · reescrito. Pregunta dos cosas —`SELECT 1` para saber
+   si D1 contesta, y `SELECT COUNT(*) FROM pregunta_activa` para saber si el esquema
+   está y cuánto hay—, y responde con `preguntas_activas` y `banco_vacio` **contados
+   de la misma vista de la que come el sitio**. La primera consulta se conserva
+   aunque parezca redundante: es la única que distingue «la base no contesta» de «la
+   base contesta pero le falta el esquema». Se añadió el código `SIN_ESQUEMA` para
+   ese segundo caso.
+
+**Comprobado provocando los tres estados**, contra la base local, el 2026-09-09:
+
+| Estado de la base | `/api/preguntas` | `/api/estado` |
+|---|---|---|
+| Sin esquema | `503` `FALLO_CONSULTA` | `503` **`SIN_ESQUEMA`** (antes: `200` «correcta») |
+| Con esquema, banco en 0 | `200` `vacio: true` | `200` `preguntas_activas: 0`, **`banco_vacio: true`** (antes: `vacio: false`) |
+| Con esquema, banco con 8 | `200` `vacio: false` | `200` `preguntas_activas: 8`, **`banco_vacio: false`** |
+
+Los dos extremos coinciden en los tres. Y `banco_vacio` cambia de valor, que es lo
+que lo separa de una constante disfrazada.
+
+**La lección, que es de método y no de este extremo.** Un campo calculado a partir de
+la **forma** del dato en vez de su **contenido** puede quedar clavado en un valor sin
+que nada avise. Este llevaba desde la iteración 12 diciendo `false` y nadie lo miró,
+porque hasta que hubo un banco vacío de verdad, `false` era la respuesta correcta por
+casualidad.

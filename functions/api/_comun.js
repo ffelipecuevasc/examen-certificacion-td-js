@@ -42,6 +42,14 @@ export const ERRORES = {
     usar_respaldo: true,
     mensaje: 'La base de datos no respondió a la consulta.',
   },
+  // La base contesta, pero le falta el esquema del banco. Es distinto de que no
+  // conteste, y merece nombre propio: con este codigo se sabe que hay que aplicar
+  // las migraciones, y con FALLO_CONSULTA habria que ir a adivinarlo al registro.
+  SIN_ESQUEMA: {
+    estado: 503,
+    usar_respaldo: true,
+    mensaje: 'La base de datos responde, pero no tiene el esquema del banco.',
+  },
   NO_ENCONTRADO: {
     estado: 404,
     usar_respaldo: false,
@@ -73,15 +81,36 @@ function cabeceras() {
   };
 }
 
-/** Respuesta correcta. `datos` puede venir vacio, y eso tambien es correcto. */
+/**
+ * Respuesta correcta. `datos` puede venir vacio, y eso tambien es correcto.
+ *
+ * `meta.vacio` SOLO aparece cuando `datos` es una lista, porque solo de una lista
+ * tiene sentido decir si esta vacia. Antes se calculaba tambien para los objetos,
+ * y ahi salia `false` SIEMPRE —un objeto no es un arreglo y no es nulo—, con lo que
+ * el campo no medía nada y aun asi se leia como una medicion.
+ *
+ * Eso produjo H-022: con el banco en cero, `/api/preguntas` respondia
+ * `vacio: true` y `/api/estado` respondia `vacio: false` en el mismo minuto y en la
+ * misma direccion. Los dos extremos contradiciendose sobre el mismo hecho, y el que
+ * mentia era justo el que uno consulta para saber que pasa.
+ *
+ * Se quita el campo en vez de darle otro valor: un extremo que no entrega una lista
+ * no tiene por que opinar sobre listas. Si necesita hablar del banco, lo dice en sus
+ * propios `datos`, con un nombre que signifique algo.
+ */
 export function respuestaOk(datos, meta = {}) {
-  const vacio = Array.isArray(datos) ? datos.length === 0 : datos == null;
+  const esLista = Array.isArray(datos);
 
   return new Response(
     JSON.stringify({
       ok: true,
       datos,
-      meta: { origen: 'd1', vacio, generado_en: new Date().toISOString(), ...meta },
+      meta: {
+        origen: 'd1',
+        ...(esLista ? { vacio: datos.length === 0 } : {}),
+        generado_en: new Date().toISOString(),
+        ...meta,
+      },
     }),
     { status: 200, headers: cabeceras() }
   );

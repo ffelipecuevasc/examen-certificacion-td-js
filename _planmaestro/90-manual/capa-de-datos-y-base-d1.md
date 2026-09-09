@@ -64,8 +64,8 @@ repetir idéntica para las dos bases, y la que deja constancia de qué se ejecut
 panel sirve para *mirar* lo que existe; para *crear*, se usa la herramienta.
 
 ```powershell
-npx wrangler d1 create examen-td-js-produccion --location wnam
-npx wrangler d1 create examen-td-js-pruebas --location wnam
+node node_modules/wrangler/bin/wrangler.js d1 create examen-td-js-produccion --location wnam
+node node_modules/wrangler/bin/wrangler.js d1 create examen-td-js-pruebas --location wnam
 ```
 
 `--location wnam` es Western North America. La región se elige al crear y **no se
@@ -168,7 +168,7 @@ curl http://127.0.0.1:8788/api/prueba
 verdad de la base y no del código, cámbialo y vuelve a consultar:
 
 ```powershell
-npx wrangler d1 execute examen-td-js-produccion --local --command "UPDATE prueba_tuberia SET valor='probando' WHERE clave='saludo';"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local --command "UPDATE prueba_tuberia SET valor='probando' WHERE clave='saludo';"
 ```
 
 ---
@@ -181,9 +181,9 @@ tabla de juguete es inofensivo; el día que ese archivo contenga el banco de
 preguntas, no lo será.
 
 ```powershell
-npx wrangler login          # abre el navegador, una sola vez por equipo
-npx wrangler d1 execute examen-td-js-produccion --remote --file=d1/juguete.sql
-npx wrangler d1 execute examen-td-js-pruebas --remote --file=d1/juguete.sql
+node node_modules/wrangler/bin/wrangler.js login          # abre el navegador, una sola vez por equipo
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --remote --file=d1/juguete.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --file=d1/juguete.sql
 ```
 
 La diferencia entre `--local` y `--remote` es la diferencia entre tu equipo y la

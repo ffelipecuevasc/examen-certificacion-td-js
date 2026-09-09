@@ -7,6 +7,11 @@ Las decisiones que lo sostienen: **ADR-018** (alternativas en tabla aparte),
 **ADR-019** (la correcta es una bandera, no una posición), **ADR-020** (las
 retiradas se marcan, no se borran) y **ADR-021** (los módulos son una tabla).
 
+**Por qué los comandos no dicen `npx wrangler`.** Corregido el 2026-09-09. Se
+escriben con el wrangler de `node_modules` porque `npx` puede traerse otra versión
+y después no se sabe cuál corrió: es la lección de **H-013**, y no tenía sentido que
+la regla del proyecto la prohibiera mientras este manual la enseñaba.
+
 Archivos:
 
 | Archivo | Para qué |
@@ -275,7 +280,7 @@ carpeta está en `.gitignore`, así que no hay nada versionado que perder.
 Debe quedar así, y conviene comprobarlo en vez de suponerlo:
 
 ```
-npx wrangler d1 execute examen-td-js-produccion --local --json --command="SELECT (SELECT COUNT(*) FROM modulo) modulos, (SELECT COUNT(*) FROM pregunta) preguntas, (SELECT COUNT(*) FROM pregunta WHERE estado='activa') activas, (SELECT COUNT(*) FROM alternativa) alternativas;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local --json --command="SELECT (SELECT COUNT(*) FROM modulo) modulos, (SELECT COUNT(*) FROM pregunta) preguntas, (SELECT COUNT(*) FROM pregunta WHERE estado='activa') activas, (SELECT COUNT(*) FROM alternativa) alternativas;"
 ```
 
 ```
@@ -295,8 +300,8 @@ preview` en cada comando**, porque esa base sólo está declarada bajo ese entor
 
 ```
 rm -rf .wrangler/state/v3/d1        # o Remove-Item -Recurse -Force en PowerShell
-npx wrangler d1 execute examen-td-js-pruebas --local --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
-npx wrangler d1 execute examen-td-js-pruebas --local --env preview --file=d1/ejemplo-banco.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --local --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --local --env preview --file=d1/ejemplo-banco.sql
 npm run datos:verificar-banco -- --base=examen-td-js-pruebas --local --env preview
 ```
 
@@ -347,11 +352,11 @@ por `--remote` y, para el entorno de pruebas, el nombre de la base:
 
 ```
 # Pruebas primero, siempre
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
 npm run datos:verificar-banco -- --base=examen-td-js-pruebas --remote --env preview
 
 # Y sólo después producción
-npx wrangler d1 execute examen-td-js-produccion --remote --file=d1/migraciones/001-banco-de-preguntas.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --remote --file=d1/migraciones/001-banco-de-preguntas.sql
 npm run datos:verificar-banco -- --remote
 ```
 
@@ -387,9 +392,10 @@ repetible no es reversible.
 
 **`PERMITIR_REMOTO=1` hace falta para `npm run datos:verificar-banco -- --remote`.**
 El envoltorio se niega a hablar con la nube salvo que se le pida a propósito: es la
-capa 3 de la barrera de ADR-015, puesta tras H-014. Los `npx wrangler` directos no la
-tienen —los escribe y los ejecuta el autor a conciencia—, pero el envoltorio sí,
-porque es el camino documentado y por tanto el que se ejecuta por inercia.
+capa 3 de la barrera de ADR-015, puesta tras H-014. Los comandos de wrangler
+directos no la tienen —los escribe y los ejecuta el autor a conciencia—, pero el
+envoltorio sí, porque es el camino documentado y por tanto el que se ejecuta por
+inercia.
 
 ### Ensayo completo sobre la base de pruebas en la nube
 
@@ -402,19 +408,19 @@ lleva `--env preview`.
 $env:PERMITIR_REMOTO=1
 
 # 1 · esquema y datos de ejemplo (aquí --file es correcto: se va a escribir)
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --file=d1/ejemplo-banco.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --file=d1/ejemplo-banco.sql
 
 # 2 · conteos, con --command porque sólo lee
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --command="SELECT (SELECT COUNT(*) FROM modulo) modulos, (SELECT COUNT(*) FROM pregunta) preguntas, (SELECT COUNT(*) FROM pregunta WHERE estado='activa') activas, (SELECT COUNT(*) FROM alternativa) alternativas;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --command="SELECT (SELECT COUNT(*) FROM modulo) modulos, (SELECT COUNT(*) FROM pregunta) preguntas, (SELECT COUNT(*) FROM pregunta WHERE estado='activa') activas, (SELECT COUNT(*) FROM alternativa) alternativas;"
 
 # 3 · VEREDICTO 1: BANCO VERIFICADO, código 0
 npm run datos:verificar-banco -- --base=examen-td-js-pruebas --remote --env preview
 
 # 4 · romper tres cosas de tipos distintos
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --command="DELETE FROM alternativa WHERE id = 40;"
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --command="UPDATE pregunta SET justificacion = '' WHERE id = 3;"
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --command="UPDATE pregunta SET estado = 'borrador' WHERE modulo = 8 AND estado = 'activa';"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --command="DELETE FROM alternativa WHERE id = 40;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --command="UPDATE pregunta SET justificacion = '' WHERE id = 3;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --command="UPDATE pregunta SET estado = 'borrador' WHERE modulo = 8 AND estado = 'activa';"
 
 # 5 · VEREDICTO 2: BANCO CON PROBLEMAS, 4 filas descritas, código 1
 npm run datos:verificar-banco -- --base=examen-td-js-pruebas --remote --env preview
@@ -480,7 +486,7 @@ del tercer veredicto, que es una base **real y alcanzable** cuya consulta falla:
 > **Antes de ejecutarlo, confirma contra qué base estás apuntando:**
 >
 > ```powershell
-> npx wrangler d1 info examen-td-js-pruebas --env preview
+> node node_modules/wrangler/bin/wrangler.js d1 info examen-td-js-pruebas --env preview
 > ```
 >
 > Es de sólo lectura. Comprueba que el `uuid` que imprime sea
@@ -494,14 +500,14 @@ del tercer veredicto, que es una base **real y alcanzable** cuya consulta falla:
 
 ```powershell
 # a · vaciar la base de pruebas — LEE EL AVISO DE ARRIBA ANTES DE PEGAR ESTO
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --command="DROP VIEW IF EXISTS pregunta_activa; DROP TABLE IF EXISTS alternativa; DROP TABLE IF EXISTS pregunta; DROP TABLE IF EXISTS modulo; DROP TABLE IF EXISTS migracion; DROP TABLE IF EXISTS prueba_tuberia;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --command="DROP VIEW IF EXISTS pregunta_activa; DROP TABLE IF EXISTS alternativa; DROP TABLE IF EXISTS pregunta; DROP TABLE IF EXISTS modulo; DROP TABLE IF EXISTS migracion; DROP TABLE IF EXISTS prueba_tuberia;"
 
 # b · VEREDICTO 3, forma B: la base existe, se alcanza, y la consulta no puede correr
 npm run datos:verificar-banco -- --base=examen-td-js-pruebas --remote --env preview
 
 # c · repoblar y dejarla como estaba
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
-npx wrangler d1 execute examen-td-js-pruebas --remote --env preview --file=d1/ejemplo-banco.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --file=d1/migraciones/001-banco-de-preguntas.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-pruebas --remote --env preview --file=d1/ejemplo-banco.sql
 npm run datos:verificar-banco -- --base=examen-td-js-pruebas --remote --env preview
 ```
 

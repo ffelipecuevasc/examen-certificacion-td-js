@@ -125,7 +125,7 @@ local con la fila 900 dentro te dibuja una pregunta hostil y un ícono roto la p
 vez que abras el navegador, y nada te lo anuncia. Si sale, retíralo:
 
 ```
-npx wrangler d1 execute examen-td-js-produccion --local --file=d1/prueba-escapado-limpiar.sql
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local --file=d1/prueba-escapado-limpiar.sql
 ```
 
 En condiciones normales no aparece: el guardián limpia solo y **comprueba** que quedó

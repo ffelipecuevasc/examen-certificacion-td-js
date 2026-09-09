@@ -18,7 +18,7 @@ Este repositorio no reemplaza las clases ni el material oficial del programa: su
 ```
 ├── index.html              Markup del sitio (sin CSS ni JS embebido)
 ├── package.json            Scripts de compilación
-├── tailwind.config.js      Paleta, tipografías y rutas de contenido
+├── tailwind.config.cjs     Paleta, tipografías y rutas de contenido. `.cjs` porque el proyecto declara `"type": "module"` (H-020)
 ├── src/
 │   └── input.css           Fuente de Tailwind (no se publica)
 └── static/

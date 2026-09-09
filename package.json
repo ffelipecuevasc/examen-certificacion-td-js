@@ -1,6 +1,7 @@
 {
   "name": "guia-certificacion-fullstack-js",
   "version": "1.0.0",
+  "type": "module",
   "description": "Guia de estudio para el examen de certificacion del Bootcamp Desarrollador FullStack JavaScript de Talento Digital para Chile.",
   "private": true,
   "author": "Felipe Cuevas (https://felipecuevas.dev)",

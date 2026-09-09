@@ -261,6 +261,48 @@ function pintar() {
 }
 
 /**
+ * Escribe el contador de la portada con lo que DE VERDAD se dibujo.
+ *
+ * Estuvo escrito a mano en el HTML —«105 preguntas · 7 modulos»— y el 2026-09-08
+ * la pantalla mostraba «105 preguntas» arriba y «copia guardada en el sitio (8
+ * preguntas)» en el pie, al mismo tiempo. Un numero que no sale del dato que
+ * acompana es un numero que va a mentir tarde o temprano, y este mintio.
+ *
+ * Se llama en los tres finales de renderCuestionario(), tambien en los dos que no
+ * dibujan preguntas: si no hay nada que contar, el contador se esconde. **Ningun
+ * numero es mejor que un numero falso.**
+ *
+ * Los modulos se cuentan igual que las preguntas, de los datos. Eran «7» fijos, y
+ * el banco puede llegar sin alguno.
+ */
+function mostrarContador(grupos) {
+  const contenedor = $('#contador-banco');
+  if (!contenedor) return;
+
+  const preguntas = grupos
+    ? grupos.reduce((suma, grupo) => suma + grupo.preguntas.length, 0)
+    : 0;
+
+  if (preguntas === 0) {
+    contenedor.innerHTML = '';
+    contenedor.classList.add('hidden');
+    contenedor.classList.remove('inline-flex');
+    return;
+  }
+
+  const modulos = grupos.length;
+  const contar = (cantidad, singular, plural) =>
+    `${cantidad} ${cantidad === 1 ? singular : plural}`;
+
+  contenedor.innerHTML =
+    `${icon('quiz', 'text-base')}<span>${esc(contar(preguntas, 'pregunta', 'preguntas'))} · ` +
+    `${esc(contar(modulos, 'módulo', 'módulos'))}</span>`;
+
+  contenedor.classList.remove('hidden');
+  contenedor.classList.add('inline-flex');
+}
+
+/**
  * Pide el banco y lo dibuja.
  *
  * Los tres finales posibles se tratan distinto a proposito, y la diferencia es
@@ -280,6 +322,7 @@ export async function renderCuestionario() {
   mostrarAvisoRespaldo(respuesta.meta?.respaldo);
 
   if (!respuesta.ok) {
+    mostrarContador(null);
     dibujarMensaje(
       contenedor,
       'database',
@@ -290,6 +333,7 @@ export async function renderCuestionario() {
   }
 
   if (respuesta.vacio) {
+    mostrarContador(null);
     dibujarMensaje(
       contenedor,
       'database',
@@ -300,6 +344,7 @@ export async function renderCuestionario() {
   }
 
   bancoCargado = agruparPorModulo(respuesta.datos);
+  mostrarContador(bancoCargado);
   pintar();
 }
 

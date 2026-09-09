@@ -210,14 +210,14 @@ Esto es lo que hay que usar cuando quieras saber el estado real, en vez de abrir
 archivo viejo.
 
 ```
-npx wrangler d1 execute examen-td-js-produccion --local --command="SELECT id, modulo, estado, substr(enunciado,1,60) FROM pregunta ORDER BY id;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local --command="SELECT id, modulo, estado, substr(enunciado,1,60) FROM pregunta ORDER BY id;"
 ```
 
 Para ver una sola pregunta con todo y sus alternativas:
 
 ```
-npx wrangler d1 execute examen-td-js-produccion --local --command="SELECT * FROM pregunta WHERE id = 3;"
-npx wrangler d1 execute examen-td-js-produccion --local --command="SELECT letra, orden, texto, es_correcta FROM alternativa WHERE pregunta_id = 3 ORDER BY orden;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local --command="SELECT * FROM pregunta WHERE id = 3;"
+node node_modules/wrangler/bin/wrangler.js d1 execute examen-td-js-produccion --local --command="SELECT letra, orden, texto, es_correcta FROM alternativa WHERE pregunta_id = 3 ORDER BY orden;"
 ```
 
 ---
