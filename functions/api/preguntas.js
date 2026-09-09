@@ -32,11 +32,10 @@
  * extremo (ADR-011). No se traducen al entrar al navegador.
  */
 import { respuestaError, respuestaOk, soloLectura } from './_comun.js';
-import { validarPreguntas } from './_validacion.js';
-
-/** Modulos que existen en el plan formativo. Igual que el CHECK del esquema. */
-const MODULO_MINIMO = 2;
-const MODULO_MAXIMO = 8;
+// El rango de modulos se importa, no se redefine: durante la iteracion 23 estuvo
+// escrito en dos archivos, y dos definiciones del mismo rango no fallan al
+// divergir, se quedan calladas.
+import { MODULO_MAXIMO, MODULO_MINIMO, validarPreguntas } from './_validacion.js';
 
 /**
  * Las dos consultas del banco, exportadas a proposito.

@@ -37,10 +37,11 @@
  *
  * LA VALIDACION ES LA DE LA LECTURA
  *
- * `validarParaEscritura()` vive en `functions/api/_validacion.js`, junto a la de
- * lectura y sobre las mismas primitivas. Aca no hay ni una regla de contenido
- * propia: si hubiera dos copias, el dia que una cambiara el banco tendria dos
- * definiciones de «pregunta valida».
+ * `validarParaEscritura()` vive en `scripts/validacion-de-escritura.mjs`, fuera
+ * del camino publicado, y esa a su vez importa `motivosDeContenido()` de
+ * `functions/api/_validacion.js`, que es la definicion unica de que es una
+ * pregunta valida. Aca no hay ni una regla de contenido propia: si hubiera dos
+ * copias, el dia que una cambiara el banco tendria dos definiciones de «valida».
  *
  * Codigos de salida:
  *   0  HECHO                 se aplico y la base lo confirma
@@ -53,7 +54,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { validarParaEscritura } from '../functions/api/_validacion.js';
+import { validarParaEscritura } from './validacion-de-escritura.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WRANGLER = join(RAIZ, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
