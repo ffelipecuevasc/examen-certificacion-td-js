@@ -9,15 +9,15 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                          |                                                                                           
   |---------------|--------------------------------------------------------------------------------|                                                                                               
-| **Iteración** | `23-administracion-del-contenido.md`                                           |                                                                                               
+| **Iteración** | `24-preparar-produccion.md`                                                    |
 | **Épica**     | 20 · Persistencia de preguntas                                                 |                                                                                               
-| **Estado**    | 🟢 Completada · dos criterios abiertos                                                                 |                                                                                              
-| **Archivo**   | `20-epica-persistencia-preguntas/iteracion-23-administracion-del-contenido.md` |                                                                                   
-| **Iniciada**  | 2026-09-08 · cerrada 2026-09-08                                                                            |                                                                                              
+| **Estado**    | 🟢 Completada · publicada y comprobada sobre el sitio                          |
+| **Archivo**   | `20-epica-persistencia-preguntas/iteracion-24-preparar-produccion.md`          |
+| **Iniciada**  | 2026-09-08 · cerrada 2026-09-09                                                |
 
 ## Iteraciones completadas
 
-**🟢 Completada** | _Iteración 23: Administración del contenido (`iteracion-23-administracion-del-contenido.md`)_
+**🟢 Completada** | _Iteración 24: Preparar producción (`iteracion-24-preparar-produccion.md`)_
 
 | Iteración                              | Épica                       | Cierre     | Bitácora      |                                                                                      
   |----------------------------------------|-----------------------------|------------|---------------|                                                                                             
@@ -27,7 +27,8 @@ decisiones vale tanto como el código que las implementa.
 | 21 - Modelo de datos del banco         | 20 - Persistencia preguntas | 2026-09-05 | 🟢 Completada |                                                                                 
 | 22 - Lectura, validación e instantánea | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |
 | 23 - Administración del contenido      | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |                                                                               
-| —                                      | —                           | —          | —             |       
+| 24 - Preparar producción               | 20 - Persistencia preguntas | 2026-09-09 | 🟢 Completada |
+| —                                      | —                           | —          | —             |
 
 ## Épicas
 

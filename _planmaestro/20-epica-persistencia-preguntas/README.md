@@ -39,8 +39,14 @@ instantánea versionada.
 |---|---|---|
 | 21 | Modelo de datos del banco | 🟢 Completada |
 | 22 | Lectura, validación e instantánea | 🟢 Completada |
-| 23 | Administración del contenido | ⚪ No iniciada |
-| 24 | Migración y ampliación | ⚪ No iniciada |
+| 23 | Administración del contenido | 🟢 Completada |
+| 24 | Preparar producción | 🟢 Completada |
+| 25 | Llenar el banco | ⚪ No iniciada |
+
+*La 24 se llamaba «Migración y ampliación» y se partió en dos el 2026-09-08 (commit
+`1aa4f13`): juntaba dos trabajos de naturaleza distinta, uno de infraestructura
+—corto y peligroso— y otro de contenido —largo y minucioso—. La 24 prepara
+producción; la 25 la llena.*
 
 ## Lo que cambió respecto al plan anterior
 
@@ -114,3 +120,62 @@ Lo que **no** deja hecho, y que hay que tener presente al planificar:
 dejaba el veneno dentro de la base), H-018 (el respaldo no se activaba ante un error en JSON ajeno, defecto que venía
 de la iteración 12), H-019 (el generador tapaba el error de wrangler con un fallo propio) y H-020 (`package.json` no
 declara `"type": "module"`, menor y abierto).
+
+## Estado de la épica, al cerrar la iteración 23
+
+*No se escribió.* La iteración 23 se cerró el 2026-09-08 sin esta sección, y
+reconstruirla después habría producido una síntesis escrita desde el resultado y no
+desde el trabajo: suena bien, no aporta, y ocupa el lugar de la que faltaba sin decir
+que falta. **Se prefiere el hueco declarado.** Lo que la 23 dejó está en su archivo de
+iteración y en `99-bitacora/2026-09-08-iteracion-23.md`, que sí se escribieron a tiempo.
+
+## Estado de la épica, al cerrar la iteración 24
+
+Cerrada el 2026-09-09 con **sus trece criterios de aceptación cumplidos con evidencia**, ocho tareas hechas y una
+aplazada con motivo escrito. Los criterios de la nube los ejecutó el autor por ADR-015. **Producción quedó vacía y
+correcta**, que era el objetivo, y el sitio publicado lo refleja sin mentir en ningún número.
+
+Lo que la iteración 24 deja hecho y que las siguientes dan por sentado:
+
+- **El esquema está en las dos bases de la nube**, comprobado pidiendo también vistas e índices y no sólo tablas: ocho
+  objetos —cuatro tablas, tres índices y la vista `pregunta_activa`—, exactamente los que declara
+  `001-banco-de-preguntas.sql`. **La vista está**, que es la que importa: es de la que come el sitio entero y de la que
+  cuenta `/api/estado` desde esta iteración.
+- **Las dos migraciones registradas en las dos bases.** La `001` quedó comprobada como repetible: en pruebas, donde ya
+  estaba desde el ensayo del 2026-09-05, volver a correrla escribió **cero filas** y no pisó su fecha.
+- **`prueba_tuberia` borrada de producción**, deuda abierta desde la iteración 12. Su única copia hoy es
+  `d1/respaldo-banco.sql`, exportado **antes** del `DROP`, que es lo que lo hacía seguro.
+- **El contenido arranca en 0 · 0 · 0 con los 7 módulos de referencia** que crea la `001`. La 25 puede darlo por cierto
+  sin volver a comprobarlo, salvo que alguien toque la base entremedio.
+- **`/api/estado` sabe fallar y dice la verdad sobre el banco.** Distingue cuatro estados —incluido `SIN_ESQUEMA`, código
+  nuevo— y cuenta `pregunta_activa`, la misma vista de la que come el sitio. Los tres estados provocados, con los dos
+  extremos coincidiendo en los tres.
+- **El contador de la portada sale del dato dibujado**, los dos números y no sólo uno, y con cero preguntas desaparece.
+- **`"type": "module"` y `tailwind.config.cjs`**, con la construcción de Cloudflare Pages comprobada por el despliegue:
+  la paleta correcta es la prueba de que encontró la configuración `.cjs`.
+
+Lo que **no** deja hecho, y que hay que tener presente al planificar:
+
+- **El banco no está cargado.** Producción tiene esquema y cero preguntas. Es toda la iteración 25.
+- **ADR-023 sigue incumplida**, y a propósito: la instantánea versionada sale de la base local. La declaración de
+  incumplimiento se trasladó a la 25 **con su fecha original intacta**, porque esta iteración no genera ninguna
+  instantánea — no habría nada que copiar.
+- **El respaldo de ADR-008 ya no se activa**, y es correcto: con esquema aplicado no hay caída que respaldar. Pero es una
+  advertencia, no sólo un dato: **si durante la carga algo sale mal, el sitio no va a caer al respaldo**; va a mostrar lo
+  que haya en la base, bien o mal. La red que tapaba los errores se retiró en esta iteración.
+- **El escapado sigue sin probarse a escala** (ADR-024). Aguantó diez filas de juguete y contenido hostil fabricado, que
+  no es lo mismo que 368 preguntas escritas por otros.
+- **Nada comprueba que la instantánea y el banco no hayan divergido**, abierto desde el 2026-09-08 a raíz de la `id 11`.
+- **No hay ejecutor de migraciones.** Se aplazó a propósito: estrenar una herramienta nueva en la única operación
+  irreversible de la épica habría sido el peor momento disponible. Se decide cuando haya una tercera migración.
+
+**Dos hallazgos, uno nuevo y uno cerrado.** **H-022**, que no estaba previsto: los dos extremos se contradijeron sobre el
+mismo hecho —`/api/preguntas` decía `vacio: true` y `/api/estado` decía `false`, en el mismo minuto y sobre el sitio
+publicado— y **el que mentía era el de diagnóstico**. La causa venía de la iteración 12 y llevaba desde entonces diciendo
+`false`, sin que nadie lo mirara, porque hasta que hubo un banco vacío de verdad `false` era la respuesta correcta por
+casualidad. Y **H-020**, cerrado, que era la razón del cambio en la construcción.
+
+**La ventana que permitió encontrar H-022 se abrió sola.** Aplicar el esquema en producción cambió el sitio publicado sin
+publicar nada, porque el Worker lee D1 en vivo. De ahí salió también algo que la iteración no se había propuesto: **el
+modo degradado quedó comprobado en sus dos extremos contra producción** —sin esquema con el respaldo activo el
+2026-09-08, y con esquema y tablas vacías el 2026-09-09—, cada uno sobre la base real y no sobre una de juguete.
