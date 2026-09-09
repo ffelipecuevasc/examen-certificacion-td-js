@@ -7,26 +7,24 @@ decisiones vale tanto como el código que las implementa.
 
 ## Iteración activa
 
-| Campo         | Valor                                                                          |                                                                                           
-  |---------------|--------------------------------------------------------------------------------|                                                                                               
-| **Iteración** | `24-preparar-produccion.md`                                                    |
-| **Épica**     | 20 · Persistencia de preguntas                                                 |                                                                                               
-| **Estado**    | 🟢 Completada · publicada y comprobada sobre el sitio                          |
-| **Archivo**   | `20-epica-persistencia-preguntas/iteracion-24-preparar-produccion.md`          |
-| **Iniciada**  | 2026-09-08 · cerrada 2026-09-09                                                |
+| Campo         | Valor                                                                          |
+|---------------|--------------------------------------------------------------------------------|
+| **Iteración** | `25-llenar-banco-de-datos.md`                                                  |
+| **Épica**     | 20 · Persistencia de preguntas                                                 |
+| **Estado**    | ⚪ No iniciada                                                                  |
+| **Archivo**   | `20-epica-persistencia-preguntas/iteracion-25-llenar-banco-de-datos.md`        |
+| **Iniciada**  | 2026-09-09                                                                     |
 
 ## Iteraciones completadas
 
-**🟢 Completada** | _Iteración 24: Preparar producción (`iteracion-24-preparar-produccion.md`)_
-
-| Iteración                              | Épica                       | Cierre     | Bitácora      |                                                                                      
-  |----------------------------------------|-----------------------------|------------|---------------|                                                                                             
-| 11 - Publicación en Cloudflare Pages   | 10 - Plataforma Cloudflare  | 2026-09-03 | 🟢 Completada |                                                                                 
-| 12 - Capa de datos y base D1           | 10 - Plataforma Cloudflare  | 2026-09-03 | 🟢 Completada |                                                                                 
-| 13 - Entornos, secretos y procedim.    | 10 - Plataforma Cloudflare  | 2026-09-04 | 🟢 Completada |                                                                                 
-| 21 - Modelo de datos del banco         | 20 - Persistencia preguntas | 2026-09-05 | 🟢 Completada |                                                                                 
+| Iteración                              | Épica                       | Cierre     | Bitácora      |
+|----------------------------------------|-----------------------------|------------|---------------|
+| 11 - Publicación en Cloudflare Pages   | 10 - Plataforma Cloudflare  | 2026-09-03 | 🟢 Completada |
+| 12 - Capa de datos y base D1           | 10 - Plataforma Cloudflare  | 2026-09-03 | 🟢 Completada |
+| 13 - Entornos, secretos y procedim.    | 10 - Plataforma Cloudflare  | 2026-09-04 | 🟢 Completada |
+| 21 - Modelo de datos del banco         | 20 - Persistencia preguntas | 2026-09-05 | 🟢 Completada |
 | 22 - Lectura, validación e instantánea | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |
-| 23 - Administración del contenido      | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |                                                                               
+| 23 - Administración del contenido      | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |
 | 24 - Preparar producción               | 20 - Persistencia preguntas | 2026-09-09 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
