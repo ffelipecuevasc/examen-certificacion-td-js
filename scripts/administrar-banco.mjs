@@ -9,6 +9,9 @@
  *   node scripts/administrar-banco.mjs insertar    <archivo.json>
  *   node scripts/administrar-banco.mjs actualizar  <archivo.json>
  *
+ * Para guardar la salida, `--registro=<archivo>` y NO una redireccion del
+ * terminal. El motivo esta explicado donde se implementa, y es H-026.
+ *
  * TODO O NADA, Y POR QUE NO HAY NINGUN «BEGIN» EN ESTE ARCHIVO
  *
  * Cada operacion se escribe a UN archivo .sql y se aplica de una sola vez. La
@@ -30,10 +33,24 @@
  * instantanea, se regenera desde una base que no cambio y el archivo versionado
  * confirma el error con toda la apariencia de una comprobacion.
  *
- * Por eso aca el veredicto sale de dos cosas, ninguna de las cuales es el codigo
- * de salida: lo que wrangler DIJO por sus dos salidas, y una segunda consulta a
- * la base preguntando si el cambio esta. Si las dos no coinciden, no hay
- * veredicto, que no es lo mismo que un fallo.
+ * Por eso aca el veredicto NO sale del codigo de salida. Sale de preguntarle a la
+ * base si el cambio esta.
+ *
+ * EL TEXTO DE WRANGLER TAMPOCO DECIDE, Y APRENDERLO COSTO UN SUSTO (H-024)
+ *
+ * Este guion tambien leia lo que wrangler imprimia, y lo tenia como CONDICION
+ * para llegar a consultar la base. El 2026-09-09 eso dio SIN VEREDICTO sobre una
+ * carga de 52 preguntas que habia entrado entera: wrangler tiene dos caminos de
+ * escritura —el de archivo chico y el de importacion— y el patron solo conocia
+ * las palabras del primero.
+ *
+ * Lo grave no era el patron corto sino DONDE estaba puesto: un texto no
+ * reconocido cortaba antes de preguntarle a la base, o sea que el guion se
+ * declaraba incapaz sin consultar a la unica fuente que podia responderle.
+ *
+ * Hoy el texto es una senal que se informa, y quien decide es el conteo de la
+ * base. Si el texto no se reconoce pero la base cuadra, se dice HECHO y se
+ * advierte que el patron se quedo corto.
  *
  * LA VALIDACION ES LA DE LA LECTURA
  *
@@ -54,6 +71,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { abrirRegistro } from './registro-de-salida.mjs';
 import { validarParaEscritura } from './validacion-de-escritura.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -71,10 +89,19 @@ const VERBOS = ['revisar', 'insertar', 'actualizar'];
 
 const raya = '='.repeat(72);
 
+/**
+ * Cierra el registro, si lo hay. Lo pone `--registro=<archivo>` mas abajo.
+ *
+ * Se reemplaza a si misma cuando el registro existe. Aca no hace nada para que
+ * `veredicto` pueda llamarla siempre sin preguntar.
+ */
+let cerrarRegistro = () => {};
+
 const veredicto = (titulo, lineas, codigo) => {
   console.log(`\n${raya}\n${titulo}\n${raya}`);
   for (const linea of lineas) console.log(linea);
   console.log(`\ncodigo de salida: ${codigo}\n`);
+  cerrarRegistro(titulo, codigo);
   process.exit(codigo);
 };
 
@@ -103,6 +130,40 @@ const sinVeredicto = (motivo, detalle = []) =>
 // ---------------------------------------------------------------------------
 
 const argumentos = process.argv.slice(2);
+
+// ---------------------------------------------------------------------------
+// --registro=<archivo>: la salida la escribe ESTE guion, no el terminal
+//
+// POR QUE NO BASTA CON REDIRIGIR
+//
+// Porque redirigir depende del terminal, y el terminal no es del proyecto. En
+// Git Bash sobre Windows, un `node` lanzado a traves de winpty —que es lo que se
+// usa para que los programas interactivos se vean bien— se NIEGA a correr si su
+// salida no va a un terminal: responde «stdout is not a tty» y no ejecuta nada.
+// El resultado es un archivo con una sola linea, que quien lo abre despues puede
+// leer como «la carga corrio y dijo poco». Detectado el 2026-09-09, durante el
+// ensayo de H-025, y anotado como H-026.
+//
+// Es el mismo filo de H-011: el mismo comando se comporta distinto segun desde
+// que terminal se lance, y la respuesta no puede ser acordarse del terminal.
+// Guardar la evidencia de una carga es medio proyecto, asi que el guion la
+// guarda el mismo y deja de depender de como lo invocaron.
+//
+// EL REGISTRO TIENE PRINCIPIO Y FIN, A PROPOSITO
+//
+// Empieza con una cabecera y termina con una linea de cierre que nombra el
+// veredicto. **Un registro sin esa linea final esta truncado**, y eso se ve al
+// abrirlo. Es lo unico que distingue «la carga termino» de «el proceso murio a
+// la mitad», que desde el archivo se ven igual.
+//
+// Y si el guion no llega a arrancar, el archivo NO existe, que es un fallo mucho
+// mas ruidoso que un archivo con una linea.
+// ---------------------------------------------------------------------------
+
+cerrarRegistro = abrirRegistro(argumentos, (motivo) =>
+  noSeAplico(motivo, ['Pediste registro y no lo hay, asi que no se hizo nada.'])
+);
+
 const verbo = argumentos[0];
 const archivo = argumentos.find((a, i) => i > 0 && !a.startsWith('--'));
 
@@ -120,7 +181,13 @@ if (!VERBOS.includes(verbo) || !archivo) {
       'insertar   carga preguntas nuevas. Una colision aborta el lote entero.',
       'actualizar corrige preguntas que ya estan, y sella fecha_modificacion.',
       '',
-      'Opciones:  --base=<nombre>   contra que base (por omision la local).',
+      'Opciones:',
+      '  --base=<nombre>       contra que base (por omision la local).',
+      '  --registro=<archivo>  guarda toda la salida en ese archivo. Usalo en vez',
+      '                        de redirigir: redirigir depende del terminal y hay',
+      '                        terminales donde ni siquiera llega a ejecutarse',
+      '                        (H-026). El registro termina con una linea de',
+      '                        cierre; si no la tiene, esta truncado.',
     ],
     NO_SE_APLICO
   );
@@ -561,7 +628,24 @@ rmSync(carpeta, { recursive: true, force: true });
 // Aca esta el corazon de H-016: NO se mira `resultado.status`. Se mira lo que
 // wrangler dijo, y despues se le pregunta a la base.
 const dijoError = /\[ERROR\]|✘|SQLITE_/i.test(salida);
-const dijoExito = /commands? executed successfully/i.test(salida);
+
+/**
+ * Wrangler tiene DOS caminos de escritura y dice cosas distintas en cada uno.
+ *
+ *   archivo chico   «🚣 Executed 3 commands executed successfully.»
+ *   importacion     «🌀 Starting import... / Processed 260 queries.»
+ *                   «🚣 Executed 260 queries in 20.70ms (884 rows written)»
+ *
+ * El segundo dice «queries», no «commands», y nunca «executed successfully».
+ * Este guion solo conocia el primero, asi que el 2026-09-09 dio SIN VEREDICTO
+ * sobre una carga de 52 preguntas que habia entrado entera. Ver H-024.
+ *
+ * ESTO YA NO ES UN PORTON, Y ESE ES EL ARREGLO DE FONDO. Antes, no reconocer el
+ * texto cortaba la ejecucion ANTES de preguntarle a la base, con lo que la unica
+ * fuente que sabe la verdad no se consultaba justo cuando mas falta hacia. Ahora
+ * es una senal que se informa, y quien decide es el conteo de la base.
+ */
+const dijoExito = /commands? executed successfully|Executed \d+ (?:commands?|queries)/i.test(salida);
 
 if (dijoError) {
   const legible = traducir(salida);
@@ -580,21 +664,47 @@ if (dijoError) {
   );
 }
 
-if (!dijoExito) {
-  sinVeredicto('Wrangler no dijo que hubiera aplicado nada, pero tampoco dio un error.', crudo(salida));
-}
-
 // ---------------------------------------------------------------------------
 // Preguntarle a la base, que es la unica que sabe
+//
+// Se pregunta SIEMPRE, haya reconocido o no el texto de wrangler. Antes esto
+// estaba detras de un `if (!dijoExito) sinVeredicto(...)`, y el resultado era que
+// un texto no reconocido impedia llegar hasta aqui: el guion se declaraba
+// incapaz sin haber consultado a la unica fuente que podia responderle.
 // ---------------------------------------------------------------------------
 
 const despues = consultar('SELECT COUNT(*) AS preguntas FROM pregunta;')[0].preguntas;
 const esperado = verbo === 'insertar' ? antes + preguntas.length : antes;
 
+// Nada cambio. Con un `insertar` que deberia haber sumado filas, eso es un fallo
+// silencioso: el lote no entro y wrangler no lo dijo.
+if (verbo === 'insertar' && despues === antes && preguntas.length > 0) {
+  veredicto(
+    'NO SE APLICO  ***  la base no cambio  ***',
+    [
+      `Antes del lote habia ${antes} preguntas y despues sigue habiendo ${antes}.`,
+      '',
+      'El lote no entro, y wrangler no dijo por que. Nada quedo a medias: la base',
+      'esta como estaba.',
+      '',
+      ...crudo(salida),
+    ],
+    NO_SE_APLICO
+  );
+}
+
 if (despues !== esperado) {
   sinVeredicto(
-    `Wrangler dijo que aplico el lote, pero la base no cuadra: esperaba ${esperado} preguntas y hay ${despues}.`,
-    ['Antes del lote habia ' + antes + '.', '', ...crudo(salida)]
+    `La base no cuadra: esperaba ${esperado} preguntas y hay ${despues}.`,
+    [
+      `Antes del lote habia ${antes}.`,
+      '',
+      despues > esperado
+        ? 'Hay MAS de las esperadas. Puede que el lote se haya cargado dos veces.'
+        : 'Hay MENOS de las esperadas. Puede que el lote entrara solo en parte.',
+      '',
+      ...crudo(salida),
+    ]
   );
 }
 
@@ -637,7 +747,15 @@ veredicto(
     `Total en la base: ${antes} -> ${despues}`,
     '',
     'Confirmado preguntandole a la base despues de escribir, no por el codigo de',
-    'salida de wrangler, que en Windows no es testigo fiable (H-016).',
+    'salida de wrangler, que en Windows no es testigo fiable (H-016), y tampoco',
+    'por el texto que imprimio, que cambia segun el camino que tome (H-024).',
+    ...(dijoExito
+      ? []
+      : [
+          '',
+          'NOTA: no reconoci el texto de wrangler, pero la base cuadra y manda ella.',
+          'Si esto sale a menudo, el patron de este guion se quedo corto.',
+        ]),
     '',
     instantaneaHecha
       ? 'Instantanea regenerada en el mismo acto (ADR-025, regla 5).'

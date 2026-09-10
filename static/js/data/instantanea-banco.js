@@ -16,9 +16,9 @@
 /** Contra que base se genero, y cuando. La fuente del aviso al estudiante. */
 export const SELLO = {
   "base": "examen-td-js-produccion",
-  "entorno": "local",
-  "generada_en": "2026-09-08T19:28:41.209Z",
-  "preguntas": 8,
+  "entorno": "nube",
+  "generada_en": "2026-09-10T00:09:19.553Z",
+  "preguntas": 52,
   "descartadas": 0
 };
 
@@ -29,9 +29,9 @@ export const PREGUNTAS = [
     "modulo": 2,
     "modulo_titulo": "Fundamentos de Desarrollo Front-End",
     "modulo_icono": "devices",
-    "enunciado": "Que limita estrictamente al Front-End en comparacion con el Back-End en la arquitectura web?",
-    "justificacion": "El codigo de Front-End se ejecuta en el navegador, dentro de un entorno aislado que no alcanza el sistema de archivos del servidor. Renderizar estilos dinamicos si puede, y ningun framework es obligatorio.",
-    "dificultad": "media",
+    "enunciado": "¿Qué limita estrictamente al Front-End en comparación con el Back-End en la arquitectura web?",
+    "justificacion": "El Front-End corre dentro del navegador, y el navegador no le da acceso al sistema de archivos del servidor: esa es una frontera de seguridad, no una limitación de las herramientas. Las otras tres describen cosas que el Front-End sí hace (estilos dinámicos) o que simplemente no son ciertas (ningún framework es obligatorio).",
+    "dificultad": null,
     "orden_fijo": 0,
     "alternativas": [
       {
@@ -45,14 +45,14 @@ export const PREGUNTAS = [
         "id": 2,
         "letra": "b",
         "orden": 2,
-        "texto": "No puede renderizar estilos dinamicos del lado del usuario.",
+        "texto": "No puede renderizar estilos dinámicos del lado del usuario.",
         "es_correcta": 0
       },
       {
         "id": 3,
         "letra": "c",
         "orden": 3,
-        "texto": "No admite la visualizacion directa de codigo ofuscado.",
+        "texto": "No admite la visualización directa de código ofuscado.",
         "es_correcta": 0
       },
       {
@@ -65,38 +65,1958 @@ export const PREGUNTAS = [
     ]
   },
   {
+    "id": 2,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál es el rol fundamental del protocolo HTTP en la comunicación entre capas de desarrollo web?",
+    "justificacion": "HTTP es un protocolo sin estado: cada petición llega sin memoria de las anteriores, y por eso las sesiones hay que construirlas encima con cookies o tokens. Las otras tres atribuyen a HTTP trabajos que hacen CSS, el compilador o la base de datos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 5,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Dar estilo visual avanzado a la página web renderizada en cliente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 6,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Permitir comunicación sin estado entre el cliente y el servidor.",
+        "es_correcta": 1
+      },
+      {
+        "id": 7,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Compilar el código JavaScript antes de su envío a producción.",
+        "es_correcta": 0
+      },
+      {
+        "id": 8,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Gestionar sesiones de usuario de forma nativa en la base de datos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En una arquitectura Fullstack clásica, ¿qué componente intermedio separa la lógica Front y Back?",
+    "justificacion": "La API es el contrato entre las dos capas: el Front-End pide y recibe datos sin saber cómo están guardados, y el Back-End los entrega sin saber cómo se van a dibujar. Esa separación es lo que permite cambiar un lado sin tocar el otro.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 9,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El motor de renderizado del navegador del cliente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 10,
+        "letra": "b",
+        "orden": 2,
+        "texto": "La Interfaz de Programación de Aplicaciones (API).",
+        "es_correcta": 1
+      },
+      {
+        "id": 11,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El sistema de control de versiones centralizado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 12,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El modelo de cajas jerárquico del CSS.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Para qué usaría primariamente el inspector del navegador un desarrollador Front-End al depurar?",
+    "justificacion": "El inspector sirve para las dos cosas a la vez: editar el DOM en vivo para probar un cambio sin recompilar, y mirar la pestaña de red para ver qué peticiones salieron y qué respondieron. Las otras tres describen tareas de servidor o de compilación, que no ocurren en el navegador.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 13,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para compilar código fuente directamente a WebAssembly en consola.",
+        "es_correcta": 0
+      },
+      {
+        "id": 14,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para estructurar entidades y tablas en la base de datos remota.",
+        "es_correcta": 0
+      },
+      {
+        "id": 15,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Para modificar el DOM en vivo y auditar peticiones HTTP de red.",
+        "es_correcta": 1
+      },
+      {
+        "id": 16,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Para reiniciar o purgar la caché del servidor web de backend.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Según la tríada de desarrollo web, ¿qué rol técnico fundamental asume JavaScript en cliente?",
+    "justificacion": "En la tríada, HTML pone la estructura, CSS la presentación y JavaScript el comportamiento: es el único de los tres que puede reaccionar a un evento y modificar el DOM después de que la página cargó. Las alternativas (a) y (b) describen justamente a HTML y a CSS.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 17,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Definir la semántica y jerarquía de nodos en la vista web.",
+        "es_correcta": 0
+      },
+      {
+        "id": 18,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Especificar reglas de diseño, colorimetría y adaptabilidad.",
+        "es_correcta": 0
+      },
+      {
+        "id": 19,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Controlar el comportamiento lógico y mutación dinámica del DOM.",
+        "es_correcta": 1
+      },
+      {
+        "id": 20,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ejecutar consultas nativas SQL sobre los datos locales en disco.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En un formulario HTML5, ¿qué atributo del form define la URI destino al procesar datos enviados?",
+    "justificacion": "`action` es el atributo que dice a qué URI se envían los datos del formulario. `enctype` define cómo se codifican, `target` dónde se abre la respuesta, y `rel` ni siquiera pertenece a `<form>`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 21,
+        "letra": "a",
+        "orden": 1,
+        "texto": "enctype",
+        "es_correcta": 0
+      },
+      {
+        "id": 22,
+        "letra": "b",
+        "orden": 2,
+        "texto": "action",
+        "es_correcta": 1
+      },
+      {
+        "id": 23,
+        "letra": "c",
+        "orden": 3,
+        "texto": "target",
+        "es_correcta": 0
+      },
+      {
+        "id": 24,
+        "letra": "d",
+        "orden": 4,
+        "texto": "rel",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál es la función semántica estricta de la etiqueta `<aside>` según los estándares de HTML5?",
+    "justificacion": "`<aside>` es para contenido relacionado con el principal pero que puede separarse de él sin que el texto pierda sentido: una barra lateral, una nota al margen, un bloque de enlaces relacionados. Si el contenido fuera indispensable para entender la página, no iría en un `<aside>`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 25,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Demarcar un contenido fundamental que debe leerse primero.",
+        "es_correcta": 0
+      },
+      {
+        "id": 26,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Contener información periférica conectada al flujo principal.",
+        "es_correcta": 1
+      },
+      {
+        "id": 27,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Aislar scripts externos del cuerpo de la página en el header.",
+        "es_correcta": 0
+      },
+      {
+        "id": 28,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Declarar legalmente los datos de autoría en el pie de página.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
     "id": 8,
     "modulo": 2,
     "modulo_titulo": "Fundamentos de Desarrollo Front-End",
     "modulo_icono": "devices",
-    "enunciado": "Que comando de Git permite crear una nueva rama y cambiar a ella de manera simultanea?",
-    "justificacion": "Tanto git checkout -b como git switch --create crean la rama y cambian a ella en un solo paso. git branch -n no hace eso. Por eso la correcta es la que agrupa las dos, y por eso esta pregunta no se puede barajar.",
-    "dificultad": "alta",
-    "orden_fijo": 1,
+    "enunciado": "¿Qué combinación de etiquetas HTML5 es correcta para instanciar un menú de opciones nativo?",
+    "justificacion": "El menú desplegable nativo de HTML es un `<select>` que contiene elementos `<option>`. Las otras tres combinan etiquetas que no existen en el estándar: `<dropdown>`, `<item>` y `<list>` son inventadas, y `<datalist>` existe pero acompaña a un `<input>`, no reemplaza al `<select>`.",
+    "dificultad": null,
+    "orden_fijo": 0,
     "alternativas": [
       {
         "id": 29,
         "letra": "a",
         "orden": 1,
-        "texto": "git branch -n <rama>",
-        "es_correcta": 0
+        "texto": "`<select>` como contenedor lógico de múltiples opciones `<option>`.",
+        "es_correcta": 1
       },
       {
         "id": 30,
         "letra": "b",
         "orden": 2,
-        "texto": "git checkout -b <rama>",
+        "texto": "`<dropdown>` inicializando múltiples atributos `<item>` internos.",
         "es_correcta": 0
       },
       {
         "id": 31,
         "letra": "c",
         "orden": 3,
-        "texto": "git switch --create <rama>",
+        "texto": "`<datalist>` anidando colecciones estáticas de nodos `<list>`.",
         "es_correcta": 0
       },
       {
         "id": 32,
+        "letra": "d",
+        "orden": 4,
+        "texto": "`<menu>` controlando estructuralmente subetiquetas `<input>`.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Dónde deben declararse semánticamente los links a hojas de estilos externas y metadatos vitales?",
+    "justificacion": "El `<head>` es donde va todo lo que describe el documento sin dibujarse: hojas de estilo, metadatos, título. Poner ahí la hoja de estilos permite además que el navegador empiece a pedirla antes de encontrarse con el contenido. La alternativa (b) es el error clásico de confundirla con los scripts, que sí se ponen al final del `<body>` y por un motivo distinto: no bloquear el dibujado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 33,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Como hijos directos dentro del contenedor `<head>`.",
+        "es_correcta": 1
+      },
+      {
+        "id": 34,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Justo antes del cierre del `</body>` para acelerar el renderizado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 35,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Anidados en el primer nodo `<header>` del documento.",
+        "es_correcta": 0
+      },
+      {
+        "id": 36,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Como metadatos configurados en atributos de la etiqueta `<html>`.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Para lograr accesibilidad, ¿qué etiqueta asocia lógicamente grupos de controles de formulario?",
+    "justificacion": "`<fieldset>` agrupa controles relacionados y, junto con `<legend>`, hace que un lector de pantalla anuncie a qué grupo pertenece cada campo. Las alternativas (a) y (c) son etiquetas inventadas, y (d) es un `<div>` con un rol ARIA: parcha la accesibilidad en vez de usar la etiqueta que ya existe para eso.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 37,
+        "letra": "a",
+        "orden": 1,
+        "texto": "`<form-section>`",
+        "es_correcta": 0
+      },
+      {
+        "id": 38,
+        "letra": "b",
+        "orden": 2,
+        "texto": "`<fieldset>`",
+        "es_correcta": 1
+      },
+      {
+        "id": 39,
+        "letra": "c",
+        "orden": 3,
+        "texto": "`<control-group>`",
+        "es_correcta": 0
+      },
+      {
+        "id": 40,
+        "letra": "d",
+        "orden": 4,
+        "texto": "`<div role=\"form\">`",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué atributo HTML asegura vincular explícita y unívocamente una etiqueta `<label>` con un input?",
+    "justificacion": "El atributo `for` del `<label>` apunta al `id` del campo, y ese vínculo hace dos cosas: el lector de pantalla anuncia la etiqueta al enfocar el campo, y hacer clic en el texto pone el cursor dentro. `name` sirve para enviar el dato, no para vincular.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 41,
+        "letra": "a",
+        "orden": 1,
+        "texto": "href",
+        "es_correcta": 0
+      },
+      {
+        "id": 42,
+        "letra": "b",
+        "orden": 2,
+        "texto": "name",
+        "es_correcta": 0
+      },
+      {
+        "id": 43,
+        "letra": "c",
+        "orden": 3,
+        "texto": "for",
+        "es_correcta": 1
+      },
+      {
+        "id": 44,
+        "letra": "d",
+        "orden": 4,
+        "texto": "form",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En el modelo de cajas CSS, ¿qué propiedad añade espacio transparente externo perimetral al borde?",
+    "justificacion": "En el modelo de cajas, de adentro hacia afuera van contenido, `padding`, `border` y `margin`. El `margin` es el espacio exterior al borde, y es transparente: separa la caja de sus vecinas. El `padding` es el espacio interior, entre el contenido y el borde.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 45,
+        "letra": "a",
+        "orden": 1,
+        "texto": "outline",
+        "es_correcta": 0
+      },
+      {
+        "id": 46,
+        "letra": "b",
+        "orden": 2,
+        "texto": "margin",
+        "es_correcta": 1
+      },
+      {
+        "id": 47,
+        "letra": "c",
+        "orden": 3,
+        "texto": "border-spacing",
+        "es_correcta": 0
+      },
+      {
+        "id": 48,
+        "letra": "d",
+        "orden": 4,
+        "texto": "padding",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Según el cálculo de especificidad CSS, ¿cuál de los siguientes selectores prevalece en conflicto?",
+    "justificacion": "La especificidad se cuenta por categorías, y un identificador pesa más que cualquier cantidad de clases o elementos. Sólo (c) tiene un `#id`, así que gana sin necesidad de contar el resto: (a) suma dos clases, (b) una clase y cuatro elementos, y (d) sólo elementos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 49,
+        "letra": "a",
+        "orden": 1,
+        "texto": "form input.active:hover",
+        "es_correcta": 0
+      },
+      {
+        "id": 50,
+        "letra": "b",
+        "orden": 2,
+        "texto": "header nav.main-menu ul li",
+        "es_correcta": 0
+      },
+      {
+        "id": 51,
+        "letra": "c",
+        "orden": 3,
+        "texto": "#main-container .btn-primary",
+        "es_correcta": 1
+      },
+      {
+        "id": 52,
+        "letra": "d",
+        "orden": 4,
+        "texto": "article > p::first-line",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué atajo media query CSS restringe la regla exclusivamente a Viewports de mínimo 1024px?",
+    "justificacion": "`min-width` significa «desde este ancho hacia arriba», así que la regla se aplica a viewports de 1024px o más. La (a) hace justo lo contrario con `max-width`, y las otras dos usan sintaxis que no existe.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 53,
+        "letra": "a",
+        "orden": 1,
+        "texto": "@media screen and (max-width: 1024px)",
+        "es_correcta": 0
+      },
+      {
+        "id": 54,
+        "letra": "b",
+        "orden": 2,
+        "texto": "@media (min-width: 1024px)",
+        "es_correcta": 1
+      },
+      {
+        "id": 55,
+        "letra": "c",
+        "orden": 3,
+        "texto": "@media only (width >= 1024px)",
+        "es_correcta": 0
+      },
+      {
+        "id": 56,
+        "letra": "d",
+        "orden": 4,
+        "texto": "@media viewport (size > 1024px)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué declaración box-sizing engloba el padding y el border en el cálculo del width total asignado?",
+    "justificacion": "Con `border-box`, el `width` que declaras es el ancho final de la caja: el `padding` y el `border` se descuentan hacia adentro en vez de sumarse. Con `content-box`, que es el valor por omisión, el `width` describe sólo el contenido y todo lo demás se suma encima.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 57,
+        "letra": "a",
+        "orden": 1,
+        "texto": "margin-box",
+        "es_correcta": 0
+      },
+      {
+        "id": 58,
+        "letra": "b",
+        "orden": 2,
+        "texto": "padding-box",
+        "es_correcta": 0
+      },
+      {
+        "id": 59,
+        "letra": "c",
+        "orden": 3,
+        "texto": "border-box",
+        "es_correcta": 1
+      },
+      {
+        "id": 60,
+        "letra": "d",
+        "orden": 4,
+        "texto": "content-box",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Ante la colisión de estilos de distintos orígenes, y sin usar `!important`, ¿qué estilo CSS impone mayor prioridad?",
+    "justificacion": "En la cascada, un estilo puesto en el atributo `style` del elemento pesa más que cualquier regla de una hoja de estilos, venga de un archivo externo o de un `<style>` embebido. La alternativa (d) es el distractor que más enseña: el orden de los orígenes es navegador, luego usuario, luego autor, así que la hoja del usuario queda por debajo. Sólo se invierte con `!important`, y por eso el enunciado lo descarta.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 61,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Selectores inyectados mediante archivos externos al final del head.",
+        "es_correcta": 0
+      },
+      {
+        "id": 62,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Bloques embebidos en una etiqueta style sin directiva important.",
+        "es_correcta": 0
+      },
+      {
+        "id": 63,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El estilo incrustado directamente utilizando el atributo en línea.",
+        "es_correcta": 1
+      },
+      {
+        "id": 64,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Directivas del navegador cliente definidas por el usuario.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué operador relacional CSS filtra afectando solo a los descendientes de primer grado (hijos)?",
+    "justificacion": "El signo `>` es el combinador de hijo directo: `div > p` afecta a los párrafos que cuelgan inmediatamente del `div`, no a los que están más abajo. El espacio alcanza a todos los descendientes, `+` al hermano inmediato y `~` a los hermanos siguientes.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 65,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Espacio general ( )",
+        "es_correcta": 0
+      },
+      {
+        "id": 66,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Signo más (+)",
+        "es_correcta": 0
+      },
+      {
+        "id": 67,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Tilde general (~)",
+        "es_correcta": 0
+      },
+      {
+        "id": 68,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Signo mayor que (>)",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuántas fracciones equitativas articulan como límite la arquitectura del grid de Bootstrap?",
+    "justificacion": "La grilla de Bootstrap divide cada fila en 12 columnas, y 12 se eligió porque se reparte en mitades, tercios, cuartos y sextos sin decimales. Por eso las clases van de `col-1` a `col-12` y la suma dentro de una fila debería dar 12.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 69,
+        "letra": "a",
+        "orden": 1,
+        "texto": "8 bloques.",
+        "es_correcta": 0
+      },
+      {
+        "id": 70,
+        "letra": "b",
+        "orden": 2,
+        "texto": "12 columnas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 71,
+        "letra": "c",
+        "orden": 3,
+        "texto": "16 sectores.",
+        "es_correcta": 0
+      },
+      {
+        "id": 72,
+        "letra": "d",
+        "orden": 4,
+        "texto": "24 celdillas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué sufijo responsivo activa modificaciones de diseño en Bootstrap al superar el breakpoint grande?",
+    "justificacion": "El sufijo `lg` corresponde al breakpoint «grande», que en Bootstrap arranca en 992px. Los sufijos van de menor a mayor —`sm`, `md`, `lg`, `xl`— y cada uno aplica desde su ancho hacia arriba, no sólo dentro de un tramo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 73,
+        "letra": "a",
+        "orden": 1,
+        "texto": ".col-md-",
+        "es_correcta": 0
+      },
+      {
+        "id": 74,
+        "letra": "b",
+        "orden": 2,
+        "texto": ".col-xl-",
+        "es_correcta": 0
+      },
+      {
+        "id": 75,
+        "letra": "c",
+        "orden": 3,
+        "texto": ".col-lg-",
+        "es_correcta": 1
+      },
+      {
+        "id": 76,
+        "letra": "d",
+        "orden": 4,
+        "texto": ".col-sm-",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué clase central de Bootstrap estabiliza el margen limitando y centrando el ancho del contenido?",
+    "justificacion": "`.container` fija un ancho máximo por cada breakpoint y centra el bloque con márgenes automáticos. `.container-fluid` hace lo contrario: ocupa siempre el 100% del ancho disponible. Las otras dos clases no existen en Bootstrap.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 77,
+        "letra": "a",
+        "orden": 1,
+        "texto": ".container-fluid",
+        "es_correcta": 0
+      },
+      {
+        "id": 78,
+        "letra": "b",
+        "orden": 2,
+        "texto": ".container",
+        "es_correcta": 1
+      },
+      {
+        "id": 79,
+        "letra": "c",
+        "orden": 3,
+        "texto": ".wrapper-box",
+        "es_correcta": 0
+      },
+      {
+        "id": 80,
+        "letra": "d",
+        "orden": 4,
+        "texto": ".col-centered",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En el sistema de utilidades, ¿qué clase induce a un nodo tipo block a ocupar el 100% de su padre?",
+    "justificacion": "`.w-100` es la utilidad de ancho que fija `width: 100%`, de modo que el elemento ocupa todo el ancho de su contenedor padre. Las otras tres no existen en Bootstrap.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 81,
+        "letra": "a",
+        "orden": 1,
+        "texto": ".w-100",
+        "es_correcta": 1
+      },
+      {
+        "id": 82,
+        "letra": "b",
+        "orden": 2,
+        "texto": ".full-width",
+        "es_correcta": 0
+      },
+      {
+        "id": 83,
+        "letra": "c",
+        "orden": 3,
+        "texto": ".d-max",
+        "es_correcta": 0
+      },
+      {
+        "id": 84,
+        "letra": "d",
+        "orden": 4,
+        "texto": ".btn-fill",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En Bootstrap 4, ¿qué propósito de interfaz cumple el componente jumbotron?",
+    "justificacion": "El jumbotron es un bloque destacado, con fondo y espaciado generosos, para resaltar el mensaje principal al comienzo de una página. El enunciado dice «en Bootstrap 4» a propósito: en Bootstrap 5 el componente se eliminó y su efecto se reconstruye combinando utilidades de fondo, borde y espaciado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 85,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Controlar migraciones asíncronas de datos en formato modal.",
+        "es_correcta": 0
+      },
+      {
+        "id": 86,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Crear un cajón semántico envolvente resaltando contenido maestro.",
+        "es_correcta": 1
+      },
+      {
+        "id": 87,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Generar alertas automáticas colapsables en la esquina del viewport.",
+        "es_correcta": 0
+      },
+      {
+        "id": 88,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Formatear validaciones cruzadas en sub-formularios anidados.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Bajo qué doctrina base se estructura algorítmicamente el flujo responsivo en Bootstrap por defecto?",
+    "justificacion": "Bootstrap está construido «mobile first»: los estilos base valen para pantallas chicas y las media queries usan `min-width` para ir agregando reglas hacia arriba. Por eso una clase sin sufijo, como `.col-6`, aplica desde el móvil en adelante.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 89,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Desktop First, degradando reglas complejas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 90,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Mobile First, escalando media queries en aumento.",
+        "es_correcta": 1
+      },
+      {
+        "id": 91,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Fluid First, forzando dimensiones relativas al 100%.",
+        "es_correcta": 0
+      },
+      {
+        "id": 92,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Media First, aislando impresión y lectura interactiva.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En evaluación nativa de JavaScript, ¿qué método atrapa de forma veloz a un único nodo por su ID?",
+    "justificacion": "`getElementById()` va directo al índice interno de identificadores del documento, así que devuelve el nodo sin recorrer el árbol. `querySelector(\"[id]\")` sí recorre y además devolvería el primer elemento que tenga cualquier `id`, no el que buscas; y `document.findAll()` no existe.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 93,
+        "letra": "a",
+        "orden": 1,
+        "texto": "document.getElementById()",
+        "es_correcta": 1
+      },
+      {
+        "id": 94,
+        "letra": "b",
+        "orden": 2,
+        "texto": "document.querySelector(\"[id]\")",
+        "es_correcta": 0
+      },
+      {
+        "id": 95,
+        "letra": "c",
+        "orden": 3,
+        "texto": "document.getElementsByName()[0]",
+        "es_correcta": 0
+      },
+      {
+        "id": 96,
+        "letra": "d",
+        "orden": 4,
+        "texto": "document.findAll()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "A nivel de memoria y asignación, ¿por qué es crítico utilizar \"let\" sobre \"var\" al iterar ciclos?",
+    "justificacion": "`var` se declara a nivel de función, así que en un bucle todas las vueltas comparten la misma variable, y una función definida dentro del ciclo termina viendo el último valor. `let` crea una variable nueva por cada iteración del bloque, y cada cierre captura la suya.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 97,
+        "letra": "a",
+        "orden": 1,
+        "texto": "let previene fugas de alcance limitando la variable al bloque léxico.",
+        "es_correcta": 1
+      },
+      {
+        "id": 98,
+        "letra": "b",
+        "orden": 2,
+        "texto": "\"var\" causa desbordamiento de memoria por sobreescritura estricta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 99,
+        "letra": "c",
+        "orden": 3,
+        "texto": "\"let\" desactiva por completo el motor de recolección de basura.",
+        "es_correcta": 0
+      },
+      {
+        "id": 100,
+        "letra": "d",
+        "orden": 4,
+        "texto": "\"var\" restringe mutaciones en tipos compuestos como arreglos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué detonante de evento del DOM percibe mutaciones confirmadas cuando el elemento pierde el foco?",
+    "justificacion": "`change` se dispara cuando el campo pierde el foco **y además** su valor cambió respecto de cuando lo ganó: por eso el enunciado dice «mutaciones confirmadas». `input` se dispara con cada tecla, sin esperar a que el campo se abandone.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 101,
+        "letra": "a",
+        "orden": 1,
+        "texto": "onkeyup",
+        "es_correcta": 0
+      },
+      {
+        "id": 102,
+        "letra": "b",
+        "orden": 2,
+        "texto": "onsubmit",
+        "es_correcta": 0
+      },
+      {
+        "id": 103,
+        "letra": "c",
+        "orden": 3,
+        "texto": "onchange",
+        "es_correcta": 1
+      },
+      {
+        "id": 104,
+        "letra": "d",
+        "orden": 4,
+        "texto": "oninput",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Considerando la sintaxis funcional ES6, ¿qué sentencia declara una arrow function correctamente?",
+    "justificacion": "La sintaxis de una arrow function es lista de parámetros, flecha y cuerpo: `() => {}`. La (a) mezcla `function` con la flecha, que no se combinan; las otras dos no son sintaxis válida.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 105,
+        "letra": "a",
+        "orden": 1,
+        "texto": "const run = function() => {}",
+        "es_correcta": 0
+      },
+      {
+        "id": 106,
+        "letra": "b",
+        "orden": 2,
+        "texto": "const run = () => {}",
+        "es_correcta": 1
+      },
+      {
+        "id": 107,
+        "letra": "c",
+        "orden": 3,
+        "texto": "let run => function() {}",
+        "es_correcta": 0
+      },
+      {
+        "id": 108,
+        "letra": "d",
+        "orden": 4,
+        "texto": "var run = arrow() {}",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Si intentas reasignar una variable declarada con `const`, ¿qué ocurre en tiempo de ejecución?",
+    "justificacion": "Reasignar una variable declarada con `const` lanza un `TypeError` y corta la ejecución: el enlace entre el nombre y su valor es lo que `const` congela. Conviene no confundirlo con lo otro: si la constante apunta a un objeto o a un arreglo, **modificar su contenido está permitido** y no lanza nada. `const` protege la referencia, no lo referenciado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 109,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una evasión pasiva, alterando solo la copia profunda local.",
+        "es_correcta": 0
+      },
+      {
+        "id": 110,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Una interrupción global por ReferenceError inalcanzable.",
+        "es_correcta": 0
+      },
+      {
+        "id": 111,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un corte forzado de ejecución levantando un TypeError.",
+        "es_correcta": 1
+      },
+      {
+        "id": 112,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El sistema ignora y anula silenciosamente los cambios aplicados.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Durante la fase de coerción implícita, ¿qué entrega la ejecución de la sentencia binaria \"3\" + 3?",
+    "justificacion": "Con el operador `+`, si uno de los operandos es una cadena, JavaScript convierte el otro a cadena y concatena: `\"3\" + 3` da `\"33\"`, del tipo String. Es el `+` el que se comporta así; con `-`, `*` o `/` la conversión va hacia número y `\"3\" - 3` daría `0`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 113,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El tipo Number 6, sumando el logaritmo binario subyacente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 114,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un fallo inminente evaluado como NaN irremediable.",
+        "es_correcta": 0
+      },
+      {
+        "id": 115,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un SyntaxError al mezclar primitivas incompatibles por diseño.",
+        "es_correcta": 0
+      },
+      {
+        "id": 116,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El tipo String '33', priorizando concatenación sobre adición.",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Al cargar jQuery, ¿qué símbolo queda definido como atajo de la función `jQuery`?",
+    "justificacion": "jQuery define la variable global `$` como atajo de la función `jQuery`, y por eso todo el código de la librería empieza con ese símbolo. Son la misma función con dos nombres: `$(\"#x\")` y `jQuery(\"#x\")` hacen lo mismo. Y como `$` es una variable corriente, se puede soltar con `jQuery.noConflict()` cuando otra librería la reclama.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 117,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La doble directiva jQ().",
+        "es_correcta": 0
+      },
+      {
+        "id": 118,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El prefijo subrayado _.",
+        "es_correcta": 0
+      },
+      {
+        "id": 119,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El símbolo monetario $.",
+        "es_correcta": 1
+      },
+      {
+        "id": 120,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El apuntador simbólico &.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál es el patrón estandarizado para adjuntar manejadores \"click\" en nodos asíncronos vía jQuery?",
+    "justificacion": "`.on(\"click\", ...)` es la forma vigente de asociar manejadores en jQuery, y es la que además permite delegar en un ancestro para que funcione con nodos que todavía no existen al momento de registrarla. `.bindClick()` y `.eventListener()` no existen, y la (b) dispara el clic en vez de escucharlo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 121,
+        "letra": "a",
+        "orden": 1,
+        "texto": "$(\"#nodo\").on(\"click\", function() {});",
+        "es_correcta": 1
+      },
+      {
+        "id": 122,
+        "letra": "b",
+        "orden": 2,
+        "texto": "document.getElementById(\"nodo\").click();",
+        "es_correcta": 0
+      },
+      {
+        "id": 123,
+        "letra": "c",
+        "orden": 3,
+        "texto": "$(\".nodo\").bindClick(function() {});",
+        "es_correcta": 0
+      },
+      {
+        "id": 124,
+        "letra": "d",
+        "orden": 4,
+        "texto": "$(\"#nodo\").eventListener(\"click\");",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué directriz bloquea la ejecución de scripts en jQuery hasta asegurar que el árbol DOM está listo?",
+    "justificacion": "`$(document).ready()` retrasa la ejecución hasta que el árbol DOM está construido, de modo que los selectores encuentren los elementos. Sin eso, un script en el `<head>` correría antes de que existieran los nodos que busca. Las otras tres no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 125,
+        "letra": "a",
+        "orden": 1,
+        "texto": "$(window).loadHandler(function() {});",
+        "es_correcta": 0
+      },
+      {
+        "id": 126,
+        "letra": "b",
+        "orden": 2,
+        "texto": "$(document).ready(function() {});",
+        "es_correcta": 1
+      },
+      {
+        "id": 127,
+        "letra": "c",
+        "orden": 3,
+        "texto": "$.initDOM(function() {});",
+        "es_correcta": 0
+      },
+      {
+        "id": 128,
+        "letra": "d",
+        "orden": 4,
+        "texto": "$(html).awaitComplete(function() {});",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Al parsear datos, ¿qué función encapsula jQuery para forzar la lectura del contenido de un `<input>`?",
+    "justificacion": "`.val()` lee y escribe el valor de los controles de formulario, que es donde vive el contenido de un `<input>`. `.text()` y `.html()` trabajan sobre el contenido entre etiquetas de apertura y cierre, y un `<input>` no tiene: es un elemento vacío.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 129,
+        "letra": "a",
+        "orden": 1,
+        "texto": ".contentNode()",
+        "es_correcta": 0
+      },
+      {
+        "id": 130,
+        "letra": "b",
+        "orden": 2,
+        "texto": ".text()",
+        "es_correcta": 0
+      },
+      {
+        "id": 131,
+        "letra": "c",
+        "orden": 3,
+        "texto": ".html()",
+        "es_correcta": 0
+      },
+      {
+        "id": 132,
+        "letra": "d",
+        "orden": 4,
+        "texto": ".val()",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué técnica animada nativa de jQuery altera gradualmente la opacidad hasta colapsar el nodo visual?",
+    "justificacion": "`.fadeOut()` baja la opacidad de forma gradual y, al terminar, oculta el elemento. `.hide()` lo esconde de golpe, `.slideUp()` lo colapsa por altura en vez de por opacidad, y `.collapse()` no es de jQuery sino de Bootstrap.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 133,
+        "letra": "a",
+        "orden": 1,
+        "texto": ".hide()",
+        "es_correcta": 0
+      },
+      {
+        "id": 134,
+        "letra": "b",
+        "orden": 2,
+        "texto": ".collapse()",
+        "es_correcta": 0
+      },
+      {
+        "id": 135,
+        "letra": "c",
+        "orden": 3,
+        "texto": ".fadeOut()",
+        "es_correcta": 1
+      },
+      {
+        "id": 136,
+        "letra": "d",
+        "orden": 4,
+        "texto": ".slideUp()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué mutación estructural consolida temporalmente 'git add' en la topología de un flujo versionado?",
+    "justificacion": "`git add` mueve los cambios del directorio de trabajo al área de preparación, que es una zona intermedia donde se arma el próximo commit. No guarda nada en la historia todavía: eso lo hace `git commit`, que es la alternativa (b).",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 137,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Indexa cambios brutos del working directory hacia el Staging Area.",
+        "es_correcta": 1
+      },
+      {
+        "id": 138,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Persiste instantáneas en el repositorio local (HEAD).",
+        "es_correcta": 0
+      },
+      {
+        "id": 139,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Traslada ramas paralelas sobre la estructura del código matriz.",
+        "es_correcta": 0
+      },
+      {
+        "id": 140,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Proyecta deltas de código directamente al clúster remoto.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Al gatillar 'git commit' careciendo de archivos indexados previos, ¿qué respuesta retorna Git CLI?",
+    "justificacion": "Sin nada en el área de preparación no hay cambios que registrar, así que Git aborta e informa que no hay nada que confirmar. No inventa un commit vacío ni guarda el directorio de trabajo por su cuenta.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 141,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Consolida instantáneamente un bypass guardando el working copy.",
+        "es_correcta": 0
+      },
+      {
+        "id": 142,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Aborta bloqueando la firma al no existir cambios en staging.",
+        "es_correcta": 1
+      },
+      {
+        "id": 143,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Imprime un log de aviso mientras fusiona el repositorio origen.",
+        "es_correcta": 0
+      },
+      {
+        "id": 144,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Sobrescribe los metadatos forzando un historial completamente vacío.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "Frente a múltiples vectores de desarrollo, ¿qué previene tácticamente el aislamiento en ramas (branch)?",
+    "justificacion": "Una rama aísla el trabajo en curso, de modo que el código a medio hacer no se mezcla con la línea principal hasta que alguien lo revise e integre. Las otras tres describen problemas de disco, de red o de criptografía, que no son lo que las ramas resuelven.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 145,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Saturar el disco local con instantáneas redundantes e inservibles.",
+        "es_correcta": 0
+      },
+      {
+        "id": 146,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Bloqueos de red al empujar datos corruptos hacia GitHub server.",
+        "es_correcta": 0
+      },
+      {
+        "id": 147,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Rupturas y colisiones críticas al inyectar código no verificado.",
+        "es_correcta": 1
+      },
+      {
+        "id": 148,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Extravío criptográfico de las claves SHA-1 vinculadas al commit.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En presencia de un Merge Conflict grave, ¿qué protocolo manual asume irrevocablemente el usuario?",
+    "justificacion": "Ante un conflicto, Git marca las zonas en disputa dentro del archivo y se detiene: es la persona quien decide qué código queda y luego confirma la resolución con un commit. Las otras tres son maniobras para esquivar el conflicto, y todas pierden trabajo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 149,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Resetear remotamente borrando su clon local mediante flag --hard.",
+        "es_correcta": 0
+      },
+      {
+        "id": 150,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Intervenir los archivos conflictivos y sellar con un nuevo commit.",
+        "es_correcta": 1
+      },
+      {
+        "id": 151,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Evadir marcas de conflicto forzando subidas push --force locales.",
+        "es_correcta": 0
+      },
+      {
+        "id": 152,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Abortar la rama y delegar dependencias mediante directivas stash.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál es la disparidad motriz exacta entre invocar \"git fetch\" frente a procesar un \"git pull\"?",
+    "justificacion": "`git fetch` trae los commits del remoto y actualiza las ramas de seguimiento, sin tocar tu rama de trabajo: puedes mirar qué llegó antes de integrarlo. `git pull` hace ese mismo `fetch` y además lo fusiona en tu rama en el mismo acto.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 153,
+        "letra": "a",
+        "orden": 1,
+        "texto": "'fetch' descarga al caché remoto; 'pull' integra eso a tu trabajo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 154,
+        "letra": "b",
+        "orden": 2,
+        "texto": "'fetch' sobrescribe tu historia local; 'pull' solo lee punteros.",
+        "es_correcta": 0
+      },
+      {
+        "id": 155,
+        "letra": "c",
+        "orden": 3,
+        "texto": "'pull' revierte fallas de red; 'fetch' reconstruye commits rotos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 156,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Son estrictamente sinónimos, ejecutando idéntica rutina binaria.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál es la principal responsabilidad arquitectónica del rol Front-End en una aplicación web moderna?",
+    "justificacion": "El rol Front-End se ocupa de lo que ocurre en el navegador: construir la interfaz y responder a lo que hace la persona. La lógica de negocio, la base de datos y la configuración del servidor pertenecen al Back-End o a operaciones.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 157,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Gestionar la lógica de negocio y la base de datos central.",
+        "es_correcta": 0
+      },
+      {
+        "id": 158,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Renderizar la interfaz y gestionar la interacción del usuario.",
+        "es_correcta": 1
+      },
+      {
+        "id": 159,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Configurar el servidor web y los protocolos de red TCP/IP.",
+        "es_correcta": 0
+      },
+      {
+        "id": 160,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Orquestar contenedores Docker para el despliegue continuo.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál selector CSS posee mayor especificidad entre un ID, una clase, un elemento y un pseudo-elemento?",
+    "justificacion": "En el cálculo de especificidad, los identificadores forman una categoría que pesa más que las clases, y las clases más que los elementos y pseudo-elementos. Un solo `#id` le gana a cualquier cantidad de clases.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 161,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El selector de elementos básicos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 162,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El selector de clases y atributos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 163,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El selector de identificadores (ID).",
+        "es_correcta": 1
+      },
+      {
+        "id": 164,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El selector de pseudo-elementos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué regla CSS se utiliza para aplicar estilos condicionales basados en el ancho de la pantalla?",
+    "justificacion": "`@media` es la regla que condiciona estilos a las características del dispositivo, y `max-width: 768px` los aplica desde ese ancho hacia abajo. Las otras tres son sintaxis inventada: no existen `@responsive`, `@viewport` con esa forma ni `@screen`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 165,
+        "letra": "a",
+        "orden": 1,
+        "texto": "@media screen and (max-width: 768px)",
+        "es_correcta": 1
+      },
+      {
+        "id": 166,
+        "letra": "b",
+        "orden": 2,
+        "texto": "@responsive query min-width 768px",
+        "es_correcta": 0
+      },
+      {
+        "id": 167,
+        "letra": "c",
+        "orden": 3,
+        "texto": "@viewport device-width = 768px",
+        "es_correcta": 0
+      },
+      {
+        "id": 168,
+        "letra": "d",
+        "orden": 4,
+        "texto": "@screen layout condition (768px)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En el sistema de grillas de Bootstrap, ¿en cuántas columnas iguales se divide por defecto una fila?",
+    "justificacion": "Bootstrap divide cada fila en 12 columnas, número elegido por ser divisible en mitades, tercios, cuartos y sextos sin decimales.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 169,
+        "letra": "a",
+        "orden": 1,
+        "texto": "En 8 columnas flexibles.",
+        "es_correcta": 0
+      },
+      {
+        "id": 170,
+        "letra": "b",
+        "orden": 2,
+        "texto": "En 12 columnas flexibles.",
+        "es_correcta": 1
+      },
+      {
+        "id": 171,
+        "letra": "c",
+        "orden": 3,
+        "texto": "En 10 columnas flexibles.",
+        "es_correcta": 0
+      },
+      {
+        "id": 172,
+        "letra": "d",
+        "orden": 4,
+        "texto": "En 16 columnas flexibles.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué método nativo de JavaScript retorna el primer elemento que coincida con un selector CSS específico?",
+    "justificacion": "`querySelector()` acepta cualquier selector CSS y devuelve el primer elemento que coincida, o `null` si no hay ninguno. `querySelectorAll()` devuelve todos, y los dos `getElement...` sólo buscan por id o por clase, sin admitir selectores compuestos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 173,
+        "letra": "a",
+        "orden": 1,
+        "texto": "document.getElementById()",
+        "es_correcta": 0
+      },
+      {
+        "id": 174,
+        "letra": "b",
+        "orden": 2,
+        "texto": "document.getElementsByClassName()",
+        "es_correcta": 0
+      },
+      {
+        "id": 175,
+        "letra": "c",
+        "orden": 3,
+        "texto": "document.querySelector()",
+        "es_correcta": 1
+      },
+      {
+        "id": 176,
+        "letra": "d",
+        "orden": 4,
+        "texto": "document.querySelectorAll()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué evento de JavaScript se dispara inmediatamente cuando un elemento HTML pierde el foco?",
+    "justificacion": "`blur` se dispara en cuanto el elemento pierde el foco, haya cambiado su valor o no. Es lo que lo separa de `change`, que además exige que el valor sea distinto del que tenía al recibir el foco.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 177,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El evento blur",
+        "es_correcta": 1
+      },
+      {
+        "id": 178,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El evento focus",
+        "es_correcta": 0
+      },
+      {
+        "id": 179,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El evento change",
+        "es_correcta": 0
+      },
+      {
+        "id": 180,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El evento input",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cuál es el ámbito (scope) de una variable declarada con la palabra clave let dentro de un bloque?",
+    "justificacion": "`let` tiene alcance de bloque: existe sólo entre las llaves donde se declaró, incluidas las de un `if` o un `for`. Es lo que la separa de `var`, que tiene alcance de función y se filtra fuera del bloque.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 181,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Ámbito global en todo el documento script.",
+        "es_correcta": 0
+      },
+      {
+        "id": 182,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ámbito de función dentro de la función padre.",
+        "es_correcta": 0
+      },
+      {
+        "id": 183,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Ámbito de bloque delimitado por llaves {}.",
+        "es_correcta": 1
+      },
+      {
+        "id": 184,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ámbito léxico accesible solo en el módulo.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En jQuery, ¿qué método se utiliza para cambiar o extraer el contenido HTML interno de un elemento?",
+    "justificacion": "`.html()` lee o reemplaza el contenido HTML interno del elemento, interpretando las etiquetas. `.text()` hace lo mismo pero tratando todo como texto plano, y `.val()` trabaja sobre el valor de los controles de formulario.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 185,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El método .text()",
+        "es_correcta": 0
+      },
+      {
+        "id": 186,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El método .html()",
+        "es_correcta": 1
+      },
+      {
+        "id": 187,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El método .val()",
+        "es_correcta": 0
+      },
+      {
+        "id": 188,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El método .attr()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Cómo se asocia un evento de clic a un botón utilizando la sintaxis estándar de la librería jQuery?",
+    "justificacion": "`$(\"button\").click(function() { })` es el atajo de jQuery para registrar un manejador de clic. La (b) es JavaScript nativo y además está incompleta, y las otras dos usan métodos que jQuery no tiene.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 189,
+        "letra": "a",
+        "orden": 1,
+        "texto": "$(\"button\").click(function() { })",
+        "es_correcta": 1
+      },
+      {
+        "id": 190,
+        "letra": "b",
+        "orden": 2,
+        "texto": "document.addEventListener(\"click\")",
+        "es_correcta": 0
+      },
+      {
+        "id": 191,
+        "letra": "c",
+        "orden": 3,
+        "texto": "$(\"button\").onEvent(\"click\")",
+        "es_correcta": 0
+      },
+      {
+        "id": 192,
+        "letra": "d",
+        "orden": 4,
+        "texto": "jQuery.bindClick(\"button\")",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué comando de Git registra oficialmente los cambios preparados (staging) en el repositorio local?",
+    "justificacion": "`git commit` toma lo que está en el área de preparación y lo registra en la historia del repositorio local. `git add` sólo prepara, `git push` envía al remoto lo ya confirmado, y `git status` no escribe nada.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 193,
+        "letra": "a",
+        "orden": 1,
+        "texto": "git add .",
+        "es_correcta": 0
+      },
+      {
+        "id": 194,
+        "letra": "b",
+        "orden": 2,
+        "texto": "git commit -m \"mensaje\"",
+        "es_correcta": 1
+      },
+      {
+        "id": 195,
+        "letra": "c",
+        "orden": 3,
+        "texto": "git push origin main",
+        "es_correcta": 0
+      },
+      {
+        "id": 196,
+        "letra": "d",
+        "orden": 4,
+        "texto": "git status",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué comando de Git permite crear una nueva rama y cambiar a ella de manera simultánea?",
+    "justificacion": "Los dos comandos crean la rama y se cambian a ella en un solo paso: `git checkout -b` es la forma clásica y `git switch --create` la moderna, que Git introdujo justamente para separar el cambio de rama de la restauración de archivos. Por eso la respuesta correcta es la que las reconoce a ambas, y por eso esta pregunta no se puede barajar: su alternativa (d) nombra a las otras dos por su letra.",
+    "dificultad": null,
+    "orden_fijo": 1,
+    "alternativas": [
+      {
+        "id": 197,
+        "letra": "a",
+        "orden": 1,
+        "texto": "git branch -n <rama>",
+        "es_correcta": 0
+      },
+      {
+        "id": 198,
+        "letra": "b",
+        "orden": 2,
+        "texto": "git checkout -b <rama>",
+        "es_correcta": 0
+      },
+      {
+        "id": 199,
+        "letra": "c",
+        "orden": 3,
+        "texto": "git switch --create <rama>",
+        "es_correcta": 0
+      },
+      {
+        "id": 200,
         "letra": "d",
         "orden": 4,
         "texto": "Ambas B y C son correctas.",
@@ -105,241 +2025,81 @@ export const PREGUNTAS = [
     ]
   },
   {
-    "id": 2,
-    "modulo": 3,
-    "modulo_titulo": "Fundamentos de Programacion en JavaScript",
-    "modulo_icono": "data-object",
-    "enunciado": "Cual es el motor principal que compila y ejecuta JavaScript dentro de Google Chrome?",
-    "justificacion": "V8 es el motor de Google, escrito en C++, que compila JavaScript a codigo maquina. SpiderMonkey es el de Firefox, JavaScriptCore el de Safari y ChakraCore fue el del Edge antiguo.",
-    "dificultad": "baja",
+    "id": 51,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "En GitHub, ¿qué propósito principal cumple la creación de un Pull Request (PR)?",
+    "justificacion": "Un Pull Request propone integrar una rama en otra y abre el espacio donde se revisa y comenta el cambio antes de fusionarlo. Es una función de la plataforma, no de Git: sirve para que la integración pase por una revisión.",
+    "dificultad": null,
     "orden_fijo": 0,
     "alternativas": [
       {
-        "id": 5,
+        "id": 201,
         "letra": "a",
         "orden": 1,
-        "texto": "SpiderMonkey",
+        "texto": "Descargar código remoto al disco duro.",
         "es_correcta": 0
       },
       {
-        "id": 6,
+        "id": 202,
         "letra": "b",
         "orden": 2,
-        "texto": "V8 Engine",
+        "texto": "Solicitar la integración de ramas y revisión.",
         "es_correcta": 1
       },
       {
-        "id": 7,
+        "id": 203,
         "letra": "c",
         "orden": 3,
-        "texto": "ChakraCore",
+        "texto": "Forzar el borrado de una rama en conflicto.",
         "es_correcta": 0
       },
       {
-        "id": 8,
+        "id": 204,
         "letra": "d",
         "orden": 4,
-        "texto": "JavaScriptCore",
+        "texto": "Sincronizar tags de versiones estables.",
         "es_correcta": 0
       }
     ]
   },
   {
-    "id": 3,
-    "modulo": 4,
-    "modulo_titulo": "Programacion Avanzada en JavaScript",
-    "modulo_icono": "bolt",
-    "enunciado": "Que pilar de POO oculta el estado interno de un objeto y exige metodos para alterarlo?",
-    "justificacion": "El encapsulamiento oculta el estado interno y obliga a pasar por metodos para modificarlo. La herencia reutiliza, el polimorfismo permite respuestas distintas al mismo metodo y la abstraccion expone solo lo esencial.",
-    "dificultad": "media",
+    "id": 52,
+    "modulo": 2,
+    "modulo_titulo": "Fundamentos de Desarrollo Front-End",
+    "modulo_icono": "devices",
+    "enunciado": "¿Qué sucede cuando Git detecta modificaciones concurrentes en la misma línea durante una unión?",
+    "justificacion": "Cuando dos ramas modifican la misma línea, Git no puede decidir cuál gana: marca el conflicto dentro del archivo y detiene la fusión hasta que alguien lo resuelva a mano. No sobrescribe ni descarta nada por su cuenta.",
+    "dificultad": null,
     "orden_fijo": 0,
     "alternativas": [
       {
-        "id": 9,
+        "id": 205,
         "letra": "a",
         "orden": 1,
-        "texto": "Herencia multiple.",
+        "texto": "Sobrescribe automáticamente el archivo nuevo.",
         "es_correcta": 0
       },
       {
-        "id": 10,
+        "id": 206,
         "letra": "b",
         "orden": 2,
-        "texto": "Encapsulamiento.",
+        "texto": "Genera un conflicto que requiere edición manual.",
         "es_correcta": 1
       },
       {
-        "id": 11,
+        "id": 207,
         "letra": "c",
         "orden": 3,
-        "texto": "Polimorfismo.",
+        "texto": "Cancela la operación y elimina el repositorio.",
         "es_correcta": 0
       },
       {
-        "id": 12,
+        "id": 208,
         "letra": "d",
         "orden": 4,
-        "texto": "Abstraccion estructural.",
-        "es_correcta": 0
-      }
-    ]
-  },
-  {
-    "id": 4,
-    "modulo": 5,
-    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
-    "modulo_icono": "database",
-    "enunciado": "Que caracteristica fundamental distingue a un RDBMS de un sistema NoSQL documental?",
-    "justificacion": "Un RDBMS garantiza atomicidad, consistencia, aislamiento y durabilidad sobre un esquema fijo. Los sistemas documentales priorizan el esquema flexible y suelen relajar esas garantias.",
-    "dificultad": "media",
-    "orden_fijo": 0,
-    "alternativas": [
-      {
-        "id": 13,
-        "letra": "a",
-        "orden": 1,
-        "texto": "Estructura flexible de esquemas dinamicos.",
-        "es_correcta": 0
-      },
-      {
-        "id": 14,
-        "letra": "b",
-        "orden": 2,
-        "texto": "Garantia estricta de propiedades ACID.",
-        "es_correcta": 1
-      },
-      {
-        "id": 15,
-        "letra": "c",
-        "orden": 3,
-        "texto": "Almacenamiento basado en grafos dirigidos.",
-        "es_correcta": 0
-      },
-      {
-        "id": 16,
-        "letra": "d",
-        "orden": 4,
-        "texto": "Ausencia de lenguaje estructurado de consultas.",
-        "es_correcta": 0
-      }
-    ]
-  },
-  {
-    "id": 5,
-    "modulo": 6,
-    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
-    "modulo_icono": "dns",
-    "enunciado": "Que modulo nativo de Node.js es indispensable para leer y escribir objetos JSON en archivos del sistema?",
-    "justificacion": "El modulo fs es el que expone las operaciones de lectura y escritura de archivos. path solo compone rutas, http sirve peticiones y os informa del sistema operativo.",
-    "dificultad": "baja",
-    "orden_fijo": 0,
-    "alternativas": [
-      {
-        "id": 17,
-        "letra": "a",
-        "orden": 1,
-        "texto": "path",
-        "es_correcta": 0
-      },
-      {
-        "id": 18,
-        "letra": "b",
-        "orden": 2,
-        "texto": "http",
-        "es_correcta": 0
-      },
-      {
-        "id": 19,
-        "letra": "c",
-        "orden": 3,
-        "texto": "fs (file system)",
-        "es_correcta": 1
-      },
-      {
-        "id": 20,
-        "letra": "d",
-        "orden": 4,
-        "texto": "os",
-        "es_correcta": 0
-      }
-    ]
-  },
-  {
-    "id": 6,
-    "modulo": 7,
-    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
-    "modulo_icono": "layers",
-    "enunciado": "Que comando SQL inicia explicitamente un bloque de control transaccional en PostgreSQL?",
-    "justificacion": "BEGIN abre un bloque transaccional en PostgreSQL. SET TRANSACTION no abre nada: fija las caracteristicas de la transaccion en curso. INIT y OPEN no son comandos SQL.",
-    "dificultad": "media",
-    "orden_fijo": 0,
-    "alternativas": [
-      {
-        "id": 21,
-        "letra": "a",
-        "orden": 1,
-        "texto": "SET TRANSACTION",
-        "es_correcta": 0
-      },
-      {
-        "id": 22,
-        "letra": "b",
-        "orden": 2,
-        "texto": "BEGIN",
-        "es_correcta": 1
-      },
-      {
-        "id": 23,
-        "letra": "c",
-        "orden": 3,
-        "texto": "INIT",
-        "es_correcta": 0
-      },
-      {
-        "id": 24,
-        "letra": "d",
-        "orden": 4,
-        "texto": "OPEN",
-        "es_correcta": 0
-      }
-    ]
-  },
-  {
-    "id": 7,
-    "modulo": 8,
-    "modulo_titulo": "Implementacion de API Backend Node Express",
-    "modulo_icono": "shield-lock",
-    "enunciado": "Que principio REST estipula que cada peticion contenga toda la info necesaria sin usar sesiones?",
-    "justificacion": "El principio stateless obliga a que cada peticion sea autosuficiente: el servidor no guarda estado de sesion entre una peticion y la siguiente.",
-    "dificultad": "media",
-    "orden_fijo": 0,
-    "alternativas": [
-      {
-        "id": 25,
-        "letra": "a",
-        "orden": 1,
-        "texto": "Interfaz uniforme estricta.",
-        "es_correcta": 0
-      },
-      {
-        "id": 26,
-        "letra": "b",
-        "orden": 2,
-        "texto": "Sistema de capas enrutadas.",
-        "es_correcta": 0
-      },
-      {
-        "id": 27,
-        "letra": "c",
-        "orden": 3,
-        "texto": "Comunicacion sin estado (Stateless).",
-        "es_correcta": 1
-      },
-      {
-        "id": 28,
-        "letra": "d",
-        "orden": 4,
-        "texto": "Arquitectura cliente-servidor.",
+        "texto": "Crea un branch temporal de respaldo oculto.",
         "es_correcta": 0
       }
     ]

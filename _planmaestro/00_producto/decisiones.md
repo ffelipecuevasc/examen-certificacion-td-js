@@ -1102,6 +1102,45 @@ de cobertura justo en la ventana en que el cambio reciente todavía no está ref
 
 ---
 
+**Actualización · 2026-09-09 · el «un solo paso» pasó a existir, y hasta hoy no existía**
+
+*Añadida al cerrar el módulo 2 de la iteración 25. No cambia la decisión: registra que
+la decisión no estaba implementada, y qué se hizo.*
+
+Esta ADR decía desde el 2026-09-05 que «un solo paso produce las dos cosas, o no
+produce ninguna». **Eso nunca se implementó.** La realidad eran dos comandos sueltos y
+un recordatorio impreso entre medio por `generar-instantanea.mjs`. Nada ataba las dos
+mitades y nada fallaba si se corría una sin la otra.
+
+**El fallo que esta ADR predijo ya había ocurrido.** El 2026-09-09 se descubrió que
+`d1/respaldo-banco.sql` contenía 527 bytes de `prueba_tuberia` —la tabla de ensayo de
+la iteración 12, exportada el 2026-09-03— y **ninguna pregunta**. Seis días versionado
+como «el respaldo del banco» sin tener banco dentro, y nadie lo vio porque nada lo
+miraba.
+
+El texto de arriba se equivocó sólo en cuál de las dos se quedaría atrás: **apostaba a
+la instantánea**, por ser la muda. Se quedó atrás el respaldo. El argumento era
+correcto y la predicción concreta no; lo que importa es que la separación produjo
+exactamente el efecto anunciado.
+
+**Qué se hizo.** `scripts/publicar-banco.mjs`, y `npm run datos:publicar` como su
+puerta. Prepara las dos mitades en archivos temporales y **sólo las instala si las dos
+salieron bien**; si algo falla, los dos archivos quedan intactos y lo demuestra con sus
+huellas. Comprueba además, antes de instalar, que el respaldo **tenga banco dentro** —
+la comprobación cuya ausencia dejó pasar lo de `prueba_tuberia`—, que el sello diga
+`nube` cuando se pidió la nube, y que la instantánea no publique más preguntas de las
+que el respaldo contiene. Provocados sus cuatro sabotajes y sus tres rechazos contra la
+base local el 2026-09-09.
+
+**Lo que esto cambia para quien lea la ADR dentro de seis meses:** el procedimiento del
+manual pasó de seis pasos a cinco, y los dos que había que acordarse de encadenar son
+ahora uno que no se puede partir. La regla que queda escrita, y que vale más allá de
+esta ADR: **un procedimiento que pide acordarse de dos cosas produce una.** Escribir la
+advertencia se siente como haber resuelto el problema; lo que lo resuelve es que el
+segundo paso no pueda no ocurrir.
+
+---
+
 ## ADR-024 · La iteración 22 se verifica con las diez filas de juguete, y el escapado no queda probado a escala hasta la 24
 
 **Estado:** ✅ Aceptada · **Fecha:** 2026-09-05
@@ -1294,3 +1333,130 @@ de wrangler en Windows (H-013, H-016). Su archivo
 `d1/migraciones/002-fecha-modificacion.sql` **no se rescata**: la migración que registra
 la fecha de modificación se escribe desde cero en la iteración 23, y se registra en la
 tabla `migracion`, cosa que aquella no hizo.
+
+## ADR-026 · Toda carga del banco la ejecuta el autor desde su computador, revisada antes
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-09 · **Complementa a:** ADR-015 y ADR-025
+
+**Decisión.** Es una **regla de trabajo declarada por Felipe Cuevas**, no una
+suposición sobre cómo suelen pasar las cosas, y por eso queda escrita aquí:
+
+1. **Toda carga de cuestionarios la hace el autor desde su computador.**
+2. **Antes de cargar, el autor revisa el formato y la integridad de los archivos.**
+3. **No hay cargas automáticas.** Ningún proceso programado, ningún disparador de
+   publicación, ninguna tarea del sistema de construcción escribe en el banco.
+4. **No hay cargas desde otro equipo.**
+
+**Motivo, y es lo que la distingue de una costumbre.** El proyecto ya tiene escrito
+—ADR-015, ADR-025— *quién puede* hablar con la cuenta de Cloudflare y *con qué
+herramienta* se edita el banco. Lo que no estaba escrito es **cómo trabaja de hecho el
+autor**, y esa diferencia importa al razonar sobre riesgos: una amenaza que sólo se
+materializa con una carga automática, o con una carga lanzada desde una máquina que
+nadie mira, **no aplica a este proyecto** — pero no aplicaba por costumbre, que es
+como se dejan de cumplir las cosas.
+
+Escrita, pasa a ser una condición que se puede citar y contra la que se puede
+contrastar. Sin escribir, cada vez que alguien evaluara una barrera tendría que volver
+a suponerlo, y una suposición repetida termina dándose por garantizada.
+
+**Consecuencia sobre las barreras.** Las capas de la barrera de ADR-015 se dimensionan
+sabiendo esto: **el modelo de amenaza no incluye un proceso desatendido escribiendo en
+producción**. Incluye lo contrario, que es lo que de verdad ha pasado en este proyecto:
+un comando que va a la base equivocada porque el nombre tecleado fue lo único que
+decidió el destino (H-015), o un agente que ejecuta contra la nube lo que debía
+escribir para que lo ejecutara el autor (H-014).
+
+**Consecuencia sobre la revisión previa.** El punto 2 es parte de la decisión, no un
+consejo. La revisión de formato e integridad **antes** de cargar es lo que sostiene que
+la carga sea de una sola pasada y sin red: si el encargo llega revisado, el todo o nada
+de la carga es una garantía; si llega sin revisar, el todo o nada sólo garantiza que el
+error entre entero o no entre.
+
+**Lo que esta ADR no dice.** No dice que el contenido sea correcto: dice que alguien lo
+miró antes. Que una justificación sea cierta, o que una alternativa marcada como
+correcta lo sea, siguen sin poder comprobarse con un programa, y eso está dicho donde
+corresponde.
+
+---
+
+## ADR-027 · Todo guion que hable con la nube lleva su propia barrera de ADR-015, y se comprueba provocándola
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-09 · **Refuerza a:** ADR-015 · **Se apoya en:** H-014, H-023
+
+**Decisión.** **Sin excepción:** cada guion del proyecto capaz de hablar con la cuenta
+de Cloudflare implementa **su propia** barrera de ADR-015 —rechazar el destino remoto
+salvo que `PERMITIR_REMOTO=1` esté puesto— y esa barrera **se comprueba provocándola**,
+no leyéndola. Un guion cuya barrera nunca ha rechazado nada no tiene barrera
+comprobada, por la regla de H-023.
+
+**El patrón del enganche NO se amplía para cubrir los guiones nuevos.** Decidido así
+por el autor el 2026-09-09, y el motivo es el que manda: **el patrón del enganche
+siempre va a ir por detrás de los guiones nuevos.** Es una lista de nombres y de
+banderas que alguien tiene que acordarse de actualizar cada vez que aparece un guion, y
+el día que se olvide no avisa nadie. Perseguirlo daría una sensación de cobertura que
+la lista no puede sostener.
+
+**La regla es lo que hace que cada guion se defienda solo.** Un guion que nace con su
+barrera está cubierto desde su primera línea, sin depender de que nadie recuerde
+añadirlo a ninguna lista. La cobertura crece con los guiones en vez de quedarse atrás.
+
+**Estado real de la capa 2, medido el 2026-09-09, y es peor de lo que se creía.** Se
+midió dándole al enganche las líneas de comando reales, una por una, en vez de razonar
+sobre su patrón. De **seis** formas de invocación que hablan con la nube, la capa 2
+bloquea **dos**:
+
+| Línea de comandos | ¿La bloquea la capa 2? |
+|---|---|
+| `npm run datos:instantanea -- <bandera remota>` | **sí**, por el prefijo `datos:` |
+| la herramienta de Cloudflare invocada directo (`d1 export`) | **sí**, por su nombre |
+| `node scripts/administrar-banco.mjs insertar … <bandera remota>` | **NO** |
+| `node scripts/generar-instantanea.mjs <bandera remota>` | **NO** |
+| `node scripts/volcar-contenido.mjs … <bandera remota>` | **NO** |
+| `node scripts/comprobar-carga.mjs … <bandera remota>` | **NO** |
+
+**Lo que esto corrige, y conviene decirlo sin suavizarlo.** Se había anotado que la
+capa 2 no veía los dos guiones nuevos. La medición dice otra cosa: **tampoco ve
+`administrar-banco.mjs`, que es la herramienta de escritura** —la que carga el banco en
+producción—, ni `generar-instantanea.mjs` cuando se lo invoca con `node` en vez de por
+el guion de npm. El mismo guion pasa o no pasa **según cómo se lo escriba**, que es el
+filo de H-011 otra vez.
+
+**Y esto refuerza la decisión en vez de contradecirla.** Si la lista ya se había quedado
+atrás con los guiones que existían antes de hoy, perseguirla con los nuevos no la iba a
+poner al día: la iba a dejar atrás más despacio. La regla que escala es la otra.
+
+**Los cuatro guiones tienen su barrera propia**, que es la capa que de verdad los
+cubre a los cuatro:
+
+| Guion | Barrera propia | Cómo consta |
+|---|---|---|
+| `scripts/comprobar-carga.mjs` | sí | **provocada** el 2026-09-09 |
+| `scripts/volcar-contenido.mjs` | sí | **provocada** el 2026-09-09 |
+| `scripts/administrar-banco.mjs` | sí, línea 246 | **leída, no provocada** |
+| `scripts/generar-instantanea.mjs` | sí, línea 203, rotulada «capa 3» | **leída, no provocada** |
+
+Las dos últimas dicen «leída» a propósito, y por la regla de H-023 **eso no cuenta como
+comprobado**. No las provocó Claude Code porque provocar la barrera de la herramienta de
+escritura exige lanzarla con la bandera remota puesta, que es exactamente la forma del
+acto que ADR-015 le prohíbe: si la barrera fuera lo que se cree, no pasa nada, y si no
+lo fuera, el daño sería el que la ADR existe para evitar. **No se apuesta sobre eso.**
+Las provoca el autor, en un segundo, y quedan cerradas.
+
+**Esto no es un defecto de la capa 2: es su naturaleza, y ya estaba escrita.** El
+propio encabezado del enganche dice que sólo ve la línea de comandos y que **es la capa
+barata, no la que sostiene**. Se anota aquí porque una limitación escrita dentro del
+archivo que la tiene no la ve quien lee la lista de barreras y cuenta tres.
+
+**Consecuencia práctica, para el guion siguiente.** Un guion nuevo que hable con la
+nube no está terminado hasta que:
+
+1. Rechaza el destino remoto sin `PERMITIR_REMOTO=1`, **provocado**.
+2. Coteja el uuid contra `wrangler.toml` antes de tocar nada, **provocado**, porque el
+   nombre es lo que uno escribe y el uuid es contra lo que se termina hablando (H-015).
+3. Deja dicho en su encabezado que lo remoto lo ejecuta el autor.
+
+**Lo que sigue sin cambiar.** La capa que de verdad sostiene sigue siendo la 1: el
+entorno sin credenciales. Esta ADR añade una capa por guion, no reemplaza aquélla, y
+sobre todo **no convierte la capa 2 en algo que no es**.
+
+---

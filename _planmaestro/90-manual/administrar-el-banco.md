@@ -292,25 +292,46 @@ terminal: tocan la cuenta de Cloudflare, y por ADR-015 nadie más los corre.
    lo único que decide dónde cae el comando (H-015).**
    ⚠️ *No recorrido: producción está vacía hasta la iteración 24.*
 
-4. **Exportar el respaldo. (autor)** ADR-014. El comando está en
-   [Respaldo y restauración](respaldo-y-restauracion.md). Sale
-   `d1/respaldo-banco.sql`.
-   ⚠️ *No recorrido contra producción.*
-
-5. **Regenerar la copia del sitio desde la nube. (autor)**
+4. **Respaldo e instantánea, en un solo paso. (autor)** ADR-023 y ADR-014.
    ```
    $env:PERMITIR_REMOTO=1
-   npm run datos:instantanea -- --remote
+   npm run datos:publicar -- --base=examen-td-js-produccion --remote
    ```
-   El sello del archivo tiene que decir `"entorno": "nube"`. Si dice `"local"`, esa
-   copia **no se publica**: es el banco de juguete.
-   ⚠️ *No recorrido: hoy la copia versionada sale de local, y es un incumplimiento
-   consciente de ADR-023 anotado en la iteración 24.*
+   **Este paso reemplazó a dos.** Hasta el 2026-09-09 eran dos comandos sueltos —una
+   exportación y una regeneración— con un recordatorio impreso entre medio, y nada
+   ataba las dos mitades. ADR-023 pedía «un solo paso produce las dos cosas, o no
+   produce ninguna»; ahora lo es.
 
-6. **Commitear los dos archivos generados y publicar. (autor)**
+   Las dos mitades se preparan en archivos temporales y **sólo se instalan si las dos
+   salieron bien**. Si algo falla, `d1/respaldo-banco.sql` y
+   `static/js/data/instantanea-banco.js` quedan exactamente como estaban, y el guion
+   lo demuestra imprimiendo sus huellas antes y después.
+
+   Comprueba tres cosas antes de instalar nada: que el respaldo **tenga banco dentro**
+   —tabla `pregunta`, tabla `alternativa`, al menos una fila—, que el sello diga
+   `"entorno": "nube"`, y que la instantánea no publique más preguntas de las que el
+   respaldo contiene.
+   ✅ *Provocados sus cuatro rechazos contra la base local el 2026-09-09, comprobando
+   en los cuatro que ninguno de los dos archivos se tocó.*
+   ⚠️ *No recorrido contra producción.*
+
+5. **Commitear los dos archivos generados y publicar. (autor)**
    `d1/respaldo-banco.sql` y `static/js/data/instantanea-banco.js` van en el mismo
    commit: son las dos copias del mismo estado, y separarlas es cómo se desincronizan.
    ⚠️ *No recorrido.*
+
+> ### Por qué este bloque dejó de ser una lista de buenas intenciones
+>
+> *Anotado el 2026-09-09.* Los pasos 4 y 5 de la versión anterior pedían al lector que
+> se acordara de correr dos comandos seguidos. **El fallo que eso permite ya había
+> ocurrido, y llevaba seis días sin que nadie lo viera:** `d1/respaldo-banco.sql`
+> contenía 527 bytes de `prueba_tuberia` —la tabla de ensayo de la iteración 12— y
+> **ninguna pregunta**. El archivo que ADR-014 llama «el respaldo del banco» no tenía
+> banco dentro.
+>
+> No se descubrió por el procedimiento: se descubrió abriendo el archivo. Por eso el
+> paso único no sólo junta las dos mitades, sino que **mira lo que exportó** antes de
+> instalarlo. Un archivo que existe no es un respaldo.
 
 **Lo que no vale:** dar este bloque por comprobado porque esté escrito. Un
 procedimiento que nadie ha recorrido entero es una hipótesis con formato de lista, y

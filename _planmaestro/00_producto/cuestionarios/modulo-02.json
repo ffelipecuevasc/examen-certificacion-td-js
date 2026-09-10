@@ -198,7 +198,7 @@
     "alternativas": [
       {
         "letra": "a",
-        "texto": "Exclusivamente como hijos directos dentro del contenedor `<head>`."
+        "texto": "Como hijos directos dentro del contenedor `<head>`."
       },
       {
         "letra": "b",
@@ -362,7 +362,7 @@
   {
     "modulo": 2,
     "numero": 16,
-    "enunciado": "Ante la colisión de múltiples orígenes, ¿qué estilo CSS impone mayor prioridad jerárquica?",
+    "enunciado": "Ante la colisión de estilos de distintos orígenes, y sin usar `!important`, ¿qué estilo CSS impone mayor prioridad?",
     "alternativas": [
       {
         "letra": "a",
@@ -506,7 +506,7 @@
   {
     "modulo": 2,
     "numero": 22,
-    "enunciado": "¿Qué propósito canónico de interfaz soluciona el clásico componente jumbotron en Bootstrap?",
+    "enunciado": "En Bootstrap 4, ¿qué propósito de interfaz cumple el componente jumbotron?",
     "alternativas": [
       {
         "letra": "a",
@@ -650,7 +650,7 @@
   {
     "modulo": 2,
     "numero": 28,
-    "enunciado": "Si mutas violentamente una referencia directa constante, ¿qué mecanismo se dispara en el runtime JS?",
+    "enunciado": "Si intentas reasignar una variable declarada con `const`, ¿qué ocurre en tiempo de ejecución?",
     "alternativas": [
       {
         "letra": "a",
@@ -698,7 +698,7 @@
   {
     "modulo": 2,
     "numero": 30,
-    "enunciado": "¿Qué atajo sintáctico universal reconoce automáticamente el motor del DOM al inicializar jQuery?",
+    "enunciado": "Al cargar jQuery, ¿qué símbolo queda definido como atajo de la función `jQuery`?",
     "alternativas": [
       {
         "letra": "a",

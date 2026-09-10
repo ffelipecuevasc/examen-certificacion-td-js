@@ -19,6 +19,7 @@
     "datos:ejemplo": "wrangler d1 execute examen-td-js-produccion --local --file=d1/ejemplo-banco.sql",
     "datos:verificar-banco": "node scripts/verificar-banco.mjs",
     "datos:instantanea": "node scripts/generar-instantanea.mjs",
+    "datos:publicar": "node scripts/publicar-banco.mjs",
     "banco:revisar": "node scripts/administrar-banco.mjs revisar",
     "banco:insertar": "node scripts/administrar-banco.mjs insertar",
     "banco:actualizar": "node scripts/administrar-banco.mjs actualizar",

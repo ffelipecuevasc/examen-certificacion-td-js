@@ -1250,3 +1250,610 @@ la **forma** del dato en vez de su **contenido** puede quedar clavado en un valo
 que nada avise. Este llevaba desde la iteración 12 diciendo `false` y nadie lo miró,
 porque hasta que hubo un banco vacío de verdad, `false` era la respuesta correcta por
 casualidad.
+
+### H-023 · PATRON · Tres comprobaciones que nunca habian dicho «no» resultaron no poder decirlo
+**Gravedad:** 🔴 · **Estado:** 🟢 Regla adoptada · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Esto no es un hallazgo suelto: es el tercero del mismo patrón**, y por eso se anota
+como patrón. Anotarlo otra vez como incidente aislado sería perder justamente lo que
+tienen en común.
+
+**Los tres casos.**
+
+| Cuándo | La comprobación | Por qué no podía fallar |
+|---|---|---|
+| Iteración 24 · H-022 | `meta.vacio` en `/api/estado` | Se calculaba sobre la **forma** del dato —`Array.isArray(datos)`— y ese extremo entrega un objeto. Daba `false` **siempre**, desde la iteración 12 |
+| Iteración 23 | Las nueve restricciones del esquema | Estaban declaradas en el SQL y **nadie les había hecho rechazar nada**. Se creía en ellas por leerlas |
+| Iteración 25 · éste | El filtro de retiradas del comprobador de conversión | `r.modulo === modulo`, y `retiradas.json` escribe `2` en el banco nuevo y `"Módulo 2"` en el viejo. Miraba **1 de 3** e informaba «ninguna colada» |
+
+**Lo que los tres comparten, y es lo único que importa.** Ninguno fallaba. Los tres
+llevaban tiempo diciendo que sí, y en los tres casos ese «sí» no era el resultado de
+una comprobación: era el **único resultado que la comprobación podía dar**. Una
+comprobación que siempre pasa y una comprobación que no existe se ven idénticas desde
+afuera, y la que siempre pasa es peor, porque además tranquiliza.
+
+**El caso de esta iteración, en detalle.** El comprobador de conversión informaba
+`retiradas del modulo 1 · comprobadas, ninguna colada`. El módulo 2 tiene **tres**
+retiradas: una del banco nuevo y dos del viejo. Las del banco viejo no sólo escriben
+el módulo distinto —`"Módulo 2"` en vez de `2`—, **tampoco traen `numero`**: se
+identifican por `posicion_original`. El filtro las descartaba a las tres sin decir
+nada, porque descartar no es fallar.
+
+Se detectó **al leer el número**, no al correr una prueba: 1 no cuadraba con lo que la
+sección de retiros del archivo de la iteración decía del módulo 2.
+
+**Corregido:** el número de módulo se normaliza venga como venga, el informe declara
+las retiradas **por banco** —`1 json_2026 + 2 js_2026`, donde un desbalance se ve— y
+se añadió la comprobación fuerte: cada hueco de numeración de `modulo-0N.json` tiene
+que corresponder a una retirada, y ningún número retirado puede seguir presente.
+
+## La regla que sale de esto
+
+> **Toda comprobación nueva hay que hacerla fallar antes de creerle.**
+
+No «probarla»: **hacerla fallar**. Verla decir «no» al menos una vez, provocándolo. Si
+no se puede provocar que diga «no», no es una comprobación: es una afirmación con
+forma de comprobación.
+
+Es la generalización de lo que la iteración 25 ya adoptó como criterio de nivel 0 para
+el comprobador de conversión —los cuatro sabotajes— y de lo que la iteración 23 hizo
+con `probar-restricciones.mjs`. Lo que cambia aquí es que **deja de ser una buena
+práctica de dos guiones concretos y pasa a ser regla del proyecto**.
+
+**Su consecuencia incómoda, dicha para que no sorprenda:** escribir la comprobación
+cuesta menos que escribir su fallo. La tentación va a ser dar por buena la que
+«claramente funciona», y los tres casos de arriba claramente funcionaban.
+
+### H-024 · El texto de wrangler podía vetar a la base, y la base era la única que sabía
+**Gravedad:** 🔴 · **Estado:** 🟢 Cerrado · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Síntoma.** La primera carga real del banco —52 preguntas del módulo 2 en producción—
+terminó en `SIN VEREDICTO`, código 2, con este mensaje:
+
+```
+Wrangler no dijo que hubiera aplicado nada, pero tampoco dio un error.
+```
+
+**Y había aplicado.** En la misma salida, dos líneas más abajo, wrangler decía
+`Executed 260 queries in 20.70ms (728 rows read, 884 rows written)`, `"success": true`
+y `changed_db: true`. Los cotejos posteriores contra la base lo confirmaron: 39
+`json_2026` y 13 `js_2026`, las 52 en `activa`.
+
+**Causa inmediata: wrangler tiene dos caminos de escritura y el guion conocía uno.**
+
+| Camino | Cuándo | Qué imprime |
+|---|---|---|
+| Archivo chico | Lotes pequeños | `Executed 3 commands executed successfully.` |
+| Importación | Archivos grandes | `Starting import…` · `Processed 260 queries.` · `Executed 260 queries…` |
+
+El patrón era `/commands? executed successfully/i`. El camino de importación dice
+**«queries»**, nunca «commands», y nunca «executed successfully».
+
+**Por qué nunca había salido.** La herramienta se construyó y se verificó en la
+iteración 23 contra lotes de 3 a 10 preguntas de juguete. **Todos tomaron el camino de
+archivo chico.** El camino de importación no se había ejecutado ni una vez hasta la
+primera carga de verdad. No es que la prueba fallara: es que esa rama nunca se corrió.
+
+**Causa de fondo, que es la que importa.** El patrón corto era el defecto pequeño. El
+grande era **dónde estaba puesto**:
+
+```js
+if (!dijoExito) {
+  sinVeredicto('Wrangler no dijo que hubiera aplicado nada...');
+}
+
+// ...la consulta a la base venía DESPUES, y no se alcanzaba nunca
+const despues = consultar('SELECT COUNT(*) AS preguntas FROM pregunta;');
+```
+
+La cabecera del propio archivo declaraba que el veredicto salía de dos fuentes —lo que
+wrangler dijo **y** una consulta a la base—. La implementación convertía la primera en
+**portón** de la segunda: cuando el texto no se reconocía, el guion **se declaraba
+incapaz sin haberle preguntado a la única fuente que podía responderle.**
+
+Es el mismo error de forma que H-019, donde el generador conocía una sola de las dos
+respuestas de wrangler; pero con un agravante propio, porque aquí existía un testigo
+autoritativo —la base— y el diseño lo dejaba fuera de alcance precisamente en el caso
+en que hacía falta.
+
+**Corrección.** Dos cambios, y el segundo es el que vale:
+
+1. El patrón reconoce los dos caminos: `Executed \d+ (?:commands?|queries)`.
+2. **La consulta a la base se hace SIEMPRE.** El texto pasó de condición a señal: si no
+   se reconoce pero la base cuadra, el veredicto es `HECHO` y se informa que el patrón
+   se quedó corto. Se añadió además un `NO SE APLICO` explícito para el caso de que la
+   base no haya cambiado nada, que antes se confundía con los demás.
+
+**Comprobado provocando los tres casos contra la D1 local**, que toma el mismo camino
+de importación, el 2026-09-09:
+
+| Provocado | Antes | Ahora |
+|---|---|---|
+| 52 preguntas sobre base vacía | `SIN VEREDICTO` | `HECHO` · `0 -> 52` |
+| El mismo lote otra vez | `NO SE APLICO` | `NO SE APLICO` · enunciado repetido, base intacta en 52 |
+| Patrón forzado a no reconocer nada | `SIN VEREDICTO` | `HECHO` + «no reconocí el texto, pero la base cuadra y manda ella» |
+
+La tercera fila es la que prueba el arreglo de fondo, y se produjo **rompiendo el
+patrón a propósito** en una copia del guion, por la regla de H-023.
+
+**La lección, y no es sobre wrangler.** Un guion que consulta dos fuentes tiene que
+dejar que la **más autoritativa** hable siempre. Poner la débil como condición de la
+fuerte convierte «no supe leer» en «no se puede saber», que son cosas distintas y la
+segunda es falsa. Aquí la base estaba a una consulta de distancia, sabía la respuesta,
+y no se le preguntó.
+
+**Actualización del 2026-09-09 · los dos caminos no se separan por tamaño sino por
+destino, y una de las frases de arriba está mal.**
+
+Al ir a comprobar la atomicidad por el camino de importación resultó que la línea
+«comprobado provocando los tres casos contra la D1 local, **que toma el mismo camino de
+importación**» es **falsa**, y con ella los encabezados de la tabla de caminos.
+
+Lo que hace wrangler 4.128.0, leído en su código y **provocado después**:
+
+| Comando | Camino | Qué imprime |
+|---|---|---|
+| `--local --file` | `db.batch()` contra miniflare, **siempre** | `N commands executed successfully.` |
+| el mismo con el flag de la nube | API de importación de D1, **siempre** | `Starting import` · `Processed N queries` · `Executed N queries…` |
+
+**No hay umbral de tamaño en ninguno de los dos.** `executeRemotely` entra en la
+importación con un `if (input.file)` que no mira cuánto pesa el archivo; `executeLocally`
+no tiene esa rama siquiera. Provocado el 2026-09-09 con archivos de **260 y de 2000
+sentencias** contra la base local: los dos respondieron `commands executed successfully`,
+ninguno dijo `queries`.
+
+**Qué cambia esto de lo ya escrito, y qué no.** El diagnóstico de fondo de H-024 queda
+entero: el patrón corto era real, el portón era real, y la tercera fila de su tabla
+—romper el patrón a propósito— probó el arreglo estructural sin depender de ningún
+camino. Lo que cambia es la explicación de **por qué nunca había salido**: no fue porque
+los lotes de la iteración 23 fueran chicos, sino porque **todos fueron locales**. La
+herramienta escribe siempre a un archivo, así que la primera escritura contra la nube que
+hiciera —de una pregunta o de cincuenta— iba a tomar la importación igual.
+
+Y deja una consecuencia que pesa más que la corrección: **el camino de importación no se
+puede ensayar contra la base local.** Ver H-025.
+
+### H-025 · La atomicidad está comprobada en un camino, y el otro no se puede ensayar en local
+**Gravedad:** 🟠 · **Estado:** 🟢 Cerrado · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09 · **Cerrado el:** 2026-09-09
+
+**Síntoma.** Los criterios de la iteración 23 que dependen de cómo se comporta wrangler
+se cerraron contra la base **local**, o sea contra `db.batch()`. Las seis cargas que
+quedan van contra la nube, o sea contra la **importación**, y ahí «todo o nada» no está
+provocado ni una vez.
+
+**Lo que sí quedó comprobado el 2026-09-09**, contra la base local, con lotes grandes,
+comparando el **contenido** campo a campo antes y después —volcado de las trece columnas
+de `pregunta` y las seis de `alternativa`, ordenado y resumido— y no el mensaje de la
+herramienta:
+
+| Provocado | Sentencias | Dónde revienta | Base antes | Base después |
+|---|---|---|---|---|
+| `insertar` 52 preguntas, la **26** choca contra `UNIQUE (enunciado)` | 260 | 126 de 260 | `d97744cee214202c` · 10 preg / 40 alt | **idéntica** |
+| `insertar` 52, la que choca es la **última** | 260 | 256 de 260 | `d97744cee214202c` | **idéntica** |
+| `actualizar` 52, choca la 26; cada una borra sus alternativas antes de reinsertarlas | 312 | 151 de 312, con 25 `DELETE` ya emitidos delante | `7c2544c0055084c3` · 62 preg / 248 alt | **idéntica** |
+| `insertar` 52 **sin sabotear**, de control | 260 | — | `d97744cee214202c` | **distinta**: 260 filas nuevas, 0 perdidas |
+
+La cuarta fila está puesta a propósito, por la regla de H-023: el cotejo tenía que decir
+«distinto» al menos una vez antes de que sus tres «idéntica» valieran algo.
+
+**Qué sube esto respecto de la iteración 23.** Allá el todo o nada se demostró con un
+lote de tres, o sea unas quince sentencias, y con la mala **al medio**. Ahora está
+demostrado con 312 sentencias y con la mala **al final**, que era el hueco real: un
+choque en las primeras sentencias no demuestra atomicidad, porque no había nada que
+deshacer. Y cubre la forma peligrosa —el `DELETE` seguido de `INSERT` de `actualizar`—,
+donde una aplicación parcial no dejaría filas de más sino preguntas **sin ninguna
+alternativa**, que es un daño bastante más difícil de ver.
+
+**Lo que sigue sin estar comprobado, y no se puede comprobar desde aquí.** Que la
+importación deshaga un lote a medias. El único testigo disponible hoy es una frase que
+imprime el propio wrangler antes de subir el archivo:
+
+> Note: if the execution fails to complete, your DB will return to its original state
+> and you can safely retry.
+
+Es una promesa del proveedor, no una comprobación. Por la regla de H-023 no cuenta:
+nadie la ha hecho decir «no».
+
+**Los otros criterios de la 23, separados por si el camino los toca o no.**
+
+| Criterio de la 23 | ¿Depende del camino? | Estado real |
+|---|---|---|
+| Todo o nada | **Sí** | Local con 312 sentencias ✅ · importación ⚪ |
+| Colisión sin sobrescritura · Errores traducidos | **Sí** | La tabla de traducciones busca el texto de SQLite (`UNIQUE constraint failed: pregunta.enunciado`). En la importación el mensaje llega desde el servidor de D1 en `response.errors`, y **nadie lo ha visto**. Si no trae ese texto, la herramienta cae en «no supo traducir el motivo» y muestra el crudo: se degrada con honestidad, pero se degrada |
+| Lote completo | Sí | **Ya cerrado en la importación** por el propio incidente de H-024: 52 entraron y la base las contó |
+| El éxito no lo decide el código de salida (H-016) | Ya no | Desde el arreglo de H-024 decide el conteo de la base, que es la misma consulta en los dos caminos |
+| Instantánea al día | Sí, pero por el lado de **lectura** | Es el tramo que ADR-023 dejó pendiente y que toca ahora |
+| Validación previa · barrera de ADR-015 · wrangler de `node_modules` · el JSON no es la fuente | No | Todo eso ocurre **antes** de que wrangler arranque |
+| Las restricciones se prueban solas | No | Son restricciones del esquema, y el esquema es el mismo en las dos bases |
+
+**Impacto.** Quedan seis cargas de 40 a 60 preguntas por el camino no ensayado. Si la
+importación no fuera atómica, el modo de fallo sería un lote a medias en la nube. La
+herramienta lo **detectaría** —el conteo no cuadraría y respondería `SIN VEREDICTO`—,
+pero detectar no es reparar, y averiguar a mano cuál entró y cuál no es exactamente el
+trabajo que ADR-025 venía a evitar.
+
+**Propuesta.** Un ensayo contra la base de **pruebas** de la nube, nunca la publicada, que
+lo corre el autor porque Claude Code no ejecuta wrangler contra la cuenta (ADR-015).
+Escrito paso a paso, con la salida esperada de cada comando, en
+`90-manual/ensayo-del-camino-de-importacion.md`. Sus dos instrumentos —
+`scripts/volcar-contenido.mjs` y `scripts/armar-lote-de-ensayo.mjs`— se probaron contra la
+base local el 2026-09-09, incluidos sus rechazos: base no declarada, uuid que no calza
+—provocado rompiendo una copia del guion—, base sin preguntas contra la que chocar, y base
+sin módulos.
+
+**Un dato de costo que apareció de paso.** `actualizar` resuelve el id de cada pregunta
+con una consulta propia **antes** de escribir, y cada consulta levanta un proceso de
+wrangler. Con 52 preguntas eso son 52 arranques: **148 segundos en local**, medidos. En
+la nube cada uno es además un viaje de red. No afecta a las seis cargas que vienen,
+porque son `insertar` y ese verbo no resuelve nada, pero una corrección masiva por
+`actualizar` va a doler. Anotado en `registro_log.md`, sin asignar.
+
+**Resultado · 2026-09-09 · LA IMPORTACIÓN DE D1 ES ATÓMICA.**
+
+Ensayo corrido por el autor contra `examen-td-js-pruebas`, sobre una base que ya tenía
+contenido —10 preguntas y 40 alternativas—, con el procedimiento de
+`90-manual/ensayo-del-camino-de-importacion.md`. Salida literal:
+
+```
+01-antes    fb6908910e0ac450   10 preguntas · 40 alternativas
+carga       NO SE APLICO · UNIQUE constraint failed: pregunta.enunciado
+            revento en la 256 de 260, con 255 sentencias ya emitidas
+02-despues  fb6908910e0ac450
+diff        >>> IDENTICAS · cero lineas
+03-final    fb6908910e0ac450 · >>> DEVUELTA A COMO ESTABA
+```
+
+No hubo que limpiar nada porque no entró nada. No hizo falta sembrar.
+
+**255 sentencias emitidas antes del choque, y ninguna sobrevivió.** El veredicto sale de
+comparar el contenido de la base antes y después, no del mensaje de la herramienta, que
+es la capa que ya mintió una vez (H-024). La nota gris que imprime wrangler —«your DB
+will return to its original state»— dejó de ser una promesa del proveedor y pasó a ser
+una comprobación.
+
+**Dos incógnitas más, resueltas de paso.**
+
+1. **La traducción funciona igual por el camino de importación.** El error que devuelve la
+   nube **sí trae** el texto de SQLite, así que la herramienta lo tradujo al castellano en
+   vez de caer en «no supo traducir el motivo». Era el primero de los tres desenlaces
+   previstos, y es el bueno: la tabla de traducciones no necesita entradas nuevas.
+2. **El defecto de H-019 en `administrar-banco.mjs` NO se manifestó.** No apareció «No
+   pude interpretar lo que devolvio la base». Queda anotado como **no observado, no como
+   inexistente**: el guion sigue buscando el primer `[` de la salida, que es el defecto
+   que `generar-instantanea.mjs` ya corrigió, y en este ensayo simplemente no salió. No se
+   provocó. La distinción importa porque es exactamente el filo de H-023: una comprobación
+   que no dijo «no» no es lo mismo que una que no puede decirlo, y aquí ni siquiera hubo
+   comprobación.
+
+**Qué cambia esto en los criterios de la iteración 23.** La tabla de más arriba —«los
+otros criterios de la 23, separados por si el camino los toca o no»— queda así después del
+ensayo:
+
+| Criterio de la 23 | Antes del ensayo | Después |
+|---|---|---|
+| Todo o nada | Local con 312 sentencias ✅ · importación ⚪ | ✅ **por los dos caminos**, y en la importación con 255 sentencias emitidas delante del choque |
+| Colisión sin sobrescritura · Errores traducidos | El mensaje de la importación no lo había visto nadie | ✅ trae el texto de SQLite y se traduce igual |
+| Lote completo | ✅ por el incidente de H-024 | Sin cambio |
+| El resto | No dependían del camino | Sin cambio |
+
+Ninguno de esos criterios estaba mal cerrado en la 23: estaban cerrados sobre la evidencia
+que existía entonces. Lo que cambia es que ahora la evidencia cubre los dos caminos, y eso
+queda dicho aquí en vez de suponerse.
+
+### H-026 · La salida de una carga no se podía guardar en un archivo, y el archivo mentía
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Síntoma.** Redirigiendo la salida de `administrar-banco.mjs` a un archivo, el archivo
+queda con **una sola línea**:
+
+```
+node scripts/administrar-banco.mjs revisar ... > archivo.txt 2>&1
+→ stdout is not a tty
+```
+
+Lo mismo canalizando a `grep`. Y no es sólo la salida: **el guion no llega a ejecutarse**.
+Comprobado por el autor durante el ensayo de H-025, con el volcado posterior confirmando
+que la base seguía en `fb6908910e0ac450`.
+
+**Causa, y no es la que parecía.** El guion no tiene nada que ver. Comprobado el
+2026-09-09 corriendo el mismo comando redirigido desde otro terminal: escribió **537
+líneas** y devolvió código 0. Todo lo que imprime pasa por `console.log`, que no consulta
+si hay terminal al otro lado.
+
+El mensaje es de **winpty**, el envoltorio que Git Bash usa en Windows para que los
+programas interactivos se vean bien. Provocado aparte para dejarlo demostrado y no
+deducido:
+
+```
+winpty node -e "console.log('esto tendria que llegar al archivo')" > archivo.txt 2>&1
+→ codigo 1, y el archivo contiene una sola linea: "stdin is not a tty"
+```
+
+Winpty se planta **antes** de lanzar el proceso. Por eso no se ejecutó nada.
+
+Es el mismo filo de **H-011**: el mismo comando se comporta distinto según desde qué
+terminal se lance. Y es la cuarta vez que este proyecto confunde el mensajero con el
+mensaje —H-011, H-013, H-016, H-019—, esta vez con el agravante de que la atribución
+inicial apuntaba al guion, que era inocente.
+
+**Impacto, que es real aunque la causa fuera otra.** Capturar evidencia es medio proyecto,
+y hasta hoy la salida de una carga **no se podía guardar en un archivo de forma fiable**.
+Cualquier registro automático era imposible. Y el modo de fallo es de los malos: ruidoso
+en pantalla, **silencioso en el archivo**. Quien abra después un archivo de una línea puede
+leerlo como «la carga corrió y dijo poco».
+
+**Resolución.** `--registro=<archivo>` en `administrar-banco.mjs`. La salida la escribe el
+propio guion, así que deja de depender de cómo lo invocaron —que es la lección de H-011:
+el proyecto no puede depender de la configuración de un terminal—. Tres propiedades, y las
+tres son contra el fallo silencioso:
+
+- El registro **empieza con cabecera** —fecha y argumentos— y **termina con una línea de
+  cierre** que nombra el veredicto y el código. Un registro sin esa línea está truncado, y
+  se ve al abrirlo.
+- Si el guion no arranca, el archivo **no existe**. Un archivo ausente es más ruidoso que
+  uno de una línea.
+- Si el registro no se puede abrir, **no se hace nada**: `NO SE APLICO · no pude abrir el
+  registro`, código 1. Quien pidió registro lo pidió para tener evidencia, y correr una
+  carga sin la evidencia pedida es peor que no correrla. Provocado apuntando `--registro`
+  a una carpeta, y comprobado que la base no se tocó.
+
+Probado el 2026-09-09 en los tres casos: un `revisar` (542 líneas, cierre `REVISADO ·
+codigo 0`), una carga fallida con la salida mandada a `/dev/null` —el registro la recogió
+igual, con el `UNIQUE constraint failed` y el cierre `NO SE APLICO · codigo 1`—, y el
+rechazo del registro imposible de abrir.
+
+**Lo que queda pendiente, dicho para que no se dé por hecho.** Que `--registro` funcione
+bajo winpty **no está provocado**: no se pudo reproducir el escenario de winpty desde el
+terminal en que se hizo el arreglo. El razonamiento es que sin redirección winpty no tiene
+nada que objetar, pero es razonamiento, no evidencia. Lo cierra el autor la primera vez
+que lo use en su terminal.
+
+---
+
+### H-027 · PATRON, cuarta vez · La comprobación de retiradas miraba un campo que no existe
+
+**Gravedad:** 🔴 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Síntoma.** Ninguno. Ese es el problema, y es exactamente el de H-023.
+
+`scripts/comprobar-carga.mjs` —el comprobador que contrasta lo cargado en D1 contra los
+bancos de origen— informaba «retiradas del módulo 3, ninguna en la base» en todas sus
+corridas. La cifra era correcta y la conclusión no medía nada.
+
+**Causa.** Una entrada de `retiradas.json` **no trae el enunciado en el primer nivel**:
+trae la pregunta original entera anidada bajo `pregunta`, y dentro va `enunciado` si viene
+del banco nuevo y `q` si viene del viejo. El bloque leía `r.enunciado ?? r.q` sobre la
+entrada, no sobre `r.pregunta`, así que obtenía `undefined` **siempre**, salía por el
+`continue` de guarda y no comparaba ni una vez.
+
+```
+r.enunciado          → undefined     (el texto está en r.pregunta.enunciado)
+r.q                  → undefined     (el del banco viejo, en r.pregunta.q)
+```
+
+**Cómo apareció.** Escribiendo el sabotaje `--sabotaje=retirada`, que cuela una retirada
+en lo leído de la base y exige que el comprobador lo cace. El sabotaje reventó con
+`TypeError: Cannot read properties of undefined`, y ese `undefined` era el mismo que la
+comprobación de verdad venía tragándose en silencio.
+
+**Es la cuarta vez en este proyecto**, después de las tres de H-023, y la primera en que
+la regla adoptada allí —*hacer fallar toda comprobación nueva antes de creerle*— es lo
+que la destapa. La comprobación nunca había dicho «no» porque **no podía**; el sabotaje
+existe para obligarla, y al obligarla se rompió.
+
+**Corregido**, con dos cosas y no una:
+
+- Se lee `r.pregunta?.enunciado ?? r.pregunta?.q`.
+- Una entrada **sin texto donde se lo busca ya no se salta en silencio**: se informa como
+  `RETIRADA ILEGIBLE` y cuenta como problema. Si el formato del archivo cambia otra vez,
+  la comprobación lo dice en vez de degradarse a nada. Saltarse lo que no se entiende es
+  lo que convirtió este bloque en decoración.
+
+**Lo que se descubrió de paso, y obligó a acotar el cotejo.** Se pensó reforzar la
+comprobación cotejando también la identidad numérica de cada retirada. **Sirve para el
+banco nuevo y no para el viejo:** el nuevo guarda `numero`, que es estable y nunca se
+renumeró; el viejo guarda `posicion_original`, que es la posición **anterior** a los
+retiros del 2026-09-04, mientras que el `numero_origen` cargado es la posición de hoy, ya
+corrida. Cotejar una contra otra habría emparejado preguntas distintas y **acusado en
+falso**. Es el mismo desplazamiento que movió la pregunta del orden fijo de la posición 13
+a la 11. El cotejo por número quedó sólo para `json_2026`, y dicho por qué en el código.
+
+### La otra cara del mismo defecto, encontrada en el mismo acto
+
+El detector de justificaciones de relleno del mismo guion marcó **ocho justificaciones
+legítimas** del módulo 2 como si fueran de relleno. Causa: buscaba las palabras en
+cualquier parte del texto y, con la bandera `i`, el patrón `TODO` cazaba la palabra
+española **«todo»** —«va todo lo que describe el documento»—.
+
+Los dos defectos son la misma clase de error: **una comprobación que no mide lo que dice
+medir.** Una nunca podía decir «no»; la otra decía «no» con material bueno. La segunda es
+menos grave y no es inofensiva: un detector que grita con material bueno enseña a
+ignorarlo, y así es como pasa el malo.
+
+**Corregido** anclando el patrón al principio del texto —un relleno no *contiene*
+«pendiente», *empieza* por ahí, porque no es una frase sobre la pregunta sino una nota
+sobre el trabajo que falta— y añadiendo un largo mínimo **medido, no elegido a ojo**: la
+justificación más corta de las 52 del módulo 2 tiene 128 caracteres y «Pendiente de
+redacción» tiene 22, así que el umbral de 60 no puede rozar una escrita de verdad.
+
+---
+
+### H-028 · El cargador del banco estaba roto en el árbol, y sólo se notaba al usarlo
+
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Síntoma.** `node scripts/administrar-banco.mjs insertar <encargo>` no cargaba nada:
+
+```
+ReferenceError: abrirRegistro is not defined
+    at scripts/administrar-banco.mjs:162
+```
+
+**Causa.** El arreglo de H-026 añadió la llamada a `abrirRegistro(...)` y **no añadió su
+`import`**. El módulo `scripts/registro-de-salida.mjs` existía y estaba bien; nadie lo
+importaba.
+
+**Por qué no se había notado.** Las tres pruebas de H-026 se hicieron sobre `revisar` y
+sobre una carga fallida, todas **antes** de que el archivo quedara en su forma final; entre
+medio no se volvió a lanzar un `insertar`. El módulo 2 ya estaba cargado, así que nada
+volvió a llamar al cargador hasta hoy.
+
+**Impacto.** La herramienta con la que se cargan los seis módulos que faltan estaba
+inservible en el árbol de trabajo. Se habría descubierto en el primer intento de cargar el
+módulo 3 —el fallo es inmediato y ruidoso, y no toca la base—, pero en medio del
+procedimiento de una carga contra producción y no antes.
+
+**Corregido** añadiendo el import. Comprobado cargando las 52 del módulo 2 contra la base
+local: `Total en la base: 0 -> 52`, código 0.
+
+**Lección de método.** Un error de referencia en un módulo ES no aparece hasta que se
+ejecuta esa línea, y ninguna comprobación del proyecto lanza los verbos de escritura de
+`administrar-banco.mjs`. `npm run verificar` mira la barrera, el CSS y el escapado: ninguna
+de las tres carga nada. Un guion que sólo se prueba cuando se usa de verdad se rompe en el
+peor momento posible.
+
+---
+
+### H-029 · El comprobador de restricciones falló una vez y no se ha vuelto a reproducir
+
+**Gravedad:** 🟠 · **Estado:** 🟡 **Visto una vez, no reproducido, hipótesis sin
+confirmar** · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Esto no es un hallazgo resuelto, y no se cierra hasta que alguien lo provoque.** Se
+anota con ese estado a propósito, por decisión del autor el 2026-09-09: **un fallo
+intermitente en el comprobador de restricciones es de los que vuelven**, y anotarlo
+como incidente resuelto sería enterrar la única pista que hay.
+
+**Qué se vio, una vez.** `npm run verificar` informó:
+
+```
+RESTRICCION CAIDA  ***  1 de 9 dejaron pasar lo que no debian  ***
+  - Indice parcial: una sola correcta por pregunta
+```
+
+**Qué se comprobó inmediatamente después, y contradice lo anterior.** El índice existe
+en la base local, con su definición correcta:
+
+```
+alternativa_una_correcta
+CREATE UNIQUE INDEX alternativa_una_correcta
+  ON alternativa (pregunta_id) WHERE es_correcta = 1
+```
+
+Y `npm run probar:restricciones` por separado dio **las nueve en pie**, con la huella
+de la base idéntica antes y después (`7f997037cc020f34`). La corrida completa siguiente
+de `npm run verificar` también dio `restricciones OK`. **No se ha vuelto a reproducir.**
+
+**Hipótesis sin confirmar.** Ocurrió justo después de restaurar los archivos
+`.sqlite`, `-shm` y `-wal` de la base local copiándolos por encima, para devolver la
+base al estado anterior a una prueba. Copiar un `-wal` a nivel de archivo puede dejar
+la base en un estado momentáneamente inconsistente con lo que el proceso siguiente
+espera leer. **Es una hipótesis: no está provocada, y mientras no lo esté no explica
+nada.**
+
+**Por qué importa aunque no se reproduzca.** Este comprobador es de los que sostienen
+el resto: `probar:restricciones` es lo que convirtió las nueve restricciones del
+esquema de «creídas por leerlas» a «comprobadas», y esa historia está escrita en H-023
+como uno de los tres casos del patrón. **Un comprobador que puede dar un falso «caída»
+enseña a desconfiar de él, y desconfiar de él es volver al punto de partida.** El modo
+de fallo contrario —un falso «en pie»— sería mucho peor y nada dice todavía que sea
+imposible.
+
+**Qué haría falta para cerrarlo.** Provocarlo: restaurar la base local por copia de
+archivos con el `-wal` incluido y correr el comprobador inmediatamente después,
+repetidas veces, a ver si el fallo vuelve. Si vuelve, el arreglo probablemente sea que
+el comprobador no dependa de un estado que se puede restaurar por fuera. Si no vuelve,
+queda anotado como visto una vez y sin explicar, que es más honesto que cerrarlo.
+
+---
+
+### H-030 · El respaldo del banco no tenía banco dentro, y el «un solo paso» de ADR-023 no existía
+
+**Gravedad:** 🔴 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 25 · **Fecha:** 2026-09-09
+
+**Son dos hallazgos y van juntos porque el segundo explica al primero.**
+
+**Lo que se encontró.** `d1/respaldo-banco.sql`, el archivo que ADR-014 designa como
+el respaldo del banco y que está versionado, contenía esto y nada más:
+
+```sql
+PRAGMA defer_foreign_keys=TRUE;
+CREATE TABLE prueba_tuberia ( id INTEGER PRIMARY KEY, clave TEXT NOT NULL UNIQUE, … );
+INSERT INTO "prueba_tuberia" VALUES(1,'saludo','Verificado por Felipe el 3 de septiembre',…);
+INSERT INTO "prueba_tuberia" VALUES(2,'entorno','Cambia este valor para comprobar …',…);
+```
+
+527 bytes. Es la tabla de ensayo de tubería de la **iteración 12**, exportada el
+**2026-09-03**. **No menciona `pregunta` ni `alternativa` ni una sola vez**: no es un
+respaldo desactualizado, es el volcado de otra cosa.
+
+**Cuánto llevaba así.** Desde el 2026-09-03. El banco existe en producción desde el
+2026-09-09. Es decir que ADR-014 **nunca se ha cumplido para el banco**, y nadie lo
+notó en seis días de trabajo intenso sobre esa misma base.
+
+**Por qué nadie lo notó.** Porque nada lo miraba. Es la hermana de la deuda ya anotada
+en la iteración 24 —«nada comprueba que la instantánea y el banco no hayan
+divergido»—, sólo que peor: allí el archivo estaba desfasado, aquí **no tenía relación
+con el banco**. Un archivo existe, tiene fecha y pesa algo, y eso se parece lo
+suficiente a estar bien como para que nadie lo abra.
+
+**Y ahora la causa, que es el segundo hallazgo.** ADR-023 dice, literal: «**Un solo
+paso produce las dos cosas, o no produce ninguna**». Eso **no estaba implementado**. La
+realidad eran dos comandos sueltos —una exportación y una regeneración— y, entre
+medio, un **recordatorio impreso** por `generar-instantanea.mjs` sugiriendo que
+exportaras también el respaldo. Nada ataba las dos mitades: nada fallaba si corrías
+una y no la otra.
+
+La propia ADR había predicho el desenlace con precisión —«separarlas es garantizar que
+una de las dos se quede atrás»— y se equivocó sólo en cuál: **apostaba a que se
+quedaría atrás la instantánea**, por ser la muda. Se quedó atrás el respaldo.
+
+**Corregido**, y no con un recordatorio más:
+`scripts/publicar-banco.mjs` hace las dos mitades en una corrida. Prepara cada una en
+un archivo temporal y **sólo instala si las dos salieron bien**; si algo falla, los dos
+archivos de verdad quedan intactos, y lo demuestra imprimiendo sus huellas antes y
+después en vez de prometerlo.
+
+Y comprueba, antes de instalar nada, lo que ningún comando comprobaba:
+
+| Comprobación | Qué caza |
+|---|---|
+| el respaldo trae tabla `pregunta`, tabla `alternativa` y al menos una fila | exactamente lo de `prueba_tuberia` |
+| con destino remoto, el sello dice `nube` | publicar el banco de juguete como respaldo del real |
+| la instantánea no publica más preguntas de las que el respaldo contiene | dos mitades sacadas de momentos distintos |
+
+**Provocado el 2026-09-09** contra la base local, en sus cuatro sabotajes —respaldo sin
+banco, respaldo vacío, sello local, y la segunda mitad fallando **después** de que la
+primera ya había salido bien—: los cuatro rechazados, y en los cuatro **comprobado por
+huella que ninguno de los dos archivos se tocó**. Provocados además sus tres rechazos
+de entrada (sin `--base`, base no declarada, barrera de ADR-015).
+
+**Comprobado también que no se rompió lo que ya protegía.** Para que el guion pudiera
+preparar la instantánea aparte hubo que añadir `--salida=` a `generar-instantanea.mjs`,
+y eso ponía en riesgo su protección de «no pisar una instantánea de la NUBE con una
+LOCAL»: si el generador mirara el archivo temporal, no habría nada anterior que
+proteger y **la protección se habría apagado sola justo al enrutarla**. Se separó el
+archivo canónico del de escritura, y se provocó: con el sello canónico puesto en
+`nube`, una corrida local responde `ME NIEGO A PISAR LA INSTANTANEA` y el paso único
+informa que no tocó nada.
+
+**Lección de método, y es la de siempre en este proyecto con una vuelta más.** Un
+procedimiento escrito que pide acordarse de dos cosas es un procedimiento que produce
+una. La ADR lo sabía —lo dice en su propio texto— y aun así se implementó como dos
+pasos, porque **escribir la advertencia se siente como haber resuelto el problema**.
+Lo que lo resuelve es que el segundo paso no pueda no ocurrir.
+
+#### Y un sabotaje que no podía cazar nada, en el mismo guion
+
+Escribiendo los cuatro sabotajes apareció el patrón de H-023 por quinta vez, esta vez
+**dentro de la herramienta escrita para que ADR-023 dejara de ser una promesa**.
+
+El sabotaje `sello-local` comprueba que se rechace una instantánea con sello `local`
+cuando se pidió la nube. La condición estaba escrita como `if (remoto && …)`, y **los
+sabotajes están prohibidos con destino remoto** —a propósito, para no tocar la cuenta—.
+Resultado: una comprobación imposible de ejercitar, que habría quedado marcada como
+probada sin haberlo estado nunca.
+
+**Corregido** separando «se pidió el sello de la nube» de «se habla con la nube»: son
+dos cosas distintas y sólo la segunda toca la cuenta. Con eso el sabotaje la ejercita
+sin que nadie salga a la red.

@@ -159,3 +159,58 @@ barrera no está, y el aviso lo dice. Volver a ponerla es pegar el bloque otra v
 
 Que haga falta un acto deliberado en un archivo del usuario —y que quede gritando
 mientras esté quitada— es exactamente el objetivo.
+
+## Qué comandos ve la capa 2, y cuáles no
+
+*Escrito el 2026-09-09 al adoptar ADR-027, y **medido**, no razonado: se le dieron al
+enganche las líneas de comando reales, una por una. Está aquí porque quien lee esta
+página y cuenta tres capas se lleva una idea de la cobertura que no es la que hay.*
+
+La capa 2 rechaza una línea sólo si contiene la bandera del destino remoto **y además**
+la palabra de la herramienta de Cloudflare o el prefijo `datos:`. De **seis** formas de
+invocación que hablan con la nube, bloquea **dos**:
+
+| Línea de comandos | ¿La bloquea? |
+|---|---|
+| `npm run datos:instantanea -- <bandera remota>` | **sí**, por `datos:` |
+| la herramienta de Cloudflare directo (`d1 export`, `d1 execute`) | **sí**, por su nombre |
+| `node scripts/administrar-banco.mjs insertar … <bandera remota>` | **NO** |
+| `node scripts/generar-instantanea.mjs <bandera remota>` | **NO** |
+| `node scripts/volcar-contenido.mjs … <bandera remota>` | **NO** |
+| `node scripts/comprobar-carga.mjs … <bandera remota>` | **NO** |
+
+**Lee bien la tercera fila: es la herramienta de escritura**, la que carga el banco en
+producción, y la capa 2 no la ve. Y la cuarta dice algo incómodo: el **mismo** guion se
+bloquea invocado por npm y pasa invocado con `node`. Es el filo de H-011 —el mismo
+comando se comporta distinto según cómo se lo lance— aplicado a la barrera.
+
+**El patrón no se va a ampliar, y está decidido.** ADR-027, por el autor, el
+2026-09-09: una lista de nombres siempre va por detrás de los guiones nuevos, y aquí ya
+iba por detrás de los viejos. La regla que escala es la otra: **todo guion que hable con
+la nube lleva su propia barrera, y se comprueba provocándola.**
+
+**Los cuatro guiones la tienen.** Es la capa 3, y es la que de verdad los cubre:
+
+| Guion | Cómo consta |
+|---|---|
+| `scripts/comprobar-carga.mjs` | **provocada** el 2026-09-09 |
+| `scripts/volcar-contenido.mjs` | **provocada** el 2026-09-09 |
+| `scripts/administrar-banco.mjs` | **leída, no provocada** — la provoca el autor |
+| `scripts/generar-instantanea.mjs` | **leída, no provocada** — la provoca el autor |
+
+Las dos últimas no las provocó Claude Code, y no por descuido: provocar la barrera de
+la herramienta de escritura obliga a lanzarla con la bandera remota puesta, que es la
+forma exacta del acto que ADR-015 le prohíbe. Si la barrera es lo que se cree, no pasa
+nada; si no lo es, el daño es el que la ADR existe para evitar. **Sobre eso no se
+apuesta.** Para cerrarlas, en tu terminal y **sin** definir `PERMITIR_REMOTO`:
+
+```powershell
+node scripts/generar-instantanea.mjs --remote
+node scripts/administrar-banco.mjs insertar d1/ejemplo-encargo.json --remote
+```
+
+Las dos tienen que responder `ME NIEGO A CORRER ESTO · ADR-015` sin tocar nada. Si
+alguna llegara a hacer algo, **eso es el hallazgo**, y se anota antes de seguir.
+
+**Lo que de verdad cubre a todos es la capa 1**, el entorno sin credenciales, que
+heredan todos los procesos hijos y no depende de que ninguna lista esté al día.

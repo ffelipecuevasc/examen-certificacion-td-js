@@ -81,7 +81,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { SQL_PREGUNTAS, sqlAlternativas } from '../functions/api/preguntas.js';
@@ -90,7 +90,18 @@ import { validarPreguntas } from '../functions/api/_validacion.js';
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WRANGLER = join(RAIZ, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
 const CONFIGURACION = join(RAIZ, 'wrangler.toml');
-const SALIDA = join(RAIZ, 'static', 'js', 'data', 'instantanea-banco.js');
+/**
+ * Donde vive la instantanea que publica el sitio. Es la CANONICA, y no cambia
+ * aunque `--salida=` mande escribir en otra parte.
+ *
+ * La distincion importa: `--salida=` existe para que `publicar-banco.mjs` pueda
+ * preparar la instantanea en un archivo temporal y moverla solo si el respaldo
+ * tambien salio bien (ADR-023). Pero la proteccion de mas abajo —negarse a pisar
+ * una instantanea de la NUBE con una LOCAL— tiene que seguir mirando este
+ * archivo, no el temporal. Si mirara el temporal, no habria nada anterior que
+ * proteger y la proteccion se apagaria sola justo cuando se la enruta.
+ */
+const SALIDA_CANONICA = join(RAIZ, 'static', 'js', 'data', 'instantanea-banco.js');
 
 const BASE_POR_OMISION = 'examen-td-js-produccion';
 
@@ -140,6 +151,18 @@ const FLAG_REMOTO = '--remote';
 const remoto = argumentos.includes(FLAG_REMOTO);
 const ensayo = argumentos.includes('--ensayo');
 const destino = remoto ? FLAG_REMOTO : '--local';
+
+/**
+ * `--salida=<archivo>`: escribe en otra parte, sin dejar de proteger la de siempre.
+ *
+ * Lo usa `publicar-banco.mjs` para preparar la instantanea aparte y moverla solo
+ * si el respaldo de ADR-014 tambien salio bien. Quien no lo pase escribe donde
+ * siempre, que es lo que hace `npm run datos:instantanea`.
+ */
+const conSalida = argumentos.find((a) => a.startsWith('--salida='));
+const SALIDA = conSalida
+  ? resolve(process.cwd(), conSalida.slice('--salida='.length))
+  : SALIDA_CANONICA;
 
 // ---------------------------------------------------------------------------
 // Que bases declara el proyecto
@@ -263,12 +286,17 @@ if (!ensayo && !basePublicada) {
 // diez filas de juguete, y se commitea sin que nada chille. Aqui chilla.
 // ---------------------------------------------------------------------------
 
-/** Sello de la instantanea que ya existe en disco, o null si no hay ninguna. */
+/**
+ * Sello de la instantanea que ya existe en disco, o null si no hay ninguna.
+ *
+ * Mira SIEMPRE la canonica, aunque `--salida=` mande escribir en otra parte: lo
+ * que hay que proteger es el archivo que publica el sitio.
+ */
 async function selloAnterior() {
-  if (!existsSync(SALIDA)) return null;
+  if (!existsSync(SALIDA_CANONICA)) return null;
 
   try {
-    const modulo = await import(`${pathToFileURL(SALIDA).href}?t=${Date.now()}`);
+    const modulo = await import(`${pathToFileURL(SALIDA_CANONICA).href}?t=${Date.now()}`);
     return modulo?.SELLO ?? null;
   } catch {
     // Un archivo ilegible no se protege a si mismo: se deja pisar.
@@ -534,7 +562,12 @@ export const PREGUNTAS = ${comoJs(validas)};
 
 writeFileSync(SALIDA, contenido, 'utf8');
 
-const relativo = SALIDA.slice(RAIZ.length + 1).replace(/\\/g, '/');
+// Con `--salida=` el archivo puede caer fuera del repositorio, y ahi el recorte
+// por longitud producia una ruta cortada por la mitad. Se recorta solo si de
+// verdad esta dentro.
+const relativo = SALIDA.startsWith(RAIZ + sep)
+  ? SALIDA.slice(RAIZ.length + 1).replace(/\\/g, '/')
+  : SALIDA.replace(/\\/g, '/');
 
 veredicto(
   'INSTANTANEA GENERADA',

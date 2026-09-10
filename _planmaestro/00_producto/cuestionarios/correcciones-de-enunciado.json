@@ -1,0 +1,79 @@
+{
+  "que_es_esto": "Rastro de cada edicion hecha al texto de una pregunta de los bancos de origen. Hasta la iteracion 25 la regla era no tocar el material: se convertia, no se editaba. Estas correcciones rompen esa regla a proposito y con permiso, y por eso dejan rastro. Sin este archivo, dentro de seis meses nadie podria saber si lo que hay en D1 es el testimonio original o una edicion nuestra.",
+  "como_se_verifica": "No es un registro que haya que creer. `node scripts/comprobar-conversion.mjs <modulo>` contrasta cada entrada contra el archivo de origen: el texto original NO puede seguir apareciendo, y el corregido SI tiene que estar. Un registro que no se contrasta envejece hasta volverse ficcion.",
+  "correcciones": [
+    {
+      "ref": "m02#9",
+      "modulo": 2,
+      "origen": "json_2026",
+      "numero_origen": 9,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-02.json",
+      "campo": "alternativa.a.texto",
+      "original": "Exclusivamente como hijos directos dentro del contenedor `<head>`.",
+      "corregido": "Como hijos directos dentro del contenedor `<head>`.",
+      "motivo": "«Exclusivamente» es mas fuerte que el estandar: HTML5 permite <link> dentro del <body> en ciertos casos, asi que la alternativa marcada como correcta era falsa en sentido estricto. Quitando esa palabra queda verdadera sin matices y sigue siendo claramente la mejor de las cuatro.",
+      "nota": "UNICA de las cinco que toca una alternativa, y ademas la correcta. Eso cambia el texto en que ancla el comprobador de conversion, asi que obligo a reconvertir y volver a comprobar el modulo entero, no solo esta pregunta.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-09"
+    },
+    {
+      "ref": "m02#16",
+      "modulo": 2,
+      "origen": "json_2026",
+      "numero_origen": 16,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-02.json",
+      "campo": "enunciado",
+      "original": "Ante la colisión de múltiples orígenes, ¿qué estilo CSS impone mayor prioridad jerárquica?",
+      "corregido": "Ante la colisión de estilos de distintos orígenes, y sin usar `!important`, ¿qué estilo CSS impone mayor prioridad?",
+      "motivo": "Sin acotar, la pregunta tenia dos respuestas correctas: una hoja de estilos DEL USUARIO marcada !important le gana al estilo en linea del autor, y eso es justo lo que ofrecia la alternativa (d). Con la acotacion, (d) sigue siendo un distractor real —el orden es navegador < usuario < autor— pero deja de ser correcta.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-09"
+    },
+    {
+      "ref": "m02#22",
+      "modulo": 2,
+      "origen": "json_2026",
+      "numero_origen": 22,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-02.json",
+      "campo": "enunciado",
+      "original": "¿Qué propósito canónico de interfaz soluciona el clásico componente jumbotron en Bootstrap?",
+      "corregido": "En Bootstrap 4, ¿qué propósito de interfaz cumple el componente jumbotron?",
+      "motivo": "El jumbotron no existe desde Bootstrap 5, donde se reemplaza combinando utilidades. Sin fechar, la pregunta es cierta o falsa segun que version suponga quien la lea. Fechada es cierta pase lo que pase.",
+      "nota": "Se evaluo retirarla y el autor decidio corregirla: si el examen se apoya en material de la epoca sigue siendo evaluable.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-09"
+    },
+    {
+      "ref": "m02#28",
+      "modulo": 2,
+      "origen": "json_2026",
+      "numero_origen": 28,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-02.json",
+      "campo": "enunciado",
+      "original": "Si mutas violentamente una referencia directa constante, ¿qué mecanismo se dispara en el runtime JS?",
+      "corregido": "Si intentas reasignar una variable declarada con `const`, ¿qué ocurre en tiempo de ejecución?",
+      "motivo": "«Mutar una referencia» se lee de dos formas opuestas y solo una lanza TypeError: reasignar la variable lanza, modificar el objeto al que apunta esta permitido. Un alumno que entiende bien la distincion podia fallar por leer el enunciado como lo que decia.",
+      "nota": "ES LA CORRECCION MAS PROFUNDA DE LAS CINCO, y el rastro tiene que decirlo. El enunciado original era AMBIGUO, no falso: se podia defender. El nuevo no es una aclaracion del mismo enunciado sino casi una pregunta distinta —cambia el verbo, el sujeto y el complemento—, y evalua algo mas estrecho: solo la reasignacion, no la mutacion. Aprobada igual por el autor el 2026-09-09, con esto dicho.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-09"
+    },
+    {
+      "ref": "m02#30",
+      "modulo": 2,
+      "origen": "json_2026",
+      "numero_origen": 30,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-02.json",
+      "campo": "enunciado",
+      "original": "¿Qué atajo sintáctico universal reconoce automáticamente el motor del DOM al inicializar jQuery?",
+      "corregido": "Al cargar jQuery, ¿qué símbolo queda definido como atajo de la función `jQuery`?",
+      "motivo": "La premisa era falsa: el motor del DOM no reconoce nada, `$` es una variable corriente que declara la libreria. La respuesta marcada era correcta y la premisa equivocada, que es peor que una pregunta dificil porque ensena algo falso de paso.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-09"
+    }
+  ]
+}
