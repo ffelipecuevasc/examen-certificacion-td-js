@@ -538,7 +538,7 @@
       },
       {
         "letra": "b",
-        "texto": "END TRANSACTION"
+        "texto": "RELEASE SAVEPOINT"
       },
       {
         "letra": "c",

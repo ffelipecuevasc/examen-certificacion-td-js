@@ -1,0 +1,1695 @@
+{
+  "procedencia": {
+    "version": 1,
+    "modulo": 7,
+    "calculada_en": "2026-09-10T18:11:54.812Z",
+    "fuentes": {
+      "modulo-0N.json": "43582f538c3079cc",
+      "cuestionario.js": "95818a625e3278b3",
+      "retiradas.json": "45db6173e7b12962",
+      "correcciones-de-enunciado.json": "18a683a37c3b436c"
+    }
+  },
+  "preguntas": [
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Qué ventaja principal ofrece implementar un \"pool\" de conexiones en PostgreSQL con Node.js?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Encripta automáticamente todos los datos en tránsito hacia la DB.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Reutiliza conexiones activas evitando el costo de crear nuevas.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Ejecuta consultas SQL en un solo hilo bloqueando las demás.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Duplica los datos en memoria RAM para lecturas más veloces.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 2,
+      "enunciado": "Al usar el paquete `pg`, ¿qué clase gestiona múltiples clientes conectados concurrentemente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "ClientManager",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "PgConnection",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Pool",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "ConnectionCluster",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 3,
+      "enunciado": "¿Qué sucede si el \"pool\" de PostgreSQL alcanza su límite máximo de conexiones concurrentes?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Detiene el servidor Node arrojando un error fatal.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Elimina las conexiones más antiguas sin previo aviso.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Pone en cola las nuevas peticiones hasta que una se libere.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Escala dinámicamente agregando nuevos procesos en el servidor.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 4,
+      "enunciado": "En el paquete `pg`, ¿qué método libera explícitamente un cliente de vuelta al pool tras su uso?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "client.disconnect()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "client.release()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "client.close()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "pool.return(client)",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 5,
+      "enunciado": "¿Cuál es el riesgo de no liberar un cliente devuelto por `pool.connect()` tras usarlo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "La base de datos elimina el registro recién insertado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Agotamiento del pool, provocando bloqueo en nuevas peticiones.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Se genera una brecha de seguridad exponiendo las credenciales.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El servidor Node se reinicia de manera automática e iterativa.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 6,
+      "enunciado": "Al configurar un Pool, ¿qué parámetro define el tiempo máximo de inactividad de una conexión?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "maxIdleTime",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "idleTimeoutMillis",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "connectionTimeout",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "keepAliveLimit",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 7,
+      "enunciado": "¿Qué técnica nativa en `pg` previene eficazmente ataques de inyección SQL (SQL Injection)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Concatenación estricta de strings validada con Regex.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Configuración del firewall en el puerto 5432.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Uso de consultas parametrizadas (Prepared Statements).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Bloqueo de direcciones IP maliciosas desde el cliente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 8,
+      "enunciado": "En una consulta parametrizada con `pg`, ¿cómo se referencian los valores dinámicos en el texto?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Usando signos de interrogación (?, ?, ?).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Empleando interpolación directa (${var}).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Mediante marcadores posicionales indexados ($1, $2, $3).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Agregando el prefijo de dos puntos (:id, :name).",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 9,
+      "enunciado": "¿Qué objeto JavaScript se debe pasar como argumento para ejecutar una consulta parametrizada?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un arreglo conteniendo los valores en orden exacto.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un string codificado en formato base64 nativo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un buffer binario de memoria compartida estricta.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Un objeto de tipo Map mapeando cada índice con su llave.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 10,
+      "enunciado": "¿Cuál es el propósito principal de usar cursores al consultar la base de datos PostgreSQL?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Encriptar el flujo de datos entre el servidor y el cliente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Procesar grandes volúmenes de datos por lotes sin saturar la RAM.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Modificar registros múltiples en una única transacción atómica.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Transformar resultados a formato JSON nativo directamente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 11,
+      "enunciado": "Usando el paquete `pg-cursor`, ¿qué método extrae un bloque específico de filas del cursor?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "cursor.read(cantidad, callback)",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "cursor.fetch(cantidad)",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "cursor.getNext(lote)",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "cursor.pull(cantidad, callback)",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 12,
+      "enunciado": "¿Qué propiedad del objeto resultado de `query()` contiene las filas retornadas por PostgreSQL?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "result.data",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "result.records",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "result.rows",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "result.dataset",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 13,
+      "enunciado": "Si usas `async/await` para una consulta SQL, ¿cómo manejas correctamente los fallos del motor?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Pasando un booleano `false` como tercer parámetro.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Envolviendo la llamada en un bloque try/catch.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Usando el evento `.on('fail')` encadenado a la promesa.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Validando si el objeto de respuesta es nulo al final.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 14,
+      "enunciado": "En mitigación de inyección SQL, ¿por qué es inseguro armar sentencias concatenando variables?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Porque el motor PostgreSQL rechaza strings mayores a 255 bytes.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Porque bloquea los hilos del pool al evaluar sintaxis compleja.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Porque rompe la conexión al transformar datos a binario.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Porque permite introducir e inyectar código SQL malicioso.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 15,
+      "enunciado": "Al realizar un INSERT con `pg`, ¿qué cláusula SQL adicional devuelve el registro recién creado?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "WITH NEW DATA",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "RETURNING *",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "OUTPUT INSERTED",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "YIELD ALL",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 16,
+      "enunciado": "¿Qué propiedad del resultado de una consulta indica cuántos registros fueron alterados por DML?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "result.affectedRows",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "result.rowCount",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "result.modified",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "result.changes",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 17,
+      "enunciado": "Al actualizar datos con UPDATE, ¿por qué es imperativo capturar y procesar errores en Node?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Para evitar bloqueos permanentes de tablas por fallos silenciados.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Para compilar nuevamente la consulta en el motor de Chrome.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Para reiniciar el paquete pg en caso de sintaxis incorrecta.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Para impedir que las claves primarias cambien su valor nativo.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 18,
+      "enunciado": "Si envías un DELETE parametrizado sin valor en el parámetro ($1), ¿qué ocurre?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Se eliminan todos los registros de la tabla inmediatamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Falla por parámetro faltante y rechaza la ejecución.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "La tabla se bloquea hasta reiniciar el pool de conexiones.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El motor asume el valor nulo e ignora la sentencia DELETE.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 19,
+      "enunciado": "¿Cuál es el riesgo de ejecutar una instrucción UPDATE o DELETE sin una cláusula WHERE?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Crea duplicados exactos de cada registro de la tabla afectada.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Alteración o eliminación accidental de todos los registros.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Falla de sintaxis inmediata que detiene la base de datos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Generación de un error de memoria por límite de cursores.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 20,
+      "enunciado": "Al usar transacciones, si un INSERT falla en medio del proceso, ¿qué se debe hacer en el catch?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Realizar un COMMIT parcial.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ignorar el error y reintentar.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Ejecutar la sentencia ROLLBACK.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Cerrar la base de datos completa.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 21,
+      "enunciado": "¿Qué comando SQL inicia explícitamente un bloque de control transaccional en PostgreSQL?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "SET TRANSACTION",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "BEGIN",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "INIT",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "OPEN",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 23,
+      "enunciado": "En Node, ¿por qué debes usar el mismo cliente del pool durante toda la transacción?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Para no reventar la pila de memoria del Event Loop.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Porque BEGIN, COMMIT y ROLLBACK dependen de la sesión activa.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Porque los parámetros solo persisten en clientes asíncronos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Para mantener el cursor de lectura en la primera fila.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 24,
+      "enunciado": "¿Qué comando confirma y persiste de forma definitiva los cambios de una transacción activa?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "SAVEPOINT",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "RELEASE SAVEPOINT",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "FLUSH",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "COMMIT",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 25,
+      "enunciado": "¿Qué operación anula todos los cambios realizados desde el comando BEGIN al detectar un error?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "TRUNCATE",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "ROLLBACK",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "UNDO ALL",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "REVERT",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 26,
+      "enunciado": "Al culminar un COMMIT o ROLLBACK usando un cliente del pool, ¿qué acción final es obligatoria?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Destruir el proceso principal de Node con process.exit().",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Liberar el cliente usando el método release() correspondiente.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Reiniciar el servidor de PostgreSQL para liberar los bloqueos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Limpiar manualmente la caché de DNS del servidor.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 27,
+      "enunciado": "¿Qué es el modo \"autocommit\" en los motores de base de datos relacionales?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Confirma cada sentencia SQL individual automáticamente si es exitosa.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Revierte automáticamente si detecta cualquier uso intensivo de CPU.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Bloquea tablas enteras hasta que un administrador confirme.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Genera un volcado de memoria antes de cada inserción riesgosa.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 28,
+      "enunciado": "¿Qué problema principal busca resolver un mapeador objeto-relacional (ORM) como Sequelize?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "La traducción de interfaces gráficas a comandos binarios.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Eliminar la necesidad de usar bases de datos físicas.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Vincular estructuras lógicas de la DB con objetos en el código.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Acelerar el ancho de banda del servidor consumiendo menos red.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 29,
+      "enunciado": "En la arquitectura de Sequelize, ¿qué representa el concepto lógico de \"Modelo\"?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un controlador de rutas API HTTP.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una clase JavaScript que mapea y abstrae una tabla de la DB.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un middleware para procesar cuerpos JSON.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una vista renderizada en el motor Handlebars.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 30,
+      "enunciado": "En Sequelize, ¿qué método de modelo se utiliza convencionalmente para insertar un nuevo registro?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Model.insert()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Model.save()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Model.create()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Model.buildRecord()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 31,
+      "enunciado": "Para recuperar múltiples registros desde la base de datos con Sequelize, ¿qué método se utiliza?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Model.selectAll()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Model.findAll()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Model.fetchMany()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Model.getRecords()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 32,
+      "enunciado": "¿Qué método en Sequelize se emplea para realizar la actualización (UPDATE) de registros?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Model.modify()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Model.put()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Model.update()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Model.change()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 33,
+      "enunciado": "¿Qué instrucción en Sequelize elimina (DELETE) físicamente un registro basado en condiciones?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Model.destroy()",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Model.delete()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Model.remove()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Model.drop()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 34,
+      "enunciado": "Al definir un modelo en Sequelize, ¿qué propiedad define el tipo de dato nativo de una columna?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "fieldType",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "type usando DataTypes",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "dbType",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "struct",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 35,
+      "enunciado": "En Sequelize, ¿qué función vincula un modelo \"A\" con un modelo \"B\" en relación Uno a Uno?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "A.belongsToOne(B)",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "A.hasOne(B)",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "A.relatesTo(B)",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "A.links(B)",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 36,
+      "enunciado": "Para completar la asociación inversa \"Uno a Uno\" o \"Uno a Muchos\", ¿qué método aplica el hijo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "belongsTo()",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "hasParent()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "childOf()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "ownsTo()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 38,
+      "enunciado": "¿Qué requiere estrictamente una relación \"Muchos a Muchos\" (N:M) en bases de datos relacionales?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Duplicar todos los campos en ambos modelos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Declarar dos llaves primarias en una misma columna.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Una tabla o modelo intermedio para alojar ambas llaves foráneas.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Modificar los índices para admitir valores nulos múltiples.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 39,
+      "enunciado": "En Sequelize, ¿qué método establece una relación Muchos a Muchos indicando la tabla intermedia?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "belongsToMany() con la opción 'through'",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "hasManyToMany() con la opción 'via'",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "associatesWith() con la opción 'middle'",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "linksToMany() con la opción 'joinTable'",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 40,
+      "enunciado": "Al consultar modelos asociados en Sequelize, ¿qué parámetro se usa para cargar relaciones (JOIN)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "fetch",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "relations",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "include",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "populate",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Qué sucede internamente al invocar client.release() tras usar una conexión de un Pool con 'pg'?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Se destruye físicamente la conexión con el servidor.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Devuelve la conexión al pool para que sea reutilizada.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Obliga a cerrar todas las transacciones pendientes.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Borra la caché de consultas precompiladas del cliente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 2,
+      "enunciado": "En Node, ¿cuándo es imperativo utilizar cursores en lugar de consultas tradicionales (client.query)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Cuando se insertan múltiples filas en una sola query.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Para procesar conjuntos de datos masivos sin saturar la RAM.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Al ejecutar comandos DDL como CREATE TABLE o ALTER.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Siempre que se utilicen transacciones asíncronas anidadas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 3,
+      "enunciado": "¿Qué ventaja ofrece usar async/await frente a callbacks al realizar múltiples consultas consecutivas?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Incrementa exponencialmente el rendimiento del motor.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Evita el Callback Hell manteniendo un flujo asíncrono legible.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Cierra la conexión automáticamente tras cada bloque await.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Compila las consultas a binario antes de enviarlas al server.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 4,
+      "enunciado": "Usando 'pg', ¿cómo se obtiene el ID generado automáticamente tras un INSERT en PostgreSQL?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Consultando la vista global de variables de sesión.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Agregando la cláusula RETURNING a la sentencia SQL.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Invocando la función interna GET_LAST_ID() de PostgreSQL.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Leyendo la propiedad nativa 'lastInsertId' del objeto Result.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 5,
+      "enunciado": "En el objeto Result devuelto por un UPDATE o DELETE, ¿qué propiedad indica las filas afectadas?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Result.rowsAffected",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Result.rowCount",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Result.changedRows",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Result.length",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 6,
+      "enunciado": "Si ocurre un error en la tercera consulta de una transacción, ¿qué instrucción debe ejecutarse?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "COMMIT PARCIAL",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "ROLLBACK",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "DROP TRANSACTION",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "REVERT CACHE",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 7,
+      "enunciado": "¿Qué representa principalmente un \"Modelo\" dentro del ecosistema del ORM Sequelize?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Una conexión activa con la base de datos PostgreSQL.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una abstracción de una tabla que permite operar con objetos.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un middleware que filtra consultas maliciosas (Injection).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una función genérica para crear vistas relacionales SQL.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 8,
+      "enunciado": "En Sequelize, ¿qué método define el lado \"1\" de una relación uno a muchos (1:N)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "belongsToMany()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "hasMany()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "hasOne()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "belongsTo()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 9,
+      "enunciado": "Para crear una relación N:M en Sequelize, ¿qué parámetro adicional es obligatorio en la asociación?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "La definición de una tabla intermedia con la opción \"through\".",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un índice agrupado (clustered index) en ambas tablas.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Una función recursiva definida como un hook global.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Declarar llaves primarias compuestas en cada modelo base.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 7,
+      "origen": "js_2026",
+      "numero_origen": 10,
+      "enunciado": "Al realizar lecturas en Sequelize, ¿qué opción permite incluir objetos de modelos relacionados (Joins)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "associations: true",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "include",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "fetchRelated",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "join: 'all'",
+          "es_correcta": false
+        }
+      ]
+    }
+  ]
+}

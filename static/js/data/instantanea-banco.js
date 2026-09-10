@@ -17,8 +17,8 @@
 export const SELLO = {
   "base": "examen-td-js-produccion",
   "entorno": "nube",
-  "generada_en": "2026-09-10T14:35:20.543Z",
-  "preguntas": 275,
+  "generada_en": "2026-09-10T18:18:46.328Z",
+  "preguntas": 323,
   "descartadas": 0
 };
 
@@ -11020,6 +11020,1926 @@ export const PREGUNTAS = [
         "letra": "d",
         "orden": 4,
         "texto": "Porque NPM oculta los errores de librerías de terceros.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 276,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué ventaja principal ofrece implementar un \"pool\" de conexiones en PostgreSQL con Node.js?",
+    "justificacion": "Abrir una conexión a PostgreSQL es caro: hay autenticación, negociación y reserva de recursos del lado del servidor. Un pool mantiene un puñado abiertas y las va prestando, así que cada consulta se ahorra ese costo. Las otras tres prometen cosas que el pool no hace: no cifra —de eso se encarga TLS—, no bloquea nada, y no duplica datos en memoria.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1101,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Encripta automáticamente todos los datos en tránsito hacia la DB.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1102,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Reutiliza conexiones activas evitando el costo de crear nuevas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1103,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Ejecuta consultas SQL en un solo hilo bloqueando las demás.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1104,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Duplica los datos en memoria RAM para lecturas más veloces.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 277,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al usar el paquete `pg`, ¿qué clase gestiona múltiples clientes conectados concurrentemente?",
+    "justificacion": "`Pool` es la clase de `pg` que administra el conjunto de conexiones y las reparte entre quienes las piden. Su hermana es `Client`, que representa **una** conexión y se usa cuando de verdad hace falta una sola, como en un guion suelto. Los otros tres nombres no existen. En un servidor web casi siempre se quiere `Pool`, y creado una vez al arrancar, no por petición.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1105,
+        "letra": "a",
+        "orden": 1,
+        "texto": "ClientManager",
+        "es_correcta": 0
+      },
+      {
+        "id": 1106,
+        "letra": "b",
+        "orden": 2,
+        "texto": "PgConnection",
+        "es_correcta": 0
+      },
+      {
+        "id": 1107,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Pool",
+        "es_correcta": 1
+      },
+      {
+        "id": 1108,
+        "letra": "d",
+        "orden": 4,
+        "texto": "ConnectionCluster",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 278,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué sucede si el \"pool\" de PostgreSQL alcanza su límite máximo de conexiones concurrentes?",
+    "justificacion": "Cuando todas las conexiones están ocupadas, las peticiones nuevas **esperan en cola** hasta que alguna se libere. No falla ni descarta: espera. Eso tiene una consecuencia práctica que conviene entender — si alguien no devuelve un cliente, la cola crece y la aplicación se va poniendo lenta antes de dar ningún error, que es el síntoma más difícil de diagnosticar.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1109,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Detiene el servidor Node arrojando un error fatal.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1110,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Elimina las conexiones más antiguas sin previo aviso.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1111,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Pone en cola las nuevas peticiones hasta que una se libere.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1112,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Escala dinámicamente agregando nuevos procesos en el servidor.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 279,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En el paquete `pg`, ¿qué método libera explícitamente un cliente de vuelta al pool tras su uso?",
+    "justificacion": "`client.release()` devuelve el cliente al pool para que otro lo use. No cierra la conexión: la deja disponible, que es justamente el sentido del pool. La (c), `client.close()`, no existe en esa forma, y `disconnect()` tampoco. Lo habitual es llamarlo en un bloque `finally`, para que se ejecute tanto si la consulta salió bien como si lanzó.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1113,
+        "letra": "a",
+        "orden": 1,
+        "texto": "client.disconnect()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1114,
+        "letra": "b",
+        "orden": 2,
+        "texto": "client.release()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1115,
+        "letra": "c",
+        "orden": 3,
+        "texto": "client.close()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1116,
+        "letra": "d",
+        "orden": 4,
+        "texto": "pool.return(client)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 280,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Cuál es el riesgo de no liberar un cliente devuelto por `pool.connect()` tras usarlo?",
+    "justificacion": "El cliente no devuelto queda ocupado para siempre, y repetido unas cuantas veces agota el pool: las peticiones nuevas se quedan esperando en una cola que ya no avanza. La aplicación no se cae — **se cuelga**, que es peor de diagnosticar porque no hay error que leer. Por eso el `release()` va en un `finally` y no al final del camino feliz.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1117,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La base de datos elimina el registro recién insertado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1118,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Agotamiento del pool, provocando bloqueo en nuevas peticiones.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1119,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Se genera una brecha de seguridad exponiendo las credenciales.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1120,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El servidor Node se reinicia de manera automática e iterativa.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 281,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al configurar un Pool, ¿qué parámetro define el tiempo máximo de inactividad de una conexión?",
+    "justificacion": "`idleTimeoutMillis` dice cuánto puede estar una conexión sin usarse antes de que el pool la cierre, para no mantener abiertas conexiones que nadie ocupa. Los otros tres nombres no existen en `pg`. Se suele configurar junto a `max` —cuántas conexiones como mucho— y `connectionTimeoutMillis`, que es cuánto espera quien pide una antes de rendirse.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1121,
+        "letra": "a",
+        "orden": 1,
+        "texto": "maxIdleTime",
+        "es_correcta": 0
+      },
+      {
+        "id": 1122,
+        "letra": "b",
+        "orden": 2,
+        "texto": "idleTimeoutMillis",
+        "es_correcta": 1
+      },
+      {
+        "id": 1123,
+        "letra": "c",
+        "orden": 3,
+        "texto": "connectionTimeout",
+        "es_correcta": 0
+      },
+      {
+        "id": 1124,
+        "letra": "d",
+        "orden": 4,
+        "texto": "keepAliveLimit",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 282,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué técnica nativa en `pg` previene eficazmente ataques de inyección SQL (SQL Injection)?",
+    "justificacion": "Las consultas parametrizadas mandan la sentencia y los valores **por separado**, así que el motor nunca interpreta el dato como parte del SQL. Eso corta la inyección de raíz, y no por filtrar lo que llega sino porque el valor jamás llega a ser código. Las otras tres son medidas de otra capa o directamente falsas: validar con expresiones regulares es una carrera que se pierde.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1125,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Concatenación estricta de strings validada con Regex.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1126,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Configuración del firewall en el puerto 5432.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1127,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Uso de consultas parametrizadas (Prepared Statements).",
+        "es_correcta": 1
+      },
+      {
+        "id": 1128,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Bloqueo de direcciones IP maliciosas desde el cliente.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 283,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En una consulta parametrizada con `pg`, ¿cómo se referencian los valores dinámicos en el texto?",
+    "justificacion": "PostgreSQL usa marcadores posicionales numerados: `SELECT * FROM alumno WHERE id = $1`. La (a) describe la convención de MySQL y SQLite, y la (d) la de Oracle y algunos ORM — son reales pero de otros motores, y por eso son buenos distractores. La (b) es justamente lo que **no** hay que hacer: interpolar es concatenar con otro nombre.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1129,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Usando signos de interrogación (?, ?, ?).",
+        "es_correcta": 0
+      },
+      {
+        "id": 1130,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Empleando interpolación directa (${var}).",
+        "es_correcta": 0
+      },
+      {
+        "id": 1131,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Mediante marcadores posicionales indexados ($1, $2, $3).",
+        "es_correcta": 1
+      },
+      {
+        "id": 1132,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Agregando el prefijo de dos puntos (:id, :name).",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 284,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué objeto JavaScript se debe pasar como argumento para ejecutar una consulta parametrizada?",
+    "justificacion": "Los valores van en un arreglo, en el mismo orden que los marcadores: `client.query(texto, [id, nombre])`, donde `$1` toma el primer elemento y `$2` el segundo. Por eso importa el orden y no el nombre. Si la cantidad no coincide con los marcadores, PostgreSQL rechaza la consulta antes de ejecutarla, que es la pregunta del `DELETE` sin parámetro.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1133,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Un arreglo conteniendo los valores en orden exacto.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1134,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un string codificado en formato base64 nativo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1135,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un buffer binario de memoria compartida estricta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1136,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Un objeto de tipo Map mapeando cada índice con su llave.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 285,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Cuál es el propósito principal de usar cursores al consultar la base de datos PostgreSQL?",
+    "justificacion": "Un cursor permite ir trayendo el resultado **por lotes** en vez de cargarlo entero en memoria. Con una tabla de millones de filas, `client.query()` intentaría materializar todo y el proceso se quedaría sin memoria. Las otras tres describen cosas que el cursor no hace: no cifra, no agrupa en una transacción y no convierte a JSON.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1137,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Encriptar el flujo de datos entre el servidor y el cliente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1138,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Procesar grandes volúmenes de datos por lotes sin saturar la RAM.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1139,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Modificar registros múltiples en una única transacción atómica.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1140,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Transformar resultados a formato JSON nativo directamente.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 286,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Usando el paquete `pg-cursor`, ¿qué método extrae un bloque específico de filas del cursor?",
+    "justificacion": "`cursor.read(cantidad, callback)` pide el siguiente bloque de filas y las entrega al callback; cuando ya no quedan, devuelve un arreglo vacío, y ésa es la señal de que se terminó. Los otros tres nombres no existen. El patrón habitual es leer en bucle hasta ese arreglo vacío, procesando cada lote y soltándolo antes de pedir el siguiente.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1141,
+        "letra": "a",
+        "orden": 1,
+        "texto": "cursor.read(cantidad, callback)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1142,
+        "letra": "b",
+        "orden": 2,
+        "texto": "cursor.fetch(cantidad)",
+        "es_correcta": 0
+      },
+      {
+        "id": 1143,
+        "letra": "c",
+        "orden": 3,
+        "texto": "cursor.getNext(lote)",
+        "es_correcta": 0
+      },
+      {
+        "id": 1144,
+        "letra": "d",
+        "orden": 4,
+        "texto": "cursor.pull(cantidad, callback)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 287,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué propiedad del objeto resultado de `query()` contiene las filas retornadas por PostgreSQL?",
+    "justificacion": "`result.rows` es el arreglo con las filas devueltas, cada una como un objeto cuyas claves son los nombres de las columnas. Los otros tres nombres no existen en `pg`. Junto a él viajan `result.rowCount` —cuántas filas— y `result.fields`, con la descripción de las columnas. Con un `SELECT` que no encuentra nada, `rows` es un arreglo **vacío**, no `null`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1145,
+        "letra": "a",
+        "orden": 1,
+        "texto": "result.data",
+        "es_correcta": 0
+      },
+      {
+        "id": 1146,
+        "letra": "b",
+        "orden": 2,
+        "texto": "result.records",
+        "es_correcta": 0
+      },
+      {
+        "id": 1147,
+        "letra": "c",
+        "orden": 3,
+        "texto": "result.rows",
+        "es_correcta": 1
+      },
+      {
+        "id": 1148,
+        "letra": "d",
+        "orden": 4,
+        "texto": "result.dataset",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 288,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Si usas `async/await` para una consulta SQL, ¿cómo manejas correctamente los fallos del motor?",
+    "justificacion": "Con `async/await`, una consulta que falla lanza como cualquier excepción, así que se atrapa con `try/catch`. Es lo mismo que se vio en el módulo anterior y aquí se vuelve crítico: sin capturar, el error se lleva por delante el `release()` del cliente y la transacción abierta, si la hay. Por eso el patrón completo lleva `try`, `catch` con `ROLLBACK` y `finally` con `release()`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1149,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Pasando un booleano `false` como tercer parámetro.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1150,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Envolviendo la llamada en un bloque try/catch.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1151,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Usando el evento `.on('fail')` encadenado a la promesa.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1152,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Validando si el objeto de respuesta es nulo al final.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 289,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En mitigación de inyección SQL, ¿por qué es inseguro armar sentencias concatenando variables?",
+    "justificacion": "Porque el valor que llega del usuario pasa a formar parte del texto de la sentencia, y si contiene SQL, ese SQL se ejecuta. Con eso se pueden leer tablas ajenas, borrar datos o saltarse una autenticación. Las otras tres inventan límites técnicos que no existen. La solución no es escapar comillas a mano: es no concatenar, y usar parámetros.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1153,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Porque el motor PostgreSQL rechaza strings mayores a 255 bytes.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1154,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Porque bloquea los hilos del pool al evaluar sintaxis compleja.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1155,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Porque rompe la conexión al transformar datos a binario.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1156,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Porque permite introducir e inyectar código SQL malicioso.",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 290,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al realizar un INSERT con `pg`, ¿qué cláusula SQL adicional devuelve el registro recién creado?",
+    "justificacion": "`RETURNING *` hace que el `INSERT` devuelva la fila tal como quedó, incluidos los valores que puso la base —el `id` de la secuencia, las columnas con `DEFAULT`, la marca de tiempo—. Se puede pedir todo con `*` o solo algunas columnas: `RETURNING id`. Las otras tres son de otros motores o no existen: `OUTPUT INSERTED` es de SQL Server.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1157,
+        "letra": "a",
+        "orden": 1,
+        "texto": "WITH NEW DATA",
+        "es_correcta": 0
+      },
+      {
+        "id": 1158,
+        "letra": "b",
+        "orden": 2,
+        "texto": "RETURNING *",
+        "es_correcta": 1
+      },
+      {
+        "id": 1159,
+        "letra": "c",
+        "orden": 3,
+        "texto": "OUTPUT INSERTED",
+        "es_correcta": 0
+      },
+      {
+        "id": 1160,
+        "letra": "d",
+        "orden": 4,
+        "texto": "YIELD ALL",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 291,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué propiedad del resultado de una consulta indica cuántos registros fueron alterados por DML?",
+    "justificacion": "`result.rowCount` dice cuántas filas afectó la sentencia, y es la forma de saber si un `UPDATE` o un `DELETE` de verdad tocó algo: un `rowCount` de cero significa que la condición no encontró nada, que no es un error pero casi siempre es una sorpresa. Los otros tres nombres pertenecen a otras bibliotecas o no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1161,
+        "letra": "a",
+        "orden": 1,
+        "texto": "result.affectedRows",
+        "es_correcta": 0
+      },
+      {
+        "id": 1162,
+        "letra": "b",
+        "orden": 2,
+        "texto": "result.rowCount",
+        "es_correcta": 1
+      },
+      {
+        "id": 1163,
+        "letra": "c",
+        "orden": 3,
+        "texto": "result.modified",
+        "es_correcta": 0
+      },
+      {
+        "id": 1164,
+        "letra": "d",
+        "orden": 4,
+        "texto": "result.changes",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 292,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al actualizar datos con UPDATE, ¿por qué es imperativo capturar y procesar errores en Node?",
+    "justificacion": "Un error que nadie atiende deja las cosas a medio camino: si la sentencia iba dentro de una transacción, ésa queda abierta, y una transacción abierta **mantiene sus bloqueos** hasta que alguien la cierre. Sumado a un cliente que tampoco se devuelve al pool, el resultado es una tabla bloqueada para los demás sin ningún error a la vista. Las otras tres describen mecanismos que no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1165,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para evitar bloqueos permanentes de tablas por fallos silenciados.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1166,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para compilar nuevamente la consulta en el motor de Chrome.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1167,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Para reiniciar el paquete pg en caso de sintaxis incorrecta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1168,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Para impedir que las claves primarias cambien su valor nativo.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 293,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Si envías un DELETE parametrizado sin valor en el parámetro ($1), ¿qué ocurre?",
+    "justificacion": "PostgreSQL rechaza la consulta antes de ejecutarla: el número de valores tiene que coincidir con el de marcadores, y si falta uno responde que se le entregaron menos parámetros de los que la sentencia requiere. **No asume nada ni ejecuta a medias**, y eso es una protección real — la (a) describe la catástrofe que ocurriría si el motor decidiera ignorar el filtro.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1169,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Se eliminan todos los registros de la tabla inmediatamente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1170,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Falla por parámetro faltante y rechaza la ejecución.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1171,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La tabla se bloquea hasta reiniciar el pool de conexiones.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1172,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El motor asume el valor nulo e ignora la sentencia DELETE.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 294,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Cuál es el riesgo de ejecutar una instrucción UPDATE o DELETE sin una cláusula WHERE?",
+    "justificacion": "Sin `WHERE`, la sentencia se aplica a **todas** las filas de la tabla: un `UPDATE` las cambia todas y un `DELETE` las borra todas. No hay error ni aviso, porque es una sentencia perfectamente válida. La costumbre que salva es escribirla primero como `SELECT` con el mismo `WHERE`, mirar cuántas filas devuelve, y recién entonces cambiar el verbo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1173,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Crea duplicados exactos de cada registro de la tabla afectada.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1174,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Alteración o eliminación accidental de todos los registros.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1175,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Falla de sintaxis inmediata que detiene la base de datos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1176,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Generación de un error de memoria por límite de cursores.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 295,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al usar transacciones, si un INSERT falla en medio del proceso, ¿qué se debe hacer en el catch?",
+    "justificacion": "Ejecutar `ROLLBACK`, que deshace todo lo hecho desde el `BEGIN` y deja la base como estaba. Es la razón de ser de la transacción: que un fallo a mitad no deje la mitad aplicada. La (a) no existe como operación —no hay confirmaciones parciales— y las otras dos empeoran las cosas. Después del `ROLLBACK` viene el `release()` del cliente, en el `finally`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1177,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Realizar un COMMIT parcial.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1178,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ignorar el error y reintentar.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1179,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Ejecutar la sentencia ROLLBACK.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1180,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Cerrar la base de datos completa.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 296,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué comando SQL inicia explícitamente un bloque de control transaccional en PostgreSQL?",
+    "justificacion": "`BEGIN` abre el bloque transaccional en PostgreSQL, y desde ahí nada es definitivo hasta el `COMMIT`. La (a), `SET TRANSACTION`, existe de verdad y por eso es el distractor que separa: **no abre nada**, sino que fija las características —nivel de aislamiento, solo lectura— de la transacción en curso. `INIT` y `OPEN` no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1181,
+        "letra": "a",
+        "orden": 1,
+        "texto": "SET TRANSACTION",
+        "es_correcta": 0
+      },
+      {
+        "id": 1182,
+        "letra": "b",
+        "orden": 2,
+        "texto": "BEGIN",
+        "es_correcta": 1
+      },
+      {
+        "id": 1183,
+        "letra": "c",
+        "orden": 3,
+        "texto": "INIT",
+        "es_correcta": 0
+      },
+      {
+        "id": 1184,
+        "letra": "d",
+        "orden": 4,
+        "texto": "OPEN",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 297,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En Node, ¿por qué debes usar el mismo cliente del pool durante toda la transacción?",
+    "justificacion": "Porque una transacción vive en **la sesión** de una conexión concreta: el `BEGIN` la abre en ese cliente, y un `COMMIT` enviado por otro cliente del pool no tiene nada que confirmar. Por eso una transacción se hace con `pool.connect()` para tomar un cliente y usarlo de principio a fin, en vez de con `pool.query()`, que puede darte una conexión distinta cada vez.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1185,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para no reventar la pila de memoria del Event Loop.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1186,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Porque BEGIN, COMMIT y ROLLBACK dependen de la sesión activa.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1187,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Porque los parámetros solo persisten en clientes asíncronos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1188,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Para mantener el cursor de lectura en la primera fila.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 298,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué comando confirma y persiste de forma definitiva los cambios de una transacción activa?",
+    "justificacion": "`COMMIT` cierra la transacción y hace permanentes sus cambios; hasta ese momento un `ROLLBACK` los desharía. Las otras tres existen y ninguna confirma nada, y la (b) es la que separa: `RELEASE SAVEPOINT` **elimina un punto de guardado y deja la transacción abierta**, así que quien crea que «liberar» un savepoint finaliza algo se lleva la pregunta mal. `SAVEPOINT` hace lo contrario —marca el punto— y `FLUSH` no es SQL. Conviene recordar que un `RELEASE SAVEPOINT` tampoco deshace lo hecho después del punto: eso sería `ROLLBACK TO SAVEPOINT`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1189,
+        "letra": "a",
+        "orden": 1,
+        "texto": "SAVEPOINT",
+        "es_correcta": 0
+      },
+      {
+        "id": 1190,
+        "letra": "b",
+        "orden": 2,
+        "texto": "RELEASE SAVEPOINT",
+        "es_correcta": 0
+      },
+      {
+        "id": 1191,
+        "letra": "c",
+        "orden": 3,
+        "texto": "FLUSH",
+        "es_correcta": 0
+      },
+      {
+        "id": 1192,
+        "letra": "d",
+        "orden": 4,
+        "texto": "COMMIT",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 299,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué operación anula todos los cambios realizados desde el comando BEGIN al detectar un error?",
+    "justificacion": "`ROLLBACK` deshace todo lo hecho desde el `BEGIN` y devuelve la base al estado anterior, sin importar cuántas sentencias hubiera en medio. `TRUNCATE` es lo contrario de deshacer: vacía una tabla. `UNDO ALL` y `REVERT` no existen en SQL. Si hay `SAVEPOINT` declarados, se puede volver a uno de ellos en vez de deshacer la transacción entera.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1193,
+        "letra": "a",
+        "orden": 1,
+        "texto": "TRUNCATE",
+        "es_correcta": 0
+      },
+      {
+        "id": 1194,
+        "letra": "b",
+        "orden": 2,
+        "texto": "ROLLBACK",
+        "es_correcta": 1
+      },
+      {
+        "id": 1195,
+        "letra": "c",
+        "orden": 3,
+        "texto": "UNDO ALL",
+        "es_correcta": 0
+      },
+      {
+        "id": 1196,
+        "letra": "d",
+        "orden": 4,
+        "texto": "REVERT",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 300,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al culminar un COMMIT o ROLLBACK usando un cliente del pool, ¿qué acción final es obligatoria?",
+    "justificacion": "Liberar el cliente con `release()`. Confirmar o deshacer cierra la **transacción**, pero el cliente sigue prestado hasta que se devuelva, y un cliente que no vuelve es una conexión menos para todos los demás. Por eso el `release()` va en el `finally`: se ejecuta tanto tras el `COMMIT` como tras el `ROLLBACK`, y también si algo lanzó por el camino.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1197,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Destruir el proceso principal de Node con process.exit().",
+        "es_correcta": 0
+      },
+      {
+        "id": 1198,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Liberar el cliente usando el método release() correspondiente.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1199,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Reiniciar el servidor de PostgreSQL para liberar los bloqueos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1200,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Limpiar manualmente la caché de DNS del servidor.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 301,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué es el modo \"autocommit\" en los motores de base de datos relacionales?",
+    "justificacion": "Con autocommit, cada sentencia que termina bien se confirma sola, como si llevara su propio `COMMIT` detrás. La consecuencia es la que importa: **no queda nada que deshacer**, porque no hay transacción abierta. Por eso, para agrupar varias sentencias en una unidad, hay que abrirla explícitamente con `BEGIN`. Las otras tres describen comportamientos que ningún motor tiene.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1201,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Confirma cada sentencia SQL individual automáticamente si es exitosa.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1202,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Revierte automáticamente si detecta cualquier uso intensivo de CPU.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1203,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Bloquea tablas enteras hasta que un administrador confirme.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1204,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Genera un volcado de memoria antes de cada inserción riesgosa.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 302,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué problema principal busca resolver un mapeador objeto-relacional (ORM) como Sequelize?",
+    "justificacion": "Un ORM traduce entre dos mundos que no encajan solos: las tablas y filas de la base, y los objetos y clases del código. Con él se consultan y guardan datos escribiendo JavaScript en vez de SQL. Lo que **no** hace es eliminar la base ni ahorrar red — y conviene saber que el SQL sigue existiendo debajo, así que entenderlo sigue siendo necesario cuando algo va lento.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1205,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La traducción de interfaces gráficas a comandos binarios.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1206,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Eliminar la necesidad de usar bases de datos físicas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1207,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Vincular estructuras lógicas de la DB con objetos en el código.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1208,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Acelerar el ancho de banda del servidor consumiendo menos red.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 303,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En la arquitectura de Sequelize, ¿qué representa el concepto lógico de \"Modelo\"?",
+    "justificacion": "Un modelo es la clase que representa una tabla: define sus columnas y sus tipos, y ofrece los métodos para consultarla y modificarla. Es la pieza central de Sequelize — todo lo demás cuelga de ahí. Las otras tres pertenecen a otras capas de la aplicación: rutas, middlewares y vistas, que no tienen nada que ver con el mapeo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1209,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Un controlador de rutas API HTTP.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1210,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Una clase JavaScript que mapea y abstrae una tabla de la DB.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1211,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un middleware para procesar cuerpos JSON.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1212,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Una vista renderizada en el motor Handlebars.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 304,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En Sequelize, ¿qué método de modelo se utiliza convencionalmente para insertar un nuevo registro?",
+    "justificacion": "`Model.create({...})` construye la instancia y la guarda en un solo paso, devolviendo el registro ya creado con el `id` que asignó la base. La (b), `Model.save()`, no existe como método de la clase — `save()` es de la **instancia**, y se usa junto a `build()` cuando se quiere crear en memoria primero y guardar después. Los otros dos no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1213,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Model.insert()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1214,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Model.save()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1215,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Model.create()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1216,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Model.buildRecord()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 305,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Para recuperar múltiples registros desde la base de datos con Sequelize, ¿qué método se utiliza?",
+    "justificacion": "`Model.findAll()` devuelve un arreglo con todos los registros que cumplan las condiciones que se le pasen, y sin condiciones devuelve la tabla entera. Los otros tres nombres no existen. Sus hermanos habituales son `findOne()`, que devuelve uno solo o `null`, y `findByPk()`, que busca por clave primaria — y conviene distinguirlos porque devuelven cosas distintas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1217,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Model.selectAll()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1218,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Model.findAll()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1219,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Model.fetchMany()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1220,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Model.getRecords()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 306,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué método en Sequelize se emplea para realizar la actualización (UPDATE) de registros?",
+    "justificacion": "`Model.update({campos}, {where})` actualiza los registros que cumplan la condición. Los otros tres nombres no existen. Ojo con el detalle que sorprende: lleva **dos** objetos, el de los valores nuevos y el de las condiciones, y olvidar el segundo actualiza toda la tabla — es el mismo peligro del `UPDATE` sin `WHERE`, con otra sintaxis.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1221,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Model.modify()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1222,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Model.put()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1223,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Model.update()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1224,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Model.change()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 307,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué instrucción en Sequelize elimina (DELETE) físicamente un registro basado en condiciones?",
+    "justificacion": "`Model.destroy({where})` borra los registros que cumplan la condición. El nombre desconcierta al principio, porque no se parece a `DELETE` ni a `remove`, y por eso los otros tres distractores son tentadores; ninguno existe. `Model.drop()` tampoco es eso: `drop` en Sequelize elimina **la tabla**, que es otra cosa y bastante más grave.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1225,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Model.destroy()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1226,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Model.delete()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1227,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Model.remove()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1228,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Model.drop()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 308,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al definir un modelo en Sequelize, ¿qué propiedad define el tipo de dato nativo de una columna?",
+    "justificacion": "Cada columna se declara con un objeto que lleva `type`, y el tipo sale de `DataTypes`: `DataTypes.STRING`, `DataTypes.INTEGER`, `DataTypes.DATE`. Esa capa existe para que el mismo modelo sirva con motores distintos, que traducen cada tipo al suyo. Los otros tres nombres no existen. Junto a `type` suelen ir `allowNull`, `defaultValue` y `unique`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1229,
+        "letra": "a",
+        "orden": 1,
+        "texto": "fieldType",
+        "es_correcta": 0
+      },
+      {
+        "id": 1230,
+        "letra": "b",
+        "orden": 2,
+        "texto": "type usando DataTypes",
+        "es_correcta": 1
+      },
+      {
+        "id": 1231,
+        "letra": "c",
+        "orden": 3,
+        "texto": "dbType",
+        "es_correcta": 0
+      },
+      {
+        "id": 1232,
+        "letra": "d",
+        "orden": 4,
+        "texto": "struct",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 309,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En Sequelize, ¿qué función vincula un modelo \"A\" con un modelo \"B\" en relación Uno a Uno?",
+    "justificacion": "`A.hasOne(B)` declara que A tiene un B, y hace que la llave foránea quede en **B** — la tabla del lado que «pertenece». Esa es la parte que más se confunde: el método se escribe en el modelo dueño, pero la columna aparece en el otro. Los otros tres nombres no existen; `belongsToOne` suena razonable y no es de Sequelize.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1233,
+        "letra": "a",
+        "orden": 1,
+        "texto": "A.belongsToOne(B)",
+        "es_correcta": 0
+      },
+      {
+        "id": 1234,
+        "letra": "b",
+        "orden": 2,
+        "texto": "A.hasOne(B)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1235,
+        "letra": "c",
+        "orden": 3,
+        "texto": "A.relatesTo(B)",
+        "es_correcta": 0
+      },
+      {
+        "id": 1236,
+        "letra": "d",
+        "orden": 4,
+        "texto": "A.links(B)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 310,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Para completar la asociación inversa \"Uno a Uno\" o \"Uno a Muchos\", ¿qué método aplica el hijo?",
+    "justificacion": "`belongsTo()` es el lado inverso, el que declara el hijo: `B.belongsTo(A)` completa lo que `A.hasOne(B)` o `A.hasMany(B)` empezaron, y es el que pone la llave foránea en B. Declarar los dos lados es lo que permite navegar la relación en ambos sentidos al consultar. Los otros tres nombres no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1237,
+        "letra": "a",
+        "orden": 1,
+        "texto": "belongsTo()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1238,
+        "letra": "b",
+        "orden": 2,
+        "texto": "hasParent()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1239,
+        "letra": "c",
+        "orden": 3,
+        "texto": "childOf()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1240,
+        "letra": "d",
+        "orden": 4,
+        "texto": "ownsTo()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 311,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué requiere estrictamente una relación \"Muchos a Muchos\" (N:M) en bases de datos relacionales?",
+    "justificacion": "Una relación N:M necesita una tabla intermedia cuyas filas son los pares, con las llaves foráneas de las dos tablas. No hay forma de representarla con una columna en cualquiera de los dos lados, porque cada fila admitiría un solo valor. Esa tabla es además el sitio natural de los atributos que pertenecen a la relación y no a las entidades.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1241,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Duplicar todos los campos en ambos modelos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1242,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Declarar dos llaves primarias en una misma columna.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1243,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Una tabla o modelo intermedio para alojar ambas llaves foráneas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1244,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Modificar los índices para admitir valores nulos múltiples.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 312,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En Sequelize, ¿qué método establece una relación Muchos a Muchos indicando la tabla intermedia?",
+    "justificacion": "`A.belongsToMany(B, { through: 'AB' })`, y hay que declararlo en los dos modelos para poder navegar en ambos sentidos. La opción `through` es obligatoria y dice qué tabla intermedia usar — puede ser un nombre o un modelo propio, y conviene lo segundo cuando la relación tiene datos suyos. Los otros tres nombres no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1245,
+        "letra": "a",
+        "orden": 1,
+        "texto": "belongsToMany() con la opción 'through'",
+        "es_correcta": 1
+      },
+      {
+        "id": 1246,
+        "letra": "b",
+        "orden": 2,
+        "texto": "hasManyToMany() con la opción 'via'",
+        "es_correcta": 0
+      },
+      {
+        "id": 1247,
+        "letra": "c",
+        "orden": 3,
+        "texto": "associatesWith() con la opción 'middle'",
+        "es_correcta": 0
+      },
+      {
+        "id": 1248,
+        "letra": "d",
+        "orden": 4,
+        "texto": "linksToMany() con la opción 'joinTable'",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 313,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al consultar modelos asociados en Sequelize, ¿qué parámetro se usa para cargar relaciones (JOIN)?",
+    "justificacion": "`include` es la opción que trae de una vez los modelos asociados, traduciéndose a un `JOIN`: `Model.findAll({ include: Otro })`. Sin ella, cada relación exigiría una consulta aparte, que es el problema de las N+1 consultas. La (d), `populate`, es real pero de Mongoose, el ORM de MongoDB, y por eso es el mejor distractor de los tres.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1249,
+        "letra": "a",
+        "orden": 1,
+        "texto": "fetch",
+        "es_correcta": 0
+      },
+      {
+        "id": 1250,
+        "letra": "b",
+        "orden": 2,
+        "texto": "relations",
+        "es_correcta": 0
+      },
+      {
+        "id": 1251,
+        "letra": "c",
+        "orden": 3,
+        "texto": "include",
+        "es_correcta": 1
+      },
+      {
+        "id": 1252,
+        "letra": "d",
+        "orden": 4,
+        "texto": "populate",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 314,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué sucede internamente al invocar client.release() tras usar una conexión de un Pool con 'pg'?",
+    "justificacion": "`release()` devuelve la conexión al pool y la deja disponible para la siguiente petición; **no la cierra**. Ésa es la distinción que la pregunta busca: cerrar sería tirar a la basura justo lo que el pool existe para conservar. Las otras tres describen efectos que no ocurren — no cierra transacciones ni borra cachés, y por eso conviene terminarlas uno mismo antes de soltar el cliente.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1253,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Se destruye físicamente la conexión con el servidor.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1254,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Devuelve la conexión al pool para que sea reutilizada.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1255,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Obliga a cerrar todas las transacciones pendientes.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1256,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Borra la caché de consultas precompiladas del cliente.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 315,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En Node, ¿cuándo es imperativo utilizar cursores en lugar de consultas tradicionales (client.query)?",
+    "justificacion": "Cuando el conjunto de resultados no cabe cómodamente en memoria. `client.query()` trae todo de una vez y construye el arreglo completo; con millones de filas, el proceso se queda sin memoria. El cursor los va entregando por lotes. Las otras tres describen situaciones donde el cursor no aporta nada: insertar, ejecutar DDL o usar transacciones.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1257,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Cuando se insertan múltiples filas en una sola query.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1258,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para procesar conjuntos de datos masivos sin saturar la RAM.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1259,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Al ejecutar comandos DDL como CREATE TABLE o ALTER.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1260,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Siempre que se utilicen transacciones asíncronas anidadas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 316,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué ventaja ofrece usar async/await frente a callbacks al realizar múltiples consultas consecutivas?",
+    "justificacion": "`async/await` deja el código asíncrono con la forma del síncrono: una consulta debajo de la otra, en vertical, en vez de anidadas dentro de callbacks. Eso importa especialmente aquí, donde una operación encadena varias consultas y el manejo de errores vuelve a ser un `try/catch` corriente. Lo que **no** hace es acelerar nada: la espera es la misma.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1261,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Incrementa exponencialmente el rendimiento del motor.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1262,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Evita el Callback Hell manteniendo un flujo asíncrono legible.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1263,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Cierra la conexión automáticamente tras cada bloque await.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1264,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Compila las consultas a binario antes de enviarlas al server.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 317,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Usando 'pg', ¿cómo se obtiene el ID generado automáticamente tras un INSERT en PostgreSQL?",
+    "justificacion": "Agregando `RETURNING id` —o `RETURNING *`— al `INSERT`, y leyendo después `result.rows[0].id`. Es la forma de PostgreSQL, y tiene una ventaja sobre las de otros motores: viene en la misma consulta, así que no hay una segunda llamada donde otra sesión pueda colarse. La (d) describe una propiedad de MySQL, y las otras dos no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1265,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Consultando la vista global de variables de sesión.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1266,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Agregando la cláusula RETURNING a la sentencia SQL.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1267,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Invocando la función interna GET_LAST_ID() de PostgreSQL.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1268,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Leyendo la propiedad nativa 'lastInsertId' del objeto Result.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 318,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En el objeto Result devuelto por un UPDATE o DELETE, ¿qué propiedad indica las filas afectadas?",
+    "justificacion": "`Result.rowCount` dice cuántas filas afectó la sentencia. Los otros tres nombres pertenecen a otras bibliotecas o no existen. Conviene mirarlo siempre después de un `UPDATE` o un `DELETE`: si vale cero, la condición no encontró nada, y eso rara vez es lo que uno esperaba — es la diferencia entre «se hizo» y «no falló».",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1269,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Result.rowsAffected",
+        "es_correcta": 0
+      },
+      {
+        "id": 1270,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Result.rowCount",
+        "es_correcta": 1
+      },
+      {
+        "id": 1271,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Result.changedRows",
+        "es_correcta": 0
+      },
+      {
+        "id": 1272,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Result.length",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 319,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Si ocurre un error en la tercera consulta de una transacción, ¿qué instrucción debe ejecutarse?",
+    "justificacion": "`ROLLBACK`, que deshace las tres consultas y no solo la que falló. En eso consiste la atomicidad: la transacción se aplica entera o no deja rastro. Las otras tres no existen como instrucciones. Y después del `ROLLBACK` queda una cosa más por hacer, que es devolver el cliente al pool con `release()`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1273,
+        "letra": "a",
+        "orden": 1,
+        "texto": "COMMIT PARCIAL",
+        "es_correcta": 0
+      },
+      {
+        "id": 1274,
+        "letra": "b",
+        "orden": 2,
+        "texto": "ROLLBACK",
+        "es_correcta": 1
+      },
+      {
+        "id": 1275,
+        "letra": "c",
+        "orden": 3,
+        "texto": "DROP TRANSACTION",
+        "es_correcta": 0
+      },
+      {
+        "id": 1276,
+        "letra": "d",
+        "orden": 4,
+        "texto": "REVERT CACHE",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 320,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "¿Qué representa principalmente un \"Modelo\" dentro del ecosistema del ORM Sequelize?",
+    "justificacion": "Un modelo es la abstracción de una tabla: define sus columnas y ofrece los métodos para operar con ella usando objetos en vez de SQL. Las otras tres describen piezas reales de una aplicación —la conexión, un middleware, una vista— que no son el modelo. La conexión, en particular, es lo que se le pasa a Sequelize al arrancar, no lo que el modelo representa.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1277,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una conexión activa con la base de datos PostgreSQL.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1278,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Una abstracción de una tabla que permite operar con objetos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1279,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un middleware que filtra consultas maliciosas (Injection).",
+        "es_correcta": 0
+      },
+      {
+        "id": 1280,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Una función genérica para crear vistas relacionales SQL.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 321,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "En Sequelize, ¿qué método define el lado \"1\" de una relación uno a muchos (1:N)?",
+    "justificacion": "`hasMany()` se declara en el lado «uno»: `Autor.hasMany(Libro)` dice que un autor tiene muchos libros, y la llave foránea queda en la tabla de libros. Su par es `belongsTo()`, que se declara en el lado «muchos» y completa la relación. `hasOne()` es para uno a uno y `belongsToMany()` para muchos a muchos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1281,
+        "letra": "a",
+        "orden": 1,
+        "texto": "belongsToMany()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1282,
+        "letra": "b",
+        "orden": 2,
+        "texto": "hasMany()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1283,
+        "letra": "c",
+        "orden": 3,
+        "texto": "hasOne()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1284,
+        "letra": "d",
+        "orden": 4,
+        "texto": "belongsTo()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 322,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Para crear una relación N:M en Sequelize, ¿qué parámetro adicional es obligatorio en la asociación?",
+    "justificacion": "La opción `through`, que nombra la tabla intermedia donde viven las dos llaves foráneas. Es obligatoria porque sin ella Sequelize no sabría dónde guardar los pares. Las otras tres describen cosas que no hacen falta: ni índices agrupados, ni hooks, ni claves compuestas declaradas a mano — de la clave de la tabla intermedia se encarga Sequelize.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1285,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La definición de una tabla intermedia con la opción \"through\".",
+        "es_correcta": 1
+      },
+      {
+        "id": 1286,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un índice agrupado (clustered index) en ambas tablas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1287,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Una función recursiva definida como un hook global.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1288,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Declarar llaves primarias compuestas en cada modelo base.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 323,
+    "modulo": 7,
+    "modulo_titulo": "Acceso a Datos en Aplicaciones Node",
+    "modulo_icono": "layers",
+    "enunciado": "Al realizar lecturas en Sequelize, ¿qué opción permite incluir objetos de modelos relacionados (Joins)?",
+    "justificacion": "`include` trae los modelos asociados en la misma consulta, traduciéndose a un `JOIN`. Sin ella hay que consultar cada relación aparte, que es el problema clásico de las N+1 consultas: una para la lista y una más por cada elemento. La (a) y la (d) no existen, y `populate` —que no aparece aquí— sería la de Mongoose, no la de Sequelize.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1289,
+        "letra": "a",
+        "orden": 1,
+        "texto": "associations: true",
+        "es_correcta": 0
+      },
+      {
+        "id": 1290,
+        "letra": "b",
+        "orden": 2,
+        "texto": "include",
+        "es_correcta": 1
+      },
+      {
+        "id": 1291,
+        "letra": "c",
+        "orden": 3,
+        "texto": "fetchRelated",
+        "es_correcta": 0
+      },
+      {
+        "id": 1292,
+        "letra": "d",
+        "orden": 4,
+        "texto": "join: 'all'",
         "es_correcta": 0
       }
     ]

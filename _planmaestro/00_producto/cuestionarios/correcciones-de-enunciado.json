@@ -123,6 +123,23 @@
       "propuesta_por": "Claude Code",
       "aprobada_por": "Felipe Cuevas",
       "fecha": "2026-09-10"
+    },
+    {
+      "ref": "m07#24",
+      "modulo": 7,
+      "origen": "json_2026",
+      "numero_origen": 24,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-07.json",
+      "campo": "alternativa.b.texto",
+      "original": "END TRANSACTION",
+      "corregido": "RELEASE SAVEPOINT",
+      "motivo": "El item tenia DOS respuestas correctas, y es el MISMO distractor que se corrigio en m05#18 el 2026-09-10: en PostgreSQL `END` es sinonimo de `COMMIT` y confirma la transaccion igual. Aqui pesa mas todavia, porque el modulo 7 trata explicitamente de PostgreSQL con Node.",
+      "reemplazo": "`RELEASE SAVEPOINT` es real en PostgreSQL y NO confirma nada: elimina un punto de guardado dejando la transaccion abierta. Tienta a quien conoce los savepoints a medias y cree que «liberarlos» finaliza la transaccion, y encima hace juego con la alternativa (a), que es `SAVEPOINT`.",
+      "por_que_no_checkpoint": "Se descarto reusar `CHECKPOINT`, que fue el reemplazo de m05#18. Las dos preguntas son casi la misma —ambas preguntan por COMMIT— y m05#18 quedo con SAVEPOINT / COMMIT / CHECKPOINT / FLUSH PRIVILEGES; poner CHECKPOINT aqui habria dejado tres de cuatro alternativas identicas entre dos items del banco. Los duplicados por redaccion distinta son deseables (decision del 2026-09-09), pero dos items con las mismas alternativas ya no son dos preguntas.",
+      "nota": "Tercera correccion de esta clase, despues de m05#18 y m06#15. NO es ADR-029 —la alternativa correcta era correcta— sino un DISTRACTOR que tambien lo era; aplica la regla del retiro de m07#21 bajo ADR-017. Se rastreo el banco entero, nuevo y viejo, buscando otros distractores que fueran sinonimos validos: este era el ultimo.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-10"
     }
   ]
 }
