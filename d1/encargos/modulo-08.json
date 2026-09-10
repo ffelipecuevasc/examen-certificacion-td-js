@@ -1,0 +1,1590 @@
+{
+  "procedencia": {
+    "version": 1,
+    "modulo": 8,
+    "calculada_en": "2026-09-10T18:29:21.903Z",
+    "fuentes": {
+      "modulo-0N.json": "8ba7de65e6296bd7",
+      "cuestionario.js": "74a67d09992d83c1",
+      "retiradas.json": "67a8875281d71d51",
+      "correcciones-de-enunciado.json": "4f53cda18c2baa0c"
+    }
+  },
+  "preguntas": [
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Qué principio REST estipula que cada petición contenga toda la info necesaria sin usar sesiones?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Interfaz uniforme estricta.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Sistema de capas enrutadas.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Comunicación sin estado (Stateless).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Arquitectura cliente-servidor.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 2,
+      "enunciado": "¿Qué ventaja técnica aporta la regla \"Cacheable\" en la arquitectura REST?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Encripta automáticamente el payload JSON del body.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Elimina la necesidad de usar verbos HTTP.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Reduce el consumo de ancho de banda y latencia.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Bloquea peticiones de dominios no autorizados por CORS.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 3,
+      "enunciado": "Según las buenas prácticas REST, ¿cómo debe nombrarse convencionalmente un endpoint de recursos?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Usando verbos de acción (ej. /getUsuarios).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Usando sustantivos en plural (ej. /usuarios).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Usando el método HTTP en el path (ej. /usuarios/post).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Usando identificadores binarios en la raíz (ej. /0101).",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 5,
+      "enunciado": "En diseño REST, ¿cómo se versiona convencionalmente una API en su etapa inicial?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Pasando la versión en el body de cada POST.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Incluyendo el prefijo /v1/ en la URL base del endpoint.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Encriptando el número de versión en el JWT.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Añadiendo la cabecera X-Version a cada petición.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 6,
+      "enunciado": "¿Qué restricción aplica el \"Sistema de Capas\" en una arquitectura RESTful estándar?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El cliente desconoce si se conecta al servidor final o a un proxy.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Los datos viajan forzosamente en formato XML.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Impide el uso de balanceadores de carga intermedios.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Exige una conexión directa punto a punto por TCP/IP.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 7,
+      "enunciado": "¿Qué formato de salida se considera el estándar predominante al diseñar una API REST moderna?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "SOAP encapsulado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "XML nativo estructurado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "HTML renderizado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "JSON (Notación de Objetos JavaScript).",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 8,
+      "enunciado": "Según REST, ¿cuál es el mecanismo adecuado para realizar búsquedas y filtros en colecciones?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Parámetros de consulta (Query Parameters) en la URL.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Enviar un archivo de texto con los filtros requeridos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Modificar los encabezados HTTP para cada filtro.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Usar exclusivamente el verbo POST con un body detallado.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 9,
+      "enunciado": "¿Qué regla REST establece la separación estricta entre interfaz de usuario y almacenamiento?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Interfaz Uniforme (Uniform Interface).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Caché implícita.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Cliente-Servidor (Client-Server).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Código bajo demanda (Code on demand).",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 10,
+      "enunciado": "En una API REST, ¿qué verbo HTTP se usa convencionalmente para actualizaciones parciales?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "PUT",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "UPDATE",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "PATCH",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "MODIFY",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 12,
+      "enunciado": "¿Qué verbo HTTP se utiliza idóneamente para la creación de un nuevo recurso en la base de datos?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "GET",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "PUT",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "POST",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "ADD",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 13,
+      "enunciado": "Según el estándar HTTP, ¿qué familia de códigos de estado indica un error provocado por el cliente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "2xx (Éxito)",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "3xx (Redirección)",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "4xx (Error del Cliente)",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "5xx (Error del Servidor)",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 14,
+      "enunciado": "¿Qué código HTTP es el más preciso para retornar cuando un recurso no existe en el servidor?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "400 Bad Request",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "401 Unauthorized",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "403 Forbidden",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "404 Not Found",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 15,
+      "enunciado": "¿Qué verbo HTTP es idempotente y se usa generalmente para reemplazar un recurso completo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "POST",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "PATCH",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "PUT",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "REPLACE",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 16,
+      "enunciado": "En Express, ¿cómo accedes a un parámetro dinámico incrustado en la ruta (ej. /users/:id)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "req.query.id",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "req.params.id",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "req.body.id",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "req.headers.id",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 17,
+      "enunciado": "Si un endpoint Express responde exitosamente a un GET, ¿cómo defines el código 200 y envías JSON?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "res.status(200).json({ data })",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "res.send(200, { data })",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "res.json(200).send({ data })",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "res.code(200).return({ data })",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 18,
+      "enunciado": "¿Qué código HTTP indica que la solicitud fue exitosa y como resultado se creó un nuevo recurso?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "200 OK",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "201 Created",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "202 Accepted",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "204 No Content",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 19,
+      "enunciado": "Si el servidor falla internamente al procesar la ruta, ¿qué código HTTP se debe devolver?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "400 Bad Request",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "409 Conflict",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "500 Internal Server Error",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "503 Service Unavailable",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 20,
+      "enunciado": "¿Qué objeto de Express contiene los parámetros enviados por la URL tras un \"?\" (ej. ?sort=asc)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "req.params",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "req.body",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "req.url",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "req.query",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 22,
+      "enunciado": "Al subir un archivo usando express-fileupload, ¿en qué objeto de la petición (req) se inyecta?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "req.body.files",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "req.files",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "req.upload",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "req.attachments",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 23,
+      "enunciado": "¿Qué validación inicial es crítica realizar en el servidor antes de procesar una subida?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Comprimir el archivo en formato ZIP.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Verificar si el objeto req.files está presente y no es nulo.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Encriptar el nombre original del archivo con bcrypt.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Reiniciar el buffer de memoria del servidor Node.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 24,
+      "enunciado": "¿Por qué es vital validar la extensión del archivo subido en el backend de un servicio REST?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Para evitar la ejecución de scripts maliciosos en el servidor.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Para acelerar la descarga del archivo en el frontend.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Porque express-fileupload rechaza archivos sin extensión.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Para mantener el orden alfabético en el disco.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 25,
+      "enunciado": "¿Qué método provee express-fileupload sobre el archivo para trasladarlo a una carpeta destino?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "file.move()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "file.mv()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "file.save()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "file.transfer()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 26,
+      "enunciado": "¿Por qué se recomienda modificar o hashear el nombre del archivo al guardarlo en el servidor?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Para reducir el tamaño físico del archivo en el disco duro.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Para cumplir con el estándar XML de subidas binarias.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Para evitar sobreescrituras por archivos con el mismo nombre.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Porque Node.js no soporta espacios en nombres de archivo.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 27,
+      "enunciado": "Al procesar un upload exitoso, ¿qué debe retornar convencionalmente la API REST al cliente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El archivo binario completo como stream de vuelta.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un mensaje de éxito y la nueva URL/nombre del archivo.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un volcado de memoria con los metadatos del sistema.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El código fuente del middleware procesador.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 28,
+      "enunciado": "¿Qué atributo interno del archivo provee express-fileupload para validar el peso del mismo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "file.size",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "file.weight",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "file.bytes",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "file.length",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 29,
+      "enunciado": "Si debes permitir solo imágenes, ¿qué propiedad del archivo revisas además de su extensión?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "file.name",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "file.mimetype (ej. image/png)",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "file.encoding",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "file.tempFilePath",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 30,
+      "enunciado": "Para borrar un archivo previamente subido al servidor, ¿qué módulo nativo de Node.js se emplea?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "http",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "os",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "fs (fs.unlinkSync)",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "path",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 31,
+      "enunciado": "¿Qué problema arquitectónico REST resuelve el uso de JSON Web Tokens (JWT)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Reemplaza la base de datos por archivos planos seguros.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Mantiene la comunicación sin estado (stateless) segura.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Evita inyecciones SQL en consultas asíncronas.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Permite subir archivos binarios sin límite de tamaño.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 33,
+      "enunciado": "En un JWT, ¿qué contiene el elemento estandarizado \"iat\" (Issued At) dentro del Payload?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "La dirección IP del servidor emisor.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "El algoritmo de encriptación utilizado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "La fecha y hora exacta en que el token fue emitido.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El tiempo máximo de vida antes de caducar.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 34,
+      "enunciado": "¿Qué formato de codificación se utiliza universalmente para representar el Header y Payload del JWT?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "UTF-8 crudo",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Base64Url",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Hexadecimal",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Binario puro",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 35,
+      "enunciado": "¿Qué paquete de NPM se utiliza canónicamente para firmar y verificar tokens en Express?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "jwt-creator",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "express-auth",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "jsonwebtoken",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "node-tokens",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 36,
+      "enunciado": "¿Por qué es fundamental la \"clave secreta\" (secret key) guardada en el servidor al usar JWT?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Para encriptar la conexión completa como lo hace TLS.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Para firmar el token y validar que no fue alterado.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Para ofuscar el código fuente de la aplicación Express.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Para generar contraseñas automáticas a los usuarios.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 37,
+      "enunciado": "¿Dónde es vulnerable almacenar un JWT en el cliente si existe riesgo de ataques XSS?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "En un disco duro externo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "En memoria volátil de solo lectura.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "En LocalStorage o SessionStorage.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "En cookies configuradas como HttpOnly.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 38,
+      "enunciado": "¿Qué paquete middleware de Express evalúa automáticamente si el request tiene un JWT válido?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "jwt-validator",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "express-jwt",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "auth-parser",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "token-checker",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 39,
+      "enunciado": "Al invocar un endpoint protegido, ¿dónde se envía convencionalmente el JWT en la petición HTTP?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "En el body del JSON como \"token_key\".",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Como query param obligatorio en la URL.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "En el header \"Authorization\" usando el esquema Bearer.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "En una cookie abierta sin cifrar.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "json_2026",
+      "numero_origen": 40,
+      "enunciado": "¿Qué riesgo de seguridad ocurre si se colocan contraseñas legibles en el Payload de un JWT?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El token será rechazado por exceder el tamaño límite de HTTP.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "El Payload se codifica en Base64, permitiendo que cualquiera lo lea.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El servidor Node colapsará al intentar hashearlo doblemente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El paquete jsonwebtoken lanza un error interno al firmar.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 1,
+      "enunciado": "Según las buenas prácticas REST, ¿cómo debe estructurarse el endpoint para obtener un recurso específico?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "GET /obtenerUsuario?id=123",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "POST /usuarios/obtener/123",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "GET /usuarios/123",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "GET /usuarios/ver/123",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 2,
+      "enunciado": "¿Qué concepto REST describe la inclusión de hipervínculos en la respuesta para navegar por la API?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Stateless Payload",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "HATEOAS",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "JWT Navigation",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "RESTful Routing",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 3,
+      "enunciado": "En Express, ¿qué middleware estándar se usa comúnmente para parsear el cuerpo JSON de una petición POST?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "express.json()",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "express.urlencoded()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "express.text()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "express.raw()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 4,
+      "enunciado": "¿Qué paquete en Node/Express se menciona comúnmente para manejar la subida de archivos (upload)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "express-session",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "express-fileupload",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "express-validator",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "multer-express",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 5,
+      "enunciado": "Al procesar un archivo con express-fileupload, ¿cómo se mueve al directorio de destino del servidor?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Editando la propiedad file.savePath local.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Copiando la caché nativa al File System.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Usando el método .mv() con la ruta destino.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Invocando path.resolve() directo al JSON.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 6,
+      "enunciado": "¿Cuáles son las tres partes estructurales que componen un JSON Web Token (JWT) estándar?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Header, Payload y Signature.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Token, Secret y Expiration.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "User, Roles y Permissions.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Header, Body y Footer.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 7,
+      "enunciado": "¿Qué elemento del JWT se utiliza para verificar que el token no ha sido alterado en el cliente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El campo estandarizado IAT del Payload.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "La codificación Base64 en todo el string.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "La firma criptográfica (Signature).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El algoritmo de control del Header.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 8,
+      "enunciado": "¿Dónde es recomendable enviar el JWT validado en una petición HTTP hacia una API REST?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "En la URL como query string principal.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "En el body de la petición HTTP POST.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "En una Cookie temporal sin atributos de red.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "En el Header de autorización usando Bearer.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 8,
+      "origen": "js_2026",
+      "numero_origen": 9,
+      "enunciado": "En seguridad JWT, ¿qué ocurre cuando el tiempo de vida (exp) definido en el token caduca?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El cliente renueva el token automáticamente sin avisar.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "La verificación falla y la API rechaza la petición HTTP.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El servidor extiende el tiempo de expiración del token.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El navegador borra la variable JWT del código fuente.",
+          "es_correcta": false
+        }
+      ]
+    }
+  ]
+}

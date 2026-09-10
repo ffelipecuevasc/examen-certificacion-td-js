@@ -206,7 +206,7 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 | 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | 🟢 comprobado en D1 | 🟢 publicado |
 | 6 | 52 · 38 + 14 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 publicado |
 | 7 | 48 · 38 + 10 | 🟢 | 🟢 | 🟢 48 de 48 | 🟢 comprobado en D1 | 🟢 publicado |
-| 8 | 45 · 36 + 9 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| 8 | 45 · 36 + 9 | 🟢 | 🟢 | 🟢 45 de 45 | ⚪ | ⚪ |
 | | **368 · 285 + 83** | | | | | |
 
 **Estados:** ⚪ Sin empezar · 🔵 En curso · 🟢 Con evidencia

@@ -17,8 +17,8 @@
 export const SELLO = {
   "base": "examen-td-js-produccion",
   "entorno": "nube",
-  "generada_en": "2026-09-10T18:18:46.328Z",
-  "preguntas": 323,
+  "generada_en": "2026-09-10T18:41:22.766Z",
+  "preguntas": 368,
   "descartadas": 0
 };
 
@@ -12940,6 +12940,1806 @@ export const PREGUNTAS = [
         "letra": "d",
         "orden": 4,
         "texto": "join: 'all'",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 324,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué principio REST estipula que cada petición contenga toda la info necesaria sin usar sesiones?",
+    "justificacion": "«Sin estado» significa que el servidor no recuerda nada entre una petición y la siguiente: cada una llega con todo lo que hace falta para atenderla, incluida la credencial. Eso es lo que permite poner varios servidores detrás de un balanceador sin preocuparse de a cuál cae cada petición. Las otras tres son restricciones reales de REST con otro oficio, y por eso son buenos distractores.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1293,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Interfaz uniforme estricta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1294,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Sistema de capas enrutadas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1295,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Comunicación sin estado (Stateless).",
+        "es_correcta": 1
+      },
+      {
+        "id": 1296,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Arquitectura cliente-servidor.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 325,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué ventaja técnica aporta la regla \"Cacheable\" en la arquitectura REST?",
+    "justificacion": "Que una respuesta se pueda guardar en caché evita volver a pedirla: menos viajes por la red, menos trabajo del servidor y respuestas más rápidas. Se declara con cabeceras como `Cache-Control` y `ETag`, que dicen qué se puede guardar y por cuánto. Las otras tres describen cosas de las que se ocupan TLS, los verbos HTTP y CORS, cada uno por su lado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1297,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Encripta automáticamente el payload JSON del body.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1298,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Elimina la necesidad de usar verbos HTTP.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1299,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Reduce el consumo de ancho de banda y latencia.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1300,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Bloquea peticiones de dominios no autorizados por CORS.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 326,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Según las buenas prácticas REST, ¿cómo debe nombrarse convencionalmente un endpoint de recursos?",
+    "justificacion": "Un endpoint nombra **un recurso**, no una acción: `/usuarios`, y la acción la dice el verbo HTTP. Por eso `/getUsuarios` es redundante —el `GET` ya lo decía— y mezcla dos formas de expresar lo mismo. El plural es la convención porque la ruta representa la colección, y el elemento se identifica dentro de ella: `/usuarios/123`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1301,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Usando verbos de acción (ej. /getUsuarios).",
+        "es_correcta": 0
+      },
+      {
+        "id": 1302,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Usando sustantivos en plural (ej. /usuarios).",
+        "es_correcta": 1
+      },
+      {
+        "id": 1303,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Usando el método HTTP en el path (ej. /usuarios/post).",
+        "es_correcta": 0
+      },
+      {
+        "id": 1304,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Usando identificadores binarios en la raíz (ej. /0101).",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 327,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "En diseño REST, ¿cómo se versiona convencionalmente una API en su etapa inicial?",
+    "justificacion": "Lo habitual al empezar es poner la versión en la ruta: `/v1/usuarios`. Es visible, se prueba desde el navegador y no exige acordarse de ninguna cabecera. La (d) describe una alternativa real —versionar por cabecera— que algunos consideran más limpia porque deja la URL identificando solo el recurso; existe, pero no es lo convencional en una API que recién arranca.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1305,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Pasando la versión en el body de cada POST.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1306,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Incluyendo el prefijo /v1/ en la URL base del endpoint.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1307,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Encriptando el número de versión en el JWT.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1308,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Añadiendo la cabecera X-Version a cada petición.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 328,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué restricción aplica el \"Sistema de Capas\" en una arquitectura RESTful estándar?",
+    "justificacion": "El sistema de capas dice que el cliente no puede saber si habla con el servidor final o con un intermediario. Gracias a eso se pueden meter proxys, cachés y balanceadores sin que el cliente cambie una línea. La (c) dice exactamente lo contrario: los balanceadores no solo se permiten, son la razón de ser de esta restricción.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1309,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El cliente desconoce si se conecta al servidor final o a un proxy.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1310,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Los datos viajan forzosamente en formato XML.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1311,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Impide el uso de balanceadores de carga intermedios.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1312,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Exige una conexión directa punto a punto por TCP/IP.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 329,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué formato de salida se considera el estándar predominante al diseñar una API REST moderna?",
+    "justificacion": "JSON es el formato predominante en las APIs REST modernas: es liviano, lo entiende cualquier lenguaje y en JavaScript se convierte a objeto con una llamada. Las otras tres existieron o existen — SOAP y XML dominaron antes y siguen vivos en sistemas heredados, y HTML es para páginas, no para datos. REST no obliga a JSON, pero es lo que se espera.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1313,
+        "letra": "a",
+        "orden": 1,
+        "texto": "SOAP encapsulado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1314,
+        "letra": "b",
+        "orden": 2,
+        "texto": "XML nativo estructurado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1315,
+        "letra": "c",
+        "orden": 3,
+        "texto": "HTML renderizado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1316,
+        "letra": "d",
+        "orden": 4,
+        "texto": "JSON (Notación de Objetos JavaScript).",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 330,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Según REST, ¿cuál es el mecanismo adecuado para realizar búsquedas y filtros en colecciones?",
+    "justificacion": "Los filtros y búsquedas van en la cadena de consulta: `/usuarios?rol=admin&orden=nombre`. Así el endpoint sigue nombrando el recurso y los parámetros solo lo acotan. Además la URL completa se puede compartir y guardar en caché, cosa que la (d) perdería: usar `POST` para buscar rompe la semántica del verbo y deja la petición fuera de cualquier caché.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1317,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Parámetros de consulta (Query Parameters) en la URL.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1318,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Enviar un archivo de texto con los filtros requeridos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1319,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Modificar los encabezados HTTP para cada filtro.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1320,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Usar exclusivamente el verbo POST con un body detallado.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 331,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué regla REST establece la separación estricta entre interfaz de usuario y almacenamiento?",
+    "justificacion": "La restricción cliente-servidor separa dos responsabilidades: la interfaz vive en el cliente y los datos en el servidor, y ninguno necesita saber cómo trabaja el otro. Eso permite cambiar la aplicación web sin tocar la API, o agregar una aplicación móvil que consuma la misma. Las otras tres son restricciones reales de REST que se ocupan de otra cosa.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1321,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Interfaz Uniforme (Uniform Interface).",
+        "es_correcta": 0
+      },
+      {
+        "id": 1322,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Caché implícita.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1323,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Cliente-Servidor (Client-Server).",
+        "es_correcta": 1
+      },
+      {
+        "id": 1324,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Código bajo demanda (Code on demand).",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 332,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "En una API REST, ¿qué verbo HTTP se usa convencionalmente para actualizaciones parciales?",
+    "justificacion": "`PATCH` envía solo los campos que cambian; `PUT` reemplaza el recurso entero, y por eso lo que no se mande en un `PUT` se pierde. Esa es la diferencia práctica que la pregunta busca. `UPDATE` y `MODIFY` no son verbos HTTP. Conviene saber que `PATCH` **no** es idempotente por definición, mientras que `PUT` sí lo es.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1325,
+        "letra": "a",
+        "orden": 1,
+        "texto": "PUT",
+        "es_correcta": 0
+      },
+      {
+        "id": 1326,
+        "letra": "b",
+        "orden": 2,
+        "texto": "UPDATE",
+        "es_correcta": 0
+      },
+      {
+        "id": 1327,
+        "letra": "c",
+        "orden": 3,
+        "texto": "PATCH",
+        "es_correcta": 1
+      },
+      {
+        "id": 1328,
+        "letra": "d",
+        "orden": 4,
+        "texto": "MODIFY",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 333,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué verbo HTTP se utiliza idóneamente para la creación de un nuevo recurso en la base de datos?",
+    "justificacion": "`POST` sobre la colección —`POST /usuarios`— es la forma convencional de crear: el cliente manda los datos y el servidor decide el identificador. La (b) merece un matiz: `PUT` también puede crear, pero solo cuando el cliente ya sabe la URL exacta del recurso, y en una API con identificadores generados por la base eso rara vez ocurre. `GET` no debe modificar nada y `ADD` no existe.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1329,
+        "letra": "a",
+        "orden": 1,
+        "texto": "GET",
+        "es_correcta": 0
+      },
+      {
+        "id": 1330,
+        "letra": "b",
+        "orden": 2,
+        "texto": "PUT",
+        "es_correcta": 0
+      },
+      {
+        "id": 1331,
+        "letra": "c",
+        "orden": 3,
+        "texto": "POST",
+        "es_correcta": 1
+      },
+      {
+        "id": 1332,
+        "letra": "d",
+        "orden": 4,
+        "texto": "ADD",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 334,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Según el estándar HTTP, ¿qué familia de códigos de estado indica un error provocado por el cliente?",
+    "justificacion": "La familia 4xx dice que el problema está en la petición: mal formada, sin credenciales, a un recurso que no existe. La 5xx dice que la petición estaba bien y el que falló fue el servidor. Distinguirlas importa porque señalan a quién le toca arreglarlo — devolver un 500 ante un dato inválido del cliente manda a buscar el error donde no está.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1333,
+        "letra": "a",
+        "orden": 1,
+        "texto": "2xx (Éxito)",
+        "es_correcta": 0
+      },
+      {
+        "id": 1334,
+        "letra": "b",
+        "orden": 2,
+        "texto": "3xx (Redirección)",
+        "es_correcta": 0
+      },
+      {
+        "id": 1335,
+        "letra": "c",
+        "orden": 3,
+        "texto": "4xx (Error del Cliente)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1336,
+        "letra": "d",
+        "orden": 4,
+        "texto": "5xx (Error del Servidor)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 335,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué código HTTP es el más preciso para retornar cuando un recurso no existe en el servidor?",
+    "justificacion": "`404 Not Found` es la respuesta exacta cuando el recurso no existe. Las otras tres son 4xx reales con otro significado: `400` es que la petición está mal formada, `401` que falta autenticarse, y `403` que estás autenticado pero no tienes permiso. Confundir `401` con `403` es el error más común de los cuatro.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1337,
+        "letra": "a",
+        "orden": 1,
+        "texto": "400 Bad Request",
+        "es_correcta": 0
+      },
+      {
+        "id": 1338,
+        "letra": "b",
+        "orden": 2,
+        "texto": "401 Unauthorized",
+        "es_correcta": 0
+      },
+      {
+        "id": 1339,
+        "letra": "c",
+        "orden": 3,
+        "texto": "403 Forbidden",
+        "es_correcta": 0
+      },
+      {
+        "id": 1340,
+        "letra": "d",
+        "orden": 4,
+        "texto": "404 Not Found",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 336,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué verbo HTTP es idempotente y se usa generalmente para reemplazar un recurso completo?",
+    "justificacion": "`PUT` reemplaza el recurso completo, y es idempotente: repetir la misma petición deja el mismo resultado que hacerla una vez. Eso lo vuelve seguro de reintentar cuando la red falla. `POST` no lo es —dos envíos crean dos recursos— y `PATCH` tampoco por definición. `REPLACE` no es un verbo HTTP.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1341,
+        "letra": "a",
+        "orden": 1,
+        "texto": "POST",
+        "es_correcta": 0
+      },
+      {
+        "id": 1342,
+        "letra": "b",
+        "orden": 2,
+        "texto": "PATCH",
+        "es_correcta": 0
+      },
+      {
+        "id": 1343,
+        "letra": "c",
+        "orden": 3,
+        "texto": "PUT",
+        "es_correcta": 1
+      },
+      {
+        "id": 1344,
+        "letra": "d",
+        "orden": 4,
+        "texto": "REPLACE",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 337,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "En Express, ¿cómo accedes a un parámetro dinámico incrustado en la ruta (ej. /users/:id)?",
+    "justificacion": "Los segmentos declarados con dos puntos en la ruta llegan en `req.params`: con `/users/:id`, la petición a `/users/7` deja `req.params.id` valiendo `\"7\"`. Ojo con eso último, que sorprende: **llega como texto**, así que compararlo con un número exige convertirlo. `req.query` es lo que va tras el `?` y `req.body` el cuerpo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1345,
+        "letra": "a",
+        "orden": 1,
+        "texto": "req.query.id",
+        "es_correcta": 0
+      },
+      {
+        "id": 1346,
+        "letra": "b",
+        "orden": 2,
+        "texto": "req.params.id",
+        "es_correcta": 1
+      },
+      {
+        "id": 1347,
+        "letra": "c",
+        "orden": 3,
+        "texto": "req.body.id",
+        "es_correcta": 0
+      },
+      {
+        "id": 1348,
+        "letra": "d",
+        "orden": 4,
+        "texto": "req.headers.id",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 338,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Si un endpoint Express responde exitosamente a un GET, ¿cómo defines el código 200 y envías JSON?",
+    "justificacion": "`res.status(200).json({...})` fija el código y envía el objeto ya serializado con la cabecera `Content-Type` correcta. La (b) es la firma antigua de Express 3, que se eliminó: hoy `res.send(200, ...)` no hace lo que parece. Y conviene saber que `res.json()` por sí solo ya responde 200, así que el `status(200)` explícito es más para dejarlo escrito que por necesidad.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1349,
+        "letra": "a",
+        "orden": 1,
+        "texto": "res.status(200).json({ data })",
+        "es_correcta": 1
+      },
+      {
+        "id": 1350,
+        "letra": "b",
+        "orden": 2,
+        "texto": "res.send(200, { data })",
+        "es_correcta": 0
+      },
+      {
+        "id": 1351,
+        "letra": "c",
+        "orden": 3,
+        "texto": "res.json(200).send({ data })",
+        "es_correcta": 0
+      },
+      {
+        "id": 1352,
+        "letra": "d",
+        "orden": 4,
+        "texto": "res.code(200).return({ data })",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 339,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué código HTTP indica que la solicitud fue exitosa y como resultado se creó un nuevo recurso?",
+    "justificacion": "`201 Created` es la respuesta correcta cuando la petición creó algo, y lo habitual es acompañarla con la cabecera `Location` apuntando al recurso nuevo. `200` diría «salió bien» sin decir que se creó nada; `202` es «lo recibí y lo procesaré después», útil en trabajos asíncronos; y `204` es «salió bien y no hay nada que devolver», típico de un borrado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1353,
+        "letra": "a",
+        "orden": 1,
+        "texto": "200 OK",
+        "es_correcta": 0
+      },
+      {
+        "id": 1354,
+        "letra": "b",
+        "orden": 2,
+        "texto": "201 Created",
+        "es_correcta": 1
+      },
+      {
+        "id": 1355,
+        "letra": "c",
+        "orden": 3,
+        "texto": "202 Accepted",
+        "es_correcta": 0
+      },
+      {
+        "id": 1356,
+        "letra": "d",
+        "orden": 4,
+        "texto": "204 No Content",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 340,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Si el servidor falla internamente al procesar la ruta, ¿qué código HTTP se debe devolver?",
+    "justificacion": "`500 Internal Server Error` es la respuesta cuando el fallo es del servidor y no de la petición: una excepción no controlada, la base caída, un error de programación. La (d), `503`, es distinta y más precisa cuando corresponde: el servicio no está disponible **temporalmente**, por mantenimiento o sobrecarga. Un `500` nunca debe devolver la traza al cliente.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1357,
+        "letra": "a",
+        "orden": 1,
+        "texto": "400 Bad Request",
+        "es_correcta": 0
+      },
+      {
+        "id": 1358,
+        "letra": "b",
+        "orden": 2,
+        "texto": "409 Conflict",
+        "es_correcta": 0
+      },
+      {
+        "id": 1359,
+        "letra": "c",
+        "orden": 3,
+        "texto": "500 Internal Server Error",
+        "es_correcta": 1
+      },
+      {
+        "id": 1360,
+        "letra": "d",
+        "orden": 4,
+        "texto": "503 Service Unavailable",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 341,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué objeto de Express contiene los parámetros enviados por la URL tras un \"?\" (ej. ?sort=asc)?",
+    "justificacion": "`req.query` trae lo que viene después del `?` ya convertido en objeto: con `?sort=asc` queda `req.query.sort` valiendo `\"asc\"`. Igual que los parámetros de ruta, **llegan como texto**. `req.params` es para los segmentos de la ruta, `req.body` para el cuerpo, y `req.url` es la URL cruda sin interpretar.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1361,
+        "letra": "a",
+        "orden": 1,
+        "texto": "req.params",
+        "es_correcta": 0
+      },
+      {
+        "id": 1362,
+        "letra": "b",
+        "orden": 2,
+        "texto": "req.body",
+        "es_correcta": 0
+      },
+      {
+        "id": 1363,
+        "letra": "c",
+        "orden": 3,
+        "texto": "req.url",
+        "es_correcta": 0
+      },
+      {
+        "id": 1364,
+        "letra": "d",
+        "orden": 4,
+        "texto": "req.query",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 342,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Al subir un archivo usando express-fileupload, ¿en qué objeto de la petición (req) se inyecta?",
+    "justificacion": "`express-fileupload` deja los archivos recibidos en `req.files`, indexados por el nombre del campo del formulario. No van en `req.body`, que trae los campos de texto: es una distinción que confunde al principio porque los dos llegan en la misma petición. Los otros dos nombres no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1365,
+        "letra": "a",
+        "orden": 1,
+        "texto": "req.body.files",
+        "es_correcta": 0
+      },
+      {
+        "id": 1366,
+        "letra": "b",
+        "orden": 2,
+        "texto": "req.files",
+        "es_correcta": 1
+      },
+      {
+        "id": 1367,
+        "letra": "c",
+        "orden": 3,
+        "texto": "req.upload",
+        "es_correcta": 0
+      },
+      {
+        "id": 1368,
+        "letra": "d",
+        "orden": 4,
+        "texto": "req.attachments",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 343,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué validación inicial es crítica realizar en el servidor antes de procesar una subida?",
+    "justificacion": "Comprobar que `req.files` exista y no sea nulo, porque si la petición no trajo ningún archivo esa propiedad **no está**, y acceder a `req.files.foto` sobre `undefined` lanza y tumba el manejador. Es la primera línea de cualquier endpoint de subida. Las otras tres describen cosas que no son validaciones de entrada.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1369,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Comprimir el archivo en formato ZIP.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1370,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Verificar si el objeto req.files está presente y no es nulo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1371,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Encriptar el nombre original del archivo con bcrypt.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1372,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Reiniciar el buffer de memoria del servidor Node.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 344,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Por qué es vital validar la extensión del archivo subido en el backend de un servicio REST?",
+    "justificacion": "Porque un archivo subido con una extensión ejecutable puede terminar corriéndose en el servidor si queda en un directorio que se sirve o se interpreta. Ahora bien, conviene saber que **validar la extensión sola no basta**: la extensión la elige quien sube. Se combina con revisar el tipo de contenido, renombrar el archivo y guardarlo fuera del directorio público.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1373,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para evitar la ejecución de scripts maliciosos en el servidor.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1374,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para acelerar la descarga del archivo en el frontend.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1375,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Porque express-fileupload rechaza archivos sin extensión.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1376,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Para mantener el orden alfabético en el disco.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 345,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué método provee express-fileupload sobre el archivo para trasladarlo a una carpeta destino?",
+    "justificacion": "`file.mv(ruta)` mueve el archivo desde donde lo dejó el middleware hasta el destino, y avisa si falla — con callback o con promesa, según cómo se lo llame. El nombre abreviado es el que se olvida: los otros tres suenan más naturales y ninguno existe. Conviene crear el directorio destino antes, porque `mv()` no lo crea.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1377,
+        "letra": "a",
+        "orden": 1,
+        "texto": "file.move()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1378,
+        "letra": "b",
+        "orden": 2,
+        "texto": "file.mv()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1379,
+        "letra": "c",
+        "orden": 3,
+        "texto": "file.save()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1380,
+        "letra": "d",
+        "orden": 4,
+        "texto": "file.transfer()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 346,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Por qué se recomienda modificar o hashear el nombre del archivo al guardarlo en el servidor?",
+    "justificacion": "Porque dos usuarios que suban `foto.jpg` pisarían el mismo archivo, y el segundo borraría al primero sin avisar. Un nombre generado —una marca de tiempo, un identificador aleatorio— evita la colisión. Y hay una segunda razón que la pregunta no menciona y conviene saber: el nombre original viene del cliente y puede traer rutas o caracteres pensados para escapar del directorio.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1381,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para reducir el tamaño físico del archivo en el disco duro.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1382,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para cumplir con el estándar XML de subidas binarias.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1383,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Para evitar sobreescrituras por archivos con el mismo nombre.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1384,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Porque Node.js no soporta espacios en nombres de archivo.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 347,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Al procesar un upload exitoso, ¿qué debe retornar convencionalmente la API REST al cliente?",
+    "justificacion": "Se devuelve una confirmación con los datos que el cliente necesita después: el nombre final del archivo o la URL desde donde se podrá pedir. Devolver el binario de vuelta —la (a)— no tiene sentido: el cliente acaba de enviarlo. Y lo habitual es responder `201 Created`, que es la pregunta sobre códigos de estado de este mismo módulo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1385,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El archivo binario completo como stream de vuelta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1386,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un mensaje de éxito y la nueva URL/nombre del archivo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1387,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un volcado de memoria con los metadatos del sistema.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1388,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El código fuente del middleware procesador.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 348,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué atributo interno del archivo provee express-fileupload para validar el peso del mismo?",
+    "justificacion": "`file.size` da el tamaño en bytes, y con eso se rechaza lo que exceda el límite antes de moverlo a su sitio. Los otros tres nombres no existen. `express-fileupload` acepta además una opción `limits` para cortar la subida antes de recibirla entera, que es mejor todavía: comprobar el tamaño después ya gastó el ancho de banda.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1389,
+        "letra": "a",
+        "orden": 1,
+        "texto": "file.size",
+        "es_correcta": 1
+      },
+      {
+        "id": 1390,
+        "letra": "b",
+        "orden": 2,
+        "texto": "file.weight",
+        "es_correcta": 0
+      },
+      {
+        "id": 1391,
+        "letra": "c",
+        "orden": 3,
+        "texto": "file.bytes",
+        "es_correcta": 0
+      },
+      {
+        "id": 1392,
+        "letra": "d",
+        "orden": 4,
+        "texto": "file.length",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 349,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Si debes permitir solo imágenes, ¿qué propiedad del archivo revisas además de su extensión?",
+    "justificacion": "`file.mimetype` dice qué tipo de contenido declara el archivo —`image/png`, `image/jpeg`—, y filtrar por ahí es más fino que mirar la extensión. Con un matiz importante: **ese valor lo envía el cliente**, así que también se puede falsear. Para algo serio se comprueba además la firma real del archivo, sus primeros bytes.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1393,
+        "letra": "a",
+        "orden": 1,
+        "texto": "file.name",
+        "es_correcta": 0
+      },
+      {
+        "id": 1394,
+        "letra": "b",
+        "orden": 2,
+        "texto": "file.mimetype (ej. image/png)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1395,
+        "letra": "c",
+        "orden": 3,
+        "texto": "file.encoding",
+        "es_correcta": 0
+      },
+      {
+        "id": 1396,
+        "letra": "d",
+        "orden": 4,
+        "texto": "file.tempFilePath",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 350,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Para borrar un archivo previamente subido al servidor, ¿qué módulo nativo de Node.js se emplea?",
+    "justificacion": "`fs.unlinkSync(ruta)` borra el archivo; su versión asíncrona es `fs.unlink()` o `fs.promises.unlink()`, preferible dentro de un servidor por lo mismo que se vio en el módulo 6 — la versión síncrona detiene el único hilo. Los otros tres módulos son nativos y hacen otra cosa: `path` arma rutas, `http` sirve y pide, y `os` informa de la máquina.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1397,
+        "letra": "a",
+        "orden": 1,
+        "texto": "http",
+        "es_correcta": 0
+      },
+      {
+        "id": 1398,
+        "letra": "b",
+        "orden": 2,
+        "texto": "os",
+        "es_correcta": 0
+      },
+      {
+        "id": 1399,
+        "letra": "c",
+        "orden": 3,
+        "texto": "fs (fs.unlinkSync)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1400,
+        "letra": "d",
+        "orden": 4,
+        "texto": "path",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 351,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué problema arquitectónico REST resuelve el uso de JSON Web Tokens (JWT)?",
+    "justificacion": "El token viaja en cada petición y lleva dentro quién es el usuario, así que el servidor puede autenticarlo **sin guardar sesión**. Eso es lo que permite mantener la comunicación sin estado sin renunciar a saber quién llama, y por eso encaja con REST. Las otras tres describen problemas de los que JWT no se ocupa.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1401,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Reemplaza la base de datos por archivos planos seguros.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1402,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Mantiene la comunicación sin estado (stateless) segura.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1403,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Evita inyecciones SQL en consultas asíncronas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1404,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Permite subir archivos binarios sin límite de tamaño.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 352,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "En un JWT, ¿qué contiene el elemento estandarizado \"iat\" (Issued At) dentro del Payload?",
+    "justificacion": "`iat` guarda el instante en que se emitió el token, como número de segundos desde 1970. Sirve para saber su antigüedad y para invalidar tokens emitidos antes de cierto momento. No hay que confundirlo con `exp`, que es la (d) y marca cuándo caduca: los dos son fechas y hacen cosas distintas. El algoritmo va en el header, no en el payload.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1405,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La dirección IP del servidor emisor.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1406,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El algoritmo de encriptación utilizado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1407,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La fecha y hora exacta en que el token fue emitido.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1408,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El tiempo máximo de vida antes de caducar.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 353,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué formato de codificación se utiliza universalmente para representar el Header y Payload del JWT?",
+    "justificacion": "Header y payload van en Base64Url, que es Base64 con los caracteres `+` y `/` cambiados para que la cadena viaje sin problemas dentro de una URL. **Es codificación, no cifrado:** cualquiera puede decodificarla y leer el contenido, que es exactamente el motivo por el que no se guardan datos sensibles ahí dentro.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1409,
+        "letra": "a",
+        "orden": 1,
+        "texto": "UTF-8 crudo",
+        "es_correcta": 0
+      },
+      {
+        "id": 1410,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Base64Url",
+        "es_correcta": 1
+      },
+      {
+        "id": 1411,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Hexadecimal",
+        "es_correcta": 0
+      },
+      {
+        "id": 1412,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Binario puro",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 354,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué paquete de NPM se utiliza canónicamente para firmar y verificar tokens en Express?",
+    "justificacion": "`jsonwebtoken` es el paquete estándar: `sign()` para emitir y `verify()` para comprobar. Los otros tres nombres no existen. Conviene saber que `verify()` comprueba la firma **y** la expiración, y que lanza si algo falla — así que se usa dentro de un `try/catch` o con el middleware que hace ese trabajo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1413,
+        "letra": "a",
+        "orden": 1,
+        "texto": "jwt-creator",
+        "es_correcta": 0
+      },
+      {
+        "id": 1414,
+        "letra": "b",
+        "orden": 2,
+        "texto": "express-auth",
+        "es_correcta": 0
+      },
+      {
+        "id": 1415,
+        "letra": "c",
+        "orden": 3,
+        "texto": "jsonwebtoken",
+        "es_correcta": 1
+      },
+      {
+        "id": 1416,
+        "letra": "d",
+        "orden": 4,
+        "texto": "node-tokens",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 355,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Por qué es fundamental la \"clave secreta\" (secret key) guardada en el servidor al usar JWT?",
+    "justificacion": "La clave secreta es lo que permite firmar el token y, después, comprobar que nadie lo tocó: si alguien cambia un solo carácter del payload, la firma deja de coincidir y el token se rechaza. **No cifra nada** — el contenido sigue siendo legible—, solo garantiza integridad y origen. Por eso vive en el servidor y nunca en el código versionado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1417,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para encriptar la conexión completa como lo hace TLS.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1418,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para firmar el token y validar que no fue alterado.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1419,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Para ofuscar el código fuente de la aplicación Express.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1420,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Para generar contraseñas automáticas a los usuarios.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 356,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Dónde es vulnerable almacenar un JWT en el cliente si existe riesgo de ataques XSS?",
+    "justificacion": "En `localStorage` o `sessionStorage`, porque cualquier script que se ejecute en la página puede leerlos: eso es exactamente lo que consigue un ataque XSS. La (d) es la alternativa más segura y por eso es un buen distractor: una cookie con `HttpOnly` no es accesible desde JavaScript, así que un XSS no puede leerla —aunque entonces hay que ocuparse de CSRF, que es otro frente.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1421,
+        "letra": "a",
+        "orden": 1,
+        "texto": "En un disco duro externo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1422,
+        "letra": "b",
+        "orden": 2,
+        "texto": "En memoria volátil de solo lectura.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1423,
+        "letra": "c",
+        "orden": 3,
+        "texto": "En LocalStorage o SessionStorage.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1424,
+        "letra": "d",
+        "orden": 4,
+        "texto": "En cookies configuradas como HttpOnly.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 357,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué paquete middleware de Express evalúa automáticamente si el request tiene un JWT válido?",
+    "justificacion": "`express-jwt` es el middleware que extrae el token de la petición, lo verifica y deja los datos del usuario disponibles para el manejador, rechazando por su cuenta lo que no sea válido. Los otros tres nombres no existen. Se combina con `jsonwebtoken`, que es quien firma: uno emite y el otro comprueba en cada petición protegida.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1425,
+        "letra": "a",
+        "orden": 1,
+        "texto": "jwt-validator",
+        "es_correcta": 0
+      },
+      {
+        "id": 1426,
+        "letra": "b",
+        "orden": 2,
+        "texto": "express-jwt",
+        "es_correcta": 1
+      },
+      {
+        "id": 1427,
+        "letra": "c",
+        "orden": 3,
+        "texto": "auth-parser",
+        "es_correcta": 0
+      },
+      {
+        "id": 1428,
+        "letra": "d",
+        "orden": 4,
+        "texto": "token-checker",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 358,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Al invocar un endpoint protegido, ¿dónde se envía convencionalmente el JWT en la petición HTTP?",
+    "justificacion": "En la cabecera `Authorization`, con el esquema `Bearer`: `Authorization: Bearer <token>`. Es lo que esperan los middlewares y lo que la especificación reserva para credenciales. La (b) es especialmente mala idea: las URL quedan en los registros del servidor, en el historial del navegador y en la cabecera `Referer`, así que el token se filtraría en tres sitios a la vez.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1429,
+        "letra": "a",
+        "orden": 1,
+        "texto": "En el body del JSON como \"token_key\".",
+        "es_correcta": 0
+      },
+      {
+        "id": 1430,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Como query param obligatorio en la URL.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1431,
+        "letra": "c",
+        "orden": 3,
+        "texto": "En el header \"Authorization\" usando el esquema Bearer.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1432,
+        "letra": "d",
+        "orden": 4,
+        "texto": "En una cookie abierta sin cifrar.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 359,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué riesgo de seguridad ocurre si se colocan contraseñas legibles en el Payload de un JWT?",
+    "justificacion": "Porque el payload va **codificado, no cifrado**: cualquiera que tenga el token puede decodificar esa parte y leerla, sin necesidad de la clave secreta. La firma protege contra que lo modifiquen, no contra que lo lean. Por eso en el payload van identificadores y roles, nunca contraseñas ni datos personales sensibles.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1433,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El token será rechazado por exceder el tamaño límite de HTTP.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1434,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El Payload se codifica en Base64, permitiendo que cualquiera lo lea.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1435,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El servidor Node colapsará al intentar hashearlo doblemente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1436,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El paquete jsonwebtoken lanza un error interno al firmar.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 360,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Según las buenas prácticas REST, ¿cómo debe estructurarse el endpoint para obtener un recurso específico?",
+    "justificacion": "`GET /usuarios/123`: el verbo dice la acción y la ruta identifica el recurso dentro de su colección. La (a) mete la acción en el nombre y pasa el identificador como filtro, que es tratar un recurso concreto como si fuera una búsqueda; la (b) usa `POST` para leer, rompiendo la semántica del verbo; y la (d) repite el verbo en la ruta.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1437,
+        "letra": "a",
+        "orden": 1,
+        "texto": "GET /obtenerUsuario?id=123",
+        "es_correcta": 0
+      },
+      {
+        "id": 1438,
+        "letra": "b",
+        "orden": 2,
+        "texto": "POST /usuarios/obtener/123",
+        "es_correcta": 0
+      },
+      {
+        "id": 1439,
+        "letra": "c",
+        "orden": 3,
+        "texto": "GET /usuarios/123",
+        "es_correcta": 1
+      },
+      {
+        "id": 1440,
+        "letra": "d",
+        "orden": 4,
+        "texto": "GET /usuarios/ver/123",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 361,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué concepto REST describe la inclusión de hipervínculos en la respuesta para navegar por la API?",
+    "justificacion": "HATEOAS —«el hipertexto como motor del estado de la aplicación»— es la idea de que la respuesta incluya los enlaces a lo que se puede hacer a continuación, de modo que el cliente navegue la API sin tener las URL escritas dentro. Es la restricción de REST que menos se implementa en la práctica, y por eso se pregunta: se reconoce más por el nombre que por haberla usado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1441,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Stateless Payload",
+        "es_correcta": 0
+      },
+      {
+        "id": 1442,
+        "letra": "b",
+        "orden": 2,
+        "texto": "HATEOAS",
+        "es_correcta": 1
+      },
+      {
+        "id": 1443,
+        "letra": "c",
+        "orden": 3,
+        "texto": "JWT Navigation",
+        "es_correcta": 0
+      },
+      {
+        "id": 1444,
+        "letra": "d",
+        "orden": 4,
+        "texto": "RESTful Routing",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 362,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "En Express, ¿qué middleware estándar se usa comúnmente para parsear el cuerpo JSON de una petición POST?",
+    "justificacion": "`express.json()` interpreta el cuerpo cuando llega como JSON y lo deja en `req.body`. Sin ese middleware, `req.body` queda `undefined`, y ése es el desconcierto clásico de quien empieza. Los otros tres son reales y atienden otros formatos: `urlencoded()` los formularios tradicionales, `text()` texto plano y `raw()` datos binarios.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1445,
+        "letra": "a",
+        "orden": 1,
+        "texto": "express.json()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1446,
+        "letra": "b",
+        "orden": 2,
+        "texto": "express.urlencoded()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1447,
+        "letra": "c",
+        "orden": 3,
+        "texto": "express.text()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1448,
+        "letra": "d",
+        "orden": 4,
+        "texto": "express.raw()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 363,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué paquete en Node/Express se menciona comúnmente para manejar la subida de archivos (upload)?",
+    "justificacion": "`express-fileupload` es el que aparece en el material del curso: se monta como middleware y deja lo recibido en `req.files`. La (d) mezcla dos nombres — `multer` existe y es la alternativa más usada en proyectos reales, pero se llama así a secas. `express-session` maneja sesiones y `express-validator` valida entradas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1449,
+        "letra": "a",
+        "orden": 1,
+        "texto": "express-session",
+        "es_correcta": 0
+      },
+      {
+        "id": 1450,
+        "letra": "b",
+        "orden": 2,
+        "texto": "express-fileupload",
+        "es_correcta": 1
+      },
+      {
+        "id": 1451,
+        "letra": "c",
+        "orden": 3,
+        "texto": "express-validator",
+        "es_correcta": 0
+      },
+      {
+        "id": 1452,
+        "letra": "d",
+        "orden": 4,
+        "texto": "multer-express",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 364,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "Al procesar un archivo con express-fileupload, ¿cómo se mueve al directorio de destino del servidor?",
+    "justificacion": "Con `.mv(rutaDestino)`, que mueve el archivo desde su ubicación temporal al destino y avisa si algo falla. Las otras tres describen mecanismos que no existen. Es el mismo método que pregunta `m08#25` con otras palabras, y conviene recordar que el directorio destino tiene que existir de antes.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1453,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Editando la propiedad file.savePath local.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1454,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Copiando la caché nativa al File System.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1455,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Usando el método .mv() con la ruta destino.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1456,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Invocando path.resolve() directo al JSON.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 365,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Cuáles son las tres partes estructurales que componen un JSON Web Token (JWT) estándar?",
+    "justificacion": "Un JWT son tres partes separadas por puntos: **header**, con el algoritmo y el tipo; **payload**, con los datos; y **signature**, la firma que valida a las dos anteriores. La (d) suena razonable y es de otra cosa — «header, body y footer» describe un documento, no un token. Las tres partes se ven a simple vista: basta contar los dos puntos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1457,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Header, Payload y Signature.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1458,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Token, Secret y Expiration.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1459,
+        "letra": "c",
+        "orden": 3,
+        "texto": "User, Roles y Permissions.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1460,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Header, Body y Footer.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 366,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Qué elemento del JWT se utiliza para verificar que el token no ha sido alterado en el cliente?",
+    "justificacion": "La firma. Se calcula sobre el header y el payload usando la clave secreta, así que cambiar cualquier cosa del token invalida la comprobación. La (b) es el distractor que separa: la codificación Base64 **no protege nada**, es solo una forma de transportar el texto, y confundirla con seguridad es el malentendido más extendido sobre JWT.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1461,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El campo estandarizado IAT del Payload.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1462,
+        "letra": "b",
+        "orden": 2,
+        "texto": "La codificación Base64 en todo el string.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1463,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La firma criptográfica (Signature).",
+        "es_correcta": 1
+      },
+      {
+        "id": 1464,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El algoritmo de control del Header.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 367,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "¿Dónde es recomendable enviar el JWT validado en una petición HTTP hacia una API REST?",
+    "justificacion": "En la cabecera `Authorization`, con el esquema `Bearer`. Es donde lo buscan los middlewares y donde la especificación pone las credenciales. Las otras tres lo exponen: en la URL queda registrado en los logs y el historial, en el cuerpo obliga a que toda petición sea `POST`, y una cookie sin atributos de seguridad queda al alcance de un XSS.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1465,
+        "letra": "a",
+        "orden": 1,
+        "texto": "En la URL como query string principal.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1466,
+        "letra": "b",
+        "orden": 2,
+        "texto": "En el body de la petición HTTP POST.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1467,
+        "letra": "c",
+        "orden": 3,
+        "texto": "En una Cookie temporal sin atributos de red.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1468,
+        "letra": "d",
+        "orden": 4,
+        "texto": "En el Header de autorización usando Bearer.",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 368,
+    "modulo": 8,
+    "modulo_titulo": "Implementacion de API Backend Node Express",
+    "modulo_icono": "shield-lock",
+    "enunciado": "En seguridad JWT, ¿qué ocurre cuando el tiempo de vida (exp) definido en el token caduca?",
+    "justificacion": "La verificación falla y la API rechaza la petición, normalmente con un `401`. Un token caducado no se renueva solo: el cliente tiene que pedir uno nuevo, autenticándose otra vez o usando un token de refresco si la API lo ofrece. Las otras tres describen comportamientos automáticos que no existen — y no podrían existir, porque el servidor no guarda estado del token.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1469,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El cliente renueva el token automáticamente sin avisar.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1470,
+        "letra": "b",
+        "orden": 2,
+        "texto": "La verificación falla y la API rechaza la petición HTTP.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1471,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El servidor extiende el tiempo de expiración del token.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1472,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El navegador borra la variable JWT del código fuente.",
         "es_correcta": 0
       }
     ]
