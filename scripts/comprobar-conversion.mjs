@@ -72,7 +72,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { comoContarlo, cotejarProcedencia } from './procedencia.mjs';
+import { avisoDeRetiro, comoContarlo, cotejarProcedencia } from './procedencia.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CUESTIONARIOS = join(RAIZ, '_planmaestro', '00_producto', 'cuestionarios');
@@ -204,6 +204,10 @@ if (!sabotaje && !argumentos.includes('--sin-cotejo')) {
       'Si de verdad sabes lo que haces: --sin-cotejo',
     ]);
   }
+}
+
+if (!existsSync(BANCO_VIEJO)) {
+  sinVeredicto('No se puede comprobar: el banco viejo ya no existe.', avisoDeRetiro('Comprobar la conversion'));
 }
 
 const { cuestionario } = await import(`file://${BANCO_VIEJO}`);

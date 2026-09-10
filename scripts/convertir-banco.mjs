@@ -48,7 +48,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { huellaDeOrigenes } from './procedencia.mjs';
+import { avisoDeRetiro, huellaDeOrigenes } from './procedencia.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CUESTIONARIOS = join(RAIZ, '_planmaestro', '00_producto', 'cuestionarios');
@@ -137,6 +137,10 @@ const desdeNuevo = bancoNuevo.map((p, i) => {
 // ---------------------------------------------------------------------------
 // Banco viejo: js_2026
 // ---------------------------------------------------------------------------
+
+if (!existsSync(BANCO_VIEJO)) {
+  morir('No se puede convertir: el banco viejo ya no existe.', avisoDeRetiro('Convertir un modulo'));
+}
 
 const { cuestionario } = await import(`file://${BANCO_VIEJO}`);
 

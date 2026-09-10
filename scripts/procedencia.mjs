@@ -47,6 +47,54 @@ import { pathToFileURL } from 'node:url';
 /** Version del formato. Si cambia lo que se mira, esto sube y las huellas viejas dejan de valer. */
 export const VERSION_PROCEDENCIA = 1;
 
+/** Lo que se anota en lugar de una huella cuando el banco viejo ya no esta. */
+export const RETIRADO = '(retirado el 2026-09-10)';
+
+/** La ruta del acta, para poder nombrarla en los mensajes sin repetirla. */
+export const ACTA_DE_RETIRO = '_planmaestro/00_producto/cuestionarios/banco-viejo-retirado.json';
+
+/**
+ * Las lineas que explican el retiro del banco viejo, escritas una sola vez.
+ *
+ * Las usan los cuatro guiones que dependian de ese archivo. Que digan todos lo
+ * mismo importa: cuatro mensajes distintos para el mismo hecho se leen como
+ * cuatro problemas distintos.
+ */
+export function avisoDeRetiro(quePedia) {
+  return [
+    'EL BANCO VIEJO SE RETIRO EL 2026-09-10, y esto no es un error.',
+    '',
+    `${quePedia} necesita «static/js/data/cuestionario.js» para la mitad js_2026`,
+    'de cada modulo, y ese archivo ya no esta.',
+    '',
+    'Se retiro despues de que sus 83 preguntas quedaran cargadas en D1 y',
+    'comprobadas contra el, ocho veces, y despues de que la evidencia de la marca',
+    'de orden fijo estuviera escrita con el archivo todavia en el arbol.',
+    '',
+    'Su contenido vive hoy en tres sitios: la base D1 de produccion, el respaldo',
+    'versionado d1/respaldo-banco.sql, y los encargos de d1/encargos/.',
+    '',
+    `El acta del retiro, con las huellas para auditarlo: ${ACTA_DE_RETIRO}`,
+    '',
+    'NO se le puso a esta herramienta una salida que la haga pasar igual: una',
+    'comprobacion que no puede comprobar tiene que decirlo, no aprobar (H-023).',
+    '',
+    'Si lo que necesitas es CORREGIR una pregunta del banco viejo, se corrige en',
+    'D1 y no reconvirtiendo:',
+    '',
+    '  node scripts/administrar-banco.mjs actualizar <encargo.json>',
+  ];
+}
+
+/** ¿El desajuste es el retiro del banco viejo, y no una edicion? */
+export function esRetiro(cotejo) {
+  return (
+    cotejo?.movidas?.length === 1 &&
+    cotejo.movidas[0] === 'cuestionario.js' &&
+    cotejo.ahora?.fuentes?.['cuestionario.js'] === RETIRADO
+  );
+}
+
 const huella = (texto) => createHash('sha256').update(texto, 'utf8').digest('hex').slice(0, 16);
 
 /** El numero de modulo de una entrada, escriba `2` o `"Módulo 2"`. */
@@ -79,9 +127,17 @@ export async function huellaDeOrigenes(modulo, RAIZ) {
   // --- El banco viejo, solo el grupo de este modulo -------------------------
 
   if (!existsSync(BANCO_VIEJO)) {
-    // Que el banco viejo ya no este NO es un fallo: la iteracion 25 lo retira al
-    // final. Se registra como ausente, y ausente cotejado contra ausente calza.
-    fuentes['cuestionario.js'] = '(retirado)';
+    // El banco viejo se retiro el 2026-09-10, despues de cargarlo entero.
+    //
+    // Se marca con un valor que NO puede coincidir con ninguna huella sellada, y
+    // eso es a proposito: un encargo sellado contra el archivo ya no se puede
+    // recomprobar contra su origen, y la herramienta tiene que decirlo en vez de
+    // dejarlo pasar. Hacer que «ausente» calzara con «ausente» convertiria esto
+    // en una comprobacion que siempre aprueba, que es justo lo que H-023 dejo
+    // escrito que no se hace.
+    //
+    // Quien lea este valor sabe distinguir el caso: ver `esRetiro()`.
+    fuentes['cuestionario.js'] = RETIRADO;
   } else {
     try {
       const { cuestionario } = await import(`${pathToFileURL(BANCO_VIEJO).href}?t=${Date.now()}`);
@@ -189,6 +245,12 @@ export async function cotejarProcedencia(encargo, modulo, RAIZ) {
  * aprende a leer uno de ellos como si fuera menos grave.
  */
 export function comoContarlo(cotejo, modulo) {
+  // El retiro del banco viejo tiene su propia explicacion: es un hecho previsto y
+  // documentado, no una edicion que alguien hizo sin avisar. Contarlo con el
+  // mensaje generico —«alguien edito un origen»— mandaria a buscar un culpable
+  // que no existe.
+  if (esRetiro(cotejo)) return avisoDeRetiro('Recomprobar este encargo');
+
   if (cotejo.sinSello) {
     return [
       'El encargo no trae sello de procedencia, asi que no se puede saber de que',

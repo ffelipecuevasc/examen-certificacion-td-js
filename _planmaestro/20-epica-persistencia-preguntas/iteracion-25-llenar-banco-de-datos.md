@@ -475,14 +475,14 @@ archivo de origen**, no al encargo: el encargo es derivado.
 
 ### Conversión
 
-- [ ] Convertir las 285 del banco nuevo al formato de encargo.
-- [ ] Convertir las 83 del banco viejo, que tiene un formato distinto: `correcta` es
+- [x] Convertir las 285 del banco nuevo al formato de encargo.
+- [x] Convertir las 83 del banco viejo, que tiene un formato distinto: `correcta` es
   un índice numérico, no una letra, y hay que traducirlo sin equivocarse de
   desplazamiento.
-- [ ] Asignar `origen` según el banco de procedencia, respetando el `CHECK` del
+- [x] Asignar `origen` según el banco de procedencia, respetando el `CHECK` del
   esquema: `json_2026` y `js_2026`.
-- [ ] Rescatar la marca de orden fijo antes de retirar el banco viejo.
-- [ ] Comprobar que la conversión no perdió ni alteró nada, contra los archivos de
+- [x] Rescatar la marca de orden fijo antes de retirar el banco viejo.
+- [x] Comprobar que la conversión no perdió ni alteró nada, contra los archivos de
   origen y no contra la intención.
 
 **Herramientas escritas el 2026-09-09, con el módulo 2 ya recorrido:**
@@ -538,12 +538,12 @@ Si se escribiera encima del primero, **el rastro de que la conversión fue fiel 
 
 ### Carga
 
-- [ ] Cargar en producción con la herramienta de la iteración 23, por lotes.
-- [ ] Comprobar que lo cargado coincide con los dos orígenes: ninguna pregunta
+- [x] Cargar en producción con la herramienta de la iteración 23, por lotes.
+- [x] Comprobar que lo cargado coincide con los dos orígenes: ninguna pregunta
   perdida, ninguna correcta desplazada, ninguna duplicada por cargar un origen
   dos veces.
-- [ ] Informar cuántas preguntas quedan sin justificación, agrupadas por módulo.
-- [ ] Informar la distribución de la posición de la correcta por módulo (H-004).
+- [x] Informar cuántas preguntas quedan sin justificación, agrupadas por módulo.
+- [x] Informar la distribución de la posición de la correcta por módulo (H-004).
 
 **La herramienta que cierra estos criterios, escrita el 2026-09-09:**
 
@@ -1309,21 +1309,21 @@ era una sospecha de un solo lote.
 
 ### Contenido
 
-- [ ] Redactar las justificaciones de las preguntas que se vayan a activar.
-- [ ] Revisar las preguntas que el trabajo de redacción marque como dudosas. Una
+- [x] Redactar las justificaciones de las preguntas que se vayan a activar.
+- [x] Revisar las preguntas que el trabajo de redacción marque como dudosas. Una
   pregunta cuya correcta resulta no serlo vale más que veinte justificaciones.
 
 ### Cierre
 
-- [ ] **Generar la instantánea desde producción** y commitearla. Cierra el criterio
+- [x] **Generar la instantánea desde producción** y commitearla. Cierra el criterio
   heredado de la iteración 22 y subsana ADR-023.
-- [ ] Exportar `d1/respaldo-banco.sql` **en el mismo acto** que la instantánea
+- [x] Exportar `d1/respaldo-banco.sql` **en el mismo acto** que la instantánea
   (ADR-023): un solo paso produce las dos cosas, o no produce ninguna.
 - [ ] Medir el peso de la instantánea con el banco completo y comprobar que el sitio
   la aguanta.
-- [ ] Retirar `static/js/data/cuestionario.js` y `scripts/build-cuestionario.py`,
+- [x] Retirar `static/js/data/cuestionario.js` y `scripts/build-cuestionario.py`,
   dejando constancia en la bitácora.
-- [ ] Publicar, al final, con el banco cargado.
+- [x] Publicar, al final, con el banco cargado.
 
 > ## Incumplimiento consciente de ADR-023, declarado el 2026-09-08 por Felipe Cuevas
 >
@@ -1685,6 +1685,106 @@ entrada más.
 **Lo que este ensayo no cubre, dicho para que no se confunda:** se hace contra pruebas,
 que es otra base con el mismo esquema. Si algún día producción y pruebas dejaran de
 compartir esquema, el ensayo dejaría de decir nada sobre producción.
+
+## Revisión antes de cerrar · qué queda suelto de las iteraciones 21 a 24
+
+*Hecha el 2026-09-10, a pedido del autor, recorriendo las **24 filas abiertas** que el
+registro tenía con origen en esas cuatro iteraciones.*
+
+**Diecisiete estaban hechas y su fila se había quedado atrás.** Se cerraron con la
+evidencia que ya existía o con la de hoy. **Siete siguen abiertas de verdad**, y de esas
+**dos bloquean el cierre de la épica**.
+
+### Las diecisiete que estaban hechas y nadie marcó
+
+| Fila | Por qué se cierra |
+|---|---|
+| Cargar las 368 preguntas *(it. 21)* | Están en producción desde hoy |
+| La instantánea desde la nube, ADR-023 *(it. 22)* | Sello `"entorno": "nube"` desde el módulo 2 |
+| El procedimiento en un solo bloque, ADR-023 *(it. 23)* | `publicar-banco.mjs`, desde el módulo 3 |
+| Migración 001 en las dos bases *(it. 24)* | El respaldo muestra el esquema en producción |
+| Transformar los siete cuestionarios *(it. 24)* | Los siete encargos, comprobados |
+| Cargar el banco transformado *(it. 24)* | 368 en D1 |
+| Escribir la justificación de cada pregunta *(it. 24)* | 368, `justificacion IS NULL` = 0 |
+| `build-cuestionario.py` no se puede ejecutar *(it. 24)* | **Cerrado hoy retirándolo** |
+| El contador de la portada, escrito a mano *(it. 24)* | Arreglado en la 24, con su fila 🟢 |
+| `/api/estado` mentía *(it. 24)* | Cerrado en la 24, con su fila 🟢 |
+| La instantánea sale de la base local *(it. 22)* | Resuelto el 2026-09-09 |
+| `/api/prueba` apunta a una tabla que no existe *(it. 22)* | El extremo ya no existe; comprobado hoy |
+| `prueba_tuberia` en producción *(sin asignar)* | **Comprobado hoy sin tocar la nube:** el respaldo versionado es un volcado de producción y solo trae `migracion`, `modulo`, `pregunta` y `alternativa` |
+| Extremos de lectura en el Worker *(it. 22)* | Entregado en la 22, que está cerrada |
+| Instantánea local de respaldo *(it. 22)* | Ídem |
+| Aviso visible al usar el respaldo *(it. 22)* | Ídem |
+| Reforzar el escapado *(it. 22)* | Ídem — lo que sigue abierto es probarlo **a escala**, que es otra fila |
+
+> **Que diecisiete filas estuvieran hechas sin marcar no es un descuido menor.** Un
+> registro con filas abiertas que ya no lo están enseña a no leerlo, y entonces las que
+> sí importan se pierden entre ellas. La mayoría se quedaron atrás por la misma causa:
+> el trabajo lo cerró **otra** iteración, y quien lo cerró anotó su propia fila sin
+> volver a la que lo había pedido.
+
+### Las siete que siguen abiertas
+
+#### 🔴 Bloquean el cierre de la épica
+
+**1. El escapado no está probado a escala (ADR-024).** Es también uno de los cuatro
+criterios abiertos de la iteración 25. La iteración 22 lo verificó con diez filas de
+juguete y ADR-024 aceptó ese riesgo **hasta que hubiera banco real**. Ahora lo hay: 368
+preguntas, de las cuales **291 traen comillas invertidas, 57 comillas dobles y 16 algo
+con forma de `<etiqueta>`**. Esas 16 son el caso que ya rompió la página una vez.
+
+**No se puede cerrar la épica con esto abierto**, porque es la comprobación que la
+propia épica aplazó hasta tener el banco, y el banco ya está.
+
+**2. Nada comprueba que la instantánea y el banco no hayan divergido.** Abierta el
+2026-09-08 tras el hallazgo de la `id 11`. `npm run verificar` mira la barrera, el CSS y
+el escapado; **ninguna de las tres compara la instantánea con la base de la que dice
+salir**. Hoy el riesgo es mayor que cuando se anotó: la instantánea pesa 488 kB y es lo
+único que ve el estudiante si la capa de datos cae.
+
+Es discutible si bloquea. **Yo diría que sí**, por una razón concreta: la épica se
+llama «persistencia de preguntas» y su entrega es el banco más su respaldo. Un respaldo
+que nadie comprueba contra su original es exactamente el fallo mudo que este proyecto ya
+documentó tres veces.
+
+#### 🟡 No bloquean, pero conviene decidirlas antes de cerrar
+
+**3. Ubicación definitiva del banco.** Los siete `modulo-0N.json` siguen en
+`_planmaestro/00_producto/cuestionarios/`, declarado temporal desde la iteración 21. La
+fila trae además una advertencia que hoy es más urgente: **al moverlos hay que comprobar
+explícitamente que no terminen copiados a `dist/`**, porque son archivos con las
+respuestas correctas y servirlos al navegador dejaría el simulacro sin sentido. Hoy es
+seguro solo porque `LISTA_COPIA` no nombra `_planmaestro/`.
+
+**4. Ensayar el manual entero desde su paso 1.** El que el autor ya tenía presente.
+Cierra el criterio 7 de la iteración 12, aplazado explícitamente. **Y con el banco
+cargado ya no se puede ensayar sobre la base del banco**: habría que hacerlo sobre una
+base nueva de pruebas, que es más fácil que antes, no menos.
+
+**5. La consecuencia de ADR-022 que hay que escribir donde se vea.** «La instantánea
+incluye las respuestas correctas» está implementado —el generador no filtra ni ofusca—,
+pero la segunda mitad de la fila pide escribir **donde el estudiante lo vea** que el
+simulacro es una herramienta de estudio y no un instrumento con validez. Eso es trabajo
+de la épica 40, y hoy no está escrito en ninguna parte del sitio.
+
+#### ⚪ Informativas, no son deuda
+
+**6. La advertencia sobre los números de solapamiento.** Retirar 37 preguntas no deja el
+banco sin duplicados. **Ya no es una limitación pendiente**: el 2026-09-09 se decidió que
+los duplicados por redacción distinta son esperados y a veces deseables. La fila describe
+un hecho, no una tarea.
+
+**7. «La 23 va antes que la 24, y eso deja dos de sus criterios dependiendo de la 24».**
+Los dos ya se cumplieron: la herramienta se probó contra el banco real en ocho cargas, y
+el bloque de ADR-023 se recorrió entero siete veces. **La fila describe una dependencia
+que se resolvió sola**, y se puede cerrar cuando el autor lo confirme.
+
+### Lo que esta revisión no cubre
+
+**No revisé las iteraciones 11, 12 y 13** —épica 10, ya cerrada— salvo donde alguna fila
+suya seguía abierta y apareció en el recorrido. Si el cierre de la épica 20 quiere
+apoyarse en que la 10 está limpia, esa revisión es otra y no se ha hecho.
+
 
 ## Notas de la iteración
 

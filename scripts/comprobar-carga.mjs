@@ -89,6 +89,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { avisoDeRetiro } from './procedencia.mjs';
 import { abrirRegistro } from './registro-de-salida.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -220,11 +221,14 @@ const rutaNuevo = join(CUESTIONARIOS, `modulo-0${modulo}.json`);
 
 if (!existsSync(rutaNuevo)) sinVeredicto(`No existe «${rutaNuevo.replace(RAIZ, '.')}».`);
 if (!existsSync(BANCO_VIEJO)) {
-  sinVeredicto(`No existe «${BANCO_VIEJO.replace(RAIZ, '.')}».`, [
+  sinVeredicto('No se puede comprobar la carga: el banco viejo ya no existe.', [
     '',
-    'Es el banco viejo, y esta iteracion lo retira AL FINAL, despues de que esta',
-    'comprobacion este escrita. Si ya no esta, la comprobacion perdio su testigo',
-    'y el orden de la iteracion 25 se rompio.',
+    ...avisoDeRetiro('Comprobar una carga contra sus origenes'),
+    '',
+    'Que esta comprobacion ya no se pueda repetir es el precio del retiro, y se',
+    'pago a sabiendas: la evidencia de que la carga correspondia a sus origenes',
+    'esta escrita ocho veces en el archivo de la iteracion 25 y en los registros',
+    'evidencia-*.txt, todas producidas con el archivo todavia en el arbol.',
   ]);
 }
 

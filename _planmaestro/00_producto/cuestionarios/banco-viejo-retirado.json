@@ -1,0 +1,41 @@
+{
+  "que_es_esto": "Acta de retiro de static/js/data/cuestionario.js, el banco viejo. Se retiro el 2026-09-10, despues de que sus 83 preguntas quedaran cargadas en D1 y comprobadas contra el, y despues de que la evidencia de la marca de orden fijo estuviera escrita con el archivo todavia en el arbol. Este archivo existe para que el retiro sea auditable: quien saque el archivo del historial de git puede recalcular estas huellas y confirmar que es el que se retiro.",
+
+  "por_que_se_retira": "Su contenido vive ahora en tres sitios que si se mantienen: la base D1 de produccion, el respaldo versionado d1/respaldo-banco.sql, y los encargos de conversion en d1/encargos/. El archivo dejo de ser fuente de nada. Ademas era un archivo GENERADO cuyo generador no se podia ejecutar —scripts/build-cuestionario.py leia de /mnt/user-data/uploads, una carpeta que no existe en este equipo—, asi que mantenerlo era mantener un generado huerfano.",
+
+  "lo_que_el_retiro_hace_imposible_para_siempre": "Volver a comprobar la conversion del banco viejo contra su origen. Los guiones convertir-banco, comprobar-conversion, comprobar-carga e informe-banco necesitan este archivo para la mitad js_2026 de cada modulo, y sin el no pueden. NO se les puso una salida que los haga pasar igual: una comprobacion que no puede comprobar tiene que decirlo, no aprobar (H-023). La comprobacion ya se hizo, ocho veces, y su evidencia esta escrita.",
+
+  "si_hay_que_corregir_una_pregunta_del_banco_viejo": "Se corrige en D1 con `node scripts/administrar-banco.mjs actualizar`, no reconvirtiendo. Esto ya estaba decidido en la iteracion 25 antes de cargar, cuando se acepto que numero_origen del banco viejo fuera una posicion: «si hubiera que corregir algo del banco viejo, se corrige en D1 despues de cargar, no en el archivo».",
+
+  "retirado_en": "2026-09-10",
+  "retirado_por": "Claude Code, por instruccion de Felipe Cuevas",
+
+  "archivo": {
+    "ruta": "static/js/data/cuestionario.js",
+    "bytes": 35310,
+    "sha256": "0f0f21a9c71fc0e4bcf27353d4970432ae9ee81f9ab64d9aac51d9d213e98720",
+    "git_hash_object": "7e2ed6a9e390cbc3a1bc5aa1d40084d6b5e152c5",
+    "ultimo_commit_donde_existe": "b82f4eb",
+    "preguntas": 83
+  },
+
+  "generador_retirado_con_el": {
+    "ruta": "scripts/build-cuestionario.py",
+    "por_que": "Es el generador de ese archivo y no se puede ejecutar: lee su entrada de /mnt/user-data/uploads, el directorio de subida de una sesion de Claude web que no existe en este equipo. Los markdown de origen nunca estuvieron en el repositorio. Sin su entrada y sin su salida, no queda nada que genere.",
+    "consecuencia_ya_anotada": "Es lo que obligo a editar el .js a mano el 2026-09-04, rompiendo la regla de que los generados no se editan. Ese problema se cierra con este retiro."
+  },
+
+  "huellas_por_modulo": {
+    "que_son": "La huella que procedencia.mjs calcula sobre el grupo de cada modulo, y que quedo sellada dentro de cada d1/encargos/modulo-0N.json. Estan aqui para que el sello de los encargos siga siendo verificable contra algo aunque el archivo ya no este.",
+    "comprobado_el_2026-09-10": "Las siete coinciden EXACTAMENTE con las selladas en los siete encargos. Eso demuestra que el archivo no se edito entre la primera conversion —el modulo 2, el 2026-09-09— y su retiro: la condicion de congelado que la iteracion 25 se impuso se cumplio, y ahora es demostrable en vez de prometida.",
+    "modulo_2": { "huella": "c8721e801d157080", "preguntas": 13 },
+    "modulo_3": { "huella": "82a9067f3174e660", "preguntas": 11 },
+    "modulo_4": { "huella": "bd31729024f0932c", "preguntas": 15 },
+    "modulo_5": { "huella": "5164a787f99175aa", "preguntas": 11 },
+    "modulo_6": { "huella": "3fd02746b3d58649", "preguntas": 14 },
+    "modulo_7": { "huella": "95818a625e3278b3", "preguntas": 10 },
+    "modulo_8": { "huella": "74a67d09992d83c1", "preguntas": 9 }
+  },
+
+  "ojo_hay_otro_archivo_con_el_mismo_nombre": "static/js/components/cuestionario.js es el COMPONENTE de interfaz y NO se retira: lo importa static/js/cuestionario-main.js y lo usa scripts/probar-escapado.mjs. Al buscar por nombre aparecen los dos. Se anota porque un borrado por nombre habria retirado el equivocado y roto la pagina."
+}

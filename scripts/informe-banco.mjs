@@ -171,7 +171,17 @@ for (const archivo of archivos) {
 const viejas = [];
 let gruposViejos = [];
 
+// El banco viejo se retiro el 2026-09-10, despues de cargarlo entero. Se
+// distingue del fallo de verdad: «no se pudo importar» se lee como algo roto, y
+// esto no lo esta. El acta del retiro tiene las huellas para auditarlo.
+if (!existsSync(BANCO_VIEJO)) {
+  console.log(`  ${BANCO_VIEJO.padEnd(30)} RETIRADO el 2026-09-10, tras cargarse entero en D1`);
+  console.log('  '.padEnd(32) + 'acta: _planmaestro/00_producto/cuestionarios/banco-viejo-retirado.json');
+  console.log('  '.padEnd(32) + 'este informe ya no puede contrastar la mitad js_2026');
+}
+
 try {
+  if (!existsSync(BANCO_VIEJO)) throw new Error('retirado');
   const modulo = await import(pathToFileURL(BANCO_VIEJO).href);
   gruposViejos = modulo.cuestionario ?? [];
   const total = gruposViejos.reduce((n, g) => n + (g.preguntas?.length ?? 0), 0);
@@ -183,8 +193,10 @@ try {
     });
   }
 } catch (error) {
-  console.log(`  ${BANCO_VIEJO} NO SE PUDO IMPORTAR: ${error.message}`);
-  anota(BANCO_VIEJO, 'no se pudo importar');
+  if (error.message !== 'retirado') {
+    console.log(`  ${BANCO_VIEJO} NO SE PUDO IMPORTAR: ${error.message}`);
+    anota(BANCO_VIEJO, 'no se pudo importar');
+  }
 }
 
 // ---------------------------------------------------------------------------
