@@ -106,6 +106,23 @@
       "propuesta_por": "Claude Code",
       "aprobada_por": "Felipe Cuevas",
       "fecha": "2026-09-10"
+    },
+    {
+      "ref": "m06#15",
+      "modulo": 6,
+      "origen": "json_2026",
+      "numero_origen": 15,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-06.json",
+      "campo": "alternativa.c.texto",
+      "original": "npm create",
+      "corregido": "npm init -y",
+      "motivo": "El item tenia DOS respuestas correctas. `npm create` es alias de `npm init` —la documentacion de npm lo lista junto con `innit`— y sin argumentos abre EXACTAMENTE el mismo asistente interactivo. Quien la marcara no se equivocaba.",
+      "comprobacion": "Provocado el 2026-09-10 en una carpeta desechable: `npm create` a secas imprime «This utility will walk you through creating a package.json file» y pregunta «package name», que es palabra por palabra lo que hace `npm init`. No se dedujo de la documentacion: se corrio.",
+      "reemplazo": "`npm init -y` es real, esta a un guion de distancia de la respuesta correcta y es incorrecta por la razon exacta que la pregunta evalua: el `-y` ACEPTA todos los valores por omision y por lo tanto NO abre el asistente interactivo. Separa a quien sabe que ese flag existe para saltarse las preguntas.",
+      "nota": "Misma clase que m05#18: no es ADR-029 —la alternativa correcta era correcta— sino un DISTRACTOR que tambien lo era. Aplica la regla del retiro de m07#21: un item con dos respuestas correctas es un error y se corrige; un distractor flojo no (ADR-017).",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-10"
     }
   ]
 }

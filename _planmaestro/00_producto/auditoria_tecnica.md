@@ -2319,6 +2319,81 @@ cómo hacerlo se desobedece.** Y no por descuido — se desobedece porque obedec
 cuesta más que arriesgarse, justo en el momento en que uno está nervioso porque algo
 acaba de fallar. Escribir el comando cuesta cuatro líneas y cambia esa cuenta.
 
+
+#### El paso 0 NO previene el 7403 · comprobado el 2026-09-10, en la carga del módulo 5
+
+**Esto refuta lo que se escribió al añadir el paso 0**, y conviene que quede dicho con
+esas palabras y no suavizado.
+
+El paso 0 se agregó tras la carga del módulo 3 con una hipótesis: la sesión guardada de
+wrangler se enfría entre carga y carga, y por eso la primera llamada de una terminal
+nueva devolvía **7403**. La mitigación era correr `whoami` antes de tocar nada, para
+despertarla y de paso comprobarla.
+
+**En la carga del módulo 5 se corrió el paso 0, respondió bien, y el 7403 apareció
+igual, en la llamada siguiente:**
+
+```
+node ... wrangler.js whoami
+👋 You are logged in with an OAuth Token, associated with the email …
+│ Felipe Cuevas │ 2e5cb791ea3bd6de0da1b019c4389b3a │
+   ↓ (la siguiente llamada, en la misma terminal)
+"text": "The given account is not valid or is not authorized to access
+         this service [code: 7403]"
+```
+
+**La sesión estaba viva** —`whoami` la leyó y la imprimió— y aun así la petición a D1
+fue rechazada por «cuenta no autorizada». Y a la vez siguiente, sin cambiar nada más,
+la misma carga funcionó.
+
+**Qué queda establecido:**
+
+| | |
+|---|---|
+| La hipótesis de la sesión fría | **refutada como causa suficiente.** `whoami` funcionó y el 7403 llegó igual |
+| El paso 0 como preventivo | **no funciona.** No evita el 7403 |
+| El 7403 | **transitorio.** Reintentar, sin cambiar nada, lo resolvió las dos veces |
+
+**Qué NO queda establecido, para no cambiar una explicación cómoda por otra:** no se
+sabe la causa. Un 7403 transitorio en la API de Cloudflare admite varias —propagación
+del token, límite de tasa, un problema pasajero del lado del proveedor— y **ninguna se
+ha comprobado**. Lo único medido es que la sesión estaba viva.
+
+#### Qué hacer con el paso 0
+
+**No se retira, y el motivo cambió.** Ya no está ahí como preventivo del 7403 —no lo
+previene— sino porque **sigue siendo la forma barata de comprobar que hay sesión antes
+de empezar**, y ese fallo distinto sí existe y sí lo caza. Lo que hay que corregir es la
+expectativa escrita en el procedimiento: pasa de «evita el 7403» a «comprueba que haya
+sesión, y no evita el 7403».
+
+**Y esto refuerza lo que ya decía el hallazgo:** el defecto de fondo sigue siendo que el
+guion **no sabe leer el sobre de error con `notes: [...]`**. Se creyó que el paso 0
+haría desaparecer el síntoma; no lo hace, así que el `SIN VEREDICTO` va a seguir
+apareciendo. Menos mal, dicho sin ironía: era el único aviso de que el defecto existe.
+
+#### Lo que sí funcionó, y era nuevo
+
+El mensaje corregido hizo su trabajo. Al fallar, imprimió el comando exacto:
+
+```
+Como mirar la base, sin repetir nada:
+
+  $env:PERMITIR_REMOTO=1
+  node scripts/comprobar-carga.mjs 5 --base=examen-td-js-produccion --remote
+```
+
+con el módulo sacado del sello del encargo y el permiso de ADR-015 incluido, que es
+justo lo que faltaba en el módulo 3.
+
+**Se repitió la carga en vez de mirar la base**, y esta vez tampoco hubo daño: el
+conteo `174 → 223` es exactamente 49, así que no entró nada dos veces. Conviene anotar
+por qué no lo hubo, que no es suerte del todo — el 7403 falló **antes** de escribir, y
+si hubiera entrado a medias, el `UNIQUE (origen, modulo, numero_origen)` habría
+rechazado la segunda pasada. **La red que sostuvo esto es el esquema, no el
+procedimiento.**
+
+
 ---
 
 ### H-032 · Nada impedía que una marca de duda se publicara como justificación

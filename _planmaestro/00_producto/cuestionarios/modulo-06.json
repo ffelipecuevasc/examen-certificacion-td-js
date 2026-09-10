@@ -350,7 +350,7 @@
       },
       {
         "letra": "c",
-        "texto": "npm create"
+        "texto": "npm init -y"
       },
       {
         "letra": "d",

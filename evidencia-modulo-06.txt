@@ -1,0 +1,53 @@
+# Registro de una corrida del proyecto
+# 2026-09-10T14:34:53.680Z
+# argumentos: 6 --base=examen-td-js-produccion --remote --registro=evidencia-modulo-06.txt
+
+
+========================================================================
+CARGA COMPROBADA  ***  la base corresponde a los dos origenes  ***
+========================================================================
+Modulo:   6
+Base:     examen-td-js-produccion   (cff1686b-3b24-4892-9a10-4306684e0127)
+Destino:  --remote
+
+Conteo por origen, contra los dos archivos de origen:
+
+  json_2026   base  38   origen  38   calzan
+  js_2026     base  14   origen  14   calzan
+  total       base  52   origen  52
+
+Estado de lo cargado:
+
+  activas                52
+  borradores              0
+  retiradas               0
+
+Campos que nadie escribio, contados sobre la base:
+
+  justificacion IS NULL   0
+  dificultad IS NULL     52   de 52
+
+Retiradas del modulo      3   (2 json_2026 + 1 js_2026), ninguna en la base
+
+Reparto de la posicion de la correcta (H-004, se informa y no se corrige):
+
+  posicion 1     9   ######### 17%
+  posicion 2    25   ######################## 48%
+  posicion 3    16   ################ 31%
+  posicion 4     2   ## 4%
+
+========================================================================
+Comprobado pregunta a pregunta, no por muestreo:
+
+  52 preguntas del origen, 52 encontradas en la base
+  enunciado, los cuatro textos EN SU ORDEN y el texto de la correcta
+  sin normalizar nada: ni espacios, ni comillas, ni mayusculas
+
+Lo que esto NO dice, y conviene no confundirlo:
+
+  que las justificaciones sean CIERTAS. Solo que existen y no son de relleno.
+  que el banco no tenga duplicados por redaccion distinta. Son esperados.
+
+codigo de salida: 0
+
+# fin del registro · CARGA COMPROBADA · codigo 0

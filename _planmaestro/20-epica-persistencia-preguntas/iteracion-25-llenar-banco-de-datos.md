@@ -203,8 +203,8 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 | 2 | 52 · 39 + 13 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 3 | 61 · 50 + 11 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 desplegado |
-| 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | ⚪ | ⚪ |
-| 6 | 52 · 38 + 14 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | 🟢 comprobado en D1 | 🟢 publicado |
+| 6 | 52 · 38 + 14 | 🟢 | 🟢 | 🟢 52 de 52 | ⚪ | ⚪ |
 | 7 | 48 · 38 + 10 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 8 | 45 · 36 + 9 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | | **368 · 285 + 83** | | | | | |
@@ -253,9 +253,26 @@ node node_modules/wrangler/bin/wrangler.js login
 > era cómo autenticarse la primera vez.
 >
 > **Se usa `whoami` y no `login`** porque es de solo lectura, no abre el navegador y
-> sirve además como pregunta: si contesta, la sesión está viva y se sigue. Convierte
-> un fallo a mitad de carga en un fallo antes de empezar, que es el mismo error
-> saliendo barato.
+> sirve además como pregunta: si contesta, la sesión está viva y se sigue.
+>
+> ### ⚠️ Corregido el 2026-09-10: este paso NO evita el 7403
+>
+> Se escribió arriba que convertía «un fallo a mitad de carga en un fallo antes de
+> empezar». **La carga del módulo 5 lo desmintió:** se corrió `whoami`, respondió con
+> la cuenta, y la llamada siguiente falló con **7403** igual. A la vez siguiente, sin
+> cambiar nada, funcionó.
+>
+> **La hipótesis de la sesión fría queda refutada como causa suficiente**, y el 7403
+> resultó ser **transitorio**. No se sabe su causa: propagación del token, límite de
+> tasa o un problema pasajero del proveedor son candidatos, y **ninguno está
+> comprobado**.
+>
+> **El paso se conserva y cambia su motivo:** ya no está para prevenir el 7403 —no lo
+> previene— sino porque sigue siendo la forma barata de comprobar que **hay sesión**
+> antes de empezar, y ese fallo distinto sí existe y sí lo caza. Cuesta un segundo.
+>
+> **Y si el 7403 aparece igual, no repitas la carga a ciegas:** el mensaje de
+> `SIN VEREDICTO` imprime el comando exacto para mirar la base antes de decidir.
 >
 > **Esto no arregla H-019**, que es otra cosa y sigue abierta: el guion no supo leer
 > ese error porque venía como sobre con `notes: [...]`. El 7403 fue amable porque
@@ -955,6 +972,57 @@ lo confirmen, no lo contrario.
 
 **Estos tres números están medidos en producción**, no calculados sobre el encargo. La
 distinción importa para una serie que se va a citar después.
+
+### Evidencia del lote · módulo 5 · 2026-09-10
+
+**Corrida por Felipe Cuevas contra producción.** Los siete criterios de nivel 1,
+cerrados.
+
+| Criterio | Qué lo cierra |
+|---|---|
+| El lote entero está en D1 y suma lo que debe | **174 → 223**, y **38 `json_2026` + 11 `js_2026` = 49** contra los dos archivos |
+| Ninguna respuesta correcta se desplazó | `CARGA COMPROBADA` sobre las 49, anclado en el texto de la correcta |
+| Ningún campo se inventó | `dificultad IS NULL` en las 49 |
+| Ninguna `activa` carece de justificación | 49 activas, `justificacion IS NULL 0` |
+| Las retiradas de ese módulo no se cargaron | las **6** —`2 json_2026 + 4 js_2026`— ninguna en la base |
+| La instantánea y el respaldo salieron del mismo acto | sello **`"entorno": "nube"`**, **223 preguntas** en los dos |
+| El módulo se ve en el sitio publicado | publicado por el autor |
+
+**Primer lote con retiradas repartidas en los dos bancos** —`2 + 4`—, después del `0+4`
+del módulo 3 y el `4+0` del 4. El informe por banco existe justamente para que eso se
+vea.
+
+**La corrección de `m05#18` llegó hasta el final:** la alternativa (c) dice
+`CHECKPOINT`, y `correcciones registradas 1` quedó contrastado contra el archivo de
+origen en la recomprobación.
+
+#### El peso de la instantánea, que es un criterio de nivel 2
+
+| | |
+|---|---|
+| Hoy, con 223 preguntas | **297 kB** |
+| Proyectado con las 368 | **~489 kB** |
+
+Es el dato que el criterio «el sitio aguanta el banco completo» pedía medir en vez de
+suponer. Medio mega es mucho para un archivo que el navegador solo carga **cuando la
+capa de datos cae**, y conviene decidir antes del módulo 8 si se acepta, se comprime o
+se recorta. **No es urgente y no se resuelve aquí**, pero ya no es una incógnita.
+
+#### H-004 · cuarto dato, y el más extremo
+
+| Lote | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|
+| Módulo 2 · 52 | 23% | **40%** | 29% | 8% |
+| Módulo 3 · 61 | 16% | **39%** | 30% | 15% |
+| Módulo 4 · 61 | 18% | **38%** | 34% | 10% |
+| Módulo 5 · 49 | 12% | **49%** | 35% | 4% |
+
+**Cuatro lotes, y la posición 2 nunca baja del 38 %.** En éste llega al **49 %**: una de
+cada dos preguntas tiene su respuesta correcta en el segundo lugar. La posición 4 cae al
+**4 %** — dos preguntas de 49.
+
+**Con cuatro lotes ya no es razonable llamarlo casualidad.** Faltan tres módulos y lo
+que queda por ver no es si hay sesgo, sino cuánto y si es parejo entre bancos.
 
 ### Contenido
 

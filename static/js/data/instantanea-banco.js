@@ -17,8 +17,8 @@
 export const SELLO = {
   "base": "examen-td-js-produccion",
   "entorno": "nube",
-  "generada_en": "2026-09-10T13:39:09.348Z",
-  "preguntas": 223,
+  "generada_en": "2026-09-10T14:35:20.543Z",
+  "preguntas": 275,
   "descartadas": 0
 };
 
@@ -8940,6 +8940,2086 @@ export const PREGUNTAS = [
         "letra": "d",
         "orden": 4,
         "texto": "El árbol de dependencias.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 224,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué característica arquitectónica fundamental distingue al motor de Node.js?",
+    "justificacion": "Node corre el código JavaScript en **un solo hilo**, y no se queda esperando a las operaciones lentas: las delega y sigue atendiendo. Ésa es la combinación —un hilo, sin bloquear— que le permite sostener muchas conexiones a la vez sin crear un hilo por cada una. Las otras tres describen arquitecturas ajenas: la de un servidor tradicional con hilos bloqueantes, la de un script de navegador, y una compilación a ensamblador que no ocurre.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 893,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Se basa en múltiples hilos bloqueantes (multi-thread).",
+        "es_correcta": 0
+      },
+      {
+        "id": 894,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Utiliza un único hilo de ejecución (single-thread) no bloqueante.",
+        "es_correcta": 1
+      },
+      {
+        "id": 895,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Delega todo el procesamiento al navegador del cliente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 896,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Compila el código a lenguaje ensamblador en tiempo real.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 225,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué motor interno utiliza Node.js para interpretar el código JavaScript?",
+    "justificacion": "Node usa V8, el mismo motor de Chrome, y por eso el JavaScript que se escribe en el servidor es el mismo lenguaje que en el navegador. Las otras tres son motores reales de otros navegadores: SpiderMonkey el de Firefox, JavaScriptCore el de Safari, y Chakra el del Edge antiguo. Lo que Node agrega por encima de V8 es todo lo que el navegador no da: archivos, red, procesos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 897,
+        "letra": "a",
+        "orden": 1,
+        "texto": "SpiderMonkey de Mozilla",
+        "es_correcta": 0
+      },
+      {
+        "id": 898,
+        "letra": "b",
+        "orden": 2,
+        "texto": "JavaScriptCore de Apple",
+        "es_correcta": 0
+      },
+      {
+        "id": 899,
+        "letra": "c",
+        "orden": 3,
+        "texto": "V8 de Google",
+        "es_correcta": 1
+      },
+      {
+        "id": 900,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Chakra de Microsoft",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 226,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cuál es el rol principal de Express dentro del ecosistema de Node.js?",
+    "justificacion": "Express es un framework minimalista para armar servidores web: rutas, middlewares y poco más. Lo que no trae es tan importante como lo que trae — no incluye base de datos, ni ORM, ni motor de plantillas obligatorio—, y esa es su idea: dar la estructura mínima y dejar que cada proyecto elija el resto. Tampoco ejecuta nada en paralelo: hereda el modelo de un solo hilo de Node.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 901,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Proveer una base de datos relacional nativa y segura.",
+        "es_correcta": 0
+      },
+      {
+        "id": 902,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ser un motor de plantillas exclusivo para frontend.",
+        "es_correcta": 0
+      },
+      {
+        "id": 903,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Funcionar como un framework minimalista para infraestructura web.",
+        "es_correcta": 1
+      },
+      {
+        "id": 904,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ejecutar tareas en múltiples hilos paralelos independientes.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 227,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "En la arquitectura de Express, ¿qué es y qué hace un \"middleware\"?",
+    "justificacion": "Un middleware es una función que se coloca en el camino de la petición y puede leerla, modificarla, responder o pasarla al siguiente con `next()`. Con eso se arman la autenticación, el registro de peticiones, el parseo del cuerpo y el manejo de errores. La clave está en ese `next()`: si un middleware no lo llama ni responde, la petición se queda colgada — y es uno de los errores más difíciles de encontrar.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 905,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una función que intercepta peticiones HTTP y respuestas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 906,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un motor de base de datos embebido en memoria.",
+        "es_correcta": 0
+      },
+      {
+        "id": 907,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Un paquete exclusivo para renderizar CSS dinámico.",
+        "es_correcta": 0
+      },
+      {
+        "id": 908,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Un módulo nativo de Node para comprimir archivos de texto.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 228,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "A diferencia de un servidor clásico, ¿cómo maneja Node.js las peticiones concurrentes?",
+    "justificacion": "Node no crea un hilo por petición: registra la operación lenta —leer un archivo, consultar la base— y sigue atendiendo, y cuando esa operación termina, su callback vuelve a la cola para ejecutarse. Por eso aguanta muchas conexiones con poca memoria. La (b) describe el modelo clásico de un hilo por usuario, que es justo lo que Node evita, y la (a) describe lo contrario de no bloquear.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 909,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Bloquea el proceso principal hasta resolver cada petición.",
+        "es_correcta": 0
+      },
+      {
+        "id": 910,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Crea un nuevo hilo de sistema operativo por usuario.",
+        "es_correcta": 0
+      },
+      {
+        "id": 911,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Delega las tareas a procesos asíncronos mediante callbacks.",
+        "es_correcta": 1
+      },
+      {
+        "id": 912,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Rechaza peticiones si sobrepasan el límite del hardware.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 229,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué tipo de arquitectura de ruteo promueve fuertemente el framework Express?",
+    "justificacion": "Express propone declarar rutas asociando un método HTTP y una ruta a una función: `app.get('/usuarios', ...)`. Se lee como una tabla de lo que la aplicación ofrece, y por eso escala bien: agregar una ruta es agregar una línea, no modificar una cadena de condicionales. Las otras tres describen enfoques que Express no promueve y que se vuelven inmanejables al crecer.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 913,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Ruteo imperativo anidado profundo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 914,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ruteo estático compilado en binarios.",
+        "es_correcta": 0
+      },
+      {
+        "id": 915,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Ruteo declarativo a través de métodos HTTP y URIs.",
+        "es_correcta": 1
+      },
+      {
+        "id": 916,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ruteo basado en variables de sesión globales de servidor.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 230,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "En el ciclo de vida de un proceso Node, ¿qué detiene la ejecución del programa de forma natural?",
+    "justificacion": "Un proceso Node termina solo cuando no le queda nada pendiente: ni callbacks encolados, ni temporizadores activos, ni servidores escuchando. Por eso un programa que solo lee un archivo termina al acabar, y un servidor web no termina nunca — el socket abierto es trabajo pendiente permanente. Es también la explicación de un caso confuso: un `setInterval` olvidado mantiene el proceso vivo para siempre.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 917,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La finalización del hilo bloqueante principal tras 5 minutos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 918,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El vaciado total de la pila de eventos (Event Loop).",
+        "es_correcta": 1
+      },
+      {
+        "id": 919,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La ejecución constante del comando interno process.pause().",
+        "es_correcta": 0
+      },
+      {
+        "id": 920,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El renderizado de la primera vista en el cliente HTTP.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 231,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al instalar dependencias globales con Node, ¿dónde quedan disponibles los comandos binarios?",
+    "justificacion": "Instalar con `-g` deja los ejecutables del paquete en un directorio que está en el `PATH` del sistema, así que se pueden invocar por su nombre desde cualquier carpeta. Una instalación local, en cambio, los deja en `node_modules/.bin`, alcanzables desde los guiones de `package.json` o con `npx`. Hoy se prefiere lo local justamente para que cada proyecto fije su versión.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 921,
+        "letra": "a",
+        "orden": 1,
+        "texto": "En el archivo package.json del proyecto local exclusivamente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 922,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Solamente en la subcarpeta node_modules local del proyecto.",
+        "es_correcta": 0
+      },
+      {
+        "id": 923,
+        "letra": "c",
+        "orden": 3,
+        "texto": "En las variables de entorno PATH del sistema operativo subyacente.",
+        "es_correcta": 1
+      },
+      {
+        "id": 924,
+        "letra": "d",
+        "orden": 4,
+        "texto": "En el registro interno del navegador del desarrollador.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 232,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué diferencia clave existe entre una instrucción \"blocking\" y \"non-blocking\" en Node?",
+    "justificacion": "Una operación bloqueante detiene el único hilo hasta terminar, y mientras tanto **ninguna otra petición se atiende**; una no bloqueante entrega el trabajo y sigue, y avisa después por un callback. En un servidor la diferencia no es de estilo: una lectura síncrona de un archivo grande deja a todos los usuarios esperando. Por eso las funciones de Node vienen casi siempre en las dos formas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 925,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Blocking pausa el hilo principal; non-blocking delega por callbacks.",
+        "es_correcta": 1
+      },
+      {
+        "id": 926,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Non-blocking detiene la CPU; blocking usa excesiva memoria RAM.",
+        "es_correcta": 0
+      },
+      {
+        "id": 927,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Blocking solo afecta a peticiones de red; non-blocking al disco.",
+        "es_correcta": 0
+      },
+      {
+        "id": 928,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Node ignora las instrucciones blocking para evitar fallas crónicas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 233,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cuál es el propósito del paquete `nodemon` durante el desarrollo de una aplicación Node?",
+    "justificacion": "`nodemon` vigila los archivos del proyecto y reinicia el proceso cuando alguno cambia, para no tener que parar y arrancar a mano en cada edición. Es una herramienta de desarrollo y por eso va en `devDependencies`: en producción no se usa, donde el reinicio lo gestiona otra cosa. Las otras tres describen oficios de herramientas distintas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 929,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Minimizar el código fuente a su versión más ligera de byte.",
+        "es_correcta": 0
+      },
+      {
+        "id": 930,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Encriptar las peticiones HTTP mediante protocolos SSL/TLS.",
+        "es_correcta": 0
+      },
+      {
+        "id": 931,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Reiniciar automáticamente el servidor al detectar cambios.",
+        "es_correcta": 1
+      },
+      {
+        "id": 932,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Generar datos falsos masivos para probar la base de datos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 234,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué objeto global en Node.js provee información y control directo sobre la ejecución actual?",
+    "justificacion": "`process` es el objeto global que representa al proceso en curso: da los argumentos de la línea de comandos en `process.argv`, las variables de entorno en `process.env`, el código de salida, y eventos como `exit`. Los otros tres nombres no existen. Es de los primeros que hay que conocer, porque casi toda configuración de una aplicación Node entra por `process.env`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 933,
+        "letra": "a",
+        "orden": 1,
+        "texto": "system",
+        "es_correcta": 0
+      },
+      {
+        "id": 934,
+        "letra": "b",
+        "orden": 2,
+        "texto": "process",
+        "es_correcta": 1
+      },
+      {
+        "id": 935,
+        "letra": "c",
+        "orden": 3,
+        "texto": "globalApp",
+        "es_correcta": 0
+      },
+      {
+        "id": 936,
+        "letra": "d",
+        "orden": 4,
+        "texto": "nodeEnv",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 235,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué ocurre si un error no capturado (uncaught exception) alcanza la cima del Event Loop?",
+    "justificacion": "Un error que nadie captura llega arriba del todo y **tumba el proceso**: Node imprime la traza y sale. No hay red de seguridad por omisión, y ésa es una diferencia grande con el navegador, donde un error en un manejador no cierra la página. Por eso en producción se pone un supervisor que reinicie, y por eso conviene capturar los errores donde ocurren en vez de confiar en `process.on('uncaughtException')`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 937,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Node ignora el error silenciosamente y continúa iterando eventos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 938,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El proceso principal se interrumpe y la aplicación se cae por fallas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 939,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Se envía un reporte automático en XML al administrador del servidor.",
+        "es_correcta": 0
+      },
+      {
+        "id": 940,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Express reinicia dinámicamente el hilo afectado sin afectar a otros.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 236,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué archivo es imprescindible para que una carpeta se reconozca como proyecto Node/NPM?",
+    "justificacion": "`package.json` es lo que convierte una carpeta en un proyecto: declara nombre, versión, dependencias y guiones. Sin él, `npm` no sabe qué instalar ni qué ejecutar. Los otros tres son habituales pero no imprescindibles: `index.js` es una convención de nombre, `node_modules` lo genera la instalación, y un archivo de entorno es opcional y además **no se versiona**.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 941,
+        "letra": "a",
+        "orden": 1,
+        "texto": "package.json",
+        "es_correcta": 1
+      },
+      {
+        "id": 942,
+        "letra": "b",
+        "orden": 2,
+        "texto": "index.js",
+        "es_correcta": 0
+      },
+      {
+        "id": 943,
+        "letra": "c",
+        "orden": 3,
+        "texto": "node_modules",
+        "es_correcta": 0
+      },
+      {
+        "id": 944,
+        "letra": "d",
+        "orden": 4,
+        "texto": ".env config",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 237,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al instalar un paquete mediante `npm install`, ¿qué carpeta almacena sus archivos físicos?",
+    "justificacion": "`npm install` deja los archivos de cada paquete en `node_modules`, en la raíz del proyecto. Esa carpeta se puede borrar y reconstruir en cualquier momento con otro `npm install`, y por eso **no se versiona**: lo que se versiona es `package.json` con lo declarado y `package-lock.json` con las versiones exactas. Los otros tres nombres no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 945,
+        "letra": "a",
+        "orden": 1,
+        "texto": "/bin modules",
+        "es_correcta": 0
+      },
+      {
+        "id": 946,
+        "letra": "b",
+        "orden": 2,
+        "texto": "/lib packages",
+        "es_correcta": 0
+      },
+      {
+        "id": 947,
+        "letra": "c",
+        "orden": 3,
+        "texto": "node_modules",
+        "es_correcta": 1
+      },
+      {
+        "id": 948,
+        "letra": "d",
+        "orden": 4,
+        "texto": "npm_packages_core",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 238,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué comando NPM inicia el asistente interactivo para crear el archivo de configuración base?",
+    "justificacion": "`npm init` abre el cuestionario que arma el `package.json` preguntando nombre, versión, punto de entrada y demás. La alternativa (c) es la que separa: `npm init -y` **crea el archivo igual, pero sin preguntar nada** — el `-y` acepta todos los valores por omisión, que es justo lo contrario del asistente interactivo que la pregunta pide. Es el atajo que se usa cuando el detalle da lo mismo. `npm start` ejecuta un guion ya declarado y `npm setup_project` no existe.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 949,
+        "letra": "a",
+        "orden": 1,
+        "texto": "npm start",
+        "es_correcta": 0
+      },
+      {
+        "id": 950,
+        "letra": "b",
+        "orden": 2,
+        "texto": "npm init",
+        "es_correcta": 1
+      },
+      {
+        "id": 951,
+        "letra": "c",
+        "orden": 3,
+        "texto": "npm init -y",
+        "es_correcta": 0
+      },
+      {
+        "id": 952,
+        "letra": "d",
+        "orden": 4,
+        "texto": "npm setup_project",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 239,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cómo se exporta correctamente un módulo personalizado en Node (CommonJS) para su reutilización?",
+    "justificacion": "En CommonJS lo que se exporta es lo que se asigne a `module.exports`, y con un objeto se exponen varias cosas de una vez. La (b) es la sintaxis de los módulos ES, que es el otro sistema y no se mezcla con éste en el mismo archivo — esa distinción es justamente lo que la pregunta separa. `return` no funciona fuera de una función y `expose_module()` no existe.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 953,
+        "letra": "a",
+        "orden": 1,
+        "texto": "module.exports = { modulo }",
+        "es_correcta": 1
+      },
+      {
+        "id": 954,
+        "letra": "b",
+        "orden": 2,
+        "texto": "export default modulo",
+        "es_correcta": 0
+      },
+      {
+        "id": 955,
+        "letra": "c",
+        "orden": 3,
+        "texto": "return modulo_global",
+        "es_correcta": 0
+      },
+      {
+        "id": 956,
+        "letra": "d",
+        "orden": 4,
+        "texto": "expose_module(modulo)",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 240,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al leer el archivo package.json, ¿qué indican los símbolos ^ o ~ en la versión de un paquete?",
+    "justificacion": "`^` y `~` fijan hasta dónde puede subir sola una dependencia al reinstalar: `^1.2.3` acepta cualquier `1.x.x` posterior, o sea correcciones y funciones nuevas pero no cambios que rompan; `~1.2.3` es más estricto y solo acepta `1.2.x`. Sin ningún símbolo, la versión queda clavada. Ninguna de las otras tres describe algo que esos símbolos hagan.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 957,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Definen estrictas políticas de actualizaciones automáticas permitidas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 958,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Indican que el paquete está obsoleto y será eliminado próximamente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 959,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Obligan a instalar forzosamente una versión pre-lanzamiento beta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 960,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Señalan que el paquete debe instalarse de forma global del sistema.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 241,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué comando NPM debes ejecutar para ver qué paquetes tienen una nueva versión disponible?",
+    "justificacion": "`npm outdated` lista los paquetes cuya versión instalada se quedó atrás, mostrando la actual, la que permitiría el rango declarado y la última publicada. No cambia nada: solo informa, y por eso es el paso previo a `npm update`. Los otros tres nombres no existen. Conviene mirarlo antes de actualizar, porque la columna «latest» puede estar detrás de un cambio mayor.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 961,
+        "letra": "a",
+        "orden": 1,
+        "texto": "npm update-check",
+        "es_correcta": 0
+      },
+      {
+        "id": 962,
+        "letra": "b",
+        "orden": 2,
+        "texto": "npm outdated",
+        "es_correcta": 1
+      },
+      {
+        "id": 963,
+        "letra": "c",
+        "orden": 3,
+        "texto": "npm upgrade-list",
+        "es_correcta": 0
+      },
+      {
+        "id": 964,
+        "letra": "d",
+        "orden": 4,
+        "texto": "npm list-old-versions",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 242,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Para invocar funcionalidades de un módulo nativo o de terceros en CommonJS, ¿qué sentencia usas?",
+    "justificacion": "`require()` es la forma de CommonJS, el sistema de módulos con el que Node nació y el que sigue usando cuando el archivo no se declara como módulo ES. La (a), `import()`, existe en Node pero pertenece al otro sistema —y en su forma dinámica devuelve una promesa—, así que no es equivalente. Los otros dos no existen. Cuál rige lo decide la extensión del archivo y el campo `type` del `package.json`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 965,
+        "letra": "a",
+        "orden": 1,
+        "texto": "import()",
+        "es_correcta": 0
+      },
+      {
+        "id": 966,
+        "letra": "b",
+        "orden": 2,
+        "texto": "loadModule()",
+        "es_correcta": 0
+      },
+      {
+        "id": 967,
+        "letra": "c",
+        "orden": 3,
+        "texto": "require()",
+        "es_correcta": 1
+      },
+      {
+        "id": 968,
+        "letra": "d",
+        "orden": 4,
+        "texto": "fetchDependency()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 243,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué ventaja ofrece usar dependencias de desarrollo (devDependencies) en el package.json?",
+    "justificacion": "Las dependencias de desarrollo son las que solo hacen falta mientras se trabaja —pruebas, `nodemon`, herramientas de construcción— y se pueden dejar fuera al desplegar, con `npm install --omit=dev` o con `NODE_ENV=production`. Eso hace la instalación más liviana y reduce lo que llega al servidor. Por omisión, un `npm install` corriente sí las instala: la separación es una declaración de intención que el despliegue aprovecha.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 969,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Aceleran el tiempo de compilación nativa directamente en el servidor.",
+        "es_correcta": 0
+      },
+      {
+        "id": 970,
+        "letra": "b",
+        "orden": 2,
+        "texto": "No se instalan obligatoriamente al desplegar el proyecto en producción.",
+        "es_correcta": 1
+      },
+      {
+        "id": 971,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Tienen mayor prioridad de carga en la memoria RAM del sistema base.",
+        "es_correcta": 0
+      },
+      {
+        "id": 972,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Permiten ejecutar código asíncrono evadiendo el uso de callbacks.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 244,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué directiva de Express se utiliza habitualmente para servir contenido estático (CSS, img)?",
+    "justificacion": "`express.static()` es el middleware que sirve archivos tal cual están en una carpeta: hojas de estilo, imágenes, guiones del cliente. Se monta con `app.use(express.static('public'))` y desde ahí el contenido queda disponible por su ruta. Los otros tres nombres no existen. Conviene recordar que lo que entra en esa carpeta queda público: es exactamente la decisión que en este proyecto toma `LISTA_COPIA`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 973,
+        "letra": "a",
+        "orden": 1,
+        "texto": "express.static()",
+        "es_correcta": 1
+      },
+      {
+        "id": 974,
+        "letra": "b",
+        "orden": 2,
+        "texto": "express.publicContent()",
+        "es_correcta": 0
+      },
+      {
+        "id": 975,
+        "letra": "c",
+        "orden": 3,
+        "texto": "app.useStaticFolder()",
+        "es_correcta": 0
+      },
+      {
+        "id": 976,
+        "letra": "d",
+        "orden": 4,
+        "texto": "express.serveAssets()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 245,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cuál es la función principal de un motor de plantillas como Handlebars en un servidor Express?",
+    "justificacion": "Un motor de plantillas toma un archivo con marcadores y los datos que le pasa el servidor, y produce el HTML final que se envía al navegador. Con eso la vista deja de escribirse a mano por cada caso. Las otras tres describen oficios ajenos: ni genera tablas de base de datos, ni valida formularios, ni comprime imágenes. La lógica pesada no va en la plantilla: va antes, en el controlador.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 977,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Generar esquemas y tablas de base de datos a partir del código JS.",
+        "es_correcta": 0
+      },
+      {
+        "id": 978,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Renderizar HTML dinámico inyectando variables del backend al vuelo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 979,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Validar fuertemente los formularios HTTP antes de enviarlos a disco.",
+        "es_correcta": 0
+      },
+      {
+        "id": 980,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Comprimir imágenes estáticas de forma asíncrona para el cliente.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 246,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué concepto en Handlebars permite reutilizar bloques de código HTML, como un header o footer?",
+    "justificacion": "Los **partials** son fragmentos de plantilla que se escriben una vez y se incluyen donde hagan falta con `{{> nombre}}`: la cabecera, el pie, un menú. Evitan repetir el mismo HTML en cada vista y, sobre todo, evitan tener que corregirlo en diez sitios. Las otras tres opciones mezclan palabras de otros contextos y no son conceptos de Handlebars.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 981,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Middleware views component",
+        "es_correcta": 0
+      },
+      {
+        "id": 982,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Partials (Páginas parciales)",
+        "es_correcta": 1
+      },
+      {
+        "id": 983,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Injections (Inyecciones de DOM)",
+        "es_correcta": 0
+      },
+      {
+        "id": 984,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Layout fragments template",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 247,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué método del objeto `res` en Express procesa una plantilla y la envía como HTML al cliente?",
+    "justificacion": "`res.render('vista', datos)` busca la plantilla, la combina con los datos y manda el HTML resultante al cliente. Es el par de `res.send()`, que envía contenido ya listo, y de `res.json()`, que envía datos. Los otros tres nombres no existen. Para que funcione hace falta haber configurado antes el motor de vistas y el directorio donde están.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 985,
+        "letra": "a",
+        "orden": 1,
+        "texto": "res.sendTemplateObject()",
+        "es_correcta": 0
+      },
+      {
+        "id": 986,
+        "letra": "b",
+        "orden": 2,
+        "texto": "res.render()",
+        "es_correcta": 1
+      },
+      {
+        "id": 987,
+        "letra": "c",
+        "orden": 3,
+        "texto": "res.htmlCompiler()",
+        "es_correcta": 0
+      },
+      {
+        "id": 988,
+        "letra": "d",
+        "orden": 4,
+        "texto": "res.viewGenerator()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 248,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Para que Express reconozca Handlebars como su motor base, ¿qué propiedad de `app.set` se define?",
+    "justificacion": "Se declara con `app.set('view engine', 'handlebars')`, y junto a él suele ir `app.set('views', ruta)` para decir dónde están las plantillas. Con eso, `res.render('inicio')` ya sabe qué archivo buscar y con qué motor procesarlo. Los otros tres nombres de propiedad no existen: Express solo reconoce las suyas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 989,
+        "letra": "a",
+        "orden": 1,
+        "texto": "'template engine base'",
+        "es_correcta": 0
+      },
+      {
+        "id": 990,
+        "letra": "b",
+        "orden": 2,
+        "texto": "'view engine'",
+        "es_correcta": 1
+      },
+      {
+        "id": 991,
+        "letra": "c",
+        "orden": 3,
+        "texto": "'render compile mode'",
+        "es_correcta": 0
+      },
+      {
+        "id": 992,
+        "letra": "d",
+        "orden": 4,
+        "texto": "'html processor native'",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 249,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "En Handlebars, ¿qué es un \"Helper\" y cuál es su utilidad principal?",
+    "justificacion": "Un helper es una función de JavaScript que se registra en Handlebars y se puede llamar desde la plantilla, para resolver ahí lo que el lenguaje de plantillas no hace solo: formatear una fecha, comparar dos valores, pluralizar. Es la válvula de escape para lógica **de presentación**, y conviene que se quede en eso: la lógica de negocio pertenece al controlador, no a la vista.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 993,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una directiva de Express para comprimir el HTML antes de su salida.",
+        "es_correcta": 0
+      },
+      {
+        "id": 994,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un archivo CSS que aplica estilos responsivos por defecto en tablas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 995,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Una función JS que ejecuta lógica de presentación incrustada en vista.",
+        "es_correcta": 1
+      },
+      {
+        "id": 996,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Un componente asíncrono que previene inyección de código tipo SQL.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 250,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Para leer el contenido de un archivo de texto de forma síncrona en Node, ¿qué método usarías?",
+    "justificacion": "`fs.readFileSync(ruta, 'utf8')` lee el archivo y devuelve su contenido de una vez, deteniendo el hilo hasta terminar. Los otros tres nombres no existen. El sufijo `Sync` es la convención de Node para las versiones bloqueantes, y por eso conviene reservarlas para guiones y arranque: dentro de un servidor que atiende peticiones, cada una de ellas deja a todos los demás esperando.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 997,
+        "letra": "a",
+        "orden": 1,
+        "texto": "fs.readSyncFile()",
+        "es_correcta": 0
+      },
+      {
+        "id": 998,
+        "letra": "b",
+        "orden": 2,
+        "texto": "fs.readFileSync()",
+        "es_correcta": 1
+      },
+      {
+        "id": 999,
+        "letra": "c",
+        "orden": 3,
+        "texto": "fs.openSyncStream()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1000,
+        "letra": "d",
+        "orden": 4,
+        "texto": "fs.loadTextSync()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 251,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al leer un archivo JSON plano con `fs`, el resultado es texto crudo. ¿Cómo lo conviertes a objeto?",
+    "justificacion": "`JSON.parse()` convierte el texto leído en un objeto de JavaScript. Su par es `JSON.stringify()`, que es la (c) y hace el camino contrario — se confunden por parecido y por costumbre. Conviene envolverlo en `try/catch`: si el archivo está a medias o corrupto, `JSON.parse()` lanza, y sin capturar ese error el proceso se cae.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1001,
+        "letra": "a",
+        "orden": 1,
+        "texto": "String.toObjectJS()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1002,
+        "letra": "b",
+        "orden": 2,
+        "texto": "JSON.parse()",
+        "es_correcta": 1
+      },
+      {
+        "id": 1003,
+        "letra": "c",
+        "orden": 3,
+        "texto": "JSON.stringify()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1004,
+        "letra": "d",
+        "orden": 4,
+        "texto": "ParseData.evaluate()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 252,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Por qué el uso exclusivo de `fs.writeFileSync()` puede ser contraproducente en aplicaciones web?",
+    "justificacion": "Escribir de forma síncrona detiene el único hilo hasta que el disco responde, y mientras tanto **ninguna otra petición se atiende**. En un guion que corre y termina no importa; en un servidor con usuarios, sí. La salida es la versión con promesas, `fs.promises.writeFile()`, que delega la espera y deja el hilo libre. Las otras tres describen limitaciones que `fs` no tiene.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1005,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Solo permite escribir archivos binarios, no strings de texto plano.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1006,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Requiere permisos de administrador (root) absolutos para funcionar.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1007,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Bloquea el hilo principal, paralizando la atención de otras peticiones.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1008,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Borra automáticamente el archivo si falla la conexión HTTP entrante.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 253,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Si deseas actualizar un registro dentro de un archivo JSON plano, ¿cuál es el flujo lógico correcto?",
+    "justificacion": "El flujo es leer el archivo, convertirlo a objeto con `JSON.parse()`, modificar lo que corresponda, volverlo a texto con `JSON.stringify()` y reescribirlo entero. Un archivo JSON no se edita por partes: se reemplaza. De ahí sale su límite como forma de persistencia — dos escrituras a la vez pueden pisarse—, que es justamente el motivo por el que el módulo siguiente pasa a una base de datos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1009,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Buscar línea exacta por regex y sobrescribir el binario en memoria.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1010,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Leer, parsear a objeto JS, modificar, pasarlo a string y reescribir.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1011,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Usar fs.updateJSON() apuntando directo a la propiedad JS anidada.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1012,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Inyectar una query SQL parametrizada mediante el módulo file-system.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 254,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al modularizar la persistencia en archivos planos, ¿cuál es una buena práctica de diseño de código?",
+    "justificacion": "Conviene reunir las funciones que tocan archivos en un módulo propio y exportarlas, de modo que las rutas solo las llamen. Así la ruta habla de HTTP y el módulo habla de persistencia, y el día que los datos se muden a una base solo cambia un archivo. Las otras tres describen prácticas que atan la aplicación a su forma actual o que dejan pasar los errores en silencio.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1013,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Dejar toda la lógica de `fs` escrita directamente en los ruteadores HTTP.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1014,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Crear funciones independientes orientadas y exportarlas como un módulo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1015,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Usar variables globales en el scope para compartir los datos en crudo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1016,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ignorar el manejo de errores de escritura para no interrumpir el flujo.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 255,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué ocurre si intentas usar `fs.writeFileSync()` sobre un archivo físico que aún no existe?",
+    "justificacion": "Lo crea. `fs.writeFileSync()` crea el archivo si no existe y lo **sobrescribe entero** si existe, que es la parte que conviene tener presente: no agrega al final. Para eso está `fs.appendFileSync()` o abrirlo con la bandera `'a'`. Las otras tres describen comportamientos que no ocurren: no lanza `FileNotFoundError`, no ignora la orden y no pide permisos por consola.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1017,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El proceso se detiene forzosamente arrojando un FileNotFoundError.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1018,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Node crea el archivo automáticamente e inserta la data especificada.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1019,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Node ignora el comando por seguridad y pasa a la siguiente instrucción.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1020,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Solicita permisos de acceso interactivo en la consola del servidor base.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 256,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cómo pasas parámetros por línea de comandos al iniciar una aplicación mediante `node index.js`?",
+    "justificacion": "Los argumentos se escriben después del nombre del archivo, y la forma `--clave=valor` es la convención habitual porque las bibliotecas que los interpretan la reconocen sola. Las otras tres inventan sintaxis de otros contextos. Lo que llegue queda disponible en `process.argv`, que es la pregunta siguiente, y de ahí lo toman herramientas como `yargs`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1021,
+        "letra": "a",
+        "orden": 1,
+        "texto": "node index.js --param=valor",
+        "es_correcta": 1
+      },
+      {
+        "id": 1022,
+        "letra": "b",
+        "orden": 2,
+        "texto": "node index.js <param>valor</param>",
+        "es_correcta": 0
+      },
+      {
+        "id": 1023,
+        "letra": "c",
+        "orden": 3,
+        "texto": "node index.js [param: valor]",
+        "es_correcta": 0
+      },
+      {
+        "id": 1024,
+        "letra": "d",
+        "orden": 4,
+        "texto": "node index.js && param=valor_node",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 257,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Dentro de qué estructura array de Node se alojan los argumentos pasados por la línea de comandos?",
+    "justificacion": "`process.argv` es un arreglo donde los dos primeros elementos son fijos —la ruta de Node y la del archivo— y **a partir del tercero vienen los argumentos de verdad**. Por eso casi siempre se lo recorta con `process.argv.slice(2)`, que es el detalle que más se olvida. Los otros tres nombres no existen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1025,
+        "letra": "a",
+        "orden": 1,
+        "texto": "global.arguments",
+        "es_correcta": 0
+      },
+      {
+        "id": 1026,
+        "letra": "b",
+        "orden": 2,
+        "texto": "process.argv",
+        "es_correcta": 1
+      },
+      {
+        "id": 1027,
+        "letra": "c",
+        "orden": 3,
+        "texto": "console.params",
+        "es_correcta": 0
+      },
+      {
+        "id": 1028,
+        "letra": "d",
+        "orden": 4,
+        "texto": "node.cli_options",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 258,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué dependencia de terceros se usa comúnmente en Node para parsear fácilmente los argumentos CLI?",
+    "justificacion": "`yargs` interpreta los argumentos de la línea de comandos y además permite declarar cuáles son obligatorios, de qué tipo, y generar la ayuda sola. Evita tener que recorrer `process.argv` a mano. Las otras tres son bibliotecas reales con otro oficio: `nodemon` reinicia, `morgan` registra las peticiones HTTP, y `underscore` trae utilidades para colecciones.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1029,
+        "letra": "a",
+        "orden": 1,
+        "texto": "yargs",
+        "es_correcta": 1
+      },
+      {
+        "id": 1030,
+        "letra": "b",
+        "orden": 2,
+        "texto": "nodemon",
+        "es_correcta": 0
+      },
+      {
+        "id": 1031,
+        "letra": "c",
+        "orden": 3,
+        "texto": "morgan",
+        "es_correcta": 0
+      },
+      {
+        "id": 1032,
+        "letra": "d",
+        "orden": 4,
+        "texto": "underscore",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 259,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Si una aplicación Node lanza un error y arroja un \"Stack Trace\", ¿qué te indica esta lectura?",
+    "justificacion": "La traza muestra la cadena de llamadas que llevó al error, de la más reciente hacia atrás, con archivo y línea de cada una. Se lee **de arriba abajo**: la primera línea es donde reventó, y las de abajo cuentan cómo se llegó ahí. Es la información más útil de un fallo, y conviene mirar la primera línea que apunte a código propio y no a `node_modules`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1033,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El uso de memoria y carga de CPU exactos al momento del fallo interno.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1034,
+        "letra": "b",
+        "orden": 2,
+        "texto": "La traza y jerarquía de funciones llamadas que condujeron al fallo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1035,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Las variables de entorno de base de datos filtradas accidentalmente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1036,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El historial encolado de peticiones HTTP de los últimos diez minutos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 260,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué atajo de teclado detiene la ejecución activa de un servidor Node.js corriendo en la terminal?",
+    "justificacion": "`Ctrl + C` envía la señal de interrupción al proceso en primer plano y lo detiene. Es la forma estándar en cualquier terminal. Node permite además atenderla con `process.on('SIGINT', ...)` para cerrar ordenadamente lo que esté abierto, que es lo que hace un servidor bien terminado antes de salir. Las otras tres no detienen un proceso de Node en la terminal.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1037,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Esc + :q",
+        "es_correcta": 0
+      },
+      {
+        "id": 1038,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ctrl + C (o Cmd + C)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1039,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Alt + F4",
+        "es_correcta": 0
+      },
+      {
+        "id": 1040,
+        "letra": "d",
+        "orden": 4,
+        "texto": "process.kill command",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 261,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cuál es el comando estándar para imprimir y evaluar el valor de variables en la consola de comandos?",
+    "justificacion": "`console.log()` imprime en la salida estándar y sirve tanto en Node como en el navegador. Los otros tres no existen — `document.write` sí existe pero pertenece al navegador y no a Node, donde no hay documento. Conviene conocer también `console.error()`, que escribe en la salida de errores y por eso se puede separar del resto al redirigir.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1041,
+        "letra": "a",
+        "orden": 1,
+        "texto": "print.value()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1042,
+        "letra": "b",
+        "orden": 2,
+        "texto": "document.writeLog()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1043,
+        "letra": "c",
+        "orden": 3,
+        "texto": "echo.terminal()",
+        "es_correcta": 0
+      },
+      {
+        "id": 1044,
+        "letra": "d",
+        "orden": 4,
+        "texto": "console.log()",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 262,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Cuál es el comportamiento nativo principal del Event Loop en la arquitectura de un proceso Node.js?",
+    "justificacion": "El bucle de eventos es lo que permite atender muchas peticiones concurrentes con **un solo hilo**: mientras una espera por el disco o la red, el hilo atiende otra, y los callbacks de lo que va terminando se van ejecutando por turno. La (a) describe el modelo de un hilo por petición, que es justo el que Node evita, y la (b) le quita lo que lo hace útil.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1045,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Asigna un hilo del procesador por cada petición entrante.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1046,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ejecuta tareas síncronas en un único hilo bloqueante.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1047,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Gestiona múltiples peticiones concurrentes en un único hilo.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1048,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Delega el ruteo web directamente al motor V8 de Google.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 263,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué patrón estructural fundamental define a un middleware dentro del ciclo de vida de Express?",
+    "justificacion": "Un middleware es una función que se interpone entre la petición y el controlador, con acceso a la petición, la respuesta y a `next()`. Ese patrón de cadena es lo que permite componer autenticación, registro y parseo sin tocar cada ruta. Las otras tres describen piezas que no son middlewares. El orden en que se declaran importa: se ejecutan en el orden en que se registraron.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1049,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una base de datos en memoria para almacenar sesiones.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1050,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un motor de renderizado exclusivo para archivos HTML puros.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1051,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Una función que intercepta peticiones antes del controlador.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1052,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Un proceso independiente para balanceo de carga.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 264,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué herramienta detiene y reinicia automáticamente un proceso Node.js al detectar cambios en el código?",
+    "justificacion": "`nodemon` vigila los archivos y reinicia el proceso al detectar un cambio, que es lo que evita parar y arrancar a mano en cada edición. Las otras tres son reales y hacen otra cosa: `morgan` registra las peticiones HTTP, `express-generator` crea el esqueleto de un proyecto una sola vez, y `yargs` interpreta argumentos de la consola.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1053,
+        "letra": "a",
+        "orden": 1,
+        "texto": "morgan",
+        "es_correcta": 0
+      },
+      {
+        "id": 1054,
+        "letra": "b",
+        "orden": 2,
+        "texto": "express-generator",
+        "es_correcta": 0
+      },
+      {
+        "id": 1055,
+        "letra": "c",
+        "orden": 3,
+        "texto": "yargs",
+        "es_correcta": 0
+      },
+      {
+        "id": 1056,
+        "letra": "d",
+        "orden": 4,
+        "texto": "nodemon",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 265,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué comando NPM instala una dependencia asegurando que no se actualice su versión mayor accidentalmente?",
+    "justificacion": "`npm install <paquete> --save-exact` guarda la versión **sin** `^` ni `~`, de modo que quede clavada tal cual. Los otros tres no existen. Conviene precisar el alcance, porque es más de lo que el enunciado dice: `--save-exact` impide **cualquier** actualización automática, no solo la de versión mayor. La que permite correcciones y funciones nuevas pero bloquea los cambios que rompen es `^`, y es la que npm pone por omisión.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1057,
+        "letra": "a",
+        "orden": 1,
+        "texto": "npm install <paquete> --no-update",
+        "es_correcta": 0
+      },
+      {
+        "id": 1058,
+        "letra": "b",
+        "orden": 2,
+        "texto": "npm install <paquete> --save-exact",
+        "es_correcta": 1
+      },
+      {
+        "id": 1059,
+        "letra": "c",
+        "orden": 3,
+        "texto": "npm add <paquete> --strict",
+        "es_correcta": 0
+      },
+      {
+        "id": 1060,
+        "letra": "d",
+        "orden": 4,
+        "texto": "npm update <paquete> --freeze",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 266,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Dónde registra NPM por defecto la metainformación y versiones de los paquetes instalados localmente?",
+    "justificacion": "`package.json` es donde npm declara las dependencias del proyecto con su rango de versiones. Los otros tres no cumplen ese papel. Conviene distinguirlo de `package-lock.json`, que es su compañero y guarda la versión **exacta** que se instaló de cada paquete y de sus dependencias: el primero dice qué se acepta, el segundo qué se puso, y los dos se versionan.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1061,
+        "letra": "a",
+        "orden": 1,
+        "texto": "En el archivo config.env de la raíz del proyecto.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1062,
+        "letra": "b",
+        "orden": 2,
+        "texto": "En el registro global de variables de entorno del sistema.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1063,
+        "letra": "c",
+        "orden": 3,
+        "texto": "En el archivo de configuración package.json del proyecto.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1064,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Dentro de la carpeta estática bin/node_modules.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 267,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "En Handlebars, ¿qué sintaxis permite renderizar una variable escapando automáticamente el código HTML?",
+    "justificacion": "`{{variable}}` escapa el HTML: si el valor trae `<script>`, se muestra como texto en vez de ejecutarse. La (a), `{{{variable}}}` con tres llaves, lo inserta **sin escapar**, y por eso es la puerta de entrada de los ataques XSS cuando el dato viene de fuera. Las otras dos son de otros motores. Esa diferencia entre dos y tres llaves es de las que más se preguntan, y con razón.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1065,
+        "letra": "a",
+        "orden": 1,
+        "texto": "{{{variable}}}",
+        "es_correcta": 0
+      },
+      {
+        "id": 1066,
+        "letra": "b",
+        "orden": 2,
+        "texto": "<% variable %>",
+        "es_correcta": 0
+      },
+      {
+        "id": 1067,
+        "letra": "c",
+        "orden": 3,
+        "texto": "{{variable}}",
+        "es_correcta": 1
+      },
+      {
+        "id": 1068,
+        "letra": "d",
+        "orden": 4,
+        "texto": "${variable}",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 268,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué ventaja arquitectónica ofrece el uso de \"partials\" al construir vistas con motores de plantillas?",
+    "justificacion": "Un partial se escribe una vez y se incluye en todas las vistas que lo necesiten, así que la cabecera o el pie dejan de estar repetidos en diez archivos. La ventaja real no es escribir menos sino **corregir en un solo sitio**: un cambio en el menú se aplica en toda la aplicación. Las otras tres atribuyen a los partials cosas que no hacen.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1069,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Minifican automáticamente el código CSS y JS de la vista.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1070,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Permiten reutilizar bloques de código en múltiples vistas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1071,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Ejecutan código SQL directamente desde la vista del cliente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1072,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Transforman la aplicación a un framework de Single Page App.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 269,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué elemento de Handlebars permite ejecutar lógica personalizada para procesar datos antes de renderizarlos?",
+    "justificacion": "Los helpers son funciones de JavaScript registradas en el motor de plantillas y llamadas desde la vista, para resolver ahí lo que la plantilla no puede sola: formatear, comparar, elegir. Los otros tres son conceptos reales de otras capas — los middlewares y los routers pertenecen a Express, y los partials reutilizan HTML pero no ejecutan lógica.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1073,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Los middlewares",
+        "es_correcta": 0
+      },
+      {
+        "id": 1074,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Los helpers",
+        "es_correcta": 1
+      },
+      {
+        "id": 1075,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Los routers",
+        "es_correcta": 0
+      },
+      {
+        "id": 1076,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Los partials abstractos",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 270,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué módulo nativo de Node.js es indispensable para leer y escribir objetos JSON en archivos del sistema?",
+    "justificacion": "`fs` es el módulo nativo que da acceso al sistema de archivos: leer, escribir, comprobar si algo existe, recorrer directorios. Los otros tres también son nativos y tienen otro oficio: `path` arma y descompone rutas sin preocuparse del sistema operativo, `http` levanta servidores y hace peticiones, y `os` informa de la máquina.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1077,
+        "letra": "a",
+        "orden": 1,
+        "texto": "path",
+        "es_correcta": 0
+      },
+      {
+        "id": 1078,
+        "letra": "b",
+        "orden": 2,
+        "texto": "http",
+        "es_correcta": 0
+      },
+      {
+        "id": 1079,
+        "letra": "c",
+        "orden": 3,
+        "texto": "fs (file system)",
+        "es_correcta": 1
+      },
+      {
+        "id": 1080,
+        "letra": "d",
+        "orden": 4,
+        "texto": "os",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 271,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué operación crítica debes realizar antes de guardar un objeto JavaScript en un archivo de texto plano?",
+    "justificacion": "Hay que convertirlo a texto con `JSON.stringify()`, porque un archivo de texto guarda caracteres y no objetos. Se le puede pasar un tercer argumento para que salga con sangría y se pueda leer a ojo: `JSON.stringify(obj, null, 2)`. Y conviene recordar lo que descarta por el camino: las funciones y las propiedades cuyo valor es `undefined` no viajan.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1081,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Cifrar el objeto usando el algoritmo bcrypt de forma segura.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1082,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Transformarlo a cadena de texto usando JSON.stringify().",
+        "es_correcta": 1
+      },
+      {
+        "id": 1083,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Parsear el objeto a formato binario mediante Buffer.alloc().",
+        "es_correcta": 0
+      },
+      {
+        "id": 1084,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Inyectar la llave pública del servidor en el propio objeto.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 272,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al leer un archivo plano con JSON.parse(), ¿qué riesgo principal existe si el archivo está corrupto?",
+    "justificacion": "Lanza una excepción, y como es una operación **síncrona**, si nadie la captura el proceso se cae. Por eso `JSON.parse()` casi siempre va dentro de un `try/catch`, sobre todo cuando el archivo lo escribió otro programa o quedó a medias por una caída. Las otras tres describen comportamientos que no ocurren: no borra nada, no devuelve `null` en silencio y no inyecta nada.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1085,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Borra automáticamente el archivo del disco para protegerlo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1086,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Lanza una excepción síncrona que puede detener la app.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1087,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Retorna un objeto nulo silenciosamente sin avisar al usuario.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1088,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Inyecta código malicioso directo al motor de base de datos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 273,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué utilidad tiene el paquete \"yargs\" al levantar una aplicación Node.js desde la consola de comandos?",
+    "justificacion": "`yargs` toma los argumentos de la consola y los entrega ya interpretados, y permite declarar cuáles son obligatorios, de qué tipo son y qué valor toman por omisión, además de generar la ayuda. Es la diferencia entre leer `process.argv` a mano y tener una interfaz de línea de comandos que avisa cuando el usuario se equivoca. Las otras tres describen cosas que no hace.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1089,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Facilita el paso y la validación de parámetros de entrada.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1090,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Inicia un servidor FTP paralelo para recibir archivos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1091,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Limpia los mensajes de error ilegibles de console.log.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1092,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Permite compilar el código de JavaScript a binario nativo.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 274,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "¿Qué técnica ayuda a diferenciar niveles de error en la salida de consola al depurar una app Node.js?",
+    "justificacion": "Dar color y formato a la salida permite distinguir de un vistazo un aviso de un error en medio de muchas líneas. Hay bibliotecas dedicadas a eso, y también registradores que ya traen niveles —`info`, `warn`, `error`— y que además permiten apagar los mensajes de depuración en producción sin borrarlos del código. Las otras tres opciones no ayudan a depurar.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1093,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Exportar todo el log como un archivo PDF firmado digitalmente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1094,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Utilizar colores y formateo con librerías externas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1095,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Escribir siempre los mensajes de error en formato XML nativo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1096,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Evitar console.log y usar alertas nativas del sistema.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 275,
+    "modulo": 6,
+    "modulo_titulo": "Desarrollo de Aplicaciones Web Node Express",
+    "modulo_icono": "dns",
+    "enunciado": "Al depurar código asíncrono, ¿por qué los errores en un callback pueden no detener la app principal?",
+    "justificacion": "Porque el callback se ejecuta **después**, en otro turno del bucle de eventos, cuando la función que lo registró ya terminó. Por eso un `try/catch` puesto alrededor de la llamada asíncrona no lo alcanza: cuando el error ocurre, ese bloque hace rato que se cerró. Conviene reconciliarlo con lo que dice la pregunta sobre errores no capturados: si el error se **lanza** y nadie lo atiende, el proceso igual se cae; lo que puede pasar inadvertido es el error que llega como primer argumento del callback —el `err` del patrón error-first— y que el código sencillamente no mira.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 1097,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Porque Express auto-reinicia la aplicación inmediatamente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1098,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Porque Node ignora cualquier error fuera del archivo index.js.",
+        "es_correcta": 0
+      },
+      {
+        "id": 1099,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Porque el error ocurre en un contexto asíncrono independiente.",
+        "es_correcta": 1
+      },
+      {
+        "id": 1100,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Porque NPM oculta los errores de librerías de terceros.",
         "es_correcta": 0
       }
     ]
