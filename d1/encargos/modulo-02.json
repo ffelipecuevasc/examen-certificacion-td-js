@@ -1,4 +1,15 @@
 {
+  "procedencia": {
+    "version": 1,
+    "modulo": 2,
+    "calculada_en": "2026-09-10T02:13:54.173Z",
+    "fuentes": {
+      "modulo-0N.json": "c8b369276f8439f7",
+      "cuestionario.js": "c8721e801d157080",
+      "retiradas.json": "9ebdbc3b537605e7",
+      "correcciones-de-enunciado.json": "98139fa7be962376"
+    }
+  },
   "preguntas": [
     {
       "modulo": 2,

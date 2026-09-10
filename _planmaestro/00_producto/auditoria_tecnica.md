@@ -1765,6 +1765,85 @@ repetidas veces, a ver si el fallo vuelve. Si vuelve, el arreglo probablemente s
 el comprobador no dependa de un estado que se puede restaurar por fuera. Si no vuelve,
 queda anotado como visto una vez y sin explicar, que es más honesto que cerrarlo.
 
+
+#### Resultado del intento de provocación · 2026-09-09
+
+**Se intentó provocar, y no se reprodujo. La hipótesis no queda confirmada ni
+descartada, y el hallazgo sigue en amarillo — pero ya no en amarillo vacío.**
+
+Corrido con `node scripts/ensayo-local.mjs --provocar-h029=8`, que restaura la base de
+las dos maneras y corre `probar:restricciones` después de cada restauración:
+
+```
+copiando .sqlite/-shm/-wal   0 fallo(s) de 8
+reconstruyendo desde SQL     0 fallo(s) de 8
+```
+
+**Ocho vueltas no prueban que no ocurra.** Un fallo que apareció una vez en decenas de
+corridas no tiene por qué caer dentro de dieciséis intentos. Lo que este resultado sí
+hace es dejar la hipótesis del `-wal` **sin apoyo empírico**: era razonable y sigue
+siéndolo, pero hoy no tiene nada detrás salvo la coincidencia temporal.
+
+#### Una hipótesis alternativa, comprobada y descartada
+
+Al matar el experimento por tiempo quedó el andamiaje de `probar-restricciones` en la
+base —la pregunta `9001`, con su alternativa correcta—. Pareció la explicación obvia:
+una corrida anterior que no limpió, y la siguiente encontrándose el terreno ocupado.
+
+**Se corrió el comprobador con esa fila puesta, a propósito, para verlo.** No es eso:
+
+```
+No pude montar el andamiaje.
+X [ERROR] UNIQUE constraint failed: pregunta.id
+Si la pregunta 9001 ya esta en la base, la dejo una corrida anterior que no limpio.
+Nadie comprobo las restricciones. No se sabe si estan o no.
+codigo de salida: 2
+```
+
+Responde `SIN VEREDICTO`, que es **la respuesta correcta** y además la que el propio
+enunciado del andamiaje anticipa. El fallo observado el 2026-09-09 fue otra cosa:
+`RESTRICCION CAIDA`, código 1, nombrando el índice parcial.
+
+**Descartar esto vale más que parecer.** Era la explicación más cómoda y habría cerrado
+el hallazgo en falso.
+
+#### Qué estado hay que buscar si vuelve, dicho con precisión
+
+Vale la pena dejarlo escrito ahora, mientras el razonamiento está fresco, porque la
+próxima vez que aparezca va a ser en medio de otra cosa.
+
+El caso que falló inserta `(9001, 'c', 3, 'una segunda correcta', 1)` y espera que el
+índice parcial lo rechace. **Sólo puede pasar si, en ese instante, ninguna otra
+alternativa de la 9001 tenía `es_correcta = 1`.** Y el andamiaje inserta precisamente
+una, `(9001, 'a', 1, …, 1)`.
+
+Se sigue que en el momento del fallo se daba **una de estas tres**, y ninguna otra:
+
+1. La alternativa `'a'` del andamiaje no estaba, **pese a que el montaje no protestó**.
+2. Estaba, pero con `es_correcta` distinto de 1.
+3. **El índice `alternativa_una_correcta` no existía en ese momento**, aunque existiera
+   al mirarlo después.
+
+La tercera es la que mejor encaja con una base restaurada por copia de archivos: un
+`-wal` copiado a medias puede dejar visible una tabla y no un índice creado en la misma
+transacción. **Es también la más difícil de provocar a voluntad**, que es probablemente
+por qué dieciséis intentos no la tocaron.
+
+**Si vuelve a salir, lo primero que hay que mirar —antes de tocar nada— es si el índice
+está**, con `SELECT name FROM sqlite_master WHERE type='index'`. Esa consulta distingue
+la tercera de las otras dos, y es la única que deja de poder hacerse en cuanto alguien
+«arregla» la base.
+
+#### Y el disparador sospechoso ya no está en el procedimiento
+
+Independientemente de si la hipótesis era buena, **restaurar la base copiando archivos
+dejó de ser parte de cómo se trabaja**: `scripts/ensayo-local.mjs` reconstruye el banco
+de juguete desde `d1/ejemplo-banco.sql`. Si el `-wal` era la causa, el procedimiento ya
+no la produce; si no lo era, no se ha perdido nada.
+
+**Eso no cierra el hallazgo.** Cerrarlo exigiría explicar el fallo, no dejar de rozarlo.
+
+
 ---
 
 ### H-030 · El respaldo del banco no tenía banco dentro, y el «un solo paso» de ADR-023 no existía
@@ -1857,3 +1936,176 @@ probada sin haberlo estado nunca.
 **Corregido** separando «se pidió el sello de la nube» de «se habla con la nube»: son
 dos cosas distintas y sólo la segunda toca la cuenta. Con eso el sabotaje la ejercita
 sin que nadie salga a la red.
+
+---
+
+### H-031 · El texto del banco compila CSS, y nadie lo sabía
+
+**Gravedad:** 🟡 · **Estado:** 🟢 Entendido y documentado · **Detectado en:** iteración 25 · **Fecha:** 2026-09-10
+
+**Síntoma.** Después de cargar el módulo 3, `npm run verificar` respondió
+`DESFASADO` sobre `static/css/style.css`. **Nadie había tocado los estilos en esa
+tanda:** ni `src/input.css`, ni una clase de Tailwind, ni un recurso de
+`static/resources/`.
+
+**Qué cambió, medido y no supuesto.** No son finales de línea. Es contenido, y son
+exactamente **80 caracteres**:
+
+```
+commiteado  18 077 caracteres
+en disco    18 157 caracteres
+
+primer carácter distinto: posición 7743
+  commiteado  …{visibility:visible}.fixed{position:fixed}…
+  en disco    …{visibility:visible}.collapse{visibility:collapse}.fixed{position:fixed}…
+```
+
+Apareció una regla que no estaba: `.collapse{visibility:collapse}`.
+
+**De dónde salió, y es lo que hay que entender.** `tailwind.config.cjs` declara:
+
+```js
+content: ['./*.html', './static/js/**/*.js']
+```
+
+Y **`static/js/data/instantanea-banco.js` está dentro de ese glob.** La instantánea
+es el banco de preguntas: enunciados, alternativas y justificaciones, escritos como
+un archivo `.js`. Tailwind no distingue código de contenido —busca cadenas que
+parezcan nombres de clase— así que **escanea el texto de las preguntas**.
+
+La palabra apareció en una justificación del módulo 2, sobre jQuery:
+
+> «…`.slideUp()` lo colapsa por altura en vez de por opacidad, y **`.collapse()`**
+> no es de jQuery sino de Bootstrap.»
+
+Tailwind vio `collapse`, lo reconoció como una de sus clases de utilidad y emitió su
+regla. **El CSS del sitio creció por una frase sobre Bootstrap escrita dentro de una
+justificación.**
+
+**Por qué se notó ahora y no antes.** La secuencia es exacta y conviene dejarla:
+
+1. `b64f1b3` commiteó la instantánea nueva —la del módulo 2, ya con esa
+   justificación dentro—.
+2. **No recompiló el CSS**, porque `publicar-banco.mjs` regenera la instantánea y el
+   respaldo, y el CSS no es asunto suyo.
+3. La primera corrida de `npm run verificar` posterior sí recompiló, la regla nueva
+   apareció, y el archivo dejó de coincidir con lo commiteado.
+
+Es decir que el desfase **entró el 2026-09-09 y se hizo visible el 10**, que es como
+se comportan los desfases: no avisan cuando nacen.
+
+**Esto no es un defecto y no hay nada que arreglar en el archivo.** El CSS de disco
+está bien generado: recompilarlo produce exactamente los mismos 18 157 bytes. El
+veredicto lo dice con precisión —«el CSS corresponde a su fuente, pero difiere de lo
+que hay commiteado»— y se cierra commiteándolo.
+
+**Lo que sí hay que arreglar es el procedimiento, y es barato.** El paso 10 del
+procedimiento de un lote listaba **dos** archivos generados para el commit —el
+respaldo y la instantánea—. Son **tres**: `static/css/style.css` también puede
+cambiar en cada carga, y de hecho va a cambiar cada vez que una justificación nueva
+contenga una palabra que Tailwind reconozca como clase. Quedan cinco módulos y unas
+trescientas justificaciones por escribir, así que va a volver a pasar.
+
+**Lo que este hallazgo obliga a saber, y no es obvio:** el banco de preguntas es
+**entrada del sistema de construcción del CSS**, no solo dato que se muestra. Ya
+estaba escrito que es contenido de origen externo que hay que escapar al pintarlo;
+ahora además hay que saber que su texto alimenta a Tailwind. Un banco con una
+pregunta sobre, digamos, la clase `hidden` de Bootstrap, agrega reglas al CSS del
+sitio sin que nadie escriba una línea de estilos.
+
+**Descartado como salida: sacar la instantánea del glob.** Se pensó y no se hace. El
+glob existe para que Tailwind vea las clases que usan los componentes de
+`static/js/`, y la instantánea vive ahí porque el navegador la importa como módulo.
+Excluirla exigiría moverla o afinar el glob, y las dos cosas tocan el camino
+publicado por un problema que cuesta 80 bytes. **Se documenta y se commitea**, que
+es proporcional.
+
+---
+
+### H-019 · Actualización del 2026-09-10 · el disparador y el defecto son dos cosas distintas
+
+*El hallazgo original sigue abierto. Esta actualización separa lo que en la carga
+del módulo 3 se vio junto, porque confundirlos llevaría a dar por resuelto lo que no
+lo está.*
+
+#### El disparador de esta vez: la sesión de wrangler se enfría
+
+La carga del módulo 3 respondió `SIN VEREDICTO` en la **primera llamada de una
+terminal recién abierta**, con un fallo de autenticación **7403** de Cloudflare.
+Repetida, entró sin problemas.
+
+**La hipótesis del autor, y encaja con cómo se trabaja aquí:** se abre una terminal
+por carga y entre carga y carga pasan **días**, así que la sesión guardada de
+wrangler llega fría a la primera llamada.
+
+**El comando existe y ya estaba en el proyecto**, en
+`90-manual/capa-de-datos-y-base-d1.md`, paso 4:
+
+```
+node node_modules/wrangler/bin/wrangler.js login
+```
+
+Y ahí está descrito como **«una sola vez por equipo»** — que es exactamente el
+supuesto que el 7403 contradice. Esa frase se escribió cuando la única pregunta era
+cómo autenticarse la primera vez; nadie había vuelto días después.
+
+**Lo que se agrega al procedimiento es un paso 0**, y el comando **no es `login`**:
+
+```
+node node_modules/wrangler/bin/wrangler.js whoami
+```
+
+`whoami` es de solo lectura, no abre el navegador, y responde en un segundo con la
+cuenta o con el fallo. **Sirve como despertador y además como pregunta:** si contesta
+la cuenta, la sesión está viva y se sigue; si falla, ahí sí se corre `login`, que es
+el que abre el navegador. Ponerlo antes de tocar nada convierte un fallo a mitad de
+carga en un fallo antes de empezar, que es el mismo error saliendo barato.
+
+**Los dos los ejecuta el autor.** La capa 2 de la barrera de ADR-015 rechaza
+`wrangler login|logout|whoami|secret|deploy` explícitamente, y hace bien.
+
+#### El defecto sigue vivo, y el login no lo toca
+
+**El guion no supo leer la respuesta cuando vino como sobre de error con
+`notes: [...]`.** Eso no lo arregla autenticarse.
+
+**Por qué importa, y es el punto entero:** el 7403 fue **amable**, porque falló
+**antes de escribir**. Cualquier otro fallo de la nube —un límite de tasa, una caída,
+una red cortada a mitad de la importación— produce **el mismo `SIN VEREDICTO`**, y en
+esos casos **sí puede ser que la carga haya entrado**. El guion respondería igual en
+los dos escenarios, que es justamente lo que un veredicto no debe hacer: parecerse a
+sí mismo cuando la situación cambió.
+
+**Resolver el login TAPA EL SÍNTOMA sin arreglar el defecto.** Después del paso 0, el
+7403 va a dejar de aparecer, y con él va a dejar de aparecer el aviso de que este
+defecto existe. Queda escrito aquí para que la próxima vez que salga un
+`SIN VEREDICTO` nadie lo lea como «otra vez la sesión fría».
+
+**Anotado, no resuelto.** No se arregla en la iteración 25 por decisión del autor el
+2026-09-10.
+
+#### Lo que sí se arregló ahora, porque era barato
+
+El mensaje de `SIN VEREDICTO` decía «mira la base antes de repetir» y **no decía
+cómo**. En la carga del módulo 3 el autor no tenía el comando a mano en ese momento y
+**repitió a ciegas; salió bien por suerte y no por método**.
+
+Ahora el guion imprime el comando exacto, con el módulo del encargo y la base contra
+la que se estaba hablando:
+
+```
+Como mirar la base, sin repetir nada:
+
+  node scripts/comprobar-carga.mjs 3 --base=examen-td-js-produccion
+
+Ese guion NO escribe: contrasta lo que hay en la base contra los archivos de
+origen y dice si el lote entro entero, a medias o no entro.
+```
+
+Provocado el 2026-09-10 contra una base sin declarar, comprobando que el número de
+módulo salga del sello del encargo y no de una suposición.
+
+**La lección, que vale más allá de este mensaje: un mensaje que pide algo sin decir
+cómo hacerlo se desobedece.** Y no por descuido — se desobedece porque obedecerlo
+cuesta más que arriesgarse, justo en el momento en que uno está nervioso porque algo
+acaba de fallar. Escribir el comando cuesta cuatro líneas y cambia esa cuenta.

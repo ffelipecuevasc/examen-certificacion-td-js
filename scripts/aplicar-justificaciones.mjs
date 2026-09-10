@@ -70,6 +70,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { comoContarlo, cotejarProcedencia } from './procedencia.mjs';
+
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CUESTIONARIOS = join(RAIZ, '_planmaestro', '00_producto', 'cuestionarios');
 
@@ -119,6 +121,31 @@ for (const [que, ruta] of [['el encargo', rutaEncargo], ['el documento de revisi
 }
 
 const encargo = JSON.parse(readFileSync(rutaEncargo, 'utf8'));
+
+/**
+ * La puerta de ADR-028: si un origen se movio despues de convertir, aqui se para.
+ *
+ * Este es el paso que produce el archivo que se carga, asi que es el ultimo sitio
+ * donde negarse sale barato. Un encargo que ya no corresponde a sus origenes es
+ * el mismo problema que un respaldo que no es el banco (H-030): esta bien
+ * formado, paso su comprobacion, y la paso contra algo que ya no es lo que hay.
+ *
+ * `--sin-cotejo` existe para el caso en que alguien sepa lo que hace, y deja
+ * rastro en la salida. No se pone por omision: la reconversion automatica y
+ * comprobada es la condicion que ADR-028 puso a su propia decision.
+ */
+if (!argumentos.includes('--sin-cotejo')) {
+  const cotejo = await cotejarProcedencia(encargo, modulo, RAIZ);
+
+  if (!cotejo.corresponde) {
+    noSeAplico('El encargo no corresponde a sus origenes (ADR-028).', [
+      ...comoContarlo(cotejo, modulo),
+      '',
+      'Si de verdad sabes lo que haces: --sin-cotejo',
+    ]);
+  }
+}
+
 const fuente = JSON.parse(readFileSync(rutaTextos, 'utf8'));
 const textosJson = fuente.justificaciones ?? {};
 const documento = readFileSync(rutaRevision, 'utf8');
@@ -301,7 +328,23 @@ const preguntas = encargo.preguntas.map((p) => {
 // 3. Repetible sin hacer dano
 // ---------------------------------------------------------------------------
 
-const contenido = `${JSON.stringify({ preguntas }, null, 2)}\n`;
+/**
+ * El sello viaja al derivado, COPIADO y no recalculado.
+ *
+ * Copiado por dos motivos. El primero es que asi el sello dice de que conversion
+ * salio este archivo, que es lo que interesa; recalcularlo diria de que origenes
+ * salio ESTA corrida, y eso ya lo comprobo la puerta de arriba.
+ *
+ * El segundo es que el sello lleva fecha: recalcularlo daria un archivo distinto
+ * en cada corrida y se cargaria la propiedad de que correr esto dos veces produzca
+ * los mismos bytes. Una idempotencia que se rompe por un reloj es peor que no
+ * tenerla, porque solo se nota cuando alguien compara.
+ */
+const contenido = `${JSON.stringify(
+  encargo.procedencia ? { procedencia: encargo.procedencia, preguntas } : { preguntas },
+  null,
+  2
+)}\n`;
 const yaEstaba = existsSync(rutaSalida) && readFileSync(rutaSalida, 'utf8') === contenido;
 
 if (!yaEstaba) {

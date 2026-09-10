@@ -74,6 +74,22 @@
       "propuesta_por": "Claude Code",
       "aprobada_por": "Felipe Cuevas",
       "fecha": "2026-09-09"
+    },
+    {
+      "ref": "m03#10",
+      "modulo": 3,
+      "origen": "json_2026",
+      "numero_origen": 10,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-03.json",
+      "campo": "alternativa.c.texto",
+      "original": "true, debido a la coerción implícita de tipos hacia booleanos.",
+      "corregido": "true, debido a la coerción implícita de tipos hacia números.",
+      "motivo": "La alternativa correcta explicaba el resultado con una regla falsa. `==` NO convierte a booleano: convierte a numero. `false` pasa a 0, `[]` pasa a la cadena vacia y de ahi a 0, y 0 == 0 da true. Un alumno que memorizara «coercion hacia booleanos» aplicaria mal esa regla en la pregunta siguiente, porque el arreglo vacio es truthy: `[] ? 1 : 2` da 1. El resultado que la alternativa afirma era correcto; el motivo que daba, no.",
+      "nota": "TOCA UNA ALTERNATIVA Y ADEMAS LA CORRECTA, que es el texto en que ancla el comprobador de conversion. Obliga a reconvertir y recomprobar el modulo entero (ADR-028). Es la primera correccion del proyecto que no es de enunciado: las cinco del modulo 2 fueron cuatro de enunciado y una de alternativa.",
+      "regla": "ADR-029: se corrige porque ensena una regla falsa, no por imprecision de lenguaje.",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-10"
     }
   ]
 }

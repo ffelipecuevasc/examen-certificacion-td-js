@@ -200,8 +200,8 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 
 | Módulo | Preguntas | Convertido | Comprobado | Justif. revisadas | Cargado | Publicado |
 |---|---|---|---|---|---|---|
-| 2 | 52 · 39 + 13 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | ⚪ |
-| 3 | 61 · 50 + 11 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| 2 | 52 · 39 + 13 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
+| 3 | 61 · 50 + 11 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 4 | 61 · 46 + 15 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 5 | 49 · 38 + 11 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 6 | 52 · 38 + 14 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
@@ -214,6 +214,235 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 «Comprobado» es la comparación anclada en el texto de la correcta, contra los
 archivos de origen. «Cargado» sólo se marca cuando **D1 confirma** la carga, no
 cuando la herramienta dice que la aplicó (H-016).
+
+## El procedimiento de un lote, de principio a fin
+
+*Escrito el 2026-09-09, **antes de convertir el módulo 3 y a propósito**. Si se
+escribiera después de convertirlo, saldría un procedimiento que describe el módulo 3 en
+vez de uno que sirva del 4 al 8: escribirlo antes lo obliga a ser general, y el módulo 3
+pasa a ser su primera prueba en vez de su molde.*
+
+**Esto arregla el hallazgo de fondo del módulo 2: la rama más cara del procedimiento
+—qué hacer cuando aparece una corrección— vivía en la memoria de quien lo había hecho.**
+Se lee de principio a fin sin tener que saber nada que no esté aquí.
+
+**Quién corre qué.** Los pasos 1 a 6 y el 8 los corre Claude Code contra la base local.
+Los pasos 7, 9 y 10 tocan la cuenta de Cloudflare y **los corre Felipe Cuevas**
+(ADR-015), desde su computador y habiendo revisado antes formato e integridad (ADR-026).
+
+---
+
+### 0 · Despertar la sesión de la nube · **(autor)** · *añadido el 2026-09-10*
+
+```powershell
+node node_modules/wrangler/bin/wrangler.js whoami
+```
+
+Tiene que responder con la cuenta. **Si falla**, la sesión está fría y se despierta
+con el que abre el navegador:
+
+```powershell
+node node_modules/wrangler/bin/wrangler.js login
+```
+
+> **Por qué existe este paso.** La carga del módulo 3 murió con un fallo de
+> autenticación **7403** en la **primera llamada de una terminal recién abierta**.
+> Aquí se abre una terminal por carga y entre carga y carga pasan **días**, así que
+> la sesión guardada llega fría a la primera llamada. El manual describía `login`
+> como «una sola vez por equipo», y esa frase se escribió cuando la única pregunta
+> era cómo autenticarse la primera vez.
+>
+> **Se usa `whoami` y no `login`** porque es de solo lectura, no abre el navegador y
+> sirve además como pregunta: si contesta, la sesión está viva y se sigue. Convierte
+> un fallo a mitad de carga en un fallo antes de empezar, que es el mismo error
+> saliendo barato.
+>
+> **Esto no arregla H-019**, que es otra cosa y sigue abierta: el guion no supo leer
+> ese error porque venía como sobre con `notes: [...]`. El 7403 fue amable porque
+> falló **antes** de escribir; otro fallo de la nube daría el mismo `SIN VEREDICTO`
+> con la carga quizá ya dentro. **Resolver el login tapa el síntoma sin arreglar el
+> defecto**, y por eso queda anotado en la auditoría en vez de darse por cerrado.
+
+### 1 · Convertir
+
+```
+node scripts/convertir-banco.mjs <N>
+```
+
+Sale `d1/encargos/modulo-0N.json`: las preguntas de los dos bancos en formato de
+encargo, **todas en `borrador`, sin justificación y sin dificultad**. El encargo queda
+**sellado** con la huella de sus cuatro orígenes (ADR-028).
+
+### 2 · Comprobar la conversión
+
+```
+node scripts/comprobar-conversion.mjs <N>
+```
+
+Contrasta el encargo contra los archivos de origen sin compartir una línea con el
+convertidor. Ancla en el texto de la correcta. **Si dice que no, no se sigue.**
+
+### 3 · Redactar las justificaciones
+
+Se escriben los textos en
+`_planmaestro/00_producto/cuestionarios/justificaciones/modulo-0N.json`, marcando
+**`[DUDA]`** dentro del texto donde no se dé algo por seguro. La convención está en el
+propio archivo y no es adorno: **donde no aparece `[DUDA]`, se está afirmando.**
+
+```
+node scripts/redactar-justificaciones.mjs <N>
+```
+
+Arma `modulo-0N-revision.md`, con cada justificación al lado de su pregunta y sus cuatro
+alternativas. Las preguntas con duda salen además listadas al principio.
+
+### 4 · Revisar · **(autor)**
+
+El autor edita el documento: marca lo que aprueba, corrige lo que no le sirve, deja sin
+marcar lo que no acepta. Lo no aprobado no se pierde: se carga en `borrador`.
+
+> ### ⚠️ Aquí nace la rama que se olvidaba, y por eso está dentro de la lista
+>
+> **Las `[DUDA]` no son sólo dudas del redactor. En el módulo 2, cinco de ellas
+> resultaron ser enunciados malos** — una premisa falsa, dos respuestas correctas, un
+> «exclusivamente» que el estándar no sostiene. Fueron **5 de 52, casi el 10%**.
+>
+> Cuando el autor aprueba una corrección de enunciado, se va al **paso C** de abajo y
+> **se vuelve al paso 1**. No es opcional y no depende de acordarse: los pasos 5, 7 y 9
+> se niegan solos si el origen se movió (ADR-028).
+
+### 5 · Aplicar lo aprobado
+
+```
+node scripts/aplicar-justificaciones.mjs <N>
+```
+
+Sale `d1/encargos/modulo-0N-para-cargar.json`: lo aprobado en `activa` con su texto tal
+cual se leyó, lo demás en `borrador`. **Coteja el sello de procedencia y se niega si un
+origen se movió.**
+
+### 6 · Ensayo local · **obligatorio, no es buena costumbre**
+
+```
+node scripts/ensayo-local.mjs <N>
+```
+
+Vacía el banco local, carga el lote con la herramienta de verdad, y le corre encima **el
+mismo comprobador que después se corre contra producción, con el mismo comando salvo el
+destino**. Al terminar reconstruye el banco de juguete desde `d1/ejemplo-banco.sql`.
+
+**Es un ensayo general gratis del comando caro.** Si el encargo tiene algo mal, se
+descubre donde equivocarse cuesta volver a correr un guion. **Si el ensayo falla, no se
+pasa al 7.**
+
+*En el módulo 2 esto se hizo, pero para probar la herramienta y no como paso. Lo que no
+está escrito como paso se salta el día que hay prisa, que es justo cuando conviene
+haberlo hecho.*
+
+### 7 · Cargar en producción · **(autor)**
+
+```powershell
+$env:PERMITIR_REMOTO=1
+node scripts/administrar-banco.mjs insertar d1/encargos/modulo-0N-para-cargar.json --base=examen-td-js-produccion --remote --registro=carga-modulo-0N.txt
+```
+
+Antes de correrlo, confirmar el uuid que anuncia la herramienta: producción es
+`cff1686b-3b24-4892-9a10-4306684e0127` (H-015). La carga es **todo o nada**, comprobado
+por los dos caminos de wrangler (H-025). **También coteja el sello de procedencia**: es
+la última puerta antes de escribir.
+
+### 8 · Comprobar la carga · **(autor)**
+
+```powershell
+$env:PERMITIR_REMOTO=1
+node scripts/comprobar-carga.mjs <N> --base=examen-td-js-produccion --remote --registro=evidencia-modulo-0N.txt
+```
+
+Cierra cinco de los siete criterios de nivel 1 de una corrida. **Si dice
+`NO CORRESPONDE`, no se sigue al 9:** una instantánea sacada de una base que no
+corresponde a los orígenes propaga el error al archivo versionado.
+
+### 9 · Respaldo e instantánea, en un solo paso · **(autor)**
+
+```powershell
+$env:PERMITIR_REMOTO=1
+npm run datos:publicar -- --base=examen-td-js-produccion --remote --registro=publicacion-modulo-0N.txt
+```
+
+Es el bloque de ADR-023, entero. Las dos mitades se instalan juntas o no se instala
+ninguna. El sello tiene que decir `"entorno": "nube"`.
+
+### 10 · Publicar · **(autor)**
+
+Los **tres** archivos generados van en el mismo commit, y `git push` a `main`.
+Empujar es publicar.
+
+| Archivo | Lo genera |
+|---|---|
+| `d1/respaldo-banco.sql` | el paso 9 |
+| `static/js/data/instantanea-banco.js` | el paso 9 |
+| `static/css/style.css` | el paso 4, al recompilar |
+
+> **El CSS es el tercero y se descubrió tarde (H-031).** El texto del banco entra
+> en la instantánea, la instantánea vive en `static/js/`, y ese directorio está
+> dentro del `content` de Tailwind — así que **una justificación que mencione una
+> palabra que Tailwind reconozca como clase agrega reglas al CSS del sitio**. Pasó
+> con `.collapse()`, nombrado en una justificación del módulo 2 sobre jQuery: 80
+> bytes nuevos en `style.css` sin que nadie tocara un estilo.
+>
+> No es un defecto y no hay nada que arreglar en el archivo: está bien generado y
+> solo faltaba commitearlo. Lo que hay que recordar es que **son tres y no dos**,
+> y por eso están en una tabla en vez de en una frase.
+
+### 11 · Ver el módulo en el sitio · **(autor)**
+
+Cuenta de preguntas, insignia, justificación al responder, y **ningún aviso de
+respaldo** — si aparece, el sitio está leyendo la instantánea y no la capa de datos.
+
+---
+
+### La rama de corrección · pasos A, B y C
+
+*Se entra aquí desde el paso 4, y también desde cualquier punto posterior: una
+corrección aprobada tarde sigue siendo una corrección aprobada.*
+
+**A · Se detecta.** Casi siempre desde una `[DUDA]` del paso 3, al revisar. También
+puede salir del paso 8, si el comprobador destapa algo, o de leer el sitio publicado.
+
+**B · Se aprueba.** La propone Claude Code con su motivo; **la aprueba el autor**. Una
+pregunta cuya correcta resulta no serlo vale más que veinte justificaciones.
+
+**C · Se registra y se aplica al origen.** La entrada va a
+`_planmaestro/00_producto/cuestionarios/correcciones-de-enunciado.json` con el texto
+original, el corregido, el motivo, quién la propuso y quién la aprobó. Y **se aplica al
+archivo de origen**, no al encargo: el encargo es derivado.
+
+**Y se vuelve al paso 1.** El módulo entero, no la pregunta.
+
+> **Por qué el módulo entero y no sólo la pregunta corregida.** Porque una corrección
+> puede tocar el texto de la alternativa correcta, que es donde ancla el comprobador, y
+> entonces la comprobación de todo el módulo se hizo contra un texto que ya no existe.
+> Pasó en el módulo 2 con `m02#9`.
+>
+> **No hay que re-aprobar todo.** El documento de revisión conserva las aprobaciones
+> cuya pregunta y justificación no cambiaron y devuelve a cero sólo las demás. En el
+> módulo 2, cinco correcciones movieron cinco justificaciones y cuarenta y siete
+> siguieron aprobadas.
+>
+> **Y si a alguien se le olvida volver al paso 1, no pasa nada malo:** los pasos 5, 7 y
+> 9 cotejan el sello y se niegan. Eso es ADR-028 y es lo que convierte esta rama de una
+> instrucción que hay que recordar en una que no se puede saltar.
+
+---
+
+### Lo que este procedimiento sigue sin poder decir
+
+- **Que las justificaciones sean ciertas.** Que existan y no sean de relleno se
+  comprueba; que sean verdad, no.
+- **Que el banco no tenga duplicados por redacción distinta.** Son esperados y a veces
+  deseables: el examen real repite el mismo hecho con redacciones distintas.
+- **Que el sesgo de posición esté corregido.** H-004 se informa y no se arregla.
+
 
 ## Tareas
 
@@ -497,8 +726,8 @@ todavia en el arbol`. Esa segunda mitad es la que da valor a la primera. El reti
 
 **Los dos que esta salida NO cierra**, y no se marcan:
 
-- **La instantánea y el respaldo del mismo acto** (ADR-023). Pendiente.
-- **El módulo se ve en el sitio publicado.** Pendiente: se cierra después de publicar.
+- ~~La instantánea y el respaldo del mismo acto (ADR-023).~~ **Cerrado el 2026-09-09**, ver abajo.
+- ~~El módulo se ve en el sitio publicado.~~ **Cerrado el 2026-09-09**, ver abajo.
 
 > **El uuid es parte de la evidencia, no un adorno.** `cff1686b-3b24-4892-9a10-4306684e0127`
 > es producción, cotejado contra `wrangler.toml` **antes** de leer nada. Sin esa línea, la
@@ -523,6 +752,134 @@ informa en **cada** módulo y no sólo al final: la serie es el dato, no el prom
 **Lo que no cambia en ningún caso:** H-004 se informa y no se corrige. El barajado lo
 neutraliza en pantalla, y reordenar las alternativas del banco para cuadrar un
 histograma sería falsear el material de origen.
+
+### El lote del módulo 2 quedó cerrado · 2026-09-09 · commit `b64f1b3`
+
+**Los siete criterios de nivel 1, con evidencia.** Los cinco primeros los cerró la
+corrida de `comprobar-carga.mjs` contra producción, más arriba. Los dos que faltaban
+los cerró Felipe Cuevas mirando el sitio publicado y el repositorio:
+
+**En el sitio publicado**, comprobados los cinco puntos:
+
+- 52 preguntas reales del módulo 2.
+- La insignia diciendo **52 preguntas · 1 módulo** — el contador que la iteración 24
+  arregló, ahora con banco real y no con las 8 de juguete.
+- La justificación apareciendo al responder.
+- **La pregunta del comando de Git sin barajar sus alternativas.** El `orden_fijo` que
+  se rescató del banco viejo no sólo llegó a D1: se está honrando en pantalla.
+- **Ningún aviso de respaldo**, o sea que el sitio está leyendo la capa de datos y no
+  la instantánea.
+
+**En el repositorio:**
+
+| | |
+|---|---|
+| Sello de la instantánea | `"entorno": "nube"`, 52 preguntas |
+| `d1/respaldo-banco.sql` | 68 kB, **52 `INSERT INTO pregunta`** |
+
+> **ADR-023 y ADR-014 dejan de estar incumplidas.** El incumplimiento consciente que se
+> declaró el 2026-09-08 —la instantánea publicada salía de la base local, o sea del
+> banco de juguete— queda subsanado aquí, que es el único sitio donde podía subsanarse.
+> Y el respaldo pasa a tener banco dentro por primera vez desde que el banco existe:
+> hasta el 2026-09-09 el archivo versionado contenía `prueba_tuberia` (H-030).
+
+### Lo que costó el primer lote
+
+*Escrito al cerrarlo, porque es el dato que importa para los seis que vienen y porque
+dentro de un mes nadie se va a acordar.*
+
+52 preguntas cargadas. Eso fue lo de menos. Lo que el lote produjo de verdad:
+
+| | |
+|---|---|
+| Hallazgos nuevos | **H-024, H-025, H-027, H-028, H-029** — y además **H-026** y **H-030**, que salieron del mismo lote |
+| Patrón generalizado | **H-023**, que reunió tres comprobaciones que no podían decir «no» y dejó la regla que destapó casi todo lo demás |
+| Decisiones cerradas | **ADR-026** y **ADR-027** |
+| Herramientas escritas | siete guiones, incluida **una de publicación que no existía** |
+| Procedimientos | el bloque de **ADR-023 recorrido entero por primera vez** |
+
+**Tres de esos hallazgos eran herramientas rotas que nadie había usado todavía:**
+`administrar-banco.mjs` no arrancaba (H-028), la comprobación de retiradas no miraba
+nada (H-027), y el respaldo versionado no tenía banco dentro (H-030). **Ninguno se
+habría descubierto cargando las 368 de una vez** — se habrían descubierto igual, pero
+en medio de la carga grande, que es donde salen caros.
+
+Y el bloque de ADR-023 no sólo se recorrió: **se descubrió que su promesa central no
+estaba implementada.** «Un solo paso produce las dos cosas» eran dos comandos sueltos y
+un recordatorio impreso. Eso es exactamente lo que un procedimiento no recorrido
+esconde, y es la razón por la que se decidió recorrerlo módulo a módulo.
+
+> ### Este costo era el de la primera vez
+>
+> **No es la estimación del módulo 3.** Casi todo lo que se pagó aquí fue construir lo
+> que no existía: los guiones de conversión y comprobación, el paso único de
+> publicación, las dos ADR, y el recorrido inicial de un procedimiento que llevaba
+> desde la iteración 23 marcado como **NO RECORRIDO**. Nada de eso se vuelve a pagar.
+>
+> **El módulo 3 es la prueba de si el procedimiento sirve.** Es la primera vez que
+> todas las piezas existen antes de empezar, así que mide lo que el módulo 2 no podía
+> medir: cuánto cuesta un lote cuando ya hay herramienta.
+>
+> **El criterio es simple, y conviene dejarlo escrito antes de saber el resultado:
+> si el módulo 3 sale sin sorpresas, el procedimiento sirve** y los cuatro que siguen
+> son repetición. Si vuelven a aparecer hallazgos del calibre de H-027 o H-028 —una
+> comprobación que no comprobaba, una herramienta que no arrancaba—, entonces lo que
+> falla no es el material sino el procedimiento, y hay que arreglarlo **antes** de
+> repetirlo cuatro veces más.
+
+### Evidencia del lote · módulo 3 · 2026-09-10
+
+**Corrida por Felipe Cuevas contra producción.** Los siete criterios de nivel 1,
+cerrados:
+
+| Criterio | Qué lo cierra |
+|---|---|
+| El lote entero está en D1 y suma lo que debe | la carga entró entera, **52 → 113**, y la comprobación calza **50 `json_2026` + 11 `js_2026` = 61** contra los dos archivos de origen |
+| Ninguna respuesta correcta se desplazó | `CARGA COMPROBADA` sobre las 61, anclado en el texto de la correcta, pregunta a pregunta |
+| Ningún campo se inventó | `dificultad IS NULL` en las 61 |
+| Ninguna `activa` carece de justificación | las 61 activas con su justificación, contadas sobre la base |
+| Las retiradas de ese módulo no se cargaron | las **cuatro** retiradas del módulo, ninguna en la base |
+| La instantánea y el respaldo salieron del mismo acto | el paso único publicó los dos con sello **`"entorno": "nube"`** y **113 preguntas cada uno** |
+| El módulo se ve en el sitio publicado | comprobado tras el despliegue |
+
+**El módulo 3 no tiene `orden_fijo`**: la única pregunta con esa marca en todo el
+proyecto está en el módulo 2 y quedó cerrada allí.
+
+> **Este lote fue la primera prueba del procedimiento**, y esa era su razón de ser.
+> Lo que apareció no fueron hallazgos del calibre de H-027 o H-028 —una comprobación
+> que no comprobaba, una herramienta que no arrancaba— sino **dos cosas de otra
+> naturaleza**: una sesión de nube que se enfría (H-019, disparador) y un CSS que
+> creció por una palabra escrita dentro de una justificación (H-031). Ninguna de las
+> dos puso en riesgo el banco, y las dos se cierran con un paso más en la lista.
+>
+> **El criterio que se había escrito antes de saber el resultado era: si el módulo 3
+> sale sin sorpresas, el procedimiento sirve.** Salió con dos sorpresas menores y
+> ninguna del tipo que obliga a rehacer nada. El procedimiento sirve, y los cinco que
+> quedan van con dos pasos más de los que tenía el módulo 2: el 0 y la tercera fila
+> del 10.
+
+#### H-004 · segundo dato de la serie
+
+| Lote | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|
+| Módulo 2 · 52 preguntas | 23% | **40%** | 29% | 8% |
+| Módulo 3 · 61 preguntas | 16% | **39%** | 30% | 15% |
+
+**Dos lotes independientes con casi el mismo número en la posición 2 empieza a
+parecer sesgo del material y no casualidad.** Con un reparto parejo cada posición
+tendría 25%; la segunda concentra cerca del 40% en los dos, y son bancos escritos por
+manos distintas en momentos distintos.
+
+**Todavía no se afirma.** Dos puntos hacen una recta y cualquier par de puntos la
+hace: **faltan cinco módulos**. Lo que sí cambió es la expectativa — hasta el módulo 2
+lo razonable era suponer casualidad; desde el 3 lo razonable es suponer sesgo y
+esperar que los siguientes lo desmientan.
+
+**Y no cambia qué se hace con él.** H-004 se informa y no se corrige: el barajado lo
+neutraliza en pantalla, y reordenar las alternativas del banco para cuadrar un
+histograma sería falsear el material de origen. Lo que la serie va a permitir, si el
+patrón se sostiene, es **decirlo** — que un banco de práctica advierta que su material
+de origen tiene sesgo de posición es información útil para quien estudia con él.
 
 ### Contenido
 
@@ -608,9 +965,9 @@ tabla de avance.
   base y no contra el encargo. Lo no revisado quedó en `borrador`.
 - [x] **Las retiradas de ese módulo no se cargaron**, comprobado contra
   `retiradas.json`.
-- [ ] **La instantánea y el respaldo salieron del mismo acto**, con sello
+- [x] **La instantánea y el respaldo salieron del mismo acto**, con sello
   `"entorno": "nube"`, y van en el mismo commit. Es el bloque de ADR-023, entero.
-- [ ] **El módulo se ve en el sitio publicado**, con su contador y sus preguntas.
+- [x] **El módulo se ve en el sitio publicado**, con su contador y sus preguntas.
 
 ### Nivel 2 · Agregado final · sólo lo cierra el último módulo
 

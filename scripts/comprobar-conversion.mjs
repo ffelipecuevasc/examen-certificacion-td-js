@@ -72,6 +72,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { comoContarlo, cotejarProcedencia } from './procedencia.mjs';
+
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CUESTIONARIOS = join(RAIZ, '_planmaestro', '00_producto', 'cuestionarios');
 const BANCO_VIEJO = join(RAIZ, 'static', 'js', 'data', 'cuestionario.js');
@@ -177,6 +179,31 @@ try {
 
 if (!Array.isArray(encargo?.preguntas)) {
   sinVeredicto('El encargo no trae una lista «preguntas».');
+}
+
+/**
+ * Cotejo de procedencia (ADR-028), antes de bendecir nada.
+ *
+ * Este guion es el que dice «la conversion fue fiel», y no puede decirlo de un
+ * encargo cuyos origenes se movieron despues de convertirlo: seria comprobar
+ * contra un archivo que ya no es el que hay. Casi siempre el cotejo de contenido
+ * lo cazaria igual, pero no siempre —una correccion recien anotada mueve el
+ * registro sin mover todavia el texto— y sobre todo el mensaje seria otro.
+ *
+ * Con `--sabotaje` no se coteja: los sabotajes estropean el encargo en memoria a
+ * proposito, y hacer que la procedencia se queje ademas taparia lo que se quiere
+ * ver.
+ */
+if (!sabotaje && !argumentos.includes('--sin-cotejo')) {
+  const cotejo = await cotejarProcedencia(encargo, modulo, RAIZ);
+
+  if (!cotejo.corresponde) {
+    sinVeredicto('El encargo no corresponde a sus origenes (ADR-028).', [
+      ...comoContarlo(cotejo, modulo),
+      '',
+      'Si de verdad sabes lo que haces: --sin-cotejo',
+    ]);
+  }
 }
 
 const { cuestionario } = await import(`file://${BANCO_VIEJO}`);

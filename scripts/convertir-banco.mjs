@@ -48,6 +48,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { huellaDeOrigenes } from './procedencia.mjs';
+
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CUESTIONARIOS = join(RAIZ, '_planmaestro', '00_producto', 'cuestionarios');
 const BANCO_VIEJO = join(RAIZ, 'static', 'js', 'data', 'cuestionario.js');
@@ -176,8 +178,18 @@ const desdeViejo = grupo.preguntas.map((p, i) => {
 
 const preguntas = [...desdeNuevo, ...desdeViejo];
 
+/**
+ * El sello de procedencia (ADR-028).
+ *
+ * Deja escrito en el encargo de que version de los cuatro origenes salio. Los
+ * pasos siguientes lo cotejan contra los archivos de hoy y se niegan a seguir si
+ * alguno se movio — que es lo que convierte «hay que acordarse de reconvertir»
+ * en «no se puede seguir sin reconvertir».
+ */
+const procedencia = await huellaDeOrigenes(modulo, RAIZ);
+
 mkdirSync(dirname(salida), { recursive: true });
-writeFileSync(salida, `${JSON.stringify({ preguntas }, null, 2)}\n`, 'utf8');
+writeFileSync(salida, `${JSON.stringify({ procedencia, preguntas }, null, 2)}\n`, 'utf8');
 
 const conOrdenFijo = preguntas.filter((p) => p.orden_fijo);
 

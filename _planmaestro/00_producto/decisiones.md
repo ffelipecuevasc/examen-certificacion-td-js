@@ -1460,3 +1460,154 @@ entorno sin credenciales. Esta ADR añade una capa por guion, no reemplaza aqué
 sobre todo **no convierte la capa 2 en algo que no es**.
 
 ---
+
+## ADR-028 · Una corrección aprobada obliga a reconvertir y recomprobar el módulo entero
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-09 · **Complementa a:** ADR-017 · **Se apoya en:** H-030
+
+**Decisión.** Cuando se aprueba una corrección al texto de una pregunta de los bancos
+de origen, **el módulo entero se reconvierte y se vuelve a comprobar**. Aparezca cuando
+aparezca: también después de que el autor haya aprobado el documento de justificaciones,
+y también si aparece con el lote listo para cargar.
+
+**No hay punto de corte.** No existe un momento a partir del cual salga más barato
+cargar algo que sabemos malo.
+
+**Motivo, y es el que manda.** El costo de reconvertir es que un guion vuelva a correr.
+El costo de publicar un enunciado con premisa falsa **lo paga un estudiante
+leyéndolo** — y lo paga estudiando para una certificación, que es justo cuando menos
+puede permitirse aprender algo falso. Los dos costos no son comparables, así que no hay
+nada que ponderar.
+
+**La condición que esta decisión se pone a sí misma.** La reconversión tiene que ser
+**automática y comprobada**, no un gesto manual que se pueda olvidar. Una regla que
+depende de que alguien se acuerde es una regla que se cumple hasta el día que hay prisa,
+y ese es exactamente el día en que se carga el módulo.
+
+**Cómo se cumple esa condición.** `scripts/procedencia.mjs`. Al convertir, el encargo
+queda **sellado** con la huella de los cuatro orígenes de los que salió:
+
+| Origen | Qué se sella |
+|---|---|
+| `modulo-0N.json` | el archivo entero |
+| `static/js/data/cuestionario.js` | **sólo el grupo de ese módulo** |
+| `retiradas.json` | **sólo las entradas de ese módulo** |
+| `correcciones-de-enunciado.json` | **sólo las entradas de ese módulo** |
+
+Y **tres pasos distintos cotejan ese sello contra los archivos de hoy y se niegan a
+seguir si algo se movió**: `comprobar-conversion.mjs`, que no puede bendecir una
+conversión cuyo origen ya no está; `aplicar-justificaciones.mjs`, que produce el archivo
+que se carga; y `administrar-banco.mjs`, que es el que escribe y por tanto la última
+puerta antes de la nube.
+
+**Por qué se acota por módulo y no por archivo entero.** Una corrección aprobada para el
+módulo 5 no tiene por qué invalidar el encargo del 3. Si lo invalidara, la primera
+reacción de cualquiera sería aprender a ignorar el aviso, y un aviso que se ignora es
+peor que no tenerlo. Acotarlo no es una optimización: es lo que hace que la comprobación
+sirva.
+
+**Motivo de fondo · es H-030 un eslabón más arriba.** Allí un archivo existía, tenía
+fecha, pesaba 527 bytes y no era el banco; pasó por respaldo durante seis días porque
+nadie lo abrió. **Un encargo que ya no corresponde a su origen es el mismo problema:**
+está bien formado, pasó su comprobación, y la pasó contra un archivo que ya no es el que
+hay. En los dos casos el archivo se parece lo suficiente a estar bien como para que
+nadie lo mire.
+
+**Consecuencia sobre el trabajo, dicha para que no sorprenda.** Reconvertir **no**
+obliga a re-aprobar las 61 justificaciones. `redactar-justificaciones.mjs` conserva las
+aprobaciones cuya pregunta y justificación no cambiaron y devuelve a cero sólo las
+demás. En el módulo 2, cinco correcciones movieron cinco justificaciones y las otras
+cuarenta y siete siguieron aprobadas.
+
+**Consecuencia sobre el orden del procedimiento.** Como una corrección puede aparecer
+tarde, el procedimiento del lote **no es una lista recta**: tiene una rama que vuelve
+atrás, y esa rama está escrita dentro de la lista y no como nota al pie. Vivía en la
+memoria de quien había hecho el módulo 2, que es donde no puede vivir.
+
+**Escape, y por qué existe.** Los tres pasos aceptan `--sin-cotejo`. Existe porque una
+regla sin escape se termina esquivando por fuera —editando el sello a mano, que no deja
+rastro— y porque los encargos escritos a mano no llevan sello y tienen que seguir
+funcionando. No está por omisión y quien lo use lo ve escrito en la salida.
+
+---
+
+## ADR-029 · Una alternativa imprecisa pero fiel al examen se conserva; solo se corrige la que enseña una regla falsa
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-10 · **Extiende:** ADR-017 · **Sujeta a:** ADR-028
+
+**Decisión.** Establecida por Felipe Cuevas el 2026-09-10, al resolver las cuatro dudas
+del módulo 3. **Es una regla del proyecto, no la respuesta a un caso.**
+
+**El examen real de Talento Digital afirma cosas de forma tajante.** Por eso una
+alternativa **imprecisa pero fiel al examen se conserva**, y el lugar donde se dice la
+verdad completa es **la justificación**.
+
+**Solo se corrige el texto cuando la alternativa correcta enseña una regla falsa que el
+alumno va a aplicar mal en otra pregunta.** Eso no es imprecisión de lenguaje: es
+contenido equivocado.
+
+### La línea, dicha de modo que se pueda aplicar
+
+| | Qué se hace |
+|---|---|
+| La alternativa dice algo **más tajante de lo que es**, y sigue apuntando al hecho correcto | **Se conserva.** El matiz va en la justificación |
+| La alternativa **afirma una regla que es falsa**, aunque el resultado que da sea correcto | **Se corrige.** El texto, no la justificación |
+
+La pregunta que decide no es «¿está bien dicho?» sino **«¿qué se lleva el alumno si
+memoriza esta alternativa?»**. Si se lleva el hecho correcto con una redacción dura, se
+conserva: así viene el examen. Si se lleva una regla que le va a fallar en la pregunta
+siguiente, se corrige.
+
+### Los casos que fijaron la regla
+
+**Corregidas · enseñaban una regla falsa:**
+
+- **`m02#30`** · El enunciado decía que «el motor del DOM reconoce automáticamente» el
+  atajo de jQuery. El motor no reconoce nada: `$` es una variable corriente que declara
+  la biblioteca. La respuesta marcada era correcta y **la premisa era falsa**.
+- **`m03#10`** · La alternativa correcta explicaba `[] == false` por «coerción implícita
+  de tipos hacia **booleanos**». `==` no convierte a booleano: convierte a **número**.
+  El resultado que afirmaba era correcto y el motivo, falso. Un alumno que memorizara
+  esa regla la aplicaría mal de inmediato, porque `[] == false` da `true` mientras
+  `[] ? 1 : 2` da `1` — como condición, el arreglo vacío es verdadero. Corregida a
+  «hacia números».
+
+**Conservadas · imprecisas y fieles, con el matiz en la justificación:**
+
+- **`m03#6`** · «El hilo se detiene» ante un error de sintaxis. Está dicho más fuerte de
+  lo que es. **Se conserva porque el examen real usa ese mismo lenguaje.** La
+  justificación precisa que no se ejecuta ese script mientras la página, los demás
+  scripts y los manejadores siguen funcionando.
+- **`m03#32`** · «Descartadas por el recolector de basura». La justificación advierte la
+  excepción: si un closure las capturó, siguen vivas. **Es justo lo que una
+  justificación buena debe adelantar**, porque el alumno va a ver closures poco después.
+- **`m03#17`** · Huecos frente a `undefined`. La justificación dice «se leen como
+  `undefined`» en vez de «se rellenan con `undefined`», **sin abrir el tema de los
+  huecos**: la distinción es cierta y a un principiante todavía no le sirve.
+
+### Por qué esto extiende ADR-017 y no la repite
+
+ADR-017 decidió conservar **los distractores** evidentemente descartables, para que el
+estudiante ensaye también el descarte por forma. Esta ADR se ocupa de la otra mitad del
+ítem: **la alternativa correcta**, que es la única que el alumno se va a llevar
+aprendida. Conservar un distractor flojo no le enseña nada falso; conservar una correcta
+que afirma una regla falsa, sí. Por eso la fidelidad al examen manda en un caso y cede
+en el otro, y por eso hacía falta escribirlo aparte.
+
+### La justificación deja de ser un accesorio
+
+De aquí se sigue algo que conviene dejar dicho: **cuando se conserva una alternativa
+imprecisa, la justificación es el único sitio donde el estudiante puede encontrar la
+verdad completa.** No es un adorno ni un resumen: es la mitad del ítem que corrige a la
+otra. Una pregunta conservada bajo esta regla **sin** su matiz escrito es peor que
+haberla corregido.
+
+### Consecuencia operativa
+
+Una corrección aprobada bajo esta regla dispara **ADR-028** sin excepciones: se
+reconvierte y se recomprueba el módulo entero. Corregir una **alternativa correcta**
+mueve además el texto en que ancla el comprobador de conversión, así que la reconversión
+no es una formalidad — es lo que impide que el módulo quede comprobado contra un texto
+que ya no existe.
+
+---

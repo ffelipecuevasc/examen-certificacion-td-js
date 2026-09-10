@@ -230,7 +230,7 @@
       },
       {
         "letra": "c",
-        "texto": "true, debido a la coerción implícita de tipos hacia booleanos."
+        "texto": "true, debido a la coerción implícita de tipos hacia números."
       },
       {
         "letra": "d",

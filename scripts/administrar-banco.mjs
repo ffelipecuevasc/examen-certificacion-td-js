@@ -71,6 +71,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { comoContarlo, cotejarProcedencia } from './procedencia.mjs';
 import { abrirRegistro } from './registro-de-salida.mjs';
 import { validarParaEscritura } from './validacion-de-escritura.mjs';
 
@@ -112,6 +113,48 @@ const noSeAplico = (motivo, detalle = []) =>
     NO_SE_APLICO
   );
 
+/**
+ * El modulo del encargo, si se llego a saber. Lo llena el cotejo de procedencia.
+ *
+ * Puede quedar en null: `sinVeredicto` se puede disparar antes de haber leido el
+ * archivo, y entonces no hay modulo que nombrar.
+ */
+let moduloDelEncargo = null;
+
+/**
+ * Como mirar la base, con el comando escrito y no como tarea del lector.
+ *
+ * POR QUE ESTO ESTA AQUI (H-019)
+ *
+ * El mensaje de `SIN VEREDICTO` decia «mira la base antes de repetir» y no decia
+ * como. El 2026-09-10, en la carga del modulo 3, el autor no tenia el comando a
+ * mano en ese momento y repitio a ciegas; salio bien por suerte y no por metodo.
+ *
+ * **Un mensaje que pide algo sin decir como hacerlo se desobedece**, y no por
+ * descuido: se desobedece porque obedecerlo cuesta mas que arriesgarse, justo en
+ * el momento en que uno esta nervioso porque algo acaba de fallar. Escribir el
+ * comando cuesta cuatro lineas y cambia esa cuenta.
+ */
+function comoMirarLaBase() {
+  const cual = moduloDelEncargo ?? '<modulo>';
+  const dondeSacarlo =
+    moduloDelEncargo === null
+      ? ['  (el numero de modulo sale del encargo que intentabas cargar)', '']
+      : [];
+
+  return [
+    'Como mirar la base, sin repetir nada:',
+    '',
+    ...(remoto ? ['  $env:PERMITIR_REMOTO=1'] : []),
+    `  node scripts/comprobar-carga.mjs ${cual} --base=${base}${remoto ? ` ${FLAG_REMOTO}` : ''}`,
+    '',
+    ...dondeSacarlo,
+    'Ese guion NO escribe: contrasta lo que hay en la base contra los archivos de',
+    'origen y dice si el lote entro entero, a medias o no entro. Con su respuesta',
+    'sabras si hay que repetir la carga o si ya estaba hecha.',
+  ];
+}
+
 const sinVeredicto = (motivo, detalle = []) =>
   veredicto(
     'SIN VEREDICTO  ***  ESTO NO ES UN APROBADO  ***',
@@ -121,6 +164,8 @@ const sinVeredicto = (motivo, detalle = []) =>
       '',
       'No se pudo saber si el cambio entro o no. Antes de repetir la operacion,',
       'mira la base: repetir a ciegas es como se cargan las cosas dos veces.',
+      '',
+      ...comoMirarLaBase(),
     ],
     SIN_VEREDICTO
   );
@@ -409,6 +454,35 @@ if (!Array.isArray(encargo?.preguntas) || encargo.preguntas.length === 0) {
     '',
     '  { "preguntas": [ { ... }, { ... } ] }',
   ]);
+}
+
+/**
+ * La ultima puerta de ADR-028, y la que de verdad importa: aqui se escribe.
+ *
+ * Solo se coteja si el encargo TRAE sello. Los encargos escritos a mano y los
+ * anteriores a ADR-028 no lo traen y siguen funcionando como siempre: esta
+ * herramienta es de proposito general y no puede exigir que todo encargo venga de
+ * `convertir-banco.mjs`.
+ *
+ * Pero cuando el sello esta, manda. Un encargo que dice de que origenes salio y
+ * ya no corresponde a ellos es peor que uno que no dice nada, porque el sello
+ * invita a confiar.
+ */
+if (encargo.procedencia) moduloDelEncargo = Number(encargo.procedencia.modulo);
+
+if (encargo.procedencia && !argumentos.includes('--sin-cotejo')) {
+  const moduloDelSello = Number(encargo.procedencia.modulo);
+  const cotejo = await cotejarProcedencia(encargo, moduloDelSello, RAIZ);
+
+  if (!cotejo.corresponde) {
+    noSeAplico('El encargo no corresponde a sus origenes (ADR-028). No se escribio nada.', [
+      ...comoContarlo(cotejo, moduloDelSello),
+      '',
+      `Y despues, para rehacer este archivo:  node scripts/aplicar-justificaciones.mjs ${moduloDelSello}`,
+      '',
+      'Si de verdad sabes lo que haces: --sin-cotejo',
+    ]);
+  }
 }
 
 /**
