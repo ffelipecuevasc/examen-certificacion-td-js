@@ -205,7 +205,7 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 | 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 desplegado |
 | 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | 🟢 comprobado en D1 | 🟢 publicado |
 | 6 | 52 · 38 + 14 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 publicado |
-| 7 | 48 · 38 + 10 | 🟢 | 🟢 | 🟢 48 de 48 | ⚪ | ⚪ |
+| 7 | 48 · 38 + 10 | 🟢 | 🟢 | 🟢 48 de 48 | 🟢 comprobado en D1 | 🟢 publicado |
 | 8 | 45 · 36 + 9 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | | **368 · 285 + 83** | | | | | |
 
@@ -1094,6 +1094,69 @@ dos grupos que conviene mirar antes de sacar una conclusión única:
 porque el corte coincide con un cambio de tema que puede no significar nada. Se anota
 porque **quedan exactamente dos módulos** —7 y 8, los dos de Node y API— y van a caer
 del lado que decide si el grupo alto era el tema o la casualidad.
+
+### Evidencia del lote · módulo 7 · 2026-09-10
+
+**Corrida por Felipe Cuevas contra producción.** Los siete criterios de nivel 1,
+cerrados.
+
+| Criterio | Qué lo cierra |
+|---|---|
+| El lote entero está en D1 y suma lo que debe | **275 → 323**, y **38 `json_2026` + 10 `js_2026` = 48** contra los dos archivos |
+| Ninguna respuesta correcta se desplazó | `CARGA COMPROBADA` sobre las 48, anclado en el texto de la correcta |
+| Ningún campo se inventó | `dificultad IS NULL` en las 48 |
+| Ninguna `activa` carece de justificación | 48 activas, `justificacion IS NULL 0` |
+| Las retiradas de ese módulo no se cargaron | las **7** —`2 json_2026 + 5 js_2026`, las más de todos los lotes— ninguna en la base |
+| La instantánea y el respaldo salieron del mismo acto | sello **`"entorno": "nube"`**, **323 preguntas** en los dos |
+| El módulo se ve en el sitio publicado | publicado por el autor |
+
+**La corrección de `m07#24` llegó hasta el final:** la alternativa (b) dice
+`RELEASE SAVEPOINT`, y `correcciones registradas 1` quedó contrastado contra el archivo
+de origen en la recomprobación.
+
+**Segunda predicción del CSS, y volvió a acertar.** Se pasó por Tailwind el texto
+completo del lote antes de cargar: cero clases. Se anunció que iría con dos archivos
+generados y `npm run verificar` respondió `VERIFICADO`. **Con dos aciertos seguidos,
+H-031 deja de ser una sorpresa y pasa a ser un dato que se consulta.**
+
+#### El peso de la instantánea, con tres puntos
+
+| Preguntas | Peso |
+|---|---|
+| 223 | 297 kB |
+| 275 | 367 kB |
+| 323 | **430 kB** |
+
+Los incrementos medidos son **1 389** y **1 341 bytes por pregunta** — consistentes
+entre sí. **Proyección con las 368: 490 kB**, la misma cifra que salía con dos puntos.
+
+**Quedan 45 preguntas y el archivo va a rondar el medio mega.** Sigue valiendo lo dicho
+desde el módulo 5: es mucho para algo que el navegador **solo carga cuando la capa de
+datos cae**. Es la última oportunidad de decidir antes de que esté completo.
+
+#### H-004 · sexto dato, y el más extremo de la serie
+
+| Lote | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|
+| Módulo 2 · 52 | 23% | **40%** | 29% | 8% |
+| Módulo 3 · 61 | 16% | **39%** | 30% | 15% |
+| Módulo 4 · 61 | 18% | **38%** | 34% | 10% |
+| Módulo 5 · 49 | 12% | **49%** | 35% | 4% |
+| Módulo 6 · 52 | 17% | **48%** | 31% | 4% |
+| Módulo 7 · 48 | 17% | **56%** | 23% | 4% |
+
+**Más de la mitad de las preguntas del módulo 7 tienen su respuesta correcta en el
+segundo lugar.** Y la forma que se anotó en el módulo 6 se sostiene y se acentúa:
+
+- **Módulos 2, 3 y 4** — front y JavaScript: **40, 39, 38 %**, bajando.
+- **Módulos 5, 6 y 7** — bases de datos, Node y acceso a datos: **49, 48, 56 %**.
+
+La posición 4 acompaña: **4 % en los tres** del grupo alto, contra 8-15 % en el bajo.
+
+**Seis lotes, y el corte entre los dos grupos ya no depende de dos puntos.** Queda un
+módulo, el 8, que pertenece al mismo bloque temático que el grupo alto. Si cae ahí,
+la partición queda establecida; si cae en el grupo bajo, hay que buscar otra
+explicación que no sea el tema.
 
 ### Contenido
 
