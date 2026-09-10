@@ -206,7 +206,7 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 | 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | 🟢 comprobado en D1 | 🟢 publicado |
 | 6 | 52 · 38 + 14 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 publicado |
 | 7 | 48 · 38 + 10 | 🟢 | 🟢 | 🟢 48 de 48 | 🟢 comprobado en D1 | 🟢 publicado |
-| 8 | 45 · 36 + 9 | 🟢 | 🟢 | 🟢 45 de 45 | ⚪ | ⚪ |
+| 8 | 45 · 36 + 9 | 🟢 | 🟢 | 🟢 45 de 45 | 🟢 comprobado en D1 | 🟢 publicado |
 | | **368 · 285 + 83** | | | | | |
 
 **Estados:** ⚪ Sin empezar · 🔵 En curso · 🟢 Con evidencia
@@ -1158,6 +1158,155 @@ módulo, el 8, que pertenece al mismo bloque temático que el grupo alto. Si cae
 la partición queda establecida; si cae en el grupo bajo, hay que buscar otra
 explicación que no sea el tema.
 
+### Evidencia del lote · módulo 8 · 2026-09-10 · **el banco queda completo**
+
+**Corrida por Felipe Cuevas contra producción.** Los siete criterios de nivel 1 del
+lote, cerrados.
+
+| Criterio | Qué lo cierra |
+|---|---|
+| El lote entero está en D1 y suma lo que debe | **323 → 368**, y **36 `json_2026` + 9 `js_2026` = 45** contra los dos archivos |
+| Ninguna respuesta correcta se desplazó | `CARGA COMPROBADA` sobre las 45, anclado en el texto de la correcta |
+| Ningún campo se inventó | `dificultad IS NULL` en las 45 |
+| Ninguna `activa` carece de justificación | 45 activas, `justificacion IS NULL 0` |
+| Las retiradas de ese módulo no se cargaron | las **10** —`4 json_2026 + 6 js_2026`, las más de todos los lotes— ninguna en la base |
+| La instantánea y el respaldo salieron del mismo acto | sello **`"entorno": "nube"`**, **368 preguntas** en los dos |
+| El módulo se ve en el sitio publicado | publicado por el autor |
+
+---
+
+## Criterios de nivel 2 · el agregado final
+
+*Se comprobaron los **siete módulos de nuevo**, con las 368 ya dentro, y no se sumaron
+los siete cierres anteriores. La diferencia importa: cada módulo se comprobó el día que
+se cargó, y esto comprueba que **hoy** los siete siguen correspondiendo a sus orígenes.*
+
+### ✅ Las 368 están en D1 y suman lo que deben sumar
+
+| Módulo | `json_2026` | `js_2026` | Total |
+|---|---|---|---|
+| 2 | 39 | 13 | 52 |
+| 3 | 50 | 11 | 61 |
+| 4 | 46 | 15 | 61 |
+| 5 | 38 | 11 | 49 |
+| 6 | 38 | 14 | 52 |
+| 7 | 38 | 10 | 48 |
+| 8 | 36 | 9 | 45 |
+| **Total** | **285** | **83** | **368** |
+
+Las siete corridas dieron `CARGA COMPROBADA` y código 0, cada una contrastando **pregunta
+a pregunta** contra sus dos archivos de origen, anclada en el texto de la correcta y sin
+normalizar nada.
+
+### ✅ Las 37 retiradas no se cargaron
+
+| Módulo | 2 | 3 | 4 | 5 | 6 | 7 | 8 | **Total** |
+|---|---|---|---|---|---|---|---|---|
+| `json_2026` | 1 | 0 | 4 | 2 | 2 | 2 | 4 | **15** |
+| `js_2026` | 2 | 4 | 0 | 4 | 1 | 5 | 6 | **22** |
+| Suma | 3 | 4 | 4 | 6 | 3 | 7 | 10 | **37** |
+
+Cuadra con `retiradas.json`, que tiene 15 del banco nuevo y 22 del viejo. **Ninguna en la
+base**, comprobado módulo por módulo.
+
+### ✅ La marca de orden fijo sobrevivió, y el testigo sigue en su sitio
+
+```
+Orden fijo (criterio de nivel 2 de la iteracion 25):
+  orden_fijo = 1   id 50   «¿Qué comando de Git permite crear una nueva rama y cambiar a…»
+  Testigo: .\static\js\data\cuestionario.js SIGUE en el arbol
+```
+
+**Es la línea que caduca**, y por eso el retiro del banco viejo va después de que esté
+escrita. Desde el 2026-09-09 se decidió que este criterio **no se cierra mostrando que la
+conversión marcó la pregunta** sino consultando D1 con el `.js` todavía presente. Así
+quedó, y ahora sí se puede retirar.
+
+### 🔵 El sitio aguanta el banco completo · medido, falta mirarlo
+
+| | |
+|---|---|
+| Instantánea con 368 | **488 kB** (499 557 bytes) |
+| Respaldo con 368 | 488 kB |
+
+**La proyección acertó:** desde 223 preguntas se proyectaban 489 kB, desde 275 y 323
+también 490-491 kB. El valor real es **488 kB**.
+
+Falta la otra mitad del criterio: comprobar `cuestionario.html` sin degradación
+perceptible, **también en teléfono**.
+
+### 🔵 El contador de la portada · falta mirarlo
+
+Con el banco real cargado debe decir **368 preguntas · 7 módulos**. La iteración 24 lo
+arregló y lo comprobó con 8; aquí se comprueba con 368.
+
+### ⚪ `npm run verificar` termina en 0
+
+Hoy termina en **2**, y no por un fallo: `barrera`, `css` y `restricciones` en `OK`, y
+**`escapado` en `AVISO`** porque nadie levantó el servidor local. Es una casilla en
+blanco, no un aprobado, y el propio guion lo dice.
+
+**Y ahora ese aviso pesa más que en los siete lotes anteriores.** Es el criterio de
+ADR-024, que la iteración 22 solo pudo verificar con diez filas de juguete. Con las 368
+dentro, el banco trae:
+
+| | |
+|---|---|
+| Preguntas con comillas invertidas | **291** |
+| Con comillas dobles | **57** |
+| Con algo con forma de `<etiqueta>` | **16** |
+
+Esas 16 son las que de verdad ponen a prueba el escapado: **son el caso que ya rompió la
+página una vez**, cuando un ejemplo que contenía `<div>` se interpretó como etiqueta real.
+
+---
+
+## H-004 · la serie completa, y la partición por tema queda refutada
+
+| Lote | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|
+| Módulo 2 · 52 | 23% | **40%** | 29% | 8% |
+| Módulo 3 · 61 | 16% | **39%** | 30% | 15% |
+| Módulo 4 · 61 | 18% | **38%** | 34% | 10% |
+| Módulo 5 · 49 | 12% | **49%** | 35% | 4% |
+| Módulo 6 · 52 | 17% | **48%** | 31% | 4% |
+| Módulo 7 · 48 | 17% | **56%** | 23% | 4% |
+| Módulo 8 · 45 | 16% | **38%** | 38% | 9% |
+| **Las 368** | **17%** | **44%** | **31%** | **8%** |
+
+**La partición por tema no se sostiene.** Se había anotado que los módulos 5, 6 y 7 —datos
+y Node— formaban un grupo alto frente al 2, 3 y 4. **El módulo 8 pertenece al mismo bloque
+temático y cayó en 38 %**, el valor más bajo de la serie junto al módulo 4. La hipótesis
+se escribió antes de conocer el dato y el dato la desmintió.
+
+### Lo que sí se sostiene, y es más interesante
+
+**El sesgo está en los dos bancos por igual.** Separando las 368 por su origen:
+
+| Banco | n | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|---|
+| `json_2026` | 285 | 17% | **43%** | 31% | 8% |
+| `js_2026` | 83 | 17% | **46%** | 31% | 6% |
+
+**Dos bancos escritos por manos distintas, en momentos distintos, con la misma forma.**
+Tres puntos porcentuales de diferencia en la posición 2 y cifras casi idénticas en las
+otras tres.
+
+Eso descarta que el sesgo sea la costumbre de un redactor concreto y apunta a algo
+compartido: **el material del que ambos derivan** —el examen real y los testimonios sobre
+él—, o la tendencia general de quien escribe preguntas de alternativas a poner la correcta
+en segundo lugar. **Con estos datos no se puede distinguir entre esas dos, y no se afirma
+ninguna.**
+
+**La variación por módulo —de 38 % a 56 %— es ruido alrededor de un 44 % común**, no dos
+poblaciones. Con lotes de 45 a 61 preguntas, esa dispersión es lo esperable.
+
+**Y no cambia qué se hace:** H-004 se informa y no se corrige. El barajado lo neutraliza
+en pantalla, y reordenar las alternativas para cuadrar un histograma sería falsear el
+material de origen. Lo que ahora se puede **decir** con respaldo es que el banco hereda un
+sesgo de posición de sus fuentes — información útil para quien estudia con él, y que antes
+era una sospecha de un solo lote.
+
 ### Contenido
 
 - [ ] Redactar las justificaciones de las preguntas que se vayan a activar.
@@ -1248,9 +1397,9 @@ tabla de avance.
 
 ### Nivel 2 · Agregado final · sólo lo cierra el último módulo
 
-- [ ] **Las 368 están en D1 y suman lo que deben sumar.** Conteo por módulo y por
+- [x] **Las 368 están en D1 y suman lo que deben sumar.** Conteo por módulo y por
   origen contra los dos bancos, sin diferencias.
-- [ ] **Las 37 retiradas no se cargaron**, comprobado contra `retiradas.json` entero.
+- [x] **Las 37 retiradas no se cargaron**, comprobado contra `retiradas.json` entero.
 - [x] **La marca de orden fijo sobrevivió.** La pregunta del comando de Git tiene
   `orden_fijo = 1` en D1, mostrado **con `static/js/data/cuestionario.js` todavía en
   el árbol**. Se cierra en el lote del módulo 2 y tiene que **seguir cierto** al
