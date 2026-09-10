@@ -204,7 +204,7 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 | 3 | 61 · 50 + 11 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 desplegado |
 | 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | 🟢 comprobado en D1 | 🟢 publicado |
-| 6 | 52 · 38 + 14 | 🟢 | 🟢 | 🟢 52 de 52 | ⚪ | ⚪ |
+| 6 | 52 · 38 + 14 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 publicado |
 | 7 | 48 · 38 + 10 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 8 | 45 · 36 + 9 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | | **368 · 285 + 83** | | | | | |
@@ -1023,6 +1023,77 @@ cada dos preguntas tiene su respuesta correcta en el segundo lugar. La posición
 
 **Con cuatro lotes ya no es razonable llamarlo casualidad.** Faltan tres módulos y lo
 que queda por ver no es si hay sesgo, sino cuánto y si es parejo entre bancos.
+
+### Evidencia del lote · módulo 6 · 2026-09-10
+
+**Corrida por Felipe Cuevas contra producción.** Los siete criterios de nivel 1,
+cerrados.
+
+| Criterio | Qué lo cierra |
+|---|---|
+| El lote entero está en D1 y suma lo que debe | **223 → 275**, y **38 `json_2026` + 14 `js_2026` = 52** contra los dos archivos |
+| Ninguna respuesta correcta se desplazó | `CARGA COMPROBADA` sobre las 52, anclado en el texto de la correcta |
+| Ningún campo se inventó | `dificultad IS NULL` en las 52 |
+| Ninguna `activa` carece de justificación | 52 activas, `justificacion IS NULL 0` |
+| Las retiradas de ese módulo no se cargaron | las **3** —`2 json_2026 + 1 js_2026`— ninguna en la base |
+| La instantánea y el respaldo salieron del mismo acto | sello **`"entorno": "nube"`**, **275 preguntas** en los dos |
+| El módulo se ve en el sitio publicado | publicado por el autor |
+
+**La corrección de `m06#15` llegó hasta el final:** la alternativa (c) dice
+`npm init -y`, y `correcciones registradas 1` quedó contrastado contra el archivo de
+origen en la recomprobación.
+
+#### La predicción del CSS se cumplió, y eso cambia cómo se trata H-031
+
+Antes de cargar se pasaron las 52 justificaciones por Tailwind con una configuración
+aparte, en el scratchpad y sin tocar el proyecto. Emitieron **una sola clase**,
+`.static`, salida de `express.static()` — y esa clase **ya estaba** en el CSS publicado
+porque el sitio la usa.
+
+Se anunció que el CSS no se movería y que el lote iría con dos archivos generados en
+vez de tres. **`npm run verificar` respondió `VERIFICADO`.**
+
+**Es la primera vez que H-031 se predice en lugar de sufrirse.** En el módulo 4 el
+mismo fenómeno rompió el despliegue y se descubrió leyendo el error de Cloudflare; aquí
+se supo antes de tocar producción, con un comando que tarda un segundo.
+
+#### El peso de la instantánea, con dos puntos de medición
+
+| Desde | Proyección con 368 |
+|---|---|
+| 223 preguntas · 297 kB | 489 kB |
+| 275 preguntas · 367 kB | **491 kB** |
+
+El incremento medido es de **1 389 bytes por pregunta**, y las dos proyecciones caen a
+2 kB una de otra. **Deja de ser una estimación de un solo punto:** con las 368 el
+archivo va a pesar cerca de **490 kB**.
+
+Sigue valiendo lo dicho en el módulo 5: medio mega es mucho para un archivo que el
+navegador solo carga **cuando la capa de datos cae**. Quedan 93 preguntas —módulo 7 con
+48 y módulo 8 con 45— y conviene decidir antes de la última si se acepta, se comprime o
+se recorta.
+
+#### H-004 · quinto dato, y aparece una forma en la serie
+
+| Lote | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|
+| Módulo 2 · 52 | 23% | **40%** | 29% | 8% |
+| Módulo 3 · 61 | 16% | **39%** | 30% | 15% |
+| Módulo 4 · 61 | 18% | **38%** | 34% | 10% |
+| Módulo 5 · 49 | 12% | **49%** | 35% | 4% |
+| Módulo 6 · 52 | 17% | **48%** | 31% | 4% |
+
+**Cinco lotes y la posición 2 nunca baja del 38 %.** Pero además la serie se parte en
+dos grupos que conviene mirar antes de sacar una conclusión única:
+
+- **Módulos 2, 3 y 4** — front, JavaScript y JavaScript avanzado: **40, 39, 38 %**.
+- **Módulos 5 y 6** — bases de datos y Node: **49, 48 %**, con la posición 4 en 4 % en
+  los dos.
+
+**No se afirma que sean dos poblaciones distintas**, porque dos lotes no lo establecen y
+porque el corte coincide con un cambio de tema que puede no significar nada. Se anota
+porque **quedan exactamente dos módulos** —7 y 8, los dos de Node y API— y van a caer
+del lado que decide si el grupo alto era el tema o la casualidad.
 
 ### Contenido
 
