@@ -202,8 +202,8 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 |---|---|---|---|---|---|---|
 | 2 | 52 · 39 + 13 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 3 | 61 · 50 + 11 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
-| 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | ⚪ despliegue detenido |
-| 5 | 49 · 38 + 11 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 desplegado |
+| 5 | 49 · 38 + 11 | 🟢 | 🟢 | 🟢 49 de 49 | ⚪ | ⚪ |
 | 6 | 52 · 38 + 14 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 7 | 48 · 38 + 10 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 8 | 45 · 36 + 9 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
@@ -907,7 +907,7 @@ cerrados; el séptimo espera el despliegue.
 | Ninguna `activa` carece de justificación | 61 activas, `justificacion IS NULL 0` |
 | Las retiradas de ese módulo no se cargaron | las **4** del módulo —`4 json_2026 + 0 js_2026`— ninguna en la base |
 | La instantánea y el respaldo salieron del mismo acto | sello **`"entorno": "nube"`**, **174 preguntas** en los dos, huellas informadas antes y después |
-| El módulo se ve en el sitio publicado | ⚪ **abierto**: el despliegue falló por H-031 y el sitio siguió sirviendo el módulo 3 |
+| El módulo se ve en el sitio publicado | **cerrado el 2026-09-10** con el arreglo de H-031 empujado: `bc55513` construyó sin errores —«17 recursos enlazados, ninguno roto»— y `Success: Your site was deployed!` |
 
 **El reparto de retiradas quedó a la vista, y por eso se informa por banco:** `4 + 0`,
 el inverso exacto del módulo 3, que fue `0 + 4`. Es lo que la corrección de H-023 vino
@@ -916,6 +916,16 @@ a permitir — un desbalance así, en el total, no se vería.
 **Sin `orden_fijo`**, como corresponde: la única marca del proyecto sigue siendo la del
 módulo 2.
 
+> **Resuelto el 2026-09-10.** Empujado el arreglo, la construcción de Cloudflare pasó
+> limpia sobre el commit `bc55513` y el sitio se desplegó. **Y el propio registro del
+> despliegue corrobora que la instantánea nueva llegó:** «Uploaded 2 files (54 already
+> uploaded)» — exactamente los dos artefactos generados que habían cambiado, la
+> instantánea y `style.css`. El respaldo no aparece porque no se publica: no está en
+> `LISTA_COPIA`, y ahí no debe estar.
+>
+> Lo que ese registro **no** prueba por sí solo es lo que se ve en pantalla —la
+> insignia diciendo 174 y 4 módulos, y que no aparezca el aviso de respaldo—. Eso
+> depende de la capa de datos, que ya está comprobada aparte con las 174 en D1.
 > **El despliegue falló, y no por la carga.** El banco estaba bien cargado y bien
 > publicado; lo que se rompió fue la **construcción del sitio**, porque una
 > justificación de este lote —`m04#19`, sobre importar un módulo por defecto— contenía

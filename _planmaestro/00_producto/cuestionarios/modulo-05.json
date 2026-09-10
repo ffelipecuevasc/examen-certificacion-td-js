@@ -398,7 +398,7 @@
       },
       {
         "letra": "c",
-        "texto": "END TRANSACTION"
+        "texto": "CHECKPOINT"
       },
       {
         "letra": "d",

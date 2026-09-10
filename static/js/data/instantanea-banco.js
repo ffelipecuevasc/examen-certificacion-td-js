@@ -17,8 +17,8 @@
 export const SELLO = {
   "base": "examen-td-js-produccion",
   "entorno": "nube",
-  "generada_en": "2026-09-10T12:46:23.730Z",
-  "preguntas": 174,
+  "generada_en": "2026-09-10T13:39:09.348Z",
+  "preguntas": 223,
   "descartadas": 0
 };
 
@@ -6980,6 +6980,1966 @@ export const PREGUNTAS = [
         "letra": "d",
         "orden": 4,
         "texto": "Promise.reject()",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 175,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué característica fundamental distingue a un RDBMS de un sistema NoSQL documental?",
+    "justificacion": "Un motor relacional garantiza ACID —atomicidad, consistencia, aislamiento y durabilidad— como parte de su contrato, y eso es lo que lo distingue del enfoque documental clásico, que nació sacrificando esas garantías a cambio de flexibilidad y escala. Las otras tres describen rasgos del lado NoSQL: el esquema flexible, el almacenamiento en grafos y la ausencia de SQL. Conviene saber que la frontera se ha ido borrando —varios motores documentales ofrecen hoy transacciones ACID—, pero la distinción sigue siendo la que el examen evalúa.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 697,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Estructura flexible de esquemas dinámicos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 698,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Garantía estricta de propiedades ACID.",
+        "es_correcta": 1
+      },
+      {
+        "id": 699,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Almacenamiento basado en grafos dirigidos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 700,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ausencia de lenguaje estructurado de consultas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 176,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Cuál es el rol principal del motor relacional en la arquitectura de un RDBMS?",
+    "justificacion": "El motor relacional recibe una consulta declarativa —qué se quiere, no cómo obtenerlo—, decide el plan de ejecución y lo ejecuta: qué índice usar, en qué orden cruzar las tablas, cuándo filtrar. Ahí es donde se gana o se pierde el rendimiento. Las otras tres describen oficios de otras piezas: no compila a binarios, no dibuja interfaces, y los respaldos son una tarea aparte.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 701,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Compilar el código SQL en binarios ejecutables nativos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 702,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Gestionar la interfaz gráfica de usuario final.",
+        "es_correcta": 0
+      },
+      {
+        "id": 703,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Optimizar y ejecutar los planes de consulta sobre los datos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 704,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Exportar automáticamente backups en formato JSON.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 177,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué protocolo se utiliza comúnmente para establecer la conexión a un motor RDBMS?",
+    "justificacion": "La conexión a un motor relacional viaja por TCP/IP cuando el cliente está en otra máquina, o por un socket local cuando está en la misma. Encima de ese transporte va el protocolo propio del motor, que no es HTTP. Las otras tres son protocolos reales de otros oficios: SMTP y POP3 mueven correo, FTP y SFTP mueven archivos, y REST es un estilo para APIs web, no para hablar con una base.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 705,
+        "letra": "a",
+        "orden": 1,
+        "texto": "HTTP/REST puro",
+        "es_correcta": 0
+      },
+      {
+        "id": 706,
+        "letra": "b",
+        "orden": 2,
+        "texto": "TCP/IP o Sockets locales",
+        "es_correcta": 1
+      },
+      {
+        "id": 707,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Protocolo SMTP/POP3",
+        "es_correcta": 0
+      },
+      {
+        "id": 708,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Transferencia FTP/SFTP",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 178,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En el contexto de un RDBMS, ¿qué es un \"catálogo de sistema\"?",
+    "justificacion": "El catálogo de sistema son tablas que describen la propia base: qué tablas hay, qué columnas, de qué tipo, qué restricciones e índices. Es la base hablando de sí misma, y por eso se puede consultar con SQL corriente. En PostgreSQL vive en `information_schema` y en `pg_catalog`. No es un manual, ni un índice, ni una vista de logs.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 709,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una vista materializada con los logs de transacciones.",
+        "es_correcta": 0
+      },
+      {
+        "id": 710,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un conjunto de tablas que almacena metadatos de la base.",
+        "es_correcta": 1
+      },
+      {
+        "id": 711,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El manual de usuario integrado en la consola SQL.",
+        "es_correcta": 0
+      },
+      {
+        "id": 712,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El índice primario de la tabla principal de la base de datos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 179,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "Si cruzas dos tablas con LEFT JOIN, ¿qué sucede con los registros huérfanos de la tabla izquierda?",
+    "justificacion": "`LEFT JOIN` conserva **todas** las filas de la tabla izquierda, tengan pareja o no; las que no la tienen aparecen igual y las columnas de la derecha se rellenan con `NULL`. Ésa es justamente la diferencia con `INNER JOIN`, que las descartaría. De ahí sale un uso muy común: `LEFT JOIN` más `WHERE derecha.id IS NULL` es la forma de encontrar los huérfanos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 713,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Se omiten del resultado final.",
+        "es_correcta": 0
+      },
+      {
+        "id": 714,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Se incluyen y los campos derechos se rellenan con NULL.",
+        "es_correcta": 1
+      },
+      {
+        "id": 715,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Generan un error crítico de integridad referencial.",
+        "es_correcta": 0
+      },
+      {
+        "id": 716,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Se rellenan con el valor por defecto de cada columna.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 180,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Cuál es el propósito principal de utilizar una subconsulta correlacionada?",
+    "justificacion": "Una subconsulta correlacionada menciona una columna de la consulta externa, así que no se puede resolver sola: se evalúa una vez por cada fila de la principal. Eso la hace potente y también cara. La (a) describe la subconsulta **no** correlacionada, que se calcula una sola vez y es el par con el que se contrasta. Cuando el costo pesa, muchas se pueden reescribir como un `JOIN`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 717,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Evaluar independientemente la subconsulta una sola vez.",
+        "es_correcta": 0
+      },
+      {
+        "id": 718,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Ejecutar la subconsulta por cada fila de la consulta principal.",
+        "es_correcta": 1
+      },
+      {
+        "id": 719,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Bloquear la tabla principal hasta terminar la subconsulta.",
+        "es_correcta": 0
+      },
+      {
+        "id": 720,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Combinar resultados usando operadores de conjunto (UNION).",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 181,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué tipo de JOIN retorna únicamente los registros que tienen coincidencias en ambas tablas?",
+    "justificacion": "`INNER JOIN` devuelve solo las filas con coincidencia en las dos tablas. Las otras tres existen y hacen otra cosa: `FULL OUTER JOIN` trae todo de ambos lados rellenando con `NULL`, `RIGHT OUTER JOIN` conserva todo el lado derecho, y `CROSS JOIN` combina cada fila con cada fila sin condición. Es el join por omisión: escribir solo `JOIN` significa `INNER JOIN`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 721,
+        "letra": "a",
+        "orden": 1,
+        "texto": "FULL OUTER JOIN",
+        "es_correcta": 0
+      },
+      {
+        "id": 722,
+        "letra": "b",
+        "orden": 2,
+        "texto": "CROSS JOIN NATURAL",
+        "es_correcta": 0
+      },
+      {
+        "id": 723,
+        "letra": "c",
+        "orden": 3,
+        "texto": "INNER JOIN",
+        "es_correcta": 1
+      },
+      {
+        "id": 724,
+        "letra": "d",
+        "orden": 4,
+        "texto": "RIGHT OUTER JOIN",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 182,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En una consulta SELECT, ¿cuál es el orden lógico interno de evaluación del motor SQL?",
+    "justificacion": "El orden lógico es `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `SELECT` —y `ORDER BY` al final—, que no es el orden en que se escribe. Entenderlo explica dos cosas que se preguntan siempre: por qué `WHERE` no puede filtrar por una función agregada, porque el agrupamiento todavía no ocurrió, y por qué en muchos motores no se puede usar en `WHERE` un alias definido en el `SELECT`, que se evalúa después.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 725,
+        "letra": "a",
+        "orden": 1,
+        "texto": "SELECT, FROM, WHERE, GROUP BY, HAVING",
+        "es_correcta": 0
+      },
+      {
+        "id": 726,
+        "letra": "b",
+        "orden": 2,
+        "texto": "FROM, WHERE, GROUP BY, HAVING, SELECT",
+        "es_correcta": 1
+      },
+      {
+        "id": 727,
+        "letra": "c",
+        "orden": 3,
+        "texto": "WHERE, FROM, GROUP BY, SELECT, HAVING",
+        "es_correcta": 0
+      },
+      {
+        "id": 728,
+        "letra": "d",
+        "orden": 4,
+        "texto": "SELECT, WHERE, HAVING, GROUP BY, FROM",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 183,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué operador SQL permite evaluar si un valor específico está dentro del resultado de una subconsulta?",
+    "justificacion": "`IN` comprueba si un valor está entre los que devuelve la subconsulta: `WHERE id IN (SELECT ...)`. `EXISTS` es el distractor fuerte porque también se usa con subconsultas, pero pregunta otra cosa —si la subconsulta devuelve **alguna** fila, sin mirar qué valor—. `BETWEEN` compara contra un rango y `LIKE` contra un patrón de texto; ninguno de los dos toma un conjunto de resultados.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 729,
+        "letra": "a",
+        "orden": 1,
+        "texto": "BETWEEN",
+        "es_correcta": 0
+      },
+      {
+        "id": 730,
+        "letra": "b",
+        "orden": 2,
+        "texto": "EXISTS",
+        "es_correcta": 0
+      },
+      {
+        "id": 731,
+        "letra": "c",
+        "orden": 3,
+        "texto": "IN",
+        "es_correcta": 1
+      },
+      {
+        "id": 732,
+        "letra": "d",
+        "orden": 4,
+        "texto": "LIKE",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 184,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "Si usas GROUP BY, ¿qué restricción impone el estándar SQL sobre las columnas del SELECT?",
+    "justificacion": "Toda columna del `SELECT` tiene que estar en el `GROUP BY` o venir envuelta en una función agregada como `COUNT`, `SUM` o `MAX`. El motivo es que el resultado tiene una fila por grupo, y una columna que no cumple eso tendría varios valores posibles y ninguna regla para elegir. Las otras tres inventan límites que no existen: ni el tipo, ni la cantidad de columnas, ni los alias están restringidos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 733,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Todas deben ser columnas de tipo numérico exclusivamente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 734,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Deben estar en el GROUP BY o dentro de una función agregada.",
+        "es_correcta": 1
+      },
+      {
+        "id": 735,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Solo puede haber un máximo de 3 columnas seleccionadas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 736,
+        "letra": "d",
+        "orden": 4,
+        "texto": "No se pueden utilizar alias lógicos en el resultado.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 185,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué operador lógico utilizarías para buscar patrones de texto específicos ignorando mayúsculas?",
+    "justificacion": "En PostgreSQL, `ILIKE` compara patrones ignorando mayúsculas; el equivalente portátil es forzar los dos lados con `UPPER()` o `LOWER()`. `LIKE` a secas sí distingue mayúsculas de minúsculas, y ésa es la diferencia que la pregunta busca. Los otros tres nombres no existen en SQL. Ojo con una consecuencia práctica: envolver la columna en `UPPER()` suele impedir que el motor use el índice.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 737,
+        "letra": "a",
+        "orden": 1,
+        "texto": "EQUALS IGNORE",
+        "es_correcta": 0
+      },
+      {
+        "id": 738,
+        "letra": "b",
+        "orden": 2,
+        "texto": "ILIKE o combinaciones con UPPER/LOWER",
+        "es_correcta": 1
+      },
+      {
+        "id": 739,
+        "letra": "c",
+        "orden": 3,
+        "texto": "MATCH TEXT EXACT",
+        "es_correcta": 0
+      },
+      {
+        "id": 740,
+        "letra": "d",
+        "orden": 4,
+        "texto": "REGEXP_ONLY",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 186,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué sentencia DML permite insertar filas directamente a partir de una consulta a otra tabla?",
+    "justificacion": "`INSERT INTO destino SELECT ... FROM origen` inserta en una tabla **que ya existe** las filas que devuelve la consulta. La (b), `CREATE TABLE ... AS`, también copia datos pero crea la tabla en el mismo acto, así que responde a otra necesidad. `MERGE` existe en varios motores y sirve para insertar o actualizar según haya coincidencia; `UPDATE ... FROM` actualiza, no inserta.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 741,
+        "letra": "a",
+        "orden": 1,
+        "texto": "INSERT INTO ... SELECT",
+        "es_correcta": 1
+      },
+      {
+        "id": 742,
+        "letra": "b",
+        "orden": 2,
+        "texto": "CREATE TABLE ... AS",
+        "es_correcta": 0
+      },
+      {
+        "id": 743,
+        "letra": "c",
+        "orden": 3,
+        "texto": "UPDATE ... FROM",
+        "es_correcta": 0
+      },
+      {
+        "id": 744,
+        "letra": "d",
+        "orden": 4,
+        "texto": "MERGE INTO ... SELECT",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 187,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "Al ejecutar un DELETE sin cláusula WHERE, ¿qué impacto ocurre internamente en la base de datos?",
+    "justificacion": "`DELETE` sin `WHERE` borra todas las filas, pero las borra **una a una y dejando registro de cada una** en el log de transacciones, de modo que la operación se puede deshacer con `ROLLBACK`. Por eso es lenta en tablas grandes y por eso existe `TRUNCATE`, que es el contraste directo. No borra la tabla —eso es `DROP`— ni reinicia los identificadores, y ningún motor la bloquea por seguridad.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 745,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Se elimina la estructura completa y definitiva de la tabla.",
+        "es_correcta": 0
+      },
+      {
+        "id": 746,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Se truncan los datos reseteando los identificadores.",
+        "es_correcta": 0
+      },
+      {
+        "id": 747,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Se eliminan todos los registros fila a fila (logueado).",
+        "es_correcta": 1
+      },
+      {
+        "id": 748,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El motor bloquea la operación masiva por seguridad.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 188,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué función principal asume una \"secuencia\" en el proceso de inserción de datos?",
+    "justificacion": "Una secuencia es un generador de números que entrega valores distintos a cada llamada, pensado para alimentar claves primarias sin que dos sesiones simultáneas obtengan el mismo. En PostgreSQL es lo que hay detrás de `SERIAL` y de las columnas `GENERATED ... AS IDENTITY`. Conviene saber que sus valores no se devuelven al deshacer una transacción: un `ROLLBACK` deja huecos en la numeración, y eso es correcto.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 749,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Ordenar los registros insertados cronológicamente al disco.",
+        "es_correcta": 0
+      },
+      {
+        "id": 750,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Generar valores únicos secuenciales para claves primarias.",
+        "es_correcta": 1
+      },
+      {
+        "id": 751,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Encriptar contraseñas automáticamente antes de guardarlas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 752,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Agrupar inserciones masivas en bloques asíncronos.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 189,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué sucede si una sentencia UPDATE viola una restricción de llave foránea (integridad referencial)?",
+    "justificacion": "La sentencia falla entera y no se aplica ninguna de sus modificaciones: una restricción de integridad referencial no es una advertencia, es una condición. Las otras tres describen comportamientos que ningún motor tiene: no rellena con `NULL` por su cuenta, no pide confirmación, y desde luego no desactiva la restricción para poder seguir. Si la sentencia iba dentro de una transacción, ésta queda para deshacer.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 753,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La fila infractora se actualiza forzosamente con NULL.",
+        "es_correcta": 0
+      },
+      {
+        "id": 754,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El motor suspende la ejecución y pide confirmación manual.",
+        "es_correcta": 0
+      },
+      {
+        "id": 755,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La sentencia DML falla y se rechazan las modificaciones.",
+        "es_correcta": 1
+      },
+      {
+        "id": 756,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El sistema desactiva temporalmente la llave foránea impuesta.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 190,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué propiedad ACID garantiza que una transacción fallida no deje registros parciales guardados?",
+    "justificacion": "La atomicidad es el todo o nada: una transacción se aplica entera o no deja rastro, así que un fallo a mitad no puede dejar registros parciales. Las otras tres son propiedades reales de ACID con otro oficio: la consistencia mantiene válidas las reglas de la base, el aislamiento evita que las transacciones simultáneas se estorben, y la durabilidad garantiza que lo confirmado sobreviva a una caída.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 757,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Aislamiento (Isolation).",
+        "es_correcta": 0
+      },
+      {
+        "id": 758,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Durabilidad (Durability).",
+        "es_correcta": 0
+      },
+      {
+        "id": 759,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Consistencia (Consistency).",
+        "es_correcta": 0
+      },
+      {
+        "id": 760,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Atomicidad (Atomicity).",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 191,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué comando asegura la persistencia permanente de los datos tras un bloque de sentencias DML?",
+    "justificacion": "`COMMIT` cierra la transacción y hace permanentes sus cambios; hasta ese momento nada de lo hecho es definitivo y un `ROLLBACK` lo desharía. Las otras tres existen y ninguna confirma nada. `SAVEPOINT` marca un punto intermedio al que se puede volver **dentro** de la transacción, sin cerrarla. `CHECKPOINT` es el distractor que separa: fuerza la escritura a disco de los buffers pendientes, así que suena a «persistencia permanente», pero no tiene nada que ver con confirmar una transacción — la durabilidad de lo confirmado la garantiza el registro de transacciones desde el `COMMIT`, sin esperar a ningún volcado. `FLUSH PRIVILEGES` es de MySQL y recarga permisos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 761,
+        "letra": "a",
+        "orden": 1,
+        "texto": "SAVEPOINT",
+        "es_correcta": 0
+      },
+      {
+        "id": 762,
+        "letra": "b",
+        "orden": 2,
+        "texto": "COMMIT",
+        "es_correcta": 1
+      },
+      {
+        "id": 763,
+        "letra": "c",
+        "orden": 3,
+        "texto": "CHECKPOINT",
+        "es_correcta": 0
+      },
+      {
+        "id": 764,
+        "letra": "d",
+        "orden": 4,
+        "texto": "FLUSH PRIVILEGES",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 192,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué problema de concurrencia grave evita el máximo nivel de aislamiento (Serializable)?",
+    "justificacion": "El nivel `SERIALIZABLE` es el más alto y evita los tres fenómenos clásicos: lecturas sucias —ver cambios no confirmados—, lecturas no repetibles —leer dos veces y obtener distinto— y lecturas fantasma —que aparezcan filas nuevas entre dos lecturas—. El precio es menos concurrencia, porque el motor tiene que serializar el acceso. Los niveles más bajos van permitiendo uno u otro a cambio de velocidad.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 765,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Lecturas sucias, lecturas no repetibles y lecturas fantasma.",
+        "es_correcta": 1
+      },
+      {
+        "id": 766,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Exclusivamente el problema de lecturas sucias aisladas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 767,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Únicamente la sobreescritura de datos mediante deadlocks.",
+        "es_correcta": 0
+      },
+      {
+        "id": 768,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Ninguno, permite alta concurrencia asíncrona incondicional.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 193,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué efecto tiene el modo AUTOCOMMIT si se encuentra activado por defecto en la consola SQL?",
+    "justificacion": "Con AUTOCOMMIT activo, cada sentencia que termina bien se confirma sola, como si llevara su propio `COMMIT` detrás. La consecuencia práctica es la que importa: **ya no hay nada que deshacer**, porque no queda transacción abierta. Por eso, para agrupar varias sentencias en una unidad, hay que abrir la transacción explícitamente con `BEGIN`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 769,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Inicia un backup automático tras cada actualización masiva.",
+        "es_correcta": 0
+      },
+      {
+        "id": 770,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Agrupa automáticamente todas las consultas del mismo usuario.",
+        "es_correcta": 0
+      },
+      {
+        "id": 771,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Confirma inmediatamente cada sentencia DML que sea exitosa.",
+        "es_correcta": 1
+      },
+      {
+        "id": 772,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Efectúa un rollback tras 30 segundos de inactividad de red.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 194,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "Si ejecutas ROLLBACK tras haber modificado 1000 filas sin hacer COMMIT, ¿qué pasa?",
+    "justificacion": "Se deshacen las 1000. `ROLLBACK` devuelve la base al estado en que estaba al empezar la transacción, sin límite de filas y sin distinguir entre inserciones, actualizaciones y borrados. Eso es la atomicidad en acción. Las otras tres inventan límites que no existen: ni un tope de 500, ni un modo de recuperación, ni un trato distinto según el tipo de sentencia.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 773,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Se revierten solo las últimas 500 modificaciones por límite.",
+        "es_correcta": 0
+      },
+      {
+        "id": 774,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Las 1000 modificaciones se deshacen, dejando datos previos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 775,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La base de datos queda bloqueada en modo recuperación.",
+        "es_correcta": 0
+      },
+      {
+        "id": 776,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Solo se deshacen inserciones, dejando las actualizaciones.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 195,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué comando DDL vacía los datos de una tabla sin registrar cada fila en el log de transacciones?",
+    "justificacion": "`TRUNCATE TABLE` vacía la tabla de una vez, sin escribir una entrada por fila en el log, y por eso es mucho más rápido que `DELETE` en tablas grandes. Conserva la estructura: la tabla sigue existiendo, vacía. Los otros tres comandos no existen. Conviene saber que suele reiniciar las secuencias asociadas si se le pide `RESTART IDENTITY`, cosa que `DELETE` nunca hace.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 777,
+        "letra": "a",
+        "orden": 1,
+        "texto": "DELETE ALL ROWS",
+        "es_correcta": 0
+      },
+      {
+        "id": 778,
+        "letra": "b",
+        "orden": 2,
+        "texto": "DROP DATA",
+        "es_correcta": 0
+      },
+      {
+        "id": 779,
+        "letra": "c",
+        "orden": 3,
+        "texto": "FORMAT TABLE",
+        "es_correcta": 0
+      },
+      {
+        "id": 780,
+        "letra": "d",
+        "orden": 4,
+        "texto": "TRUNCATE TABLE",
+        "es_correcta": 1
+      }
+    ]
+  },
+  {
+    "id": 196,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En la creación de tablas, ¿qué restricción impide tajantemente ingresar valores repetidos?",
+    "justificacion": "`PRIMARY KEY` y `UNIQUE` son las que impiden valores repetidos; la diferencia entre ambas es que la primaria además no admite nulos y solo puede haber una por tabla. `NOT NULL` obliga a que haya un valor pero no a que sea distinto; `CHECK` valida una condición sobre el valor; y `FOREIGN KEY` exige que el valor exista en otra tabla, que es lo contrario de impedir repeticiones.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 781,
+        "letra": "a",
+        "orden": 1,
+        "texto": "CONSTRAINT NOT NULL",
+        "es_correcta": 0
+      },
+      {
+        "id": 782,
+        "letra": "b",
+        "orden": 2,
+        "texto": "PRIMARY KEY o UNIQUE",
+        "es_correcta": 1
+      },
+      {
+        "id": 783,
+        "letra": "c",
+        "orden": 3,
+        "texto": "CONSTRAINT CHECK",
+        "es_correcta": 0
+      },
+      {
+        "id": 784,
+        "letra": "d",
+        "orden": 4,
+        "texto": "CONSTRAINT FOREIGN KEY",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 197,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué instrucción DDL se utiliza convencionalmente para modificar el tipo de dato de una columna?",
+    "justificacion": "La forma estándar es `ALTER TABLE tabla ALTER COLUMN columna TYPE nuevo_tipo`, y es la que usa PostgreSQL. Las otras tres no existen: `UPDATE` cambia datos y no estructura, que es la confusión que la (b) busca provocar. Ojo con algo que se pregunta poco y duele mucho: cambiar el tipo de una columna con datos dentro puede fallar si alguno no se puede convertir.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 785,
+        "letra": "a",
+        "orden": 1,
+        "texto": "ALTER TABLE ... ALTER COLUMN",
+        "es_correcta": 1
+      },
+      {
+        "id": 786,
+        "letra": "b",
+        "orden": 2,
+        "texto": "UPDATE TABLE ... SET COLUMN",
+        "es_correcta": 0
+      },
+      {
+        "id": 787,
+        "letra": "c",
+        "orden": 3,
+        "texto": "MODIFY STRUCTURE ... COLUMN",
+        "es_correcta": 0
+      },
+      {
+        "id": 788,
+        "letra": "d",
+        "orden": 4,
+        "texto": "CHANGE DATA TYPE ... ON TABLE",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 198,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué diferencia técnica crítica existe entre el comando DROP TABLE y TRUNCATE TABLE?",
+    "justificacion": "`DROP TABLE` borra la tabla entera —datos, estructura, índices y metadatos—, y después de ejecutarlo la tabla ya no existe. `TRUNCATE TABLE` borra solo las filas y deja la tabla vacía y lista para recibir datos. La (d) invierte la clasificación: los dos son DDL, no uno de cada tipo. Y ninguno admite `WHERE`: para borrar con condición está `DELETE`.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 789,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Ninguna, ambos comandos realizan la misma acción destructiva.",
+        "es_correcta": 0
+      },
+      {
+        "id": 790,
+        "letra": "b",
+        "orden": 2,
+        "texto": "DROP requiere un filtro WHERE, TRUNCATE borra sin condición.",
+        "es_correcta": 0
+      },
+      {
+        "id": 791,
+        "letra": "c",
+        "orden": 3,
+        "texto": "DROP elimina estructura y metadatos, TRUNCATE solo datos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 792,
+        "letra": "d",
+        "orden": 4,
+        "texto": "TRUNCATE es un comando DML, mientras que DROP es puro DDL.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 199,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "Al agregar una restricción NOT NULL a una columna ya existente, ¿qué precondición debe cumplirse?",
+    "justificacion": "La columna no puede tener ningún `NULL` en las filas existentes: la restricción se valida contra los datos que ya están, y si alguno la incumple, la sentencia falla. La salida habitual es llenar esos huecos primero con un `UPDATE` y recién después agregar la restricción. Las otras tres inventan requisitos que no existen: ni ser llave foránea, ni estar indexada, ni el estado de los registros importan.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 793,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La columna debe haber sido definida como llave foránea.",
+        "es_correcta": 0
+      },
+      {
+        "id": 794,
+        "letra": "b",
+        "orden": 2,
+        "texto": "La tabla no debe contener registros nulos en dicha columna.",
+        "es_correcta": 1
+      },
+      {
+        "id": 795,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Todos los registros de la tabla deben estar inactivos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 796,
+        "letra": "d",
+        "orden": 4,
+        "texto": "La columna debe estar indexada como llave primaria antes.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 200,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué palabra reservada se emplea para asignar un valor fijo automático si este se omite al insertar?",
+    "justificacion": "`DEFAULT` fija el valor que toma la columna cuando la inserción no la menciona. Se declara al crear la tabla y evita tener que repetir el mismo valor en cada `INSERT`. Los otros tres nombres no existen. Conviene distinguirlo de `NOT NULL`: `DEFAULT` da un valor cuando falta, `NOT NULL` prohíbe que falte; juntos garantizan que la columna siempre tenga algo con sentido.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 797,
+        "letra": "a",
+        "orden": 1,
+        "texto": "AUTO_INSERT",
+        "es_correcta": 0
+      },
+      {
+        "id": 798,
+        "letra": "b",
+        "orden": 2,
+        "texto": "FALLBACK_VAL",
+        "es_correcta": 0
+      },
+      {
+        "id": 799,
+        "letra": "c",
+        "orden": 3,
+        "texto": "DEFAULT",
+        "es_correcta": 1
+      },
+      {
+        "id": 800,
+        "letra": "d",
+        "orden": 4,
+        "texto": "INITIAL_DATA",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 201,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En el modelo conceptual, ¿cómo se representa idealmente la capacidad de abstracción de un problema?",
+    "justificacion": "El modelo conceptual se dibuja como un diagrama Entidad-Relación: entidades, sus atributos, las relaciones entre ellas y las cardinalidades. Es deliberadamente independiente del motor y hasta de si al final se usará una base relacional. Las otras tres saltan a la implementación —clases, DDL, XML—, que es justo lo que el modelo conceptual evita para poder discutirse con quien no programa.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 801,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Mediante código encapsulado de clases y métodos de Java.",
+        "es_correcta": 0
+      },
+      {
+        "id": 802,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Mediante un diagrama Entidad-Relación y sus cardinalidades.",
+        "es_correcta": 1
+      },
+      {
+        "id": 803,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Como un script de creación masiva de tablas DDL nativo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 804,
+        "letra": "d",
+        "orden": 4,
+        "texto": "A través de documentación en crudo en formato XML puro.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 202,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué característica define esencialmente a una \"Entidad Fuerte\" en el modelamiento conceptual?",
+    "justificacion": "Una entidad fuerte existe por sí sola y se identifica con sus propios atributos, sin depender de otra. Su contraste es la entidad débil, que es la (b) y que necesita de una entidad dueña para existir e identificarse. Las otras dos describen cosas que no definen la fuerza de una entidad: ni los atributos compuestos ni las llaves foráneas tienen que ver con eso.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 805,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Posee obligatoriamente atributos de tipo matriz anidada.",
+        "es_correcta": 0
+      },
+      {
+        "id": 806,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Su existencia es dependiente de otra entidad principal.",
+        "es_correcta": 0
+      },
+      {
+        "id": 807,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Tiene existencia propia e identificador único independiente.",
+        "es_correcta": 1
+      },
+      {
+        "id": 808,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Se vincula de forma exclusiva mediante llaves foráneas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 203,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Cómo se resuelve una relación \"Muchos a Muchos\" (N:M) al transformar al modelo relacional?",
+    "justificacion": "Una relación N:M no se puede representar con una llave foránea en ninguno de los dos lados, porque cada fila admitiría un solo valor. Se resuelve creando una **tabla intermedia** cuyas filas son los pares, con las llaves foráneas de las dos entidades formando su clave. Además de resolver el problema, esa tabla es el sitio natural para los atributos que pertenecen a la relación y no a las entidades.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 809,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Insertando una clave foránea en la tabla más pequeña del modelo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 810,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Creando una entidad intermedia que contenga ambas llaves.",
+        "es_correcta": 1
+      },
+      {
+        "id": 811,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Almacenando los datos múltiples en un formato de texto largo.",
+        "es_correcta": 0
+      },
+      {
+        "id": 812,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Fusionando ambas entidades fuertes en una sola gran tabla unida.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 204,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué condición principal exige la Primera Forma Normal (1FN) al aplicarla en una tabla relacional?",
+    "justificacion": "La Primera Forma Normal pide que cada celda contenga un valor **atómico**: nada de listas, ni campos con varios datos separados por comas, ni grupos repetidos de columnas como `telefono1`, `telefono2`. Es la condición que hace posibles las demás: sin valores atómicos no se puede hablar de dependencias funcionales. La (b) describe justamente lo que la Tercera Forma Normal viene a eliminar.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 813,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La ausencia absoluta de claves foráneas hacia otras tablas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 814,
+        "letra": "b",
+        "orden": 2,
+        "texto": "La dependencia transitiva de todos los atributos descriptivos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 815,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Que cada columna contenga valores atómicos (indivisibles).",
+        "es_correcta": 1
+      },
+      {
+        "id": 816,
+        "letra": "d",
+        "orden": 4,
+        "texto": "La existencia estricta de al menos dos llaves candidatas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 205,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué tipo de dependencia se busca erradicar para alcanzar la Tercera Forma Normal (3FN)?",
+    "justificacion": "La Tercera Forma Normal elimina las **dependencias transitivas**: un atributo no clave que depende de otro atributo no clave en vez de depender de la clave. El caso de manual es guardar `codigo_ciudad` y `nombre_ciudad` en la tabla de personas — el nombre depende del código, no de la persona, y por eso se repite y se puede contradecir. La (a) describe lo que resuelve la Segunda Forma Normal.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 817,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La dependencia funcional parcial respecto a llaves compuestas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 818,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Dependencias transitivas lógicas entre atributos no clave.",
+        "es_correcta": 1
+      },
+      {
+        "id": 819,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Las asociaciones lógicas circulares entre entidades débiles.",
+        "es_correcta": 0
+      },
+      {
+        "id": 820,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Los atributos heredados a partir de funciones trigonométricas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 206,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué concepto representa fundamentalmente la cardinalidad en un modelo Entidad-Relación (MER)?",
+    "justificacion": "La cardinalidad dice cuántas ocurrencias de una entidad pueden vincularse con una de la otra: uno a uno, uno a muchos, muchos a muchos. Es lo que decide cómo se traduce la relación al modelo relacional — dónde va la llave foránea, o si hace falta una tabla intermedia. No tiene nada que ver con el tamaño en bytes, ni con tipos de dato, ni con el número de columnas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 821,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El límite máximo de ocupación en bytes de cada registro guardado.",
+        "es_correcta": 0
+      },
+      {
+        "id": 822,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El número de ocurrencias lógicas de una entidad vinculada a otra.",
+        "es_correcta": 1
+      },
+      {
+        "id": 823,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El tipo de dato primitivo asociado explícitamente a una llave foránea.",
+        "es_correcta": 0
+      },
+      {
+        "id": 824,
+        "letra": "d",
+        "orden": 4,
+        "texto": "La suma total e inflexible de columnas que la tabla puede alojar.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 207,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Por qué razón técnica de arquitectura podría llegar a justificarse una desnormalización de datos?",
+    "justificacion": "Se desnormaliza para que ciertas consultas dejen de pagar el costo de muchos `JOIN`, duplicando a propósito datos que la normalización había separado. Es una decisión de rendimiento, tomada a sabiendas y con una contrapartida clara: vuelven las anomalías de actualización y hay que mantener la copia. Por eso se hace después de medir, no por adelantado, y nunca para ahorrar espacio — de hecho ocupa más.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 825,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Para satisfacer los exigentes requisitos de la forma Boyce-Codd.",
+        "es_correcta": 0
+      },
+      {
+        "id": 826,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Para reducir el tamaño total de toda la base de datos en el disco.",
+        "es_correcta": 0
+      },
+      {
+        "id": 827,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Para optimizar el rendimiento y lectura de consultas muy repetitivas.",
+        "es_correcta": 1
+      },
+      {
+        "id": 828,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Para prevenir la inserción maliciosa de valores nulos indeseados.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 208,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué herramienta o documento consolida los metadatos y definiciones del modelo de base de datos?",
+    "justificacion": "El diccionario de datos reúne las definiciones formales del modelo: qué tablas hay, qué columnas, de qué tipo, con qué restricciones y qué significa cada una. Es la referencia que permite entender la base sin abrirla. Las otras tres son artefactos reales del motor con otro oficio: el plan de ejecución explica una consulta, el log registra transacciones, y un volcado es una copia.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 829,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El plan de ejecución visual de consultas nativo del motor.",
+        "es_correcta": 0
+      },
+      {
+        "id": 830,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El Diccionario de Datos del sistema unificado de información.",
+        "es_correcta": 1
+      },
+      {
+        "id": 831,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El log binario transaccional del servidor (archivos pg_xlog).",
+        "es_correcta": 0
+      },
+      {
+        "id": 832,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El archivo de volcado y compresión del esquema (database dump).",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 209,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "Al transformar una entidad débil al modelo relacional, ¿cómo se compone su llave primaria final?",
+    "justificacion": "La clave de una entidad débil se forma **uniendo la clave de la entidad fuerte de la que depende con su propio atributo discriminante**, porque por sí sola no distingue sus ocurrencias. Es lo que traduce al modelo relacional la dependencia de existencia: la fila no puede existir sin su dueña, y el motor lo hace cumplir con la llave foránea que forma parte de esa clave compuesta.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 833,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Uniendo la llave de la entidad fuerte de la que depende con su propio ID.",
+        "es_correcta": 1
+      },
+      {
+        "id": 834,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Creando y asignando un identificador global único e independiente.",
+        "es_correcta": 0
+      },
+      {
+        "id": 835,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Omitiendo usar llaves primarias por diseño de esquema relacional.",
+        "es_correcta": 0
+      },
+      {
+        "id": 836,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Replicando exactamente todos los atributos de la entidad dominante.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 210,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Cuál es el objetivo técnico primordial al aplicar el proceso de normalización en una base de datos?",
+    "justificacion": "La normalización busca guardar cada dato **una sola vez**, y con eso desaparecen las anomalías de inserción, actualización y borrado — los casos en que cambiar un dato en un sitio y no en otro deja la base contradiciéndose. El precio es más tablas y más `JOIN`, que es exactamente lo que la desnormalización revierte cuando el rendimiento lo justifica. La (a) describe el intercambio al revés.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 837,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Acelerar radicalmente las operaciones DML sacrificando consistencia.",
+        "es_correcta": 0
+      },
+      {
+        "id": 838,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Minimizar drásticamente la redundancia y erradicar anomalías de datos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 839,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Transformar arquitecturas SQL estrictas en modelos NoSQL de grafos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 840,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Borrar lógicamente el uso de FOREIGN KEY para liberar CPU y memoria.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 211,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En el contexto de un modelo relacional estricto, ¿qué concepto matemático fundamenta a las tablas?",
+    "justificacion": "El modelo relacional se apoya en la teoría de conjuntos: una tabla **es** una relación matemática, un subconjunto del producto cartesiano de los dominios de sus columnas, y cada fila es una tupla. De ahí viene que el orden de las filas no signifique nada y que las operaciones —unión, intersección, diferencia, producto— tengan definición formal. Es lo que separa a SQL de manipular archivos.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 841,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Topologías complejas derivadas de árboles binarios asimétricos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 842,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Relaciones lógicas entre conjuntos estructurados y sus dominios.",
+        "es_correcta": 1
+      },
+      {
+        "id": 843,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Algoritmos heurísticos de agrupamiento en estructuras difusas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 844,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Tensores multidimensionales definidos por matrices ortogonales.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 212,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En el diseño de un modelo conceptual, ¿qué es y qué implica un atributo denominado \"derivado\"?",
+    "justificacion": "Un atributo derivado **no se guarda**: su valor se calcula cuando hace falta, a partir de otros que sí están. La edad a partir de la fecha de nacimiento es el ejemplo clásico, y muestra el motivo: guardarla obligaría a actualizarla, y quedaría mal el día que nadie lo hiciera. En el diagrama se dibuja con línea punteada, y al implementar se resuelve con una columna calculada o con una vista.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 845,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Una llave alfanumérica de auditoría impuesta por el motor SQL central.",
+        "es_correcta": 0
+      },
+      {
+        "id": 846,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Un dato que no se almacena porque su valor se calcula a partir de otros.",
+        "es_correcta": 1
+      },
+      {
+        "id": 847,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Una variable foránea que modifica su origen dependiendo de los accesos.",
+        "es_correcta": 0
+      },
+      {
+        "id": 848,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Un registro replicado a partir de una tabla maestra del sistema matriz.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 213,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Cuál es el propósito principal del \"journaling\" o registro de transacciones en un RDBMS?",
+    "justificacion": "El registro de transacciones anota lo que se va a cambiar **antes** de cambiarlo, así que tras una caída el motor puede rehacer lo confirmado y deshacer lo que quedó a medias. Es lo que sostiene la **durabilidad** y la atomicidad de ACID, no una optimización de lectura. Las otras tres describen oficios ajenos: la velocidad de lectura la dan los índices, y el cifrado de contraseñas es cosa de la aplicación.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 849,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Optimizar la velocidad de lectura de las tablas indexadas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 850,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Evitar la fragmentación del disco duro del servidor web.",
+        "es_correcta": 0
+      },
+      {
+        "id": 851,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Garantizar la recuperación ante fallos y la durabilidad.",
+        "es_correcta": 1
+      },
+      {
+        "id": 852,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Encriptar automáticamente las contraseñas de los usuarios.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 214,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué tipo de JOIN devuelve todas las filas de la tabla izquierda y las coincidencias de la derecha?",
+    "justificacion": "`LEFT OUTER JOIN` —o `LEFT JOIN`, que es lo mismo— conserva todas las filas de la izquierda y agrega las coincidencias de la derecha, rellenando con `NULL` donde no las hay. `RIGHT` hace lo simétrico, `FULL` conserva los dos lados, e `INNER` se queda solo con lo que casa. La palabra `OUTER` es opcional en los tres y no cambia nada: lo que manda es el lado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 853,
+        "letra": "a",
+        "orden": 1,
+        "texto": "INNER JOIN",
+        "es_correcta": 0
+      },
+      {
+        "id": 854,
+        "letra": "b",
+        "orden": 2,
+        "texto": "LEFT OUTER JOIN",
+        "es_correcta": 1
+      },
+      {
+        "id": 855,
+        "letra": "c",
+        "orden": 3,
+        "texto": "RIGHT OUTER JOIN",
+        "es_correcta": 0
+      },
+      {
+        "id": 856,
+        "letra": "d",
+        "orden": 4,
+        "texto": "FULL OUTER JOIN",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 215,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué cláusula SQL permite filtrar los resultados resultantes de una función de agrupación como SUM()?",
+    "justificacion": "`HAVING` filtra **después** de agrupar, y por eso puede usar funciones agregadas: `HAVING SUM(total) > 1000`. `WHERE` filtra antes, cuando los grupos todavía no existen, así que ahí un `SUM()` no tiene sentido y el motor lo rechaza. Ésa es toda la diferencia y es de las que más se preguntan. `GROUP FILTER` no existe, y `ORDER BY` ordena, no filtra.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 857,
+        "letra": "a",
+        "orden": 1,
+        "texto": "WHERE",
+        "es_correcta": 0
+      },
+      {
+        "id": 858,
+        "letra": "b",
+        "orden": 2,
+        "texto": "ORDER BY",
+        "es_correcta": 0
+      },
+      {
+        "id": 859,
+        "letra": "c",
+        "orden": 3,
+        "texto": "HAVING",
+        "es_correcta": 1
+      },
+      {
+        "id": 860,
+        "letra": "d",
+        "orden": 4,
+        "texto": "GROUP FILTER",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 216,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué ocurre si omites la condición de unión (ON o WHERE) al realizar una consulta a múltiples tablas?",
+    "justificacion": "Sin condición que las una, el motor combina **cada fila de una tabla con cada fila de la otra**: el producto cartesiano. Con dos tablas de mil filas salen un millón, y por eso el síntoma clásico es una consulta que devuelve muchísimo más de lo esperado **sin dar ningún error**, que es lo que la vuelve peligrosa. Conviene saber que esto ocurre con la sintaxis de coma —`FROM a, b`— y que escribir `FROM a JOIN b` sin su `ON` es distinto: ahí el motor sí protesta. Ésa es una razón práctica para preferir siempre la sintaxis explícita con `JOIN ... ON`: convierte un olvido silencioso en un error inmediato.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 861,
+        "letra": "a",
+        "orden": 1,
+        "texto": "La consulta produce un producto cartesiano (Cross Join).",
+        "es_correcta": 1
+      },
+      {
+        "id": 862,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El motor asume un INNER JOIN por la clave primaria.",
+        "es_correcta": 0
+      },
+      {
+        "id": 863,
+        "letra": "c",
+        "orden": 3,
+        "texto": "La base de datos arroja un error de sintaxis bloqueante.",
+        "es_correcta": 0
+      },
+      {
+        "id": 864,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Solo se devuelven las filas de la primera tabla listada.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 217,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En sentencias DML, ¿qué comando deshace los cambios no confirmados de la transacción actual en curso?",
+    "justificacion": "`ROLLBACK` descarta todos los cambios de la transacción en curso y deja la base como estaba al empezarla. Es la contraparte de `COMMIT` y lo que hace útil una transacción: poder equivocarse sin consecuencias mientras no se confirme. Los otros tres nombres no existen en SQL. Si hay `SAVEPOINT` declarados, se puede volver a uno de ellos en vez de deshacerlo todo.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 865,
+        "letra": "a",
+        "orden": 1,
+        "texto": "UNDO TRANSACTION",
+        "es_correcta": 0
+      },
+      {
+        "id": 866,
+        "letra": "b",
+        "orden": 2,
+        "texto": "DROP COMMIT",
+        "es_correcta": 0
+      },
+      {
+        "id": 867,
+        "letra": "c",
+        "orden": 3,
+        "texto": "ROLLBACK",
+        "es_correcta": 1
+      },
+      {
+        "id": 868,
+        "letra": "d",
+        "orden": 4,
+        "texto": "REVERT STATE",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 218,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué comando DDL se utiliza para eliminar completamente la estructura de una tabla y sus datos?",
+    "justificacion": "`DROP TABLE` elimina la tabla completa: sus filas, su estructura, sus índices y sus restricciones. Después de ejecutarlo la tabla no existe y volver a usarla exige crearla de nuevo. `TRUNCATE` deja la tabla vacía pero viva, y `DELETE` borra filas con o sin condición; `DELETE TABLE` y `REMOVE TABLE` no existen. Conviene tener presente que `DROP` de una tabla referenciada por otras puede fallar por las llaves foráneas.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 869,
+        "letra": "a",
+        "orden": 1,
+        "texto": "TRUNCATE TABLE",
+        "es_correcta": 0
+      },
+      {
+        "id": 870,
+        "letra": "b",
+        "orden": 2,
+        "texto": "DELETE TABLE",
+        "es_correcta": 0
+      },
+      {
+        "id": 871,
+        "letra": "c",
+        "orden": 3,
+        "texto": "DROP TABLE",
+        "es_correcta": 1
+      },
+      {
+        "id": 872,
+        "letra": "d",
+        "orden": 4,
+        "texto": "REMOVE TABLE",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 219,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué restricción DDL asegura la integridad referencial obligando a que el valor exista en otra tabla?",
+    "justificacion": "`FOREIGN KEY` obliga a que el valor exista en la tabla referenciada, y es lo que sostiene la integridad referencial: impide dejar filas apuntando a algo que no está. Las otras tres restringen dentro de la propia tabla — `UNIQUE` prohíbe repetidos, `PRIMARY KEY` identifica, y `CHECK` valida una condición—. Además define qué pasa al borrar o actualizar el original, con `ON DELETE CASCADE` y sus variantes.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 873,
+        "letra": "a",
+        "orden": 1,
+        "texto": "UNIQUE CONSTRAINT",
+        "es_correcta": 0
+      },
+      {
+        "id": 874,
+        "letra": "b",
+        "orden": 2,
+        "texto": "PRIMARY KEY",
+        "es_correcta": 0
+      },
+      {
+        "id": 875,
+        "letra": "c",
+        "orden": 3,
+        "texto": "FOREIGN KEY",
+        "es_correcta": 1
+      },
+      {
+        "id": 876,
+        "letra": "d",
+        "orden": 4,
+        "texto": "CHECK CONSTRAINT",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 220,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "A diferencia de DELETE, ¿por qué la sentencia TRUNCATE TABLE suele ser más rápida y eficiente?",
+    "justificacion": "`TRUNCATE` no borra fila por fila: descarta el contenido de la tabla de una vez, sin escribir una entrada por registro en el log de transacciones. Ahí está toda la diferencia de velocidad con `DELETE`. El precio es la contrapartida que hay que conocer: al no quedar registro fila a fila, no se puede deshacer con la misma facilidad, y no dispara los disparadores de borrado.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 877,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Porque elimina todo sin generar logs individuales por fila.",
+        "es_correcta": 1
+      },
+      {
+        "id": 878,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Porque borra la estructura sin afectar a los datos reales.",
+        "es_correcta": 0
+      },
+      {
+        "id": 879,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Porque se ejecuta en memoria caché y no en el disco físico.",
+        "es_correcta": 0
+      },
+      {
+        "id": 880,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Porque solo borra temporalmente mediante un alias de vista.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 221,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "En el modelamiento conceptual, ¿cómo se denomina a una entidad cuya existencia depende de otra entidad?",
+    "justificacion": "Una entidad débil no tiene existencia propia: depende de otra para existir y para identificarse, así que su clave incluye la de la entidad fuerte. El ejemplo típico es el detalle de una factura, que no significa nada sin su factura. Los otros tres nombres suenan plausibles y no son categorías del modelo Entidad-Relación; «recursiva» describe una relación de una entidad consigo misma, que es otra cosa.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 881,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Entidad Abstracta",
+        "es_correcta": 0
+      },
+      {
+        "id": 882,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Entidad Débil",
+        "es_correcta": 1
+      },
+      {
+        "id": 883,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Entidad Polimórfica",
+        "es_correcta": 0
+      },
+      {
+        "id": 884,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Entidad Recursiva",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 222,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Cuál es el objetivo principal de aplicar la Tercera Forma Normal (3FN) a una base de datos relacional?",
+    "justificacion": "La Tercera Forma Normal elimina las dependencias transitivas —atributos no clave que dependen de otros atributos no clave— y con ellas la redundancia que producen. El resultado es que cada dato vive en un solo sitio y no puede contradecirse. La (b) dice justo lo contrario de lo que ocurre: normalizar suele agregar `JOIN`, no quitarlos, y ése es el intercambio que la desnormalización revierte.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 885,
+        "letra": "a",
+        "orden": 1,
+        "texto": "Permitir la creación ilimitada de llaves foráneas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 886,
+        "letra": "b",
+        "orden": 2,
+        "texto": "Acelerar el procesamiento de los JOINs en consultas lentas.",
+        "es_correcta": 0
+      },
+      {
+        "id": 887,
+        "letra": "c",
+        "orden": 3,
+        "texto": "Eliminar redundancias y dependencias transitivas de datos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 888,
+        "letra": "d",
+        "orden": 4,
+        "texto": "Cifrar automáticamente todas las contraseñas almacenadas.",
+        "es_correcta": 0
+      }
+    ]
+  },
+  {
+    "id": 223,
+    "modulo": 5,
+    "modulo_titulo": "Fundamentos de Bases de Datos Relacionales",
+    "modulo_icono": "database",
+    "enunciado": "¿Qué elemento central documenta formalmente las tablas, atributos, tipos de datos y sus restricciones?",
+    "justificacion": "El diccionario de datos es el documento que formaliza qué hay en la base: tablas, atributos, tipos y restricciones, con el significado de cada uno. Sirve para que alguien entienda el modelo sin tener que deducirlo del DDL. Las otras tres son piezas reales con otro oficio: el log registra transacciones, y ni un mapa físico ni un árbol de dependencias documentan tipos ni restricciones.",
+    "dificultad": null,
+    "orden_fijo": 0,
+    "alternativas": [
+      {
+        "id": 889,
+        "letra": "a",
+        "orden": 1,
+        "texto": "El mapa conceptual físico.",
+        "es_correcta": 0
+      },
+      {
+        "id": 890,
+        "letra": "b",
+        "orden": 2,
+        "texto": "El diccionario de datos.",
+        "es_correcta": 1
+      },
+      {
+        "id": 891,
+        "letra": "c",
+        "orden": 3,
+        "texto": "El log de transacciones.",
+        "es_correcta": 0
+      },
+      {
+        "id": 892,
+        "letra": "d",
+        "orden": 4,
+        "texto": "El árbol de dependencias.",
         "es_correcta": 0
       }
     ]

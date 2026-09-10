@@ -90,6 +90,22 @@
       "propuesta_por": "Claude Code",
       "aprobada_por": "Felipe Cuevas",
       "fecha": "2026-09-10"
+    },
+    {
+      "ref": "m05#18",
+      "modulo": 5,
+      "origen": "json_2026",
+      "numero_origen": 18,
+      "archivo": "_planmaestro/00_producto/cuestionarios/modulo-05.json",
+      "campo": "alternativa.c.texto",
+      "original": "END TRANSACTION",
+      "corregido": "CHECKPOINT",
+      "motivo": "El item tenia DOS respuestas correctas. En PostgreSQL —el motor del curso— `END` es sinonimo de `COMMIT` y confirma la transaccion igual, asi que `END TRANSACTION` era tan valida como la marcada. Un alumno que la eligiera no se equivocaba.",
+      "reemplazo": "`CHECKPOINT` existe en PostgreSQL, tienta justamente en esta pregunta porque fuerza la escritura a disco de los buffers sucios —suena a «persistencia permanente»— y NO confirma ninguna transaccion. Separa a quien sabe que la durabilidad de una transaccion la da el COMMIT sobre el registro de transacciones, y no un volcado a disco.",
+      "nota": "NO se corrige por ADR-029, que trata la alternativa correcta que ensena una regla falsa. Aqui la correcta es correcta: lo que fallaba era un DISTRACTOR que tambien lo era. Es el mismo caso que m07#21 —donde `START TRANSACTION` abria un bloque igual que `BEGIN`— y la regla que aplica es la de ese retiro: un item con dos respuestas correctas es un error y se corrige; un distractor flojo no (ADR-017).",
+      "propuesta_por": "Claude Code",
+      "aprobada_por": "Felipe Cuevas",
+      "fecha": "2026-09-10"
     }
   ]
 }

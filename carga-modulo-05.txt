@@ -1,0 +1,23 @@
+# Registro de una corrida del proyecto
+# 2026-09-10T13:38:05.366Z
+# argumentos: insertar d1/encargos/modulo-05-para-cargar.json --base=examen-td-js-produccion --remote --registro=carga-modulo-05.txt
+
+
+========================================================================
+HECHO
+========================================================================
+Operacion: insertar
+Archivo:   d1/encargos/modulo-05-para-cargar.json
+Preguntas: 49
+Base:      examen-td-js-produccion (nube)
+Total en la base: 174 -> 223
+
+Confirmado preguntandole a la base despues de escribir, no por el codigo de
+salida de wrangler, que en Windows no es testigo fiable (H-016), y tampoco
+por el texto que imprimio, que cambia segun el camino que tome (H-024).
+
+Instantanea regenerada en el mismo acto (ADR-025, regla 5).
+
+codigo de salida: 0
+
+# fin del registro · HECHO · codigo 0

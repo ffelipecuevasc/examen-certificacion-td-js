@@ -1,0 +1,34 @@
+# Registro de una corrida del proyecto
+# 2026-09-10T13:39:00.304Z
+# argumentos: --base=examen-td-js-produccion --remote --registro=publicacion-modulo-05.txt
+
+
+Paso 1 de 2 · exportando el respaldo de «examen-td-js-produccion» (--remote)…
+  respaldo con banco dentro · 223 preguntas · 302408 caracteres
+
+Paso 2 de 2 · regenerando la instantanea desde «examen-td-js-produccion» (--remote)…
+
+========================================================================
+PUBLICADO  ***  los dos archivos, del mismo acto  ***
+========================================================================
+Base       examen-td-js-produccion (cff1686b-3b24-4892-9a10-4306684e0127)
+Destino    --remote
+Sello      entorno «nube» · generada 2026-09-10T13:39:09.348Z
+
+Los dos archivos, instalados juntos:
+
+  d1/respaldo-banco.sql                  297.6 kB   223 preguntas
+  static/js/data/instantanea-banco.js    296.5 kB   223 activas
+
+  huella del respaldo      cd67d1b6ebe1f496 -> a3f797f26ff9a9c8
+  huella de la instantanea abf2d7b46a758e0d -> db1459fa462af487
+
+========================================================================
+LOS DOS VAN EN EL MISMO COMMIT. Son dos copias del mismo estado, y separarlas
+es como se desincronizan (ADR-023).
+
+El sello dice «nube», asi que esta instantanea SI se publica.
+
+codigo de salida: 0
+
+# fin del registro · PUBLICADO · codigo 0
