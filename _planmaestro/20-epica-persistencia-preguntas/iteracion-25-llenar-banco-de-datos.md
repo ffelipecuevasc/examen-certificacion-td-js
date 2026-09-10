@@ -202,7 +202,7 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 |---|---|---|---|---|---|---|
 | 2 | 52 · 39 + 13 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 3 | 61 · 50 + 11 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
-| 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | ⚪ | ⚪ |
+| 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | ⚪ despliegue detenido |
 | 5 | 49 · 38 + 11 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 6 | 52 · 38 + 14 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 7 | 48 · 38 + 10 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
@@ -893,6 +893,58 @@ neutraliza en pantalla, y reordenar las alternativas del banco para cuadrar un
 histograma sería falsear el material de origen. Lo que la serie va a permitir, si el
 patrón se sostiene, es **decirlo** — que un banco de práctica advierta que su material
 de origen tiene sesgo de posición es información útil para quien estudia con él.
+
+### Evidencia del lote · módulo 4 · 2026-09-10
+
+**Corrida por Felipe Cuevas contra producción.** Seis de los siete criterios de nivel 1
+cerrados; el séptimo espera el despliegue.
+
+| Criterio | Qué lo cierra |
+|---|---|
+| El lote entero está en D1 y suma lo que debe | la carga entró entera, **113 → 174**, y la comprobación calza **46 `json_2026` + 15 `js_2026` = 61** contra los dos archivos |
+| Ninguna respuesta correcta se desplazó | `CARGA COMPROBADA` sobre las 61, anclado en el texto de la correcta, pregunta a pregunta |
+| Ningún campo se inventó | `dificultad IS NULL` en las 61 |
+| Ninguna `activa` carece de justificación | 61 activas, `justificacion IS NULL 0` |
+| Las retiradas de ese módulo no se cargaron | las **4** del módulo —`4 json_2026 + 0 js_2026`— ninguna en la base |
+| La instantánea y el respaldo salieron del mismo acto | sello **`"entorno": "nube"`**, **174 preguntas** en los dos, huellas informadas antes y después |
+| El módulo se ve en el sitio publicado | ⚪ **abierto**: el despliegue falló por H-031 y el sitio siguió sirviendo el módulo 3 |
+
+**El reparto de retiradas quedó a la vista, y por eso se informa por banco:** `4 + 0`,
+el inverso exacto del módulo 3, que fue `0 + 4`. Es lo que la corrección de H-023 vino
+a permitir — un desbalance así, en el total, no se vería.
+
+**Sin `orden_fijo`**, como corresponde: la única marca del proyecto sigue siendo la del
+módulo 2.
+
+> **El despliegue falló, y no por la carga.** El banco estaba bien cargado y bien
+> publicado; lo que se rompió fue la **construcción del sitio**, porque una
+> justificación de este lote —`m04#19`, sobre importar un módulo por defecto— contenía
+> `import Modulo from './archivo.js'` y el verificador de enlaces la tomó por una
+> referencia real. Es la **segunda cara de H-031**, y está en la auditoría con su
+> arreglo, sus provocaciones y un tercer camino que se buscó a propósito.
+>
+> **Conviene que quede separado:** el banco en producción y los dos archivos generados
+> estaban correctos desde el primer intento. Lo que faltaba era que el sitio pudiera
+> construirse con ese banco dentro.
+
+#### H-004 · tercer dato, medido
+
+| Lote | pos. 1 | **pos. 2** | pos. 3 | pos. 4 |
+|---|---|---|---|---|
+| Módulo 2 · 52 | 23% | **40%** | 29% | 8% |
+| Módulo 3 · 61 | 16% | **39%** | 30% | 15% |
+| Módulo 4 · 61 | 18% | **38%** | 34% | 10% |
+
+**40, 39, 38.** Tres lotes independientes, de dos bancos escritos por manos distintas y
+en momentos distintos, y la posición 2 clavada cerca del **40 %** contra el 25 % de un
+reparto parejo. La posición 4 es su espejo: 8, 15 y 10, siempre la más baja.
+
+**Ya cuesta llamarlo casualidad.** Faltan cuatro módulos y la expectativa quedó
+invertida: hoy lo razonable es suponer sesgo del material y esperar que los que vienen
+lo confirmen, no lo contrario.
+
+**Estos tres números están medidos en producción**, no calculados sobre el encargo. La
+distinción importa para una serie que se va a citar después.
 
 ### Contenido
 

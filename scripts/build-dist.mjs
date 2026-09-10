@@ -131,17 +131,73 @@ function resolver(desde, rel) {
 }
 
 /**
+ * La carpeta cuyos archivos son DATOS y no codigo.
+ *
+ * POR QUE ESTO ES UNA REGLA Y NO UNA EXCEPCION (H-031)
+ *
+ * `static/js/data/` guarda el banco de preguntas escrito como modulo ES. Lo que
+ * hay dentro de esos archivos es **material citado**: enunciados, alternativas y
+ * justificaciones sobre programacion. Que ese material contenga algo con forma de
+ * ruta no lo convierte en una referencia, igual que un libro sobre cartografia no
+ * lleva a ninguna parte.
+ *
+ * La version anterior de este archivo ya sabia la mitad: sabia que los ejemplos de
+ * HTML guardados como texto —`avatar.jpg`— no son enlaces, y por eso en un `.js`
+ * solo miraba los `import`. **Lo que no vio es que el banco tambien contiene
+ * ejemplos de JavaScript.** El 2026-09-10 una justificacion del modulo 4 sobre
+ * modulos ES —`import Modulo from './archivo.js'`— rompio la construccion, y el
+ * despliegue del lote fallo.
+ *
+ * POR QUE NO SE ARREGLA AFINANDO EL PATRON
+ *
+ * Se penso exigir que el `import` estuviera al principio de linea, que es donde
+ * esta un import de verdad. Arregla el caso de hoy y no el problema: quedan cuatro
+ * modulos y unas 250 preguntas, muchas sobre codigo, y ahi van a aparecer
+ * `require('./modulo')`, `fetch('/api/datos.json')`, rutas con `../`, extensiones
+ * `.mjs` y `.json`, y `await import('./x.js')` — que es una expresion y puede ir
+ * a mitad de linea con todo derecho. Cada uno pediria su parche, y una lista de
+ * excepciones se rompe en el modulo siguiente.
+ *
+ * Lo que no depende de la forma del texto es **donde vive**. Un archivo de datos
+ * no enlaza a nada, cualquiera sea lo que cite. Esa es la regla.
+ *
+ * LO QUE SIGUE COMPROBANDOSE, PARA QUE NO SE LEA COMO UN AGUJERO
+ *
+ * Que el archivo de datos EXISTA se comprueba igual: el recorrido llega hasta el
+ * desde quien lo importa —incluida la instantanea, que solo se carga con un
+ * import dinamico— y falla si no esta. Lo unico que deja de hacerse es seguir
+ * rastros hacia AFUERA de el, que es lo que nunca debio hacerse.
+ *
+ * Y para que la regla no pueda esconder un fallo de verdad, mas abajo se
+ * comprueba que estos archivos no traigan imports reales. Si algun dia los
+ * traen, dejaron de ser datos y esto hay que repensarlo.
+ */
+const DATOS = 'static/js/data/';
+
+/**
+ * La primera linea de un archivo de datos que parezca un import de verdad.
+ *
+ * Un import real es una SENTENCIA y empieza la linea; el material citado del banco
+ * viaja dentro de cadenas JSON, siempre precedido en su linea por la clave que lo
+ * contiene. Por eso el ancla a principio de linea distingue a uno del otro aqui,
+ * aunque no sirviera para el caso general.
+ *
+ * Es una heuristica y se dice: no analiza el archivo, lo mira. Su unico trabajo es
+ * avisar si esta carpeta deja de contener solo datos.
+ */
+function importDeVerdad(texto) {
+  for (const [i, linea] of texto.split('\n').entries()) {
+    if (/^\s*import\s*[('"{*a-zA-Z_$]/.test(linea)) return { numero: i + 1, linea: linea.trim() };
+    if (/^\s*export\s+[^=]*\bfrom\b/.test(linea)) return { numero: i + 1, linea: linea.trim() };
+  }
+  return null;
+}
+
+/**
  * Enlaces locales de un archivo.
  *
  * En un .html cuentan los atributos src/href. En un modulo ES solo cuentan los
- * import: los archivos de static/js/data/ guardan ejemplos de HTML como texto
- * —material didactico— y sus src/href apuntan a archivos imaginarios como
- * avatar.jpg. Tratarlos como referencias reales rompe la construccion sin motivo.
- * Es el mismo malentendido que describe H-003: contenido que contiene marcado no
- * es marcado.
- *
- * Consecuencia asumida: si algun dia una plantilla de JavaScript enlaza un recurso
- * propio, esta comprobacion no lo vera. Las paginas si se revisan enteras.
+ * import. Los archivos de `static/js/data/` no pasan por aqui: ver DATOS.
  */
 function referencias(ruta, texto) {
   const crudas = ruta.endsWith('.html')
@@ -165,6 +221,7 @@ function referencias(ruta, texto) {
 const porRevisar = [...PAGINAS];
 const revisados = new Set();
 const rotos = [];
+const datosConCodigo = [];
 let comprobados = 0;
 
 while (porRevisar.length) {
@@ -181,9 +238,32 @@ while (porRevisar.length) {
 
   // Solo se sigue el rastro dentro de archivos de texto que enlazan a otros.
   if (!/\.(html|js|mjs)$/.test(ruta)) continue;
-  for (const ref of referencias(ruta, readFileSync(enDestino, 'utf8'))) {
+
+  const texto = readFileSync(enDestino, 'utf8');
+
+  // Un archivo de datos no enlaza a nada: su contenido es material citado. Se
+  // comprueba que siga siendo datos, y no se le siguen rastros hacia afuera.
+  if (ruta.startsWith(DATOS)) {
+    const real = importDeVerdad(texto);
+    if (real) datosConCodigo.push({ ruta, ...real });
+    continue;
+  }
+
+  for (const ref of referencias(ruta, texto)) {
     porRevisar.push(resolver(ruta, ref));
   }
+}
+
+if (datosConCodigo.length) {
+  console.error(`ERROR: ${DATOS} tiene ${datosConCodigo.length} archivo(s) con imports de verdad:`);
+  for (const d of datosConCodigo) console.error(`  - ${d.ruta}:${d.numero}  ${d.linea.slice(0, 70)}`);
+  console.error('');
+  console.error('Esa carpeta se trata como DATOS: no se le siguen referencias, porque lo que');
+  console.error('contiene es material citado del banco de preguntas. Si ahora trae codigo que');
+  console.error('enlaza de verdad, esa regla dejo de valer y hay que repensarla — no basta con');
+  console.error('borrar esta comprobacion, que es lo unico que impide que la regla esconda un');
+  console.error('enlace roto. Ver H-031.');
+  process.exit(1);
 }
 
 if (rotos.length) {

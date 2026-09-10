@@ -2102,6 +2102,133 @@ Excluirla exigiría moverla o afinar el glob, y las dos cosas tocan el camino
 publicado por un problema que cuesta 80 bytes. **Se documenta y se commitea**, que
 es proporcional.
 
+
+#### Segunda cara · 2026-09-10 · el banco rompió la construcción, y el despliegue falló
+
+**El módulo 4 se cargó y se publicó bien, y el despliegue de Cloudflare falló:**
+
+```
+ERROR: 1 referencia(s) sin destino dentro de dist/:
+  - static/js/data/archivo.js
+La construccion se detiene: publicar asi dejaria recursos rotos en el sitio.
+```
+
+**No existe ninguna pregunta sobre `archivo.js`. El culpable es una justificación**, la
+de `m04#19`, sobre cómo se importa un módulo exportado por defecto:
+
+> …se importa sin llaves y con el nombre que uno quiera: `import Modulo from './archivo.js'`.
+
+El verificador de enlaces de `build-dist.mjs` buscaba `import … from '…'` con una
+expresión regular sobre el texto completo del archivo, y esa expresión **no distingue
+una sentencia de una cadena**. Encontró la del ejemplo, la tomó por una referencia
+real, fue a buscar `static/js/data/archivo.js`, no lo halló, y detuvo la construcción.
+
+**El guion ya conocía media verdad.** Su propio comentario decía que los archivos de
+`static/js/data/` guardan ejemplos de HTML —`avatar.jpg`— y que tratarlos como enlaces
+rompe la construcción sin motivo; por eso en un `.js` sólo miraba los `import`. **Lo
+que no vio es que el banco también contiene ejemplos de JavaScript**, y que ahí la
+defensa se convertía en el problema.
+
+#### Por qué el arreglo no es afinar el patrón
+
+Se consideró exigir que el `import` estuviera **al principio de línea**, que es donde
+está una sentencia de verdad. Arregla el caso de hoy y no el problema.
+
+Quedan cuatro módulos y unas 250 preguntas, muchas sobre código. Lo que viene:
+`require('./modulo')`, `fetch('/api/datos.json')`, rutas con `../`, extensiones `.mjs`
+y `.json`, y `await import('./x.js')` — **que es una expresión y puede ir a mitad de
+línea con todo derecho**, así que el ancla ni siquiera lo cubriría. Cada caso pediría
+su parche, y una lista de excepciones se rompe en el módulo siguiente.
+
+**Lo que no depende de la forma del texto es dónde vive.** Un archivo de
+`static/js/data/` no enlaza a nada, cite lo que cite. Ésa es la regla que se
+implementó, y es estructural: no enumera qué formas ignorar, sino qué archivos son
+datos.
+
+**Lo que se sigue comprobando**, para que no se lea como un agujero: que el archivo de
+datos **exista** se comprueba igual, porque el recorrido llega hasta él desde quien lo
+importa —la instantánea, por su import dinámico— y falla si no está. Lo único que dejó
+de hacerse es seguir rastros **hacia afuera** de él, que es lo que nunca debió hacerse.
+
+**Y la regla no puede esconder un fallo real:** si un archivo de `static/js/data/`
+llegara a traer un import de verdad, la construcción se detiene y lo dice. Dejaría de
+ser un archivo de datos, y entonces la regla habría que repensarla.
+
+**Provocado el 2026-09-10, en los dos sentidos:**
+
+| | |
+|---|---|
+| Antes del arreglo | `npm run build` → `codigo=1`, el mismo error del despliegue |
+| Después | `npm run build` → `codigo=0`, «17 recursos enlazados, ninguno roto» |
+| La protección nueva | un `import algo from './no-existe.js'` metido en la instantánea → `codigo=1`, nombrando archivo y línea |
+
+**Y el primer intento de provocar la protección falló, lo que destapó su límite.** Se
+metió el import en `static/js/data/cuestionario.js` y la construcción pasó igual:
+**nada importa ese archivo**, así que el recorrido nunca llega a él y la comprobación
+no lo mira. La protección cubre los archivos de datos **que alguien importa**, no la
+carpeta entera. Hoy eso alcanza —la instantánea es la que importa y sí se visita— pero
+está dicho para que nadie lo suponga más ancho de lo que es.
+
+#### El tercer camino, que sí existe y hoy funciona por casualidad
+
+*Buscado a propósito el 2026-09-10, a pedido del autor.*
+
+`build-dist.mjs` lee la instantánea una segunda vez, para avisar si el sello no dice
+`nube` — el aviso que sostiene ADR-023:
+
+```js
+const sello = readFileSync(INSTANTANEA, 'utf8').match(/"entorno":\s*"([^"]+)"/);
+```
+
+**Ese `match` no es global: se queda con la PRIMERA coincidencia del archivo.** Hoy la
+primera es el sello de verdad, porque el generador escribe `export const SELLO` en la
+línea 17 y `export const PREGUNTAS` en la 26. **Funciona por el orden en que se
+escriben las dos constantes, no porque el guion sepa cuál es cuál.**
+
+Si ese orden se invirtiera alguna vez —o si el formato del archivo cambiara— una
+pregunta cuyo texto contuviera `"entorno": "nube"` bastaría para que una instantánea
+generada en local pasara por generada en la nube. El aviso diría que todo está bien y
+el sitio publicaría el banco de juguete como respaldo, que es exactamente el fallo
+silencioso que ADR-023 existe para impedir.
+
+**No se arregla hoy**, porque no está roto y el arreglo toca el generador. Queda
+anotado con su condición: **mientras `SELLO` se escriba antes que `PREGUNTAS`, esto es
+correcto; el día que eso cambie, deja de serlo sin avisar.**
+
+**Descartados tras mirarlos**, para que la lista sirva de algo: `build-icons.mjs` lee
+los SVG de un directorio y no escanea texto; `verificar.mjs` compara el CSS, que es
+aguas abajo del mismo camino de Tailwind; `verificar-banco.mjs` valida contenido y no
+construye; y `probar-escapado.mjs` es de ejecución, no de construcción.
+
+#### Lo de fondo, que es lo que hay que llevarse
+
+**El banco participa de la construcción, y ya van tres caminos:**
+
+| Camino | Qué hace con el texto del banco |
+|---|---|
+| Tailwind | lo escanea buscando nombres de clase, y emite CSS |
+| Verificador de enlaces | lo escaneaba buscando referencias, y detenía la construcción |
+| Lectura del sello | lo lee con una expresión regular que sólo el orden salva |
+
+**Los tres tienen la misma raíz: el banco se publica como un módulo `.js` dentro del
+árbol que las herramientas tratan como código.** `static/js/data/instantanea-banco.js`
+cae dentro del `content` de Tailwind (`static/js/**/*.js`) y dentro del filtro del
+verificador (`/\.(html|js|mjs)$/`) porque **termina en `.js`**, no porque alguien
+decidiera que fuera código.
+
+**La salida de raíz, dicha y no implementada:** publicar la instantánea como `.json` en
+vez de `.js`. Deja de casar con los dos filtros de una vez, sin listas ni excepciones,
+y ningún camino futuro que busque «archivos de código» la encontraría. **El costo es
+real y por eso no se hace aquí:** habría que cargarla con `fetch` en vez de con un
+import dinámico, y ese es el camino que **sólo corre el día que la capa de datos cae**
+— o sea el que más caro sale romper y el más difícil de probar. Cambiarlo merece su
+propia iteración y su propia comprobación, no un arreglo al paso.
+
+**Y la pregunta que conviene hacerse en cada herramienta nueva que toque el sitio:**
+¿esto va a leer `static/js/data/`? Si la respuesta es sí, va a leer el banco, y el
+banco dice cosas sobre programación.
+
+
 ---
 
 ### H-019 · Actualización del 2026-09-10 · el disparador y el defecto son dos cosas distintas
