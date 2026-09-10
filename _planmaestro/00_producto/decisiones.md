@@ -1611,3 +1611,50 @@ no es una formalidad — es lo que impide que el módulo quede comprobado contra
 que ya no existe.
 
 ---
+
+## ADR-030 · Los mensajes de commit no pasan de 200 caracteres; el porqué vive en la bitácora y el registro
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-10 · **Afecta a:** el flujo de trabajo de CLAUDE.md
+
+**Decisión.** Establecida por Felipe Cuevas el 2026-09-10, después del commit del
+módulo 3, que ocupaba treinta líneas.
+
+Un mensaje de commit **no pasa de 200 caracteres**: una línea que diga qué se hizo, y
+basta.
+
+**El porqué se va íntegro a `99-bitacora/` y a `00_producto/registro_log.md`.** No se
+resume ni se recorta: **cambia de sitio**.
+
+**Motivo.** Ese contexto es lo que ha hecho utilizable este proyecto y no se pierde.
+Pero el mensaje de commit es el peor sitio donde guardarlo:
+
+- **No se puede corregir.** Un `git commit --amend` sobre algo ya empujado reescribe
+  la historia; un error en la bitácora se arregla editando un archivo.
+- **No se puede enlazar ni buscar bien.** La bitácora y el registro se leen enteros,
+  se referencian por número de ADR o de hallazgo, y se navegan.
+- **No se lee.** Un mensaje de treinta líneas se colapsa en cualquier vista de
+  historial, y lo que queda visible es la primera línea de todos modos.
+
+**La prueba de que la regla funciona, y es la parte que importa: si un commit corto
+deja algo sin explicar, es señal de que falta escribirlo allá.** El mensaje corto no
+esconde el contexto — lo delata cuando no está escrito donde corresponde. Es un
+detector, no una pérdida.
+
+**Lo que esto NO autoriza.** No autoriza escribir menos. La cantidad de contexto que
+este proyecto produce por lote —hallazgos, decisiones, evidencia, lo que salió
+distinto— sigue siendo la misma y sigue siendo obligatoria. Cambia dónde se escribe,
+y solamente eso.
+
+**Forma del mensaje.** La que ya venía usando el proyecto, ahora acotada:
+
+```
+Plan Trabajo - Iteracion NN: <qué se hizo>.
+```
+
+**Consecuencia sobre la bitácora.** Hasta hoy tenía **una entrada por iteración
+cerrada**. La iteración 25 dura siete lotes y su contexto no puede esperar al
+séptimo, así que admite además **una entrada por lote**, con el nombre
+`AAAA-MM-DD-iteracion-NN-modulo-MM.md`. Queda anotado en
+`99-bitacora/README.md`.
+
+---

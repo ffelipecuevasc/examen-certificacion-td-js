@@ -87,7 +87,10 @@ se serviría como archivo descargable en vez de ejecutarse. El build lo comprueb
   compilado **se versiona**, aunque el despliegue lo recompile igual: el sitio publicado sale de `dist/`, no del archivo
   versionado (ADR-010).
 - Las páginas usan módulos ES: se prueban con un servidor local, nunca abriendo el archivo con doble clic.
-- **Claude Code no hace commits ni push.** El repositorio es público y el control de versiones lo lleva el autor.
+- **Claude Code no hace commits ni push.** El repositorio es público y el control de versiones lo lleva el autor. Cuando
+  redacte un mensaje de commit: **una línea, máximo 200 caracteres**. El porqué va íntegro a `_planmaestro/99-bitacora/`
+  y a `_planmaestro/00_producto/registro_log.md`, nunca al mensaje (ADR-030). Si el mensaje corto deja algo sin
+  explicar, falta escribirlo allá.
 - **Claude Code no toca producción.** El desarrollo ocurre contra el entorno de pruebas y una base D1 local. Lo que deba
   aplicarse en producción se documenta como procedimiento para que lo ejecute el autor.
 - **Claude Code no ejecuta wrangler contra la cuenta de Cloudflare.** La regla es comprobable mirando el comando:

@@ -302,6 +302,57 @@ if (divergencias.length > 0) {
 const activas = [];
 const borradores = [];
 
+/**
+ * Ninguna justificacion con **[DUDA]** se carga como activa.
+ *
+ * POR QUE ESTO ES UNA PUERTA Y NO UN AVISO
+ *
+ * `[DUDA]` marca lo que el redactor no da por seguro, y el texto que lo rodea
+ * habla CON EL REVISOR, no con el estudiante: «conviene que sepas», «queria que
+ * lo decidieras tu». Ese texto se carga en la columna `justificacion` y es lo
+ * que la epica 30 va a mostrar en pantalla. Publicarlo seria enviarle al alumno
+ * una nota interna del proceso editorial.
+ *
+ * **Hasta el 2026-09-10 nada lo impedia.** En el modulo 3 las cuatro marcas se
+ * quitaron a mano y salio bien; funciono por memoria y no por metodo, que es la
+ * forma en que este proyecto ya se ha equivocado varias veces. Aca se cierra.
+ *
+ * Se para y no se degrada a borrador en silencio: una duda resuelta se reescribe,
+ * y reescribirla es trabajo de quien la redacto, no del guion.
+ */
+const conDuda = [];
+
+for (const p of encargo.preguntas) {
+  const bloque = bloques.get(`${p.origen}#${p.numero_origen}`);
+  if (bloque?.aprobada && /\[DUDA\]/.test(bloque.justificacion ?? '')) conDuda.push(p);
+}
+
+if (conDuda.length) {
+  noSeAplico(
+    `${conDuda.length} justificacion(es) aprobada(s) todavia traen **[DUDA]** dentro.`,
+    [
+      ...conDuda.map(
+        (p) => `  ${p.origen} n.o ${p.numero_origen} · ${String(p.enunciado).slice(0, 62)}…`
+      ),
+      '',
+      'Una marca de duda es una nota para el revisor, no contenido para el',
+      'estudiante, y ese texto es exactamente el que se carga en la base y el que',
+      'la epica 30 va a mostrar en pantalla.',
+      '',
+      'Que hacer: resolver la duda y REESCRIBIR esas justificaciones sin la marca.',
+      'Si la pregunta se conserva tal cual, el matiz pasa a ser contenido util para',
+      'el estudiante (ADR-029); si se corrige, se sigue el camino de ADR-028.',
+      '',
+      'Despues:',
+      '',
+      `  node scripts/redactar-justificaciones.mjs ${modulo}`,
+      '',
+      'El documento conserva las aprobaciones de lo que no cambio y devuelve a cero',
+      'solo estas.',
+    ]
+  );
+}
+
 const preguntas = encargo.preguntas.map((p) => {
   const bloque = bloques.get(`${p.origen}#${p.numero_origen}`);
 

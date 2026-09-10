@@ -202,7 +202,7 @@ disciplina de cerrar con evidencia en cuanto nadie puede ver dónde va.*
 |---|---|---|---|---|---|---|
 | 2 | 52 · 39 + 13 | 🟢 | 🟢 | 🟢 52 de 52 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
 | 3 | 61 · 50 + 11 | 🟢 | 🟢 | 🟢 61 de 61 | 🟢 comprobado en D1 | 🟢 visto en el sitio |
-| 4 | 61 · 46 + 15 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| 4 | 61 · 46 + 15 | 🟢 | 🟢 | 🟢 61 de 61 | ⚪ | ⚪ |
 | 5 | 49 · 38 + 11 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 6 | 52 · 38 + 14 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 | 7 | 48 · 38 + 10 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
@@ -396,8 +396,18 @@ Empujar es publicar.
 
 ### 11 · Ver el módulo en el sitio · **(autor)**
 
-Cuenta de preguntas, insignia, justificación al responder, y **ningún aviso de
-respaldo** — si aparece, el sitio está leyendo la instantánea y no la capa de datos.
+Cuenta de preguntas, insignia, las preguntas del módulo visibles, y **ningún aviso
+de respaldo** — si aparece, el sitio está leyendo la instantánea y no la capa de
+datos.
+
+> **Aquí NO se comprueba que la justificación aparezca al responder, y conviene
+> saber por qué.** No está implementado: mostrarla es trabajo de la **épica 30,
+> iteración 33**, y estaba en el registro como pendiente desde antes de esta
+> iteración. *Corregido el 2026-09-10: hasta esa fecha este paso lo pedía, y no
+> podía cumplirse.*
+>
+> **No es un defecto de la carga.** Si al mirar el sitio no ves la justificación,
+> eso es lo esperado y no hay nada que arreglar.
 
 ---
 
@@ -764,7 +774,10 @@ los cerró Felipe Cuevas mirando el sitio publicado y el repositorio:
 - 52 preguntas reales del módulo 2.
 - La insignia diciendo **52 preguntas · 1 módulo** — el contador que la iteración 24
   arregló, ahora con banco real y no con las 8 de juguete.
-- La justificación apareciendo al responder.
+- ~~La justificación apareciendo al responder.~~ **Retirado el 2026-09-10: esto no
+  se pudo comprobar porque no existe.** Mostrar la justificación al responder es
+  trabajo de la épica 30, iteración 33, y el registro ya lo tenía como pendiente
+  cuando se escribió esta lista. El punto estaba mal puesto, no mal mirado.
 - **La pregunta del comando de Git sin barajar sus alternativas.** El `orden_fijo` que
   se rescató del banco viejo no sólo llegó a D1: se está honrando en pantalla.
 - **Ningún aviso de respaldo**, o sea que el sitio está leyendo la capa de datos y no
@@ -840,7 +853,7 @@ cerrados:
 | Ninguna `activa` carece de justificación | las 61 activas con su justificación, contadas sobre la base |
 | Las retiradas de ese módulo no se cargaron | las **cuatro** retiradas del módulo, ninguna en la base |
 | La instantánea y el respaldo salieron del mismo acto | el paso único publicó los dos con sello **`"entorno": "nube"`** y **113 preguntas cada uno** |
-| El módulo se ve en el sitio publicado | comprobado tras el despliegue |
+| El módulo se ve en el sitio publicado | comprobado tras el despliegue: preguntas visibles, insignia **113 preguntas · 2 módulos**, ningún aviso de respaldo, y `m03#10` diciendo «hacia números». **La justificación al responder no entra en este criterio**: no existe todavía (épica 30, iteración 33) |
 
 **El módulo 3 no tiene `orden_fijo`**: la única pregunta con esa marca en todo el
 proyecto está en el módulo 2 y quedó cerrada allí.

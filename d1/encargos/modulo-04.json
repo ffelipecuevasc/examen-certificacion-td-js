@@ -1,0 +1,2150 @@
+{
+  "procedencia": {
+    "version": 1,
+    "modulo": 4,
+    "calculada_en": "2026-09-10T12:15:20.306Z",
+    "fuentes": {
+      "modulo-0N.json": "b905b55bf68e6425",
+      "cuestionario.js": "bd31729024f0932c",
+      "retiradas.json": "4aed6fe1e5cfe383",
+      "correcciones-de-enunciado.json": "4f53cda18c2baa0c"
+    }
+  },
+  "preguntas": [
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Qué pilar de POO oculta el estado interno de un objeto y exige métodos para alterarlo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Herencia múltiple.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Encapsulamiento.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Polimorfismo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Abstracción estructural.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 2,
+      "enunciado": "En JS pre-ES6, ¿qué mecanismo emula la herencia de clases tradicional?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "La cadena de prototipos (prototype chain).",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Clases abstractas puras.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Mixins estáticos globales.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Mutación directa de la memoria base.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 3,
+      "enunciado": "¿Qué método convierte un objeto literal de JavaScript a una cadena de texto en formato JSON?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "JSON.parse()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Object.toJSON()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "JSON.stringify()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "String.fromJSON()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 4,
+      "enunciado": "¿Qué restricción estricta de sintaxis aplica al estándar JSON que difiere de objetos JS?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Las claves deben estar obligatoriamente entre comillas dobles.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Permite comentarios multi-línea con la sintaxis /* */.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Admite funciones como valores de las propiedades.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Las claves no requieren comillas si son alfanuméricas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 5,
+      "enunciado": "En POO, ¿qué término define a una entidad concreta creada a partir de una clase plantilla?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Prototipo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Interfaz.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Método estático.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Instancia.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 7,
+      "enunciado": "Al instanciar un objeto con `new`, ¿qué función especial de la clase se ejecuta primero?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "render()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "init()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "constructor()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "super()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 8,
+      "enunciado": "En notación literal de objetos JS, ¿cómo defines un método interno correctamente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "method: function() {}",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "function method() {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "method => {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "def method() {}",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 9,
+      "enunciado": "¿Qué tipo de dato nativo JS no es válido para ser almacenado en una estructura JSON?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Booleano (true/false).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Número (enteros o flotantes).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Array (lista de elementos).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Función o método.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 10,
+      "enunciado": "En el prototipo de JS, ¿qué propiedad apunta al objeto del cual hereda sus métodos base?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "__super__",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "__proto__",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "baseObject",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "parentClass",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 11,
+      "enunciado": "¿Qué característica fundamental diferencia a `let` frente a `var` en su ámbito de alcance?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "let tiene alcance global exclusivo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "let posee alcance limitado al bloque (block scope).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "let no permite cambiar el tipo de dato asignado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "var se destruye automáticamente al salir de la función.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 12,
+      "enunciado": "¿Qué ocurre si intentas reasignar un nuevo valor escalar a una variable definida con `const`?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Cambia el valor silenciosamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ignora el cambio manteniendo el primer valor.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Lanza un TypeError crítico deteniendo la ejecución.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Retorna false en la operación de asignación.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 13,
+      "enunciado": "¿Qué comportamiento léxico particular tienen las Arrow Functions (`=>`) respecto a `this`?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Heredan `this` del contexto de ejecución circundante.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Tienen su propio `this` inmutable.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Apuntan siempre al objeto global `window`.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Generan un error si se invoca `this` en su interior.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 14,
+      "enunciado": "¿Qué operador ES6 permite desestructurar un arreglo y agrupar el resto de sus elementos?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Operador Spread (...).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Operador Rest (...).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Operador In (in).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Nullish Coalescing (??).",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 15,
+      "enunciado": "En clases ES6, ¿qué palabra clave invoca al constructor de la clase padre al usar herencia?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "parent()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "extends()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "super()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "base()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 16,
+      "enunciado": "¿Qué mecanismo en ES6 permite expandir elementos de un arreglo dentro de otro arreglo nuevo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Array.concat()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Destructuring.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Operador Spread (...).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "String Interpolation.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 17,
+      "enunciado": "¿Cómo se define correctamente un método estático dentro de una clase en ES6?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "static nombreMetodo() {}",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "const nombreMetodo = () => {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "function static nombreMetodo() {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "@static nombreMetodo() {}",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 18,
+      "enunciado": "¿Qué palabra clave se usa en un módulo ES6 para exponer una función y usarla en otro archivo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "expose",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "module.exports",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "export",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "include",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 19,
+      "enunciado": "¿Cuál es la sintaxis correcta para importar un módulo exportado por defecto en ES6?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "import { Modulo } from './archivo.js';",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "import Modulo from './archivo.js';",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "require('./archivo.js');",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "fetch('./archivo.js').import;",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 20,
+      "enunciado": "¿Qué ventaja principal ofrece la interpolación de strings mediante template literals (` `)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Cifra el texto automáticamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ejecuta expresiones JS complejas incrustadas con ${}.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Convierte strings a números de forma nativa.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Compila el texto a binario para mayor velocidad.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 21,
+      "enunciado": "¿Qué representa la estructura subyacente jerárquica del DOM (Document Object Model)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un arreglo lineal de cadenas HTML.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un árbol de nodos de objetos accesibles mediante JS.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un documento XML estático y no mutable.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una base de datos relacional del lado del cliente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 22,
+      "enunciado": "¿Qué método estándar de JS añade un nuevo nodo hijo al final de un elemento padre en el DOM?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "appendChild()",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "insertAfter()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "addChild()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "pushNode()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 23,
+      "enunciado": "En la fase de captura de eventos del DOM, ¿en qué dirección se propaga el evento?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Desde el elemento objetivo hacia la raíz del documento.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Desde la raíz del documento hacia el elemento objetivo.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Solo se ejecuta en los nodos hermanos adyacentes.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El evento no se propaga, permanece estático en el nodo.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 25,
+      "enunciado": "Si se asignan varios manejadores al mismo evento en un nodo con `addEventListener`, ¿qué pasa?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El último manejador sobreescribe a todos los anteriores.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Se ejecutan todos los manejadores en orden de registro.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Genera un error de duplicidad de eventos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Solo se ejecuta el primero, bloqueando los subsiguientes.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 26,
+      "enunciado": "¿Qué propiedad del objeto evento (Event) identifica el nodo exacto que originó dicho evento?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "event.currentTarget",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "event.source",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "event.target",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "event.nodeOrigin",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 27,
+      "enunciado": "¿Qué método detiene la propagación (burbujeo) de un evento hacia sus nodos padres en el DOM?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "event.preventDefault()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "event.stopPropagation()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "event.cancelBubble()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "event.stopBouncing()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 28,
+      "enunciado": "Para modificar las clases CSS de un nodo de forma segura y dinámica, ¿qué propiedad usarías?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "node.className",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "node.classList",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "node.style",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "node.cssProperties",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 29,
+      "enunciado": "¿Qué evento ocurre cuando el DOM inicial HTML es cargado y parseado completamente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "window.onload",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "document.onready",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "DOMContentLoaded",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "HTMLParsedEvent",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 30,
+      "enunciado": "¿Qué método altera dinámicamente el contenido de texto de un nodo omitiendo etiquetas HTML?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "innerHTML",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "outerHTML",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "textContent",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "value",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 31,
+      "enunciado": "¿Por qué JavaScript es considerado un lenguaje de un único hilo (single-threaded) por diseño?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Porque solo tiene un call stack para procesar instrucciones.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Porque no permite ejecutar ciclos repetitivos continuos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Porque compila su código en una sola pasada.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Porque restringe la ejecución a un único archivo fuente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 32,
+      "enunciado": "En el contexto del Event Loop, ¿qué componente encola los callbacks de operaciones asíncronas?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El Call Stack (pila de llamadas).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "El Memory Heap (montículo).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "La Callback Queue (cola de tareas).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El motor de renderizado CSS.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 34,
+      "enunciado": "¿Qué estados fundamentales posee una Promesa en JavaScript durante su ciclo de vida lógico?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Started, Processing, Finished.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Pending, Fulfilled, Rejected.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Awaiting, Resolved, Catching.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Null, Truthy, Falsy.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 35,
+      "enunciado": "¿Qué método de una Promesa se ejecuta siempre, sin importar si fue resuelta o rechazada?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": ".then()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": ".catch()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": ".finally()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": ".all()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 36,
+      "enunciado": "Al encadenar bloques `.then()`, ¿qué debe retornar el bloque actual para pasarlo al siguiente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Obligatoriamente una nueva Promesa.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un valor procesado o una nueva Promesa.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El mismo evento capturado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una función callback anidada.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 37,
+      "enunciado": "Si usas la palabra clave `await` dentro de una función, ¿qué requisito debe tener esa función?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Estar declarada como `async`.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ser un método estático de una clase.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Estar dentro de un bloque try-catch estructural.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Retornar estrictamente un valor primitivo booleano.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 38,
+      "enunciado": "¿Qué bloque atrapa correctamente una Promesa rechazada dentro de una función `async`?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un bloque .catch() encadenado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una estructura try / catch estándar.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Una declaración if(error) throw.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El objeto global window.onerror.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 39,
+      "enunciado": "¿Qué método procesa un array de Promesas y falla si al menos una de las Promesas es rechazada?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Promise.race()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Promise.allSettled()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Promise.any()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Promise.all()",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 40,
+      "enunciado": "¿Qué retorna intrínsecamente cualquier función que ha sido declarada con el prefijo `async`?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El valor evaluado final, pero bloqueando el proceso principal.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una nueva función generadora asíncrona.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Siempre retorna una Promesa implícita resolviendo su valor.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El tipo de dato devuelto por la sentencia return.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 41,
+      "enunciado": "En la API XHR (XMLHttpRequest), ¿qué estado numérico del `readyState` indica éxito completo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "1 (Opened)",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "2 (Headers_Received)",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "3 (Loading)",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "4 (Done)",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 42,
+      "enunciado": "Al realizar una petición con XHR, ¿qué evento detecta cambios en el estado de la comunicación?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "onstatechange",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "onreadystatechange",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "onloadend",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "onprogress",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 43,
+      "enunciado": "¿Qué código de estado HTTP 2xx devuelve habitualmente una API REST al responder con éxito?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "200 OK",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "201 Created",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "204 No Content",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Todos los anteriores según la acción.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 44,
+      "enunciado": "En contraposición a XHR, ¿qué estructura retorna por defecto el método `fetch()` en JavaScript?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un objeto XMLHttpRequest instanciado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una Promesa (Promise).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un callback asíncrono puro.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Un stream de datos binarios bloqueantes.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 45,
+      "enunciado": "Al usar `fetch()`, ¿qué método extrae el cuerpo de la respuesta asíncrona a un objeto JS?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "response.toJSON()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "response.parse()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "response.json()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "response.objectify()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 47,
+      "enunciado": "¿Qué propiedad del objeto `Response` en `fetch()` indica si la solicitud HTTP fue un éxito (2xx)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "response.ok",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "response.success",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "response.valid",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "response.statusText",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 48,
+      "enunciado": "Para enviar datos POST mediante `fetch()`, ¿en qué parámetro incluyes el payload JSON?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "headers",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "mode",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "body",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "params",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 49,
+      "enunciado": "¿Qué cabecera HTTP (header) debes enviar para avisarle a la API que envías formato JSON?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Accept: application/json",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Content-Type: application/json",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Authorization: Bearer JSON",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Data-Type: json",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 50,
+      "enunciado": "¿Qué riesgo de seguridad ocurre al consumir APIs ajenas sin validación de origen permitida?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Ataques de Inyección SQL locales.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Fallas de XSS mutando el DOM.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Bloqueo CORS por políticas del mismo origen.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Sobrecarga de memoria del Event Loop.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Cómo implementa internamente JavaScript la herencia entre objetos sin usar la sintaxis de clases de ES6?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Copiando propiedades estáticas al instanciar.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Mediante la cadena de prototipos (prototype chain).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "A través de la clonación profunda de JSON.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Utilizando clases abstractas nativas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 2,
+      "enunciado": "En formato JSON válido, ¿cuál es la regla estricta para escribir los nombres de las claves (keys)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Pueden ir sin comillas si no contienen espacios.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Deben usar comillas simples exclusivamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Deben escribirse obligatoriamente con comillas dobles.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Requieren notación de corchetes en cada atributo.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 3,
+      "enunciado": "¿Qué pilar de la POO permite que objetos de distintas clases respondan a una misma invocación de método?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Encapsulamiento",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Herencia múltiple",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Polimorfismo",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Abstracción estructural",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 4,
+      "enunciado": "¿Qué ocurre si declaramos una variable con let e intentamos acceder a ella antes de su inicialización?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Retorna undefined por defecto.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Lanza un ReferenceError por la Temporal Dead Zone.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Asigna valor nulo hasta su primer uso en código.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Se eleva (hoisting) permitiendo su lectura temprana.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 5,
+      "enunciado": "¿Qué diferencia principal tiene una función flecha (arrow function) frente a una función tradicional?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Las funciones flecha no tienen su propio contexto 'this'.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Retornan siempre un objeto JSON estructurado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Obligan el uso de la palabra reservada 'function'.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Solo pueden recibir un máximo de tres parámetros.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 6,
+      "enunciado": "En módulos ES6, ¿qué sintaxis permite exportar múltiples funciones nombradas desde un mismo archivo?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "export default { func1, func2 };",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "module.exports = [func1, func2];",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "export { func1, func2 };",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "require(func1, func2);",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 7,
+      "enunciado": "¿Qué fase del flujo de eventos del DOM ocurre propagándose desde el elemento objetivo hacia la raíz?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Fase de captura (Capturing phase).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Fase de destino (Target phase).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Fase de delegación (Delegation phase).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Fase de burbujeo (Bubbling phase).",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 8,
+      "enunciado": "¿Qué método detiene el comportamiento por defecto de un evento, como el refresco al enviar un formulario?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "event.stopPropagation()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "event.preventDefault()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "event.stopImmediatePropagation()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "event.cancelEvent()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 9,
+      "enunciado": "¿Cuál es la estrategia más óptima para añadir eventos a múltiples elementos hijos generados dinámicamente?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Asignar un evento individual a cada elemento creado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Utilizar delegación de eventos en un contenedor padre.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Reemplazar el DOM completo con innerHTML en cada clic.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Invocar addEventListener dentro de un ciclo infinito.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 10,
+      "enunciado": "¿Qué problema estructural del código resuelve principalmente el uso de Promesas frente a Callbacks clásicos?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El consumo excesivo de memoria RAM del navegador.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "El \"Callback Hell\" o anidamiento excesivo de código.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El bloqueo del hilo principal (Main Thread).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "La imposibilidad de ejecutar instrucciones sincrónicas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 11,
+      "enunciado": "¿En qué estado interno queda una Promesa que ha completado su operación asíncrona con éxito?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Pending",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Fulfilled",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Rejected",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Settled",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 12,
+      "enunciado": "¿Qué estructura de control es necesaria para capturar errores de ejecución utilizando async/await?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Bloques if/else anidados exhaustivos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Condicionales switch/case por código de error.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El bloque try/catch en la función asíncrona.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El método callback .catch() encadenado.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 13,
+      "enunciado": "A diferencia de XHR, ¿qué tipo de objeto nativo retorna por defecto la API Fetch al ser ejecutada?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un objeto literal XMLHttpRequest.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un objeto JSON parseado automáticamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Una Promesa (Promise).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una función Callback de respuesta.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 14,
+      "enunciado": "Usando Fetch, ¿qué estado asume la promesa si el servidor responde con un error HTTP 404 (Not Found)?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Se rechaza inmediatamente (Rejected).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Lanza una excepción de red nativa bloqueante.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Se resuelve (Fulfilled) pero su propiedad ok es falsa.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Queda en estado Pending hasta recibir un código 200.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 15,
+      "enunciado": "¿Qué objeto nativo del navegador permite cancelar explícitamente una petición Fetch que está en progreso?",
+      "justificacion": null,
+      "orden_fijo": false,
+      "estado": "borrador",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "AbortController",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "XMLHttpRequest.abort()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "EventTarget",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Promise.reject()",
+          "es_correcta": false
+        }
+      ]
+    }
+  ]
+}

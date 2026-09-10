@@ -1,0 +1,2150 @@
+{
+  "procedencia": {
+    "version": 1,
+    "modulo": 4,
+    "calculada_en": "2026-09-10T12:15:20.306Z",
+    "fuentes": {
+      "modulo-0N.json": "b905b55bf68e6425",
+      "cuestionario.js": "bd31729024f0932c",
+      "retiradas.json": "4aed6fe1e5cfe383",
+      "correcciones-de-enunciado.json": "4f53cda18c2baa0c"
+    }
+  },
+  "preguntas": [
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Qué pilar de POO oculta el estado interno de un objeto y exige métodos para alterarlo?",
+      "justificacion": "El encapsulamiento es el pilar que esconde el estado interno y obliga a pasar por métodos para tocarlo, de modo que el objeto controla cómo se lo modifica. Los otros tres existen y hacen otra cosa: el polimorfismo permite que objetos distintos respondan al mismo método, la abstracción expone qué hace algo y esconde cómo, y la herencia múltiple ni siquiera es de JavaScript — un objeto hereda de un solo prototipo.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Herencia múltiple.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Encapsulamiento.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Polimorfismo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Abstracción estructural.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 2,
+      "enunciado": "En JS pre-ES6, ¿qué mecanismo emula la herencia de clases tradicional?",
+      "justificacion": "Antes de ES6 no había clases, y la herencia se armaba con la cadena de prototipos: cada objeto guarda un enlace a otro, y al pedir una propiedad que no tiene, el motor sube por esa cadena hasta encontrarla o llegar a `null`. Las clases de ES6 no cambiaron eso: son azúcar sintáctico sobre el mismo mecanismo. Las otras tres nombran cosas que JavaScript no tiene: clases abstractas puras, mixins estáticos globales, y desde luego no se manipula la memoria a mano.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "La cadena de prototipos (prototype chain).",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Clases abstractas puras.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Mixins estáticos globales.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Mutación directa de la memoria base.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 3,
+      "enunciado": "¿Qué método convierte un objeto literal de JavaScript a una cadena de texto en formato JSON?",
+      "justificacion": "`JSON.stringify()` convierte un valor de JavaScript a texto en formato JSON. El que va en la dirección contraria es `JSON.parse()`, que es la (a) y el par con el que siempre se confunde: uno serializa y el otro interpreta. `Object.toJSON()` y `String.fromJSON()` no existen. Conviene recordar que `stringify` **descarta** las funciones y las propiedades `undefined`, lo que enlaza con la pregunta sobre qué tipos admite JSON.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "JSON.parse()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Object.toJSON()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "JSON.stringify()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "String.fromJSON()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 4,
+      "enunciado": "¿Qué restricción estricta de sintaxis aplica al estándar JSON que difiere de objetos JS?",
+      "justificacion": "En JSON las claves van **siempre** entre comillas dobles: `{\"nombre\": \"Ana\"}`. Los objetos de JavaScript son más laxos —admiten claves sin comillas y con comillas simples—, y esa diferencia es la fuente del error más común al escribir JSON a mano. Las otras tres describen permisos que JSON no da: no admite comentarios, no admite funciones como valores, y no perdona las claves sin comillas aunque sean alfanuméricas.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Las claves deben estar obligatoriamente entre comillas dobles.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Permite comentarios multi-línea con la sintaxis /* */.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Admite funciones como valores de las propiedades.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Las claves no requieren comillas si son alfanuméricas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 5,
+      "enunciado": "En POO, ¿qué término define a una entidad concreta creada a partir de una clase plantilla?",
+      "justificacion": "Una instancia es el objeto concreto que se crea a partir de una clase: la clase es el plano y la instancia es la casa construida. Un prototipo es el objeto del que se hereda, no lo que se construye; una interfaz describe un contrato y JavaScript no las tiene como constructo del lenguaje; y un método estático pertenece a la clase y no a los objetos que salen de ella.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Prototipo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Interfaz.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Método estático.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Instancia.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 7,
+      "enunciado": "Al instanciar un objeto con `new`, ¿qué función especial de la clase se ejecuta primero?",
+      "justificacion": "El `constructor()` es lo primero que corre al usar `new`: recibe los argumentos y prepara el objeto. `super()` también corre pronto, pero **dentro** del constructor y solo cuando hay herencia — y ahí hay una regla que conviene saber: si la clase extiende a otra, hay que llamar a `super()` antes de usar `this`. `render()` e `init()` no son nada del lenguaje; son convenciones de bibliotecas.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "render()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "init()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "constructor()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "super()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 8,
+      "enunciado": "En notación literal de objetos JS, ¿cómo defines un método interno correctamente?",
+      "justificacion": "En notación literal, un método es una propiedad cuyo valor es una función: `metodo: function() {}`. La (b) es la sintaxis de una función suelta y no cabe dentro de un objeto literal; la (c) confunde la flecha con la asignación, y la (d) es de Python. Desde ES6 existe además la forma abreviada `metodo() {}`, que significa exactamente lo mismo y es la que se ve hoy en el código nuevo.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "method: function() {}",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "function method() {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "method => {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "def method() {}",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 9,
+      "enunciado": "¿Qué tipo de dato nativo JS no es válido para ser almacenado en una estructura JSON?",
+      "justificacion": "JSON no tiene tipo función, así que una función no se puede guardar en él. `JSON.stringify()` no falla al encontrarse una: **la omite en silencio**, que es peor que fallar, porque el objeto viaja incompleto sin que nadie avise. Los otros tres —booleanos, números y arreglos— son tipos que JSON admite sin problema, junto con cadenas, objetos y `null`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Booleano (true/false).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Número (enteros o flotantes).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Array (lista de elementos).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Función o método.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 10,
+      "enunciado": "En el prototipo de JS, ¿qué propiedad apunta al objeto del cual hereda sus métodos base?",
+      "justificacion": "`__proto__` es la propiedad que apunta al objeto del que se hereda, y recorrerla es recorrer la cadena de prototipos. Las otras tres no existen. Conviene saber que hoy `__proto__` está desaconsejada aunque siga funcionando: lo recomendado es `Object.getPrototypeOf(obj)` para leerla y `Object.setPrototypeOf()` para cambiarla, y que no se confunde con `prototype`, que es otra cosa y vive en las funciones constructoras.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "__super__",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "__proto__",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "baseObject",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "parentClass",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 11,
+      "enunciado": "¿Qué característica fundamental diferencia a `let` frente a `var` en su ámbito de alcance?",
+      "justificacion": "`let` tiene alcance de **bloque**: existe dentro de las llaves donde se declaró y desaparece al salir, así que un `let` dentro de un `if` o un `for` no se ve fuera. `var` tiene alcance de función, que es más ancho y la causa de muchos errores con contadores de ciclos. Las otras tres son falsas: `let` no es global, sí permite cambiar el tipo del valor, y `var` no desaparece al salir de un bloque.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "let tiene alcance global exclusivo.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "let posee alcance limitado al bloque (block scope).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "let no permite cambiar el tipo de dato asignado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "var se destruye automáticamente al salir de la función.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 12,
+      "enunciado": "¿Qué ocurre si intentas reasignar un nuevo valor escalar a una variable definida con `const`?",
+      "justificacion": "Reasignar una variable declarada con `const` lanza un `TypeError`. Es un error de verdad, no un aviso: la asignación no ocurre y, si nadie lo atrapa, corta la ejecución de ese script. Ojo con el alcance de la protección, que es lo que más se confunde: `const` protege **el identificador**, no el contenido. Sobre un objeto declarado con `const` se pueden agregar, cambiar y borrar propiedades; lo que falla es apuntarlo a otro objeto.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Cambia el valor silenciosamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ignora el cambio manteniendo el primer valor.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Lanza un TypeError crítico deteniendo la ejecución.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Retorna false en la operación de asignación.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 13,
+      "enunciado": "¿Qué comportamiento léxico particular tienen las Arrow Functions (`=>`) respecto a `this`?",
+      "justificacion": "Las funciones flecha no tienen `this` propio: usan el del contexto donde fueron escritas. Por eso resuelven el problema clásico de perder `this` dentro de un callback, y por eso **no sirven como métodos de un objeto** cuando se espera que `this` apunte a ese objeto. Es un comportamiento léxico —lo decide dónde está escrita la función, no cómo se la llama— y es la diferencia práctica más importante frente a `function`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Heredan `this` del contexto de ejecución circundante.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Tienen su propio `this` inmutable.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Apuntan siempre al objeto global `window`.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Generan un error si se invoca `this` en su interior.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 14,
+      "enunciado": "¿Qué operador ES6 permite desestructurar un arreglo y agrupar el resto de sus elementos?",
+      "justificacion": "El operador rest agrupa lo que sobra en un arreglo nuevo: `const [primero, ...resto] = lista`. Comparte los tres puntos con el spread y por eso se confunden, pero hacen lo contrario: **rest recoge y spread reparte**. Lo que decide cuál es cuál es la posición — a la izquierda de una asignación o en los parámetros de una función, recoge; dentro de un arreglo, un objeto o una llamada, reparte.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Operador Spread (...).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Operador Rest (...).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Operador In (in).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Nullish Coalescing (??).",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 15,
+      "enunciado": "En clases ES6, ¿qué palabra clave invoca al constructor de la clase padre al usar herencia?",
+      "justificacion": "`super()` llama al constructor de la clase padre, y hay que invocarlo antes de usar `this` en una clase que extiende a otra. `extends` existe pero es la palabra que declara la herencia en la cabecera de la clase, no una función que se invoque; `parent()` y `base()` no son nada de JavaScript. `super` también sirve para llamar métodos del padre desde un método propio: `super.metodo()`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "parent()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "extends()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "super()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "base()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 16,
+      "enunciado": "¿Qué mecanismo en ES6 permite expandir elementos de un arreglo dentro de otro arreglo nuevo?",
+      "justificacion": "El operador spread expande los elementos de un arreglo dentro de otro: `[...a, ...b]`. `Array.concat()` consigue un resultado parecido y por eso es un buen distractor, pero la pregunta es por el mecanismo de ES6. Ojo con un límite que importa: el spread hace una copia **superficial**, así que los objetos de dentro se siguen compartiendo entre el arreglo viejo y el nuevo.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Array.concat()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Destructuring.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Operador Spread (...).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "String Interpolation.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 17,
+      "enunciado": "¿Cómo se define correctamente un método estático dentro de una clase en ES6?",
+      "justificacion": "Un método estático se declara anteponiendo `static` al nombre, y pertenece a la clase y no a sus instancias: se invoca como `Clase.metodo()` y no desde un objeto creado con `new`. La (b) define una propiedad con una función flecha, que no es lo mismo; la (c) mezcla dos sintaxis que no se combinan; y la (d) usa un decorador, que no es JavaScript estándar.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "static nombreMetodo() {}",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "const nombreMetodo = () => {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "function static nombreMetodo() {}",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "@static nombreMetodo() {}",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 18,
+      "enunciado": "¿Qué palabra clave se usa en un módulo ES6 para exponer una función y usarla en otro archivo?",
+      "justificacion": "`export` es la palabra de los módulos ES6 para exponer algo a otro archivo. `module.exports` es la forma de CommonJS, la de Node antes de los módulos ES, y por eso es el distractor que separa los dos sistemas — que no se mezclan en el mismo archivo. `expose` e `include` no existen. En este proyecto se usa `export`, porque las páginas cargan sus scripts con `type=\"module\"`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "expose",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "module.exports",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "export",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "include",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 19,
+      "enunciado": "¿Cuál es la sintaxis correcta para importar un módulo exportado por defecto en ES6?",
+      "justificacion": "Lo exportado por defecto se importa sin llaves y con el nombre que uno quiera: `import Modulo from './archivo.js'`. Con llaves, la (a), se importan las exportaciones **nombradas**, y ahí el nombre sí tiene que coincidir. `require()` es de CommonJS. Un archivo puede tener una sola exportación por defecto y todas las nombradas que quiera.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "import { Modulo } from './archivo.js';",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "import Modulo from './archivo.js';",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "require('./archivo.js');",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "fetch('./archivo.js').import;",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 20,
+      "enunciado": "¿Qué ventaja principal ofrece la interpolación de strings mediante template literals (` `)?",
+      "justificacion": "Dentro de una plantilla literal, `${...}` evalúa cualquier expresión de JavaScript y pega su resultado en el texto: no solo variables, también llamadas a funciones y operaciones. La segunda ventaja, que la pregunta no menciona, es que el texto puede ocupar varias líneas sin escapar nada. Las otras tres prometen cosas que no ocurren: no cifra, no convierte a número y no compila a binario.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Cifra el texto automáticamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ejecuta expresiones JS complejas incrustadas con ${}.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Convierte strings a números de forma nativa.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Compila el texto a binario para mayor velocidad.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 21,
+      "enunciado": "¿Qué representa la estructura subyacente jerárquica del DOM (Document Object Model)?",
+      "justificacion": "El DOM es un árbol de nodos: el documento es la raíz y cada etiqueta, atributo y trozo de texto es un nodo con sus hijos. Esa forma es lo que permite recorrerlo, buscar dentro y modificarlo desde JavaScript. No es una lista plana de cadenas de HTML —esa es la vista del código fuente, no la del documento cargado— ni es estático ni es una base de datos.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un arreglo lineal de cadenas HTML.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un árbol de nodos de objetos accesibles mediante JS.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un documento XML estático y no mutable.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una base de datos relacional del lado del cliente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 22,
+      "enunciado": "¿Qué método estándar de JS añade un nuevo nodo hijo al final de un elemento padre en el DOM?",
+      "justificacion": "`appendChild()` agrega un nodo como último hijo del elemento sobre el que se lo llama. Las otras tres no existen con esos nombres. Vale la pena conocer a sus vecinos reales: `insertBefore()` coloca antes de un nodo concreto, y los modernos `append()`, `prepend()`, `before()` y `after()` admiten además texto suelto y varios nodos a la vez.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "appendChild()",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "insertAfter()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "addChild()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "pushNode()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 23,
+      "enunciado": "En la fase de captura de eventos del DOM, ¿en qué dirección se propaga el evento?",
+      "justificacion": "La captura va **desde la raíz hacia el elemento objetivo**: el evento baja por el árbol antes de llegar a su destino. Es la primera de las tres fases —captura, destino y burbujeo— y es la menos usada, porque `addEventListener` escucha en burbujeo salvo que se le pase `true` o `{ capture: true }`. La (a) describe el burbujeo, que es el camino de vuelta.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Desde el elemento objetivo hacia la raíz del documento.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Desde la raíz del documento hacia el elemento objetivo.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Solo se ejecuta en los nodos hermanos adyacentes.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El evento no se propaga, permanece estático en el nodo.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 25,
+      "enunciado": "Si se asignan varios manejadores al mismo evento en un nodo con `addEventListener`, ¿qué pasa?",
+      "justificacion": "Se ejecutan todos, en el orden en que se registraron. Ésa es una de las razones de ser de `addEventListener` frente a asignar `onclick`, que sí se sobrescribe: con `onclick` solo sobrevive el último manejador. No hay error de duplicidad, y ninguno bloquea a los siguientes — salvo que uno llame a `stopImmediatePropagation()`, que es lo único que corta la lista.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El último manejador sobreescribe a todos los anteriores.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Se ejecutan todos los manejadores en orden de registro.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Genera un error de duplicidad de eventos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Solo se ejecuta el primero, bloqueando los subsiguientes.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 26,
+      "enunciado": "¿Qué propiedad del objeto evento (Event) identifica el nodo exacto que originó dicho evento?",
+      "justificacion": "`event.target` es el nodo donde el evento se originó de verdad. Se distingue de `event.currentTarget`, que es el elemento en el que está puesto el manejador y que es la (a): en un manejador delegado sobre un contenedor, `currentTarget` es el contenedor y `target` es el hijo que recibió el clic. Esa diferencia es exactamente lo que hace posible la delegación de eventos.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "event.currentTarget",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "event.source",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "event.target",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "event.nodeOrigin",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 27,
+      "enunciado": "¿Qué método detiene la propagación (burbujeo) de un evento hacia sus nodos padres en el DOM?",
+      "justificacion": "`stopPropagation()` corta el viaje del evento hacia los nodos padres. No se confunde con `preventDefault()`, que es la (a) y cancela la acción por omisión del navegador —enviar el formulario, seguir el enlace— sin detener la propagación: son dos cosas independientes y a veces se usan juntas. `cancelBubble` existe como propiedad heredada de Internet Explorer, pero no como método, y `stopBouncing()` no existe.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "event.preventDefault()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "event.stopPropagation()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "event.cancelBubble()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "event.stopBouncing()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 28,
+      "enunciado": "Para modificar las clases CSS de un nodo de forma segura y dinámica, ¿qué propiedad usarías?",
+      "justificacion": "`classList` da una interfaz pensada para esto —`add()`, `remove()`, `toggle()`, `contains()`— y toca una sola clase sin pisar las demás. `className` es la (a) y es la forma antigua: guarda todas las clases en una cadena, así que asignarle un valor **borra las que ya estaban**, y ése es el «de forma segura» que la pregunta pide. `style` cambia estilos en línea, no clases.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "node.className",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "node.classList",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "node.style",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "node.cssProperties",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 29,
+      "enunciado": "¿Qué evento ocurre cuando el DOM inicial HTML es cargado y parseado completamente?",
+      "justificacion": "`DOMContentLoaded` se dispara cuando el HTML terminó de parsearse y el árbol está armado, sin esperar imágenes ni hojas de estilo. `window.onload`, la (a), espera además a que todos esos recursos carguen, así que llega bastante después: es el par que hay que saber distinguir. `document.onready` no existe en JavaScript nativo — es de jQuery, `$(document).ready()` —, y `HTMLParsedEvent` no existe en ninguna parte.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "window.onload",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "document.onready",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "DOMContentLoaded",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "HTMLParsedEvent",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 30,
+      "enunciado": "¿Qué método altera dinámicamente el contenido de texto de un nodo omitiendo etiquetas HTML?",
+      "justificacion": "`textContent` trata lo que se le da como texto plano, así que las etiquetas se ven tal cual en vez de interpretarse. `innerHTML` sí las interpreta, y por eso es la (a) y es la puerta de entrada de los ataques XSS cuando el texto viene de fuera. En este proyecto esa distinción no es teórica: el banco de preguntas es contenido de origen externo y todo lo que se pinta con `innerHTML` pasa antes por una función de escapado.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "innerHTML",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "outerHTML",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "textContent",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "value",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 31,
+      "enunciado": "¿Por qué JavaScript es considerado un lenguaje de un único hilo (single-threaded) por diseño?",
+      "justificacion": "JavaScript tiene un solo call stack, así que ejecuta una instrucción a la vez y nada corre en paralelo dentro de él. Lo que da la impresión de simultaneidad es que las operaciones lentas —red, temporizadores— las atiende el entorno por fuera y devuelve sus callbacks a una cola, que es de lo que se ocupa el bucle de eventos. Las otras tres describen limitaciones inventadas: sí hay ciclos, sí hay varios archivos.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Porque solo tiene un call stack para procesar instrucciones.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Porque no permite ejecutar ciclos repetitivos continuos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Porque compila su código en una sola pasada.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Porque restringe la ejecución a un único archivo fuente.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 32,
+      "enunciado": "En el contexto del Event Loop, ¿qué componente encola los callbacks de operaciones asíncronas?",
+      "justificacion": "La cola de callbacks es donde esperan los callbacks de las operaciones asíncronas ya terminadas, hasta que el call stack se vacía y el bucle de eventos los pasa a ejecutar. Las otras dos piezas de la lista son reales y tienen otro oficio: el call stack ejecuta, y el montículo guarda los objetos. Conviene saber que las promesas usan una cola aparte y con prioridad, la de microtareas, que se vacía antes que ésta.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El Call Stack (pila de llamadas).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "El Memory Heap (montículo).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "La Callback Queue (cola de tareas).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El motor de renderizado CSS.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 34,
+      "enunciado": "¿Qué estados fundamentales posee una Promesa en JavaScript durante su ciclo de vida lógico?",
+      "justificacion": "Una promesa está `pending` mientras la operación no termina, y de ahí pasa a `fulfilled` si salió bien o a `rejected` si falló. Ese paso ocurre **una sola vez** y es definitivo: una promesa resuelta no vuelve atrás ni cambia de valor. Se oye además la palabra `settled`, que no es un cuarto estado sino el nombre de «ya no está pendiente», o sea cumplida o rechazada.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Started, Processing, Finished.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Pending, Fulfilled, Rejected.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Awaiting, Resolved, Catching.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Null, Truthy, Falsy.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 35,
+      "enunciado": "¿Qué método de una Promesa se ejecuta siempre, sin importar si fue resuelta o rechazada?",
+      "justificacion": "`.finally()` corre pase lo que pase, y sirve para lo que hay que hacer en los dos casos: cerrar una conexión, quitar un indicador de carga. No recibe el valor ni el error, justamente porque no sabe cuál de los dos ocurrió. `.then()` atiende el éxito, `.catch()` el fallo, y `.all()` ni siquiera es un método de la instancia sino de `Promise`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": ".then()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": ".catch()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": ".finally()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": ".all()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 36,
+      "enunciado": "Al encadenar bloques `.then()`, ¿qué debe retornar el bloque actual para pasarlo al siguiente?",
+      "justificacion": "Lo que devuelve un `.then()` se convierte en el valor que recibe el siguiente. Si devuelve un valor corriente, se pasa tal cual; si devuelve una promesa, la cadena **espera** a que se resuelva y pasa su resultado. Esa segunda regla es la que permite encadenar operaciones asíncronas en vertical en vez de anidarlas. Y hay una trampa muy común: si el bloque no devuelve nada, el siguiente recibe `undefined`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Obligatoriamente una nueva Promesa.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un valor procesado o una nueva Promesa.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El mismo evento capturado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una función callback anidada.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 37,
+      "enunciado": "Si usas la palabra clave `await` dentro de una función, ¿qué requisito debe tener esa función?",
+      "justificacion": "`await` solo se puede usar dentro de una función declarada `async`; fuera de ella es un error de sintaxis. La (c) suena razonable y es falsa: el `try/catch` es recomendable para atrapar el fallo, pero no es requisito para que `await` funcione. Conviene saber que desde ES2022 los módulos admiten `await` en el nivel superior, sin función que lo envuelva — pero solo en módulos, y la pregunta habla de una función.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Estar declarada como `async`.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Ser un método estático de una clase.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Estar dentro de un bloque try-catch estructural.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Retornar estrictamente un valor primitivo booleano.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 38,
+      "enunciado": "¿Qué bloque atrapa correctamente una Promesa rechazada dentro de una función `async`?",
+      "justificacion": "Dentro de una función `async`, un `await` sobre una promesa rechazada lanza como si fuera una excepción corriente, así que se atrapa con `try/catch`. Ésa es la forma idiomática y la razón de ser de la sintaxis: el manejo de errores del código asíncrono vuelve a ser el de siempre. Conviene saber que el `.catch()` encadenado tampoco es un error —`await promesa.catch(...)` recoge el rechazo igual—, pero mezcla los dos estilos en la misma línea y se lee peor. Las otras dos alternativas sí son falsas: un `if(error) throw` no atrapa nada, y `window.onerror` no ve los rechazos de promesas.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un bloque .catch() encadenado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una estructura try / catch estándar.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Una declaración if(error) throw.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El objeto global window.onerror.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 39,
+      "enunciado": "¿Qué método procesa un array de Promesas y falla si al menos una de las Promesas es rechazada?",
+      "justificacion": "`Promise.all()` espera a que todas se cumplan y falla en cuanto una se rechaza, descartando el resto de los resultados. Es lo que se quiere cuando todas las piezas son necesarias. Las otras tres existen y tienen otra política: `race()` devuelve la primera que se resuelva o rechace, `any()` la primera que se **cumpla** ignorando los rechazos, y `allSettled()` espera a todas y no falla nunca — informa qué pasó con cada una.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Promise.race()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Promise.allSettled()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Promise.any()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Promise.all()",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 40,
+      "enunciado": "¿Qué retorna intrínsecamente cualquier función que ha sido declarada con el prefijo `async`?",
+      "justificacion": "Una función `async` devuelve siempre una promesa, aunque su `return` sea un número. Si devuelve un valor corriente, la promesa se cumple con ese valor; si lanza, se rechaza con el error. De ahí se sigue algo que conviene tener claro: llamarla sin `await` no da el valor, da la promesa. Y no bloquea el hilo principal — eso es justo lo que `async/await` viene a evitar.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El valor evaluado final, pero bloqueando el proceso principal.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una nueva función generadora asíncrona.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Siempre retorna una Promesa implícita resolviendo su valor.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El tipo de dato devuelto por la sentencia return.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 41,
+      "enunciado": "En la API XHR (XMLHttpRequest), ¿qué estado numérico del `readyState` indica éxito completo?",
+      "justificacion": "`readyState` recorre los valores 0 a 4, y el 4 —`DONE`— es el único que indica que el intercambio terminó. Ahora bien, **terminar no es lo mismo que salir bien**, y ésa es la distinción que hay que llevarse: una respuesta 404 o 500 llega igual con `readyState` 4. Para saber si hubo éxito se mira aparte `xhr.status`, comprobando que esté entre 200 y 299. El patrón completo es comprobar las dos cosas: primero que `readyState` sea 4, y recién entonces qué dice `status`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "1 (Opened)",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "2 (Headers_Received)",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "3 (Loading)",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "4 (Done)",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 42,
+      "enunciado": "Al realizar una petición con XHR, ¿qué evento detecta cambios en el estado de la comunicación?",
+      "justificacion": "`onreadystatechange` es el manejador que XHR llama cada vez que cambia su `readyState`, y dentro de él se comprueba si ya llegó al 4. `onstatechange` no existe. `onloadend` y `onprogress` sí existen en la API moderna de XHR y por eso son buenos distractores, pero la pregunta apunta al mecanismo clásico, que es el que se ve en el material del examen.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "onstatechange",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "onreadystatechange",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "onloadend",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "onprogress",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 43,
+      "enunciado": "¿Qué código de estado HTTP 2xx devuelve habitualmente una API REST al responder con éxito?",
+      "justificacion": "Los tres son códigos 2xx y una API REST usa cada uno según lo que hizo: `200 OK` para una lectura o una operación con cuerpo de respuesta, `201 Created` cuando se creó un recurso, y `204 No Content` cuando la operación salió bien y no hay nada que devolver — típico de un borrado. La respuesta es «todos», y lo que la pregunta evalúa es saber que el éxito no es un solo código.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "200 OK",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "201 Created",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "204 No Content",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Todos los anteriores según la acción.",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 44,
+      "enunciado": "En contraposición a XHR, ¿qué estructura retorna por defecto el método `fetch()` en JavaScript?",
+      "justificacion": "`fetch()` devuelve una promesa, y ésa es su diferencia de fondo con XHR: se encadena con `.then()` o se espera con `await` en vez de registrar manejadores. Conviene recordar que hacen falta **dos** pasos asíncronos para llegar al dato: uno para la respuesta y otro para leer su cuerpo con `.json()`, que también devuelve una promesa.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un objeto XMLHttpRequest instanciado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Una Promesa (Promise).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Un callback asíncrono puro.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Un stream de datos binarios bloqueantes.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 45,
+      "enunciado": "Al usar `fetch()`, ¿qué método extrae el cuerpo de la respuesta asíncrona a un objeto JS?",
+      "justificacion": "`response.json()` lee el cuerpo de la respuesta y lo convierte en un objeto de JavaScript. Devuelve una promesa, así que hay que esperarla: es el segundo `await` del patrón. Sus hermanos son `text()`, `blob()` y `formData()`, según lo que venga. Y el cuerpo se puede leer **una sola vez**: intentarlo dos veces sobre la misma respuesta falla.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "response.toJSON()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "response.parse()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "response.json()",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "response.objectify()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 47,
+      "enunciado": "¿Qué propiedad del objeto `Response` en `fetch()` indica si la solicitud HTTP fue un éxito (2xx)?",
+      "justificacion": "`response.ok` es `true` cuando el código está entre 200 y 299. Es la comprobación que hay que hacer siempre, porque `fetch` **no rechaza la promesa ante un error HTTP**: un 404 llega como respuesta cumplida con `ok` en falso. Las otras tres no existen, salvo `statusText`, que es un texto descriptivo y no un booleano.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "response.ok",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "response.success",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "response.valid",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "response.statusText",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 48,
+      "enunciado": "Para enviar datos POST mediante `fetch()`, ¿en qué parámetro incluyes el payload JSON?",
+      "justificacion": "El cuerpo de la petición va en `body`, y si son datos JSON hay que serializarlos antes con `JSON.stringify()`: `body` recibe texto, no un objeto. Junto a él van `method: 'POST'` y la cabecera `Content-Type`. `headers` lleva las cabeceras, `mode` controla el comportamiento respecto de CORS, y `params` no es una opción de `fetch`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "headers",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "mode",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "body",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "params",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 49,
+      "enunciado": "¿Qué cabecera HTTP (header) debes enviar para avisarle a la API que envías formato JSON?",
+      "justificacion": "`Content-Type: application/json` describe **lo que se está enviando**, y es lo que permite al servidor interpretar el cuerpo. Se confunde con `Accept`, la (a), que dice lo que se espera **recibir**: son direcciones opuestas y a veces se mandan las dos. Enviar JSON sin esa cabecera es una de las causas más frecuentes de que una API responda con un error de formato.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Accept: application/json",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Content-Type: application/json",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Authorization: Bearer JSON",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Data-Type: json",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "json_2026",
+      "numero_origen": 50,
+      "enunciado": "¿Qué riesgo de seguridad ocurre al consumir APIs ajenas sin validación de origen permitida?",
+      "justificacion": "Lo que ocurre es que el navegador **bloquea la respuesta** si el servidor ajeno no autoriza tu origen con sus cabeceras CORS. Conviene entender bien de qué lado está esto: CORS no es un ataque ni un agujero, es el navegador protegiendo al usuario, y por eso no se «desactiva» desde el código del cliente — se resuelve en el servidor que responde. Las otras tres nombran riesgos reales que no son éste.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Ataques de Inyección SQL locales.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Fallas de XSS mutando el DOM.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Bloqueo CORS por políticas del mismo origen.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Sobrecarga de memoria del Event Loop.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 1,
+      "enunciado": "¿Cómo implementa internamente JavaScript la herencia entre objetos sin usar la sintaxis de clases de ES6?",
+      "justificacion": "JavaScript hereda por prototipos: cada objeto guarda un enlace a otro, y las propiedades que no encuentra en sí mismo las busca subiendo por esa cadena. Las clases de ES6 no cambiaron el mecanismo, solo le dieron una sintaxis familiar. Las otras tres describen técnicas que no son la herencia del lenguaje: copiar propiedades es composición, clonar con JSON produce objetos sueltos sin cadena, y no hay clases abstractas nativas.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Copiando propiedades estáticas al instanciar.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Mediante la cadena de prototipos (prototype chain).",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "A través de la clonación profunda de JSON.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Utilizando clases abstractas nativas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 2,
+      "enunciado": "En formato JSON válido, ¿cuál es la regla estricta para escribir los nombres de las claves (keys)?",
+      "justificacion": "Las claves de JSON van siempre entre comillas **dobles**. Las simples no valen —son legales en JavaScript pero no en JSON— y omitirlas tampoco, aunque la clave no tenga espacios. Es la regla que más se rompe al escribir JSON a mano, y el error que devuelve `JSON.parse()` suele señalar una posición y no la causa, así que conviene reconocerla de memoria.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Pueden ir sin comillas si no contienen espacios.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Deben usar comillas simples exclusivamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Deben escribirse obligatoriamente con comillas dobles.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Requieren notación de corchetes en cada atributo.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 3,
+      "enunciado": "¿Qué pilar de la POO permite que objetos de distintas clases respondan a una misma invocación de método?",
+      "justificacion": "El polimorfismo es que objetos de clases distintas respondan al mismo mensaje, cada uno a su manera: llamar a `area()` sobre un círculo y sobre un cuadrado y que cada uno haga su cálculo. El encapsulamiento esconde el estado, la abstracción esconde el cómo, y la herencia múltiple no existe en JavaScript. En un lenguaje dinámico como éste el polimorfismo sale casi solo: basta con que el método exista.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Encapsulamiento",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Herencia múltiple",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Polimorfismo",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Abstracción estructural",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 4,
+      "enunciado": "¿Qué ocurre si declaramos una variable con let e intentamos acceder a ella antes de su inicialización?",
+      "justificacion": "Lanza un `ReferenceError`. La variable **sí** se eleva, pero queda en la zona muerta temporal —la Temporal Dead Zone— desde el inicio del bloque hasta su declaración, y tocarla ahí es un error. Es la diferencia práctica con `var`, que en esa situación devuelve `undefined` y deja pasar el problema. La (d) describe justamente el comportamiento de `var`, y por eso es el distractor que separa al que entiende el hoisting del que lo recita.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Retorna undefined por defecto.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Lanza un ReferenceError por la Temporal Dead Zone.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Asigna valor nulo hasta su primer uso en código.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Se eleva (hoisting) permitiendo su lectura temprana.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 5,
+      "enunciado": "¿Qué diferencia principal tiene una función flecha (arrow function) frente a una función tradicional?",
+      "justificacion": "Una función flecha no tiene `this` propio: toma el del lugar donde está escrita. De ahí sale su uso más común —callbacks que necesitan el `this` de fuera— y también su límite: no sirven como métodos cuando se espera que `this` sea el objeto. Tampoco tienen `arguments` propio ni se pueden usar con `new`. Las otras tres son inventadas: no devuelven JSON, no obligan a `function` y no limitan los parámetros.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Las funciones flecha no tienen su propio contexto 'this'.",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Retornan siempre un objeto JSON estructurado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Obligan el uso de la palabra reservada 'function'.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Solo pueden recibir un máximo de tres parámetros.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 6,
+      "enunciado": "En módulos ES6, ¿qué sintaxis permite exportar múltiples funciones nombradas desde un mismo archivo?",
+      "justificacion": "`export { func1, func2 };` exporta varias funciones nombradas, y quien las importe tiene que usar llaves y los mismos nombres. La (a) exporta un objeto por defecto, que es otra cosa y se importa distinto; la (b) es CommonJS; y la (d) confunde exportar con importar. También se puede poner `export` delante de cada declaración, que produce el mismo resultado.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "export default { func1, func2 };",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "module.exports = [func1, func2];",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "export { func1, func2 };",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "require(func1, func2);",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 7,
+      "enunciado": "¿Qué fase del flujo de eventos del DOM ocurre propagándose desde el elemento objetivo hacia la raíz?",
+      "justificacion": "El burbujeo es la vuelta: el evento sube desde el elemento objetivo hacia la raíz, y por eso un manejador puesto en un contenedor se entera de los clics de sus hijos. Es lo contrario de la captura, que baja, y es la fase en la que `addEventListener` escucha por omisión. La fase de destino es el instante en el elemento mismo, y «delegación» no es una fase sino una técnica que se apoya en el burbujeo.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Fase de captura (Capturing phase).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Fase de destino (Target phase).",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Fase de delegación (Delegation phase).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Fase de burbujeo (Bubbling phase).",
+          "es_correcta": true
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 8,
+      "enunciado": "¿Qué método detiene el comportamiento por defecto de un evento, como el refresco al enviar un formulario?",
+      "justificacion": "`preventDefault()` cancela lo que el navegador haría por su cuenta: enviar el formulario, seguir el enlace, marcar la casilla. No detiene la propagación — para eso está `stopPropagation()`, que es la (a) y el par con el que se confunde. `stopImmediatePropagation()` es más fuerte todavía: además de cortar la propagación, impide que corran los otros manejadores del mismo elemento.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "event.stopPropagation()",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "event.preventDefault()",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "event.stopImmediatePropagation()",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "event.cancelEvent()",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 9,
+      "enunciado": "¿Cuál es la estrategia más óptima para añadir eventos a múltiples elementos hijos generados dinámicamente?",
+      "justificacion": "La delegación de eventos: un solo manejador en el contenedor padre, que se entera de los clics de sus hijos gracias al burbujeo y decide con `event.target` cuál fue. Funciona con elementos creados **después** de registrar el manejador, que es justo lo que la pregunta plantea y lo que la (a) no resuelve — habría que registrar uno por cada elemento nuevo, y nadie se acuerda siempre.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Asignar un evento individual a cada elemento creado.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Utilizar delegación de eventos en un contenedor padre.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Reemplazar el DOM completo con innerHTML en cada clic.",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Invocar addEventListener dentro de un ciclo infinito.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 10,
+      "enunciado": "¿Qué problema estructural del código resuelve principalmente el uso de Promesas frente a Callbacks clásicos?",
+      "justificacion": "Las promesas aplanan lo que los callbacks anidaban. Con callbacks, cada operación que depende de la anterior agrega un nivel de indentación hasta volver el código ilegible; con promesas, la cadena de `.then()` se lee en vertical, y con `async/await` se lee casi como código síncrono. No resuelven el consumo de memoria ni el bloqueo del hilo: el hilo no se bloqueaba tampoco con callbacks.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "El consumo excesivo de memoria RAM del navegador.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "El \"Callback Hell\" o anidamiento excesivo de código.",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El bloqueo del hilo principal (Main Thread).",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "La imposibilidad de ejecutar instrucciones sincrónicas.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 11,
+      "enunciado": "¿En qué estado interno queda una Promesa que ha completado su operación asíncrona con éxito?",
+      "justificacion": "`Fulfilled` es el estado de una promesa que terminó bien. `Pending` es mientras espera y `Rejected` es cuando falló. `Settled` es el mejor distractor de los cuatro porque **sí es un término real**, pero no es un estado: es el nombre que agrupa a las dos formas de terminar, cumplida o rechazada. Saber que existe y que no es un estado es exactamente lo que la pregunta separa.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Pending",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Fulfilled",
+          "es_correcta": true
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Rejected",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Settled",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 12,
+      "enunciado": "¿Qué estructura de control es necesaria para capturar errores de ejecución utilizando async/await?",
+      "justificacion": "Con `async/await` los errores se atrapan con `try/catch`, igual que en código síncrono: un `await` sobre una promesa rechazada lanza, y el `catch` lo recoge. Ésa es la ventaja de la sintaxis — que el manejo de errores vuelve a ser el de siempre, sin encadenar nada. El `.catch()` encadenado también funcionaría, pero pertenece al estilo de las cadenas de promesas y mezclarlo con `await` en la misma línea hace el código más difícil de leer. Las otras dos no sirven: ni un `if/else` ni un `switch` ven una excepción que se está lanzando.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Bloques if/else anidados exhaustivos.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Condicionales switch/case por código de error.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "El bloque try/catch en la función asíncrona.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "El método callback .catch() encadenado.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 13,
+      "enunciado": "A diferencia de XHR, ¿qué tipo de objeto nativo retorna por defecto la API Fetch al ser ejecutada?",
+      "justificacion": "`fetch()` devuelve una promesa, mientras que XHR devuelve un objeto sobre el que se registran manejadores. Ésa es la diferencia de forma que la pregunta busca. Ojo con la (b), que es el error más común de todos: `fetch` **no** devuelve el JSON ya interpretado — devuelve una respuesta, y sacar el objeto de dentro es un segundo paso asíncrono con `.json()`.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Un objeto literal XMLHttpRequest.",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Un objeto JSON parseado automáticamente.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Una Promesa (Promise).",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Una función Callback de respuesta.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 14,
+      "enunciado": "Usando Fetch, ¿qué estado asume la promesa si el servidor responde con un error HTTP 404 (Not Found)?",
+      "justificacion": "La promesa **se cumple**. `fetch` solo se rechaza si la petición no se pudo hacer —sin red, DNS caído, CORS—; un 404 o un 500 son respuestas válidas del servidor y llegan como promesa cumplida con `response.ok` en falso. Es la trampa más importante de la API, porque un `try/catch` alrededor de un `fetch` **no** atrapa un 404: hay que comprobar `ok` a mano y lanzar si hace falta.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "Se rechaza inmediatamente (Rejected).",
+          "es_correcta": false
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "Lanza una excepción de red nativa bloqueante.",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "Se resuelve (Fulfilled) pero su propiedad ok es falsa.",
+          "es_correcta": true
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Queda en estado Pending hasta recibir un código 200.",
+          "es_correcta": false
+        }
+      ]
+    },
+    {
+      "modulo": 4,
+      "origen": "js_2026",
+      "numero_origen": 15,
+      "enunciado": "¿Qué objeto nativo del navegador permite cancelar explícitamente una petición Fetch que está en progreso?",
+      "justificacion": "`AbortController` permite cancelar una petición en curso: se crea uno, se le pasa su `signal` a `fetch`, y al llamar a `abort()` la promesa se rechaza. Sirve para descartar una búsqueda que el usuario ya cambió, o para poner un tiempo límite. La (b) es el método equivalente de XHR y por eso es buen distractor, pero no funciona con `fetch`; `EventTarget` y `Promise.reject()` no cancelan nada.",
+      "orden_fijo": false,
+      "estado": "activa",
+      "alternativas": [
+        {
+          "letra": "a",
+          "orden": 1,
+          "texto": "AbortController",
+          "es_correcta": true
+        },
+        {
+          "letra": "b",
+          "orden": 2,
+          "texto": "XMLHttpRequest.abort()",
+          "es_correcta": false
+        },
+        {
+          "letra": "c",
+          "orden": 3,
+          "texto": "EventTarget",
+          "es_correcta": false
+        },
+        {
+          "letra": "d",
+          "orden": 4,
+          "texto": "Promise.reject()",
+          "es_correcta": false
+        }
+      ]
+    }
+  ]
+}

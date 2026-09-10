@@ -1844,6 +1844,88 @@ no la produce; si no lo era, no se ha perdido nada.
 **Eso no cierra el hallazgo.** Cerrarlo exigiría explicar el fallo, no dejar de rozarlo.
 
 
+
+#### Volvió · 2026-09-10 · y la hipótesis que teníamos quedó muerta
+
+**Segunda aparición**, en `npm run verificar`, con el mismo mensaje:
+`RESTRICCION CAIDA · Indice parcial: una sola correcta por pregunta`.
+
+**Se corrió el diagnóstico escrito para este momento, antes de tocar nada.** Era la
+única consulta que deja de poder hacerse en cuanto alguien «arregla» la base:
+
+```
+SELECT name FROM sqlite_master WHERE type='index'
+  -> alternativa_una_correcta        EL INDICE ESTABA
+  -> pregunta_por_estado_y_modulo
+  -> pregunta_reemplazos
+
+SELECT ... FROM pregunta WHERE id >= 9000
+  -> (sin filas)                     NO HABIA ANDAMIAJE RESIDUAL
+```
+
+Y acto seguido, `npm run probar:restricciones` suelto: **las nueve en pie**, con la
+huella de la base idéntica antes y después. La corrida siguiente de
+`npm run verificar` completo: **también en pie**.
+
+**Qué queda refutado, que es lo que esta vuelta aporta:**
+
+| Hipótesis | Estado |
+|---|---|
+| Restaurar copiando `.sqlite`/`-shm`/`-wal` | **REFUTADA.** Esta vez **no hubo ninguna copia de archivos**. La última manipulación de la base local había sido una reconstrucción desde SQL, hecha por `ensayo-local.mjs`. El fallo no necesita el disparador que le habíamos atribuido |
+| Andamiaje dejado por una corrida anterior | **REFUTADA**, ya lo estaba: produce `SIN VEREDICTO` código 2, y además esta vez no había ninguna fila `9000+` |
+| El índice no existía en ese momento | **Sin apoyo.** Existía al mirarlo. *Con la salvedad honesta de que se miró después de que el comprobador limpiara lo suyo, así que no prueba que estuviera visible durante* |
+
+**Las tres hipótesis escritas en la primera vuelta están hoy sin apoyo, y una está
+muerta.** Eso es progreso, aunque no lo parezca: se dejó de buscar donde no estaba.
+
+#### Lo único que las dos apariciones comparten
+
+**Las dos ocurrieron dentro de `npm run verificar`. Ninguna suelta.** Son dos casos y
+dos no son una serie, pero es el primer rasgo común que aparece y conviene anotarlo
+antes de olvidarlo.
+
+Lo que **no** lo explica: `verificar-todo.mjs` corre sus cuatro comprobaciones **en
+serie**, con `spawnSync` dentro de un `for`. No hay concurrencia entre ellas, así que
+la explicación fácil —dos procesos tocando la base local a la vez— queda descartada
+por lectura del código.
+
+#### Una hipótesis nueva, con evidencia de esta misma sesión y sin provocar
+
+**Wrangler se cae al terminar, en Windows.** No es una sospecha: está escrito desde
+H-016 y se vio otra vez el 2026-09-10, en la salida de una carga:
+
+```
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94
+```
+
+Un proceso que revienta al salir **puede no cerrar limpiamente la base local**, y con
+ella su `-wal`. El proceso siguiente que la abra podría leer una vista donde falte lo
+último que se escribió — por ejemplo, la alternativa correcta del andamiaje que el
+comprobador acaba de insertar. Si esa fila no está visible, el índice parcial **no
+tiene nada contra qué chocar** y deja pasar la segunda correcta: exactamente el fallo
+que se ve.
+
+Encaja con las tres cosas que hacían raro el caso: que sea intermitente, que se
+arregle al repetir, y que el índice esté cuando se lo mira después.
+
+**Es una hipótesis y no está provocada.** Se anota con su evidencia —el `Assertion
+failed` es real y observado— y sin darla por buena. Provocarla exigiría forzar una
+salida sucia de wrangler entre el montaje del andamiaje y la comprobación, y no está
+claro que se pueda hacer a voluntad.
+
+#### Lo que sigue siendo cierto y conviene no perder de vista
+
+**El modo de fallo observado es un falso «caída», no un falso «en pie».** El
+comprobador acusa de más, no de menos. La versión peligrosa —que diga «restricciones
+en pie» cuando no lo están— **no se ha observado nunca**, y nada de lo aprendido
+hasta ahora sugiere que sea posible por esta vía: si el andamiaje no está visible, lo
+que falla es la comprobación, no la restricción.
+
+**Sigue en amarillo.** Dos apariciones, tres hipótesis sin apoyo, una muerta, una
+nueva sin provocar, y un rasgo común anotado. No se cierra: cerrarlo exigiría
+explicar el fallo.
+
+
 ---
 
 ### H-030 · El respaldo del banco no tenía banco dentro, y el «un solo paso» de ADR-023 no existía
@@ -2109,3 +2191,68 @@ módulo salga del sello del encargo y no de una suposición.
 cómo hacerlo se desobedece.** Y no por descuido — se desobedece porque obedecerlo
 cuesta más que arriesgarse, justo en el momento en que uno está nervioso porque algo
 acaba de fallar. Escribir el comando cuesta cuatro líneas y cambia esa cuenta.
+
+---
+
+### H-032 · Nada impedía que una marca de duda se publicara como justificación
+
+**Gravedad:** 🟠 · **Estado:** 🟢 Resuelto · **Detectado en:** iteración 25 · **Fecha:** 2026-09-10
+
+**Síntoma.** Ninguno todavía, y ése es el punto: **no había fallado nunca porque hasta
+hoy lo evitó una persona acordándose.**
+
+Una justificación marcada con `**[DUDA]**` no es contenido para el estudiante: es una
+nota para el revisor, y el texto que la rodea le habla a él —«conviene que sepas»,
+«quería que lo decidieras tú»—. Ese mismo texto es el que se carga en la columna
+`justificacion` de D1 y el que la **épica 30** va a mostrar en pantalla.
+
+**Hasta el 2026-09-10, si una justificación aprobada traía `[DUDA]` dentro, se cargaba
+tal cual.** Nada en la cadena lo miraba: ni `aplicar-justificaciones.mjs`, ni
+`validacion-de-escritura.mjs`, ni `motivosDeContenido()`.
+
+**Cómo se evitó las dos veces anteriores.** A mano. En el módulo 3 las cuatro marcas se
+quitaron al reescribir las justificaciones, y se comprobó contándolas —«`[DUDA]` que
+quedan: 0»—. Funcionó, y funcionó **por memoria y no por método**, que es la forma
+exacta en que este proyecto ya se ha equivocado: es lo mismo que decía H-030 sobre un
+procedimiento que pide acordarse de dos cosas.
+
+**Cómo apareció.** Al ir a aplicar las justificaciones del módulo 4 con las tres
+`[DUDA]` **conservadas por decisión del autor**. Conservar la pregunta no significa
+conservar la marca: la marca tenía que desaparecer igual, porque lo que se decidió es
+que el matiz pase a ser **contenido útil para el estudiante**. Al reescribirlas se hizo
+visible que nada obligaba a hacerlo.
+
+**Corregido.** `aplicar-justificaciones.mjs` se niega a producir el encargo de carga si
+alguna justificación **aprobada** trae `[DUDA]` dentro. No lo degrada a borrador en
+silencio: se para y nombra cuáles. Una duda resuelta se reescribe, y reescribirla es
+trabajo de quien la redactó, no del guion.
+
+**Provocado el 2026-09-10, y costó dos intentos que vale la pena anotar:**
+
+1. El primero metió la marca **en el párrafo de instrucciones** del documento, que
+   menciona el marcador en su propia prosa. No probó nada: el sabotaje no tocó ninguna
+   justificación.
+2. El segundo la metió en un bloque real **editando el documento a mano**, y saltó
+   antes la comprobación de divergencia —el texto ya no correspondía a su sello—. Eso
+   demuestra que ese camino ya estaba cubierto, pero **tampoco ejercitó la puerta
+   nueva**.
+3. El tercero la metió **en el JSON de origen** y regeneró el documento, que es el
+   camino legítimo y el único por el que una marca puede llegar aprobada. Ahí sí: `NO
+   SE APLICO · 1 justificacion(es) aprobada(s) todavia traen [DUDA] dentro`, y no se
+   escribió ningún archivo.
+
+**Los dos primeros intentos son parte del hallazgo y no un tropiezo que ocultar.** Un
+sabotaje que salta por otra comprobación deja la nueva sin probar y la haría pasar por
+comprobada — es exactamente lo que el requisito estricto de `comprobar-carga.mjs`
+existe para impedir, y aquí se vio en vivo.
+
+**Lo que esto NO cubre, dicho para que no se confíe de más.** La marca es una
+convención de forma. Un texto que exprese la misma duda **sin escribir `[DUDA]`** pasa
+la puerta sin problema. Lo que se cierra es el olvido mecánico, que era el riesgo real;
+la duda encubierta la sigue teniendo que ver una persona al revisar.
+
+**Coste anotado.** Provocar el caso 3 obligó a meter la marca en el JSON real y
+regenerar el documento, y eso **devolvió a cero la aprobación de `m04#1`** aunque su
+texto volviera a ser byte a byte el mismo. La aprobación no se restauró a mano: una
+marca significa «una persona miró este texto», y restaurarla desde el guion la
+convertiría en otra cosa. Se pidió de nuevo, diciendo por qué.
