@@ -9,11 +9,13 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                          |
 |---------------|--------------------------------------------------------------------------------|
-| **Iteración** | `25-llenar-banco-de-datos.md`                                                  |
-| **Épica**     | 20 · Persistencia de preguntas                                                 |
-| **Estado**    | ⚪ No iniciada                                                                  |
-| **Archivo**   | `20-epica-persistencia-preguntas/iteracion-25-llenar-banco-de-datos.md`        |
-| **Iniciada**  | 2026-09-09                                                                     |
+| **Iteración** | **ninguna**                                                                    |
+| **Épica**     | —                                                                              |
+| **Estado**    | 🟢 La épica 20 se cerró el 2026-09-11                                          |
+| **Siguiente** | La candidata natural es `31-banco-completo.md` (épica 30), que ya existe y depende de la 20. **La elige el autor**, no se da por iniciada acá. |
+
+> Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
+> poner la épica correspondiente en 🔵.
 
 ## Iteraciones completadas
 
@@ -26,6 +28,7 @@ decisiones vale tanto como el código que las implementa.
 | 22 - Lectura, validación e instantánea | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |
 | 23 - Administración del contenido      | 20 - Persistencia preguntas | 2026-09-08 | 🟢 Completada |
 | 24 - Preparar producción               | 20 - Persistencia preguntas | 2026-09-09 | 🟢 Completada |
+| 25 - Llenar el banco                   | 20 - Persistencia preguntas | 2026-09-11 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

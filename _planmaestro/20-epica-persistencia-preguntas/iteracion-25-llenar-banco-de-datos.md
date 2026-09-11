@@ -1,8 +1,48 @@
 # Iteración 25 · Llenar el banco
 
 **Épica:** 20 · Persistencia de preguntas
-**Estado:** ⚪ No iniciada
+**Estado:** 🟢 **Completada el 2026-09-11**
 **Depende de:** iteración 24, que deja producción con esquema y vacía
+**Bitácoras:** una por lote (`2026-09-10-iteracion-25-modulo-03` … `-modulo-08`) más
+`2026-09-10-cierre-epica-20.md`
+
+> ## Cierre · 2026-09-11
+>
+> **Las 368 preguntas están en producción**, con justificación cada una, instantánea y
+> respaldo generados desde la nube en un solo acto (ADR-023) y el banco viejo retirado.
+> **Todos los criterios cerrados, ninguno aplazado.**
+>
+> Lo último que faltaba lo comprobó el autor **en el sitio publicado**, tras un push que
+> Cloudflare desplegó sin error: la insignia dice `368 preguntas · 7 módulos`, la carga
+> pesa **91,9 kB** —prueba de que la instantánea de 487,8 kB no se baja— y en teléfono se
+> comporta igual.
+>
+> ### Lo que costó, para la próxima vez que se llene un banco
+>
+> Siete lotes, y el primero costó lo que cuestan los primeros: **cinco hallazgos nuevos**
+> (H-024, H-025, H-027, H-028, H-029), dos ADR y una herramienta de publicación que no
+> existía. Del módulo 3 en adelante el procedimiento se sostuvo: los seis lotes restantes
+> no produjeron ninguna sorpresa de procedimiento, sólo de contenido.
+>
+> El cierre añadió cuatro hallazgos más —H-031, H-032, H-033, H-034— y **dos de ellos los
+> encontró el uso, no la revisión**: el manual de restauración mandaba borrar una tabla
+> que ya no existe, y matar el proceso que escucha no apaga el servidor local.
+>
+> ### Lo que esta iteración deja probado y antes no lo estaba
+>
+> - El escapado, **sobre el banco real**: 2208 porciones de texto, 184 con algo que
+>   escapar, provocado hasta sacar 22 etiquetas ajenas incluida `script` (ADR-024).
+> - Que la instantánea y el respaldo **cuentan el mismo banco**, comparados pregunta a
+>   pregunta dentro de `npm run verificar`.
+> - Que el banco viejo **no se editó** entre la primera conversión y su retiro: las siete
+>   huellas de procedencia coincidieron exactamente con las selladas.
+>
+> ### Lo que deja escrito y no resuelto
+>
+> **H-029 sigue en amarillo.** Dos apariciones, ninguna reproducida. H-034 le dejó una
+> hipótesis con mecanismo concreto —`workerd` huérfanos manteniendo abierta la base local—
+> y una comprobación de diez segundos para la próxima vez. No se cierra: cerrarlo exigiría
+> explicar el fallo.
 
 ## Objetivo
 
@@ -1487,10 +1527,9 @@ era una sospecha de un solo lote.
   heredado de la iteración 22 y subsana ADR-023.
 - [x] Exportar `d1/respaldo-banco.sql` **en el mismo acto** que la instantánea
   (ADR-023): un solo paso produce las dos cosas, o no produce ninguna.
-- [ ] Medir el peso de la instantánea con el banco completo y comprobar que el sitio
-  la aguanta. **La mitad medida está hecha** (487,8 kB, y sólo se baja si la capa de datos
-  cae: una visita normal son ~101 kB). **Falta la mitad mirada**, que no la puede dar una
-  medición.
+- [x] Medir el peso de la instantánea con el banco completo y comprobar que el sitio
+  la aguanta. Medido: **487,8 kB**, y no se baja salvo que la capa de datos caiga. Mirado
+  por el autor **en el sitio publicado** el 2026-09-11: la carga pesó **91,9 kB**.
 - [x] Retirar `static/js/data/cuestionario.js` y `scripts/build-cuestionario.py`,
   dejando constancia en la bitácora.
 - [x] Publicar, al final, con el banco cargado.
@@ -1574,17 +1613,26 @@ tabla de avance.
   `orden_fijo = 1` en D1, mostrado **con `static/js/data/cuestionario.js` todavía en
   el árbol**. Se cierra en el lote del módulo 2 y tiene que **seguir cierto** al
   final; el retiro del `.js` ocurre después de esta evidencia y no antes.
-- [ ] **El sitio aguanta el banco completo.** Se mide el peso de la instantánea y se
-  comprueba `cuestionario.html` sin degradación perceptible, también en teléfono.
-  **Al 2026-09-11: medido, no mirado.** Pesos en la sección de más arriba; falta la
-  observación en pantalla y en teléfono.
-- [ ] **El contador de la portada dice la verdad** con el banco real cargado. La
-  iteración 24 lo arregló y lo comprobó con 8; aquí se comprueba con 368.
-  **Al 2026-09-11: sin evidencia.** El registro del servidor del autor muestra ocho
-  `GET /api/preguntas 200 OK`, así que la página se abrió —son dos peticiones por carga,
-  o sea unas cuatro cargas—, pero **eso dice que se abrió, no qué decía el contador**.
-  Deducirlo del registro sería exactamente lo que esta iteración documenta cinco veces:
-  dar por comprobado lo que no se miró.
+- [x] **El sitio aguanta el banco completo.** Comprobado por el autor el 2026-09-11
+  **en el sitio publicado**, no en local: tras un push que Cloudflare desplegó sin error.
+  La carga pesó **91,9 kB**, y en teléfono se comporta igual.
+
+  **Los 91,9 kB son la prueba que buscaba el criterio.** La instantánea pesa 487,8 kB: si
+  se estuviera bajando, la carga no podría pesar 92. No se baja, y eso es lo que había que
+  demostrar.
+
+  > **Y corrigen mi estimación, que estaba mal construida.** Yo había proyectado ~101 kB
+  > sumando *todo* `dist/`, que es un límite superior con dos errores que se compensaron:
+  > incluía `components/modules.js`, `roadmap.js` y `data/modules.js` —que son de
+  > `index.html` y `cuestionario.html` nunca carga— y no contaba las tipografías web. El
+  > número medido es el bueno. Que cayera cerca fue suerte, no método.
+- [x] **El contador de la portada dice la verdad** con el banco real cargado. Comprobado
+  por el autor el 2026-09-11 en el sitio publicado: la insignia dice exactamente
+  **`368 preguntas · 7 módulos`**.
+
+  La iteración 24 lo arregló y lo comprobó con 8 preguntas. Aquí se comprueba con **368**,
+  que es lo que faltaba: un contador que acierta con 8 puede estar contando mal de una
+  forma que sólo se nota a escala.
 
 > ### Por qué estos dos siguen abiertos el 2026-09-11
 >

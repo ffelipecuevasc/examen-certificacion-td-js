@@ -1,6 +1,6 @@
 # Épica 20 · Persistencia de preguntas
 
-**Estado:** 🔵 En curso
+**Estado:** 🟢 **Completada el 2026-09-11**
 **Depende de:** épica 10
 
 ## Problema
@@ -41,7 +41,7 @@ instantánea versionada.
 | 22 | Lectura, validación e instantánea | 🟢 Completada |
 | 23 | Administración del contenido | 🟢 Completada |
 | 24 | Preparar producción | 🟢 Completada |
-| 25 | Llenar el banco | ⚪ No iniciada |
+| 25 | Llenar el banco | 🟢 Completada |
 
 *La 24 se llamaba «Migración y ampliación» y se partió en dos el 2026-09-08 (commit
 `1aa4f13`): juntaba dos trabajos de naturaleza distinta, uno de infraestructura
@@ -179,3 +179,53 @@ casualidad. Y **H-020**, cerrado, que era la razón del cambio en la construcci�
 publicar nada, porque el Worker lee D1 en vivo. De ahí salió también algo que la iteración no se había propuesto: **el
 modo degradado quedó comprobado en sus dos extremos contra producción** —sin esquema con el respaldo activo el
 2026-09-08, y con esquema y tablas vacías el 2026-09-09—, cada uno sobre la base real y no sobre una de juguete.
+
+---
+
+## Cierre · 2026-09-11
+
+**El banco vive en D1 y el sitio lo consume por el Worker.** 368 preguntas en producción,
+cada una con su justificación, y corregir o agregar una ya no exige publicar el
+repositorio: era el problema con el que abrió esta épica y está resuelto.
+
+### El resultado esperado, punto por punto
+
+| Lo que se prometió | Cómo quedó |
+|---|---|
+| El banco vive en Cloudflare D1 | 368 preguntas, sello `nube` |
+| El sitio lo consume por el Worker | Extremos de lectura, sólo lectura |
+| Corregir no exige publicar el repositorio | `banco:actualizar` escribe en D1 |
+| Si la capa de datos cae, el estudiante igual estudia | Instantánea versionada (ADR-008), con aviso visible |
+
+El alcance se cumplió entero, **con una ampliación**: se prometían «las 105 actuales más
+hasta ~300» y quedaron **368**, tras retirar 37 duplicados de los 405 candidatos.
+
+### Lo que esta épica aprendió, y vale más que el banco
+
+Cinco hallazgos —H-018, H-023, H-027, H-030, H-033— tienen la misma forma: **una
+comprobación que decía haber comprobado sin hacerlo**. De ahí salió la regla que ahora
+gobierna el proyecto entero:
+
+> **Si no se puede provocar que diga «no», no es una comprobación sino una afirmación con
+> su forma** (H-023).
+
+Se aplicó sin excepción en esta épica: los comprobadores de carga, de publicación, de
+instantánea y de escapado se rompieron a propósito antes de creerles, y tres veces hubo que
+rehacer un sabotaje porque lo cazaba la comprobación de al lado en vez de la que se estaba
+probando.
+
+### Lo que queda abierto y no bloqueaba
+
+- **H-029**, en amarillo. Dos apariciones, ninguna reproducida. H-034 le dejó una hipótesis
+  con mecanismo y una comprobación de diez segundos.
+- **H-015**, en curso: `wrangler.toml` no delimita contra qué base se escribe en remoto.
+- **El ensayo del manual**, ⏸️ aplazado por decisión del autor con motivo y fecha — **no**
+  marcado como ejecutado.
+- **La ampliación del lado remoto de H-033**: el manual de restauración sigue llevando una
+  lista escrita a mano, ahora con la instrucción de comprobarla antes de usarla.
+
+### Lo que esta épica no cubrió
+
+Mostrar la justificación al responder **no está implementado, y no es un defecto**: es
+trabajo de la épica 30, iteración 33. Se confirma acá para que nadie lo confunda al ver el
+banco cargado con 368 justificaciones que la página todavía no dibuja.

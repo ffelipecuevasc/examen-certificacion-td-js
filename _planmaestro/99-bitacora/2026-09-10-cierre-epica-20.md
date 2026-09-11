@@ -1,6 +1,6 @@
 # Cierre de la épica 20 · Persistencia de preguntas
 
-**Fecha:** 2026-09-10 · **Iteración:** 25 · **Decide:** Felipe Cuevas
+**Fecha:** 2026-09-10, cerrado el 2026-09-11 · **Iteración:** 25 · **Decide:** Felipe Cuevas
 
 Las 368 preguntas quedaron en producción con sello `nube`. Lo que sigue es el cierre: dos
 deudas que sí bloqueaban, dos decisiones del autor, dos filas que resultaron no ser deuda,
@@ -300,3 +300,44 @@ escrita dentro y el guion **se niega a correr si recibe cualquier argumento**.
 **No se revisaron las iteraciones 11, 12 y 13** —épica 10, ya cerrada— salvo donde alguna
 fila suya seguía abierta y apareció en el recorrido. Si el cierre de la épica 20 quisiera
 apoyarse en que la 10 está limpia, esa revisión es otra y no se ha hecho.
+
+---
+
+## Cerrado · 2026-09-11
+
+El autor hizo push, Cloudflare desplegó sin error, y lo último se comprobó **en el sitio
+publicado** y no en local:
+
+| | |
+|---|---|
+| Insignia del contador | `368 preguntas · 7 módulos` |
+| Peso de la carga | **91,9 kB** |
+| Teléfono | igual |
+
+**Los 91,9 kB son la prueba que faltaba.** La instantánea pesa 487,8 kB: si se estuviera
+bajando, la carga no podría pesar 92. No se baja. El criterio de nivel 2 no pedía un número
+bonito, pedía demostrar eso.
+
+> **Y corrigen mi estimación.** Yo había proyectado ~101 kB sumando *todo* `dist/`: un
+> límite superior con dos errores que se compensaron. Incluía `components/modules.js`,
+> `roadmap.js` y `data/modules.js` —que son de `index.html` y que `cuestionario.html` nunca
+> carga— y no contaba las tipografías web. Cayó cerca por suerte, no por método. El número
+> medido es el bueno.
+
+### Los dos criterios que estuvieron abiertos un día más
+
+`probar:escapado` y `verificar` cerraron todo lo que produce salida de terminal. Estos dos
+no la producen: se cierran mirando la página.
+
+El registro del servidor mostraba ocho `GET /api/preguntas 200 OK` —unas cuatro cargas—, y
+habría sido fácil dar por cerrado el contador con eso. **No se hizo**, porque el log dice
+que la página se abrió, no qué decía la insignia. Deducirlo habría sido el sexto caso del
+patrón que esta misma épica documenta cinco veces.
+
+Un día de espera contra un registro que no miente. Salió barato.
+
+### Estado final
+
+**Iteración 25 completada. Épica 20 completada.** Todos los criterios cerrados, ninguno
+aplazado. Queda H-029 en amarillo —con hipótesis y comprobación, sin explicación— y el
+ensayo del manual aplazado con fecha y motivo, escrito como aplazado y no como hecho.
