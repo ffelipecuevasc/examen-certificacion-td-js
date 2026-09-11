@@ -89,8 +89,25 @@ Tres cosas que hay que saber antes de usarlo:
 
 Cuando la base ya no existe, o el error tiene más de 7 días.
 
+> **Corregido el 2026-09-10.** Hasta hoy este paso borraba sólo `prueba_tuberia`, que era
+> la única tabla cuando se escribió y que ya no existe. **Seguirlo tal cual fallaría**, con
+> `table migracion already exists`. Salió al volcar el respaldo en la base local para
+> probar el escapado a escala.
+
+Primero mira **qué objetos crea el respaldo**, en vez de confiar en una lista escrita
+aquí, que es justamente lo que acaba de quedarse corto:
+
 ```powershell
-node node_modules/wrangler/bin/wrangler.js d1 execute <base> --remote --command "DROP TABLE IF EXISTS prueba_tuberia;"
+Select-String -Path d1/respaldo-banco.sql -Pattern '^CREATE' | ForEach-Object { $_.Line -replace '\(.*','' }
+```
+
+Hoy son **ocho**: cuatro tablas (`migracion`, `modulo`, `pregunta`, `alternativa`), tres
+índices (`alternativa_una_correcta`, `pregunta_por_estado_y_modulo`,
+`pregunta_reemplazos`) y una vista (`pregunta_activa`). Después bórralos **en orden
+inverso al de creación** —las vistas y los índices cuelgan de las tablas— y vuelca:
+
+```powershell
+node node_modules/wrangler/bin/wrangler.js d1 execute <base> --remote --command "DROP VIEW IF EXISTS pregunta_activa; DROP INDEX IF EXISTS pregunta_reemplazos; DROP INDEX IF EXISTS pregunta_por_estado_y_modulo; DROP INDEX IF EXISTS alternativa_una_correcta; DROP TABLE IF EXISTS alternativa; DROP TABLE IF EXISTS pregunta; DROP TABLE IF EXISTS modulo; DROP TABLE IF EXISTS migracion;"
 node node_modules/wrangler/bin/wrangler.js d1 execute <base> --remote --file=d1/respaldo-banco.sql
 ```
 
@@ -99,6 +116,12 @@ node node_modules/wrangler/bin/wrangler.js d1 execute <base> --remote --file=d1/
 tablas, falla porque ya existen. O sea que la restauración **también** es
 destructiva: reemplaza, no fusiona. Es exactamente la clase de detalle que solo
 aparece cuando alguien ensaya la restauración de verdad, y por eso se ensaya.
+
+**Y por qué la lista de arriba se mira antes de usarla.** Una migración futura puede
+agregar una tabla: el respaldo la creará y este `DROP` no la habrá quitado, y el error
+aparecerá recién ahí. `scripts/banco-local.mjs` hace exactamente eso para la base local
+—deduce los `DROP` leyendo los `CREATE` del propio respaldo— y su código sirve de
+referencia si alguna vez se quiere automatizar también el lado remoto.
 
 ---
 

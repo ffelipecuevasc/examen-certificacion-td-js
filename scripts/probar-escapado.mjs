@@ -75,6 +75,25 @@ const EN_PIE = 0;
 const ROTO = 1;
 const SIN_VEREDICTO = 2;
 const BASE_SUCIA = 3;
+const NO_A_ESCALA = 4;
+
+/**
+ * Cuantas preguntas tiene que traer la base local para que la revision del banco
+ * valga como «a escala» (ADR-024).
+ *
+ * El numero no sale de una formula: sale de que el banco de juguete trae 10 y el
+ * real trae 368. Cualquier corte entre medio separa los dos casos. Se pone en 100
+ * para que siga separandolos aunque el banco real encoja.
+ *
+ * POR QUE HAY UN PISO Y NO SOLO UN CONTADOR IMPRESO
+ *
+ * Hasta el 2026-09-10 esta seccion revisaba «lo que la base local tuviera dentro»
+ * y daba verde igual. Con el banco real da verde diciendo la verdad; con el de
+ * juguete daba verde revisando 10 filas y diciendolo en una linea que nadie mira.
+ * Eso es el patron de H-023: la comprobacion deja de comprobar y no lo dice en el
+ * veredicto, que es la unica parte que se lee.
+ */
+const PISO_DE_ESCALA = 100;
 
 const LINEA = '='.repeat(72);
 
@@ -208,6 +227,47 @@ function terminar(codigo) {
 const fetchReal = globalThis.fetch;
 const CONSULTA = `${DIRECCION}/api/preguntas?modulo=${MODULO_HOSTIL}`;
 
+/**
+ * Pregunta si hay alguien aceptando conexiones en el puerto, sin pedirle nada.
+ *
+ * POR QUE HACE FALTA, ademas del sondeo HTTP
+ *
+ * «No contesta» tiene dos causas que se arreglan de forma distinta, y hasta el
+ * 2026-09-11 este guion las trataba igual: decia «no hay nadie escuchando» en
+ * los dos casos.
+ *
+ *   - No hay nadie      -> falta levantar el servidor. Se arregla levantandolo.
+ *   - Hay alguien mudo  -> el puerto esta tomado por un proceso que acepta la
+ *                          conexion y no responde. Levantar otro servidor NO lo
+ *                          arregla: el nuevo no puede tomar el puerto, y quien
+ *                          contesta —o deja de contestar— sigue siendo el viejo.
+ *
+ * El segundo caso ocurrio de verdad: un `wrangler` huerfano de una sesion
+ * anterior seguia vivo, y cada vez que se mataba su `workerd` el padre lo
+ * reponia y volvia a tomar el 8788. El mensaje mandaba a levantar el servidor,
+ * que era justamente lo que no servia.
+ *
+ * Distinguirlos es barato: se abre un socket y se mira si conecta.
+ */
+async function hayAlguienEnElPuerto() {
+  const { hostname, port } = new URL(DIRECCION);
+  const { Socket } = await import('node:net');
+
+  return new Promise((resolver) => {
+    const socket = new Socket();
+    const cerrar = (respuesta) => {
+      socket.destroy();
+      resolver(respuesta);
+    };
+
+    socket.setTimeout(2000);
+    socket.once('connect', () => cerrar(true));
+    socket.once('timeout', () => cerrar(false));
+    socket.once('error', () => cerrar(false));
+    socket.connect(Number(port), hostname);
+  });
+}
+
 try {
   const sondeo = await fetchReal(CONSULTA, { signal: AbortSignal.timeout(ESPERA_SONDEO) });
 
@@ -222,15 +282,40 @@ try {
     terminar(SIN_VEREDICTO);
   }
 } catch (error) {
+  // Antes de decir «no hay nadie», comprobarlo. Son dos fallos distintos y el
+  // consejo de uno no sirve para el otro.
+  const alguien = await hayAlguienEnElPuerto();
+
   anunciar('NO SE PUDO PROBAR  ***  ESTO NO ES UN APROBADO  ***', [
-    `No hay nadie escuchando en ${DIRECCION}.`,
-    '',
-    'Levanta el servidor local en otra terminal y vuelve a correrlo:',
-    '',
-    '  npm run datos:dev',
-    '  npm run probar:escapado',
-    '',
-    `Detalle: ${error.message}`,
+    ...(alguien
+      ? [
+          `HAY alguien escuchando en ${DIRECCION}, pero no contesta.`,
+          '',
+          'Esto NO se arregla levantando el servidor: el puerto ya esta tomado,',
+          'y quien lo tiene es un proceso que acepta la conexion y se queda mudo.',
+          'Lo normal es un wrangler de una sesion anterior que quedo vivo.',
+          '',
+          'Mira quien lo tiene y matalo POR SU PADRE, no por el que escucha:',
+          'si matas solo al workerd, el wrangler que lo lanzo lo repone y vuelve',
+          'a tomar el puerto.',
+          '',
+          '  Get-NetTCPConnection -LocalPort 8788 | Select-Object OwningProcess',
+          `  Get-CimInstance Win32_Process -Filter "Name='workerd.exe'" |`,
+          '    Select-Object ProcessId, ParentProcessId',
+          '  Stop-Process -Id <el ParentProcessId> -Force',
+          '',
+          `Detalle: ${error.message}`,
+        ]
+      : [
+          `No hay nadie escuchando en ${DIRECCION}.`,
+          '',
+          'Levanta el servidor local en otra terminal y vuelve a correrlo:',
+          '',
+          '  npm run datos:dev',
+          '  npm run probar:escapado',
+          '',
+          `Detalle: ${error.message}`,
+        ]),
     '',
     'No se cargo ningun contenido hostil: la base local esta intacta.',
     'Y esto NO significa que el escapado este bien, ni que este mal: significa',
@@ -324,6 +409,110 @@ try {
     );
   }
 
+  // --- 5b · EL BANCO REAL, A ESCALA (ADR-024) -----------------------------
+  //
+  // Hasta el 2026-09-10 este guion comprobaba una sola fila: la hostil, cargada
+  // por el propio guion. Eso verifica el MECANISMO de escapado, y ADR-024 acepto
+  // ese alcance «hasta que hubiera banco real».
+  //
+  // Ya lo hay. Y lo que ADR-024 pedia era otra cosa: recorrer la pagina entera
+  // buscando texto salido de su tarjeta, con las 368 dentro. El banco real trae
+  // comillas invertidas, comillas dobles y ejemplos con forma de <etiqueta> —ese
+  // ultimo es el caso que ya rompio la pagina una vez, cuando un ejemplo que
+  // contenia <div> se interpreto como etiqueta real—.
+  //
+  // Se aplican las MISMAS dos afirmaciones que a la fila hostil, a cada texto de
+  // cada pregunta que el extremo devolvio. No es una comprobacion nueva: es la
+  // misma, sobre todo el material en vez de sobre una fila.
+  // Se pide el banco ENTERO, sin filtrar por modulo.
+  //
+  // `crudo` viene de `/api/preguntas?modulo=N`, porque la fila hostil vive en un
+  // modulo concreto. Reusarlo aqui dejaria la comprobacion mirando un solo modulo
+  // y anunciando que reviso «el banco real»: 52 de 368. Es el patron de H-023
+  // —una comprobacion que dice mas de lo que mira— y por eso se pide aparte.
+  let todo;
+  try {
+    const respuesta = await fetchReal(`${DIRECCION}/api/preguntas`, {
+      signal: AbortSignal.timeout(ESPERA_SONDEO),
+    });
+    todo = await respuesta.json();
+  } catch (error) {
+    sinVeredicto(`Se cayo la consulta al banco entero.`, error.message);
+  }
+
+  if (!todo?.ok) sinVeredicto('El extremo no devolvio el banco entero.', JSON.stringify(todo, null, 2));
+
+  const delBanco = todo.datos.filter((p) => p.id !== ID_HOSTIL);
+  let textosRevisados = 0;
+  let justificacionesVistas = 0;
+  let justificacionesDibujadas = 0;
+  let conCaracteresPeligrosos = 0;
+  const problemasDelBanco = [];
+
+  for (const p of delBanco) {
+    // Lo que el componente DIBUJA hoy. La justificacion no esta aqui a
+    // proposito: no se muestra todavia —es trabajo de la epica 30, iteracion
+    // 33—, asi que exigir que su forma escapada aparezca en el HTML seria
+    // exigir que se dibuje algo que nadie implemento. Se revisa aparte, mas
+    // abajo, de una forma que no caduca.
+    const suyos = [
+      [`pregunta ${p.id} · enunciado`, p.enunciado],
+      ...p.alternativas.map((a) => [`pregunta ${p.id} · alternativa ${a.letra}`, a.texto]),
+      [`pregunta ${p.id} · icono del modulo`, p.modulo_icono],
+    ];
+
+    // La justificacion viaja desde la base aunque no se dibuje, asi que lo que
+    // SI se le puede exigir es que no aparezca cruda.
+    if (typeof p.justificacion === 'string' && p.justificacion !== '') {
+      justificacionesVistas += 1;
+      const escapada = esc(p.justificacion);
+      if (escapada !== p.justificacion && html.includes(p.justificacion)) {
+        problemasDelBanco.push(`pregunta ${p.id} · justificacion: su forma CRUDA aparece en el HTML`);
+      }
+      if (html.includes(escapada)) justificacionesDibujadas += 1;
+    }
+
+    for (const [nombre, texto] of suyos) {
+      if (typeof texto !== 'string' || texto === '') continue;
+      textosRevisados += 1;
+      const escapado = esc(texto);
+      if (escapado !== texto) conCaracteresPeligrosos += 1;
+
+      if (escapado !== texto && html.includes(texto)) {
+        problemasDelBanco.push(`${nombre}: su forma CRUDA aparece en el HTML, sin escapar`);
+      }
+      if (!html.includes(escapado)) {
+        problemasDelBanco.push(`${nombre}: su forma escapada NO aparece, asi que se perdio texto`);
+      }
+    }
+  }
+
+  // Que el banco real traiga de verdad algo que escapar es parte de lo que hay
+  // que comprobar. Un banco sin un solo caracter peligroso volveria esta seccion
+  // un tramite que siempre pasa, que es el patron de H-023.
+  // O NINGUNA justificacion se dibuja —porque la iteracion 33 todavia no las
+  // muestra— o se dibujan TODAS. Un intermedio significa que algunas se estan
+  // perdiendo por el camino, y ese si seria el fallo.
+  //
+  // Escrito asi para que no caduque: el dia que la epica 30 las muestre, esta
+  // misma linea pasa a exigir que aparezcan las 368, sin que nadie tenga que
+  // acordarse de venir a quitar una exclusion.
+  if (justificacionesDibujadas !== 0 && justificacionesDibujadas !== justificacionesVistas) {
+    problemasDelBanco.push(
+      `de ${justificacionesVistas} justificaciones, ${justificacionesDibujadas} aparecen en el HTML ` +
+        'y el resto no: o se dibujan todas o ninguna, y un intermedio es texto perdido'
+    );
+  }
+
+  if (delBanco.length > 0 && conCaracteresPeligrosos === 0) {
+    problemasDelBanco.push(
+      `las ${textosRevisados} porciones de texto del banco real no traen ni un caracter ` +
+        'que escapar: esta comprobacion dejo de comprobar algo'
+    );
+  }
+
+  for (const p of problemasDelBanco) problemas.push(p);
+
   const PROPIAS = new Set(['section', 'header', 'ul', 'li', 'div', 'p', 'span', 'button']);
   const presentes = [
     ...new Set([...html.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)].map((m) => m[1].toLowerCase())),
@@ -334,16 +523,38 @@ try {
     problemas.push(`etiquetas que el componente no emite: ${intrusas.join(', ')}`);
   }
 
-  if (problemas.length === 0) {
+  if (problemas.length === 0 && delBanco.length < PISO_DE_ESCALA) {
+    codigo = NO_A_ESCALA;
+    anunciar('MECANISMO EN PIE, PERO NO A ESCALA  ***  ESTO NO CIERRA ADR-024  ***', [
+      `Se cargaron ${textos.length} textos hostiles y ninguno llego al HTML como`,
+      'marcado. El mecanismo de escapado funciona.',
+      '',
+      `Pero la base local trae ${delBanco.length} preguntas, y ADR-024 pide probarlo`,
+      `sobre el banco real. Con menos de ${PISO_DE_ESCALA} esto revisa el banco de`,
+      'juguete, que no trae los ejemplos con forma de <etiqueta> que ya rompieron',
+      'la pagina una vez.',
+      '',
+      'Para probarlo de verdad, carga el respaldo versionado en la base local:',
+      '',
+      '  npm run datos:banco-local',
+      '',
+      'No necesita nube ni credenciales: d1/respaldo-banco.sql esta versionado.',
+    ]);
+  } else if (problemas.length === 0) {
     anunciar('ESCAPADO EN PIE', [
       `Se cargaron ${textos.length} textos hostiles en la base local y ninguno`,
       'llego al HTML como marcado: todos llegaron como texto, enteros.',
       '',
+      `Y ademas se reviso EL BANCO REAL: ${delBanco.length} preguntas, ${textosRevisados}`,
+      `porciones de texto, de las cuales ${conCaracteresPeligrosos} traian algun caracter`,
+      'que escapar. Ninguna aparecio cruda en el HTML y ninguna se perdio.',
+      '',
       `Etiquetas en el HTML: ${presentes.sort().join(', ')}`,
       'Ninguna ajena al componente.',
       '',
-      'Recuerda lo que esto NO prueba: que el banco real no traiga',
-      'sorpresas. Diez filas de juguete no son 368 (ADR-024).',
+      'Lo que esto NO prueba: que el banco que hay en PRODUCCION sea el que',
+      'se acaba de revisar. Esta prueba corre contra la base LOCAL, y solo vale',
+      'para el contenido que ella tenga dentro en este momento.',
     ]);
   } else {
     codigo = ROTO;

@@ -1658,3 +1658,51 @@ séptimo, así que admite además **una entrada por lote**, con el nombre
 `99-bitacora/README.md`.
 
 ---
+
+## ADR-031 · El banco fuente se queda en `_planmaestro/00_producto/cuestionarios/`
+
+**Fecha:** 2026-09-10 · **Estado:** aceptada · **Decide:** Felipe Cuevas
+
+### Contexto
+
+Desde la iteración 21 los siete `modulo-0N.json` viven en
+`_planmaestro/00_producto/cuestionarios/`, y la fila que los puso ahí lo declaró
+**temporal**, con una ubicación definitiva por decidir. La fila llevaba abierta cinco
+iteraciones y arrastraba una advertencia concreta: **al moverlos hay que comprobar de
+forma explícita que la carpeta destino no termine copiada a `dist/`**, porque son
+archivos con las respuestas correctas y servirlos al navegador deja el simulacro sin
+sentido.
+
+Hoy es seguro por una razón estructural y no por cuidado: `build-dist.mjs` copia una
+lista blanca, `LISTA_COPIA`, y esa lista no nombra `_planmaestro/`. Nada dentro de
+`_planmaestro/` puede llegar a `dist/` sin que alguien edite esa lista a propósito.
+
+### Decisión
+
+**No se mueven.** La ubicación temporal pasa a ser la definitiva.
+
+### Por qué
+
+1. **El riesgo que motivaba el traslado ya está cubierto donde estaba.** Mover era una
+   forma de proteger los archivos de `dist/`; desde `_planmaestro/` ya están protegidos
+   por la lista blanca, que es una barrera más fuerte que una convención de carpetas.
+
+2. **Mover rompería las siete huellas de procedencia sin ganar nada.** Los sellos de
+   ADR-028 fijan la ruta de cada fuente junto a su SHA-256. Cambiar la ruta invalida los
+   siete encargos del banco ya cargado: habría que regenerarlos para que volvieran a
+   cotejar, y ese trabajo compraría prolijidad, no seguridad.
+
+3. **El banco fuente es material de planificación, no material del sitio.** Está junto a
+   las justificaciones, las retiradas y las correcciones de enunciado, que son de la
+   misma naturaleza. Sacarlo de ahí lo separaría de los archivos con los que siempre se
+   lee junto.
+
+### Consecuencias
+
+- La fila de la iteración 21 se cierra como **decidida**, no como pendiente.
+- La advertencia sobre `dist/` **no desaparece**: se traslada a esta ADR. Si alguna vez
+  se mueve el banco, o se agrega `_planmaestro/` a `LISTA_COPIA`, hay que comprobar
+  explícitamente que las respuestas correctas no queden servidas al navegador. Esa
+  comprobación no existe hoy porque hoy no hace falta.
+- Las rutas selladas en los siete encargos quedan firmes, y **su coincidencia sigue
+  siendo demostrable**, que es lo que el retiro del banco viejo acaba de demostrar.

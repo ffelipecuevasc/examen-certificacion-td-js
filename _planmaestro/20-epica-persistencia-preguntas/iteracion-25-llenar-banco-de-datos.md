@@ -1232,23 +1232,51 @@ quedó, y ahora sí se puede retirar.
 **La proyección acertó:** desde 223 preguntas se proyectaban 489 kB, desde 275 y 323
 también 490-491 kB. El valor real es **488 kB**.
 
-Falta la otra mitad del criterio: comprobar `cuestionario.html` sin degradación
-perceptible, **también en teléfono**.
+#### Pero 488 kB es el precio del día malo, no el de cada día
+
+Es el dato que cambia el sentido de los otros tres, y no se había mirado hasta el
+2026-09-10. **El navegador no baja la instantánea.** `servicios/datos.js` la pide con
+importación dinámica, y sólo cuando la capa de datos no responde:
+
+```js
+instantanea = await import('../data/instantanea-banco.js');
+```
+
+Medido sobre `dist/`:
+
+| | |
+|---|---|
+| `cuestionario.html` | 13,9 kB |
+| CSS + JS que sí se bajan | 86,9 kB |
+| **Total al abrir la página, con el Worker en pie** | **~101 kB** |
+| La instantánea, sólo si el Worker cae | 487,8 kB |
+| `dist/` completo, 55 archivos | 634,9 kB |
+
+Los 488 kB se pagan **únicamente el día que el Worker cae**, que es exactamente el día en
+que valen lo que pesan: es lo que mantiene el sitio en pie (ADR-008).
+
+> **Queda escrito así a propósito.** Las tres anotaciones anteriores dejaron el número
+> suelto —«490 kB proyectados»— y un número suelto de ese tamaño asusta sin motivo. Lo que
+> hay que decir no es cuánto pesa el archivo, sino **cuándo se paga**.
+
+Falta la otra mitad del criterio, que sigue siendo necesaria: comprobar
+`cuestionario.html` sin degradación perceptible, **también en teléfono**. Medir bytes no
+sustituye a mirar la página: el barajado de 368 preguntas es trabajo del navegador y eso
+no sale en el peso.
 
 ### 🔵 El contador de la portada · falta mirarlo
 
 Con el banco real cargado debe decir **368 preguntas · 7 módulos**. La iteración 24 lo
 arregló y lo comprobó con 8; aquí se comprueba con 368.
 
-### ⚪ `npm run verificar` termina en 0
+### 🟢 `npm run verificar` termina en 0 · cerrado el 2026-09-10
 
-Hoy termina en **2**, y no por un fallo: `barrera`, `css` y `restricciones` en `OK`, y
-**`escapado` en `AVISO`** porque nadie levantó el servidor local. Es una casilla en
-blanco, no un aprobado, y el propio guion lo dice.
+Terminaba en **2**, y no por un fallo: `barrera`, `css` y `restricciones` en `OK`, y
+**`escapado` en `AVISO`** porque nadie levantaba el servidor local. Era una casilla en
+blanco, no un aprobado, y el propio guion lo decía.
 
-**Y ahora ese aviso pesa más que en los siete lotes anteriores.** Es el criterio de
-ADR-024, que la iteración 22 solo pudo verificar con diez filas de juguete. Con las 368
-dentro, el banco trae:
+**Ese aviso era el criterio de ADR-024**, que la iteración 22 solo pudo verificar con diez
+filas de juguete. Con las 368 dentro, el banco trae:
 
 | | |
 |---|---|
@@ -1258,6 +1286,146 @@ dentro, el banco trae:
 
 Esas 16 son las que de verdad ponen a prueba el escapado: **son el caso que ya rompió la
 página una vez**, cuando un ejemplo que contenía `<div>` se interpretó como etiqueta real.
+
+#### Qué se hizo
+
+`probar-escapado.mjs` dejó de revisar sólo la fila hostil que él mismo carga. Ahora pide
+además **el banco entero sin filtrar por módulo** y aplica a cada texto las mismas dos
+afirmaciones que a la fila hostil: su forma cruda **no** puede aparecer en el HTML, y su
+forma escapada **sí** tiene que aparecer. La segunda es la que caza el texto perdido, que
+es el fallo silencioso del escapado.
+
+```
+ESCAPADO EN PIE
+
+Se cargaron 6 textos hostiles en la base local y ninguno
+llego al HTML como marcado: todos llegaron como texto, enteros.
+
+Y ademas se reviso EL BANCO REAL: 368 preguntas, 2208
+porciones de texto, de las cuales 184 traian algun caracter
+que escapar. Ninguna aparecio cruda en el HTML y ninguna se perdio.
+
+Etiquetas en el HTML: button, div, header, li, p, section, span, ul
+Ninguna ajena al componente.
+```
+
+#### Antes de creerle, se rompió (H-023)
+
+Se editó `esc()` en `static/js/utils/dom.js` para que dejara de escapar `<`
+—`/[&<>"']/g` pasó a `/[&>"']/g`— y se repitió sin tocar nada más:
+
+```
+ESCAPADO ROTO  ***  1  ***
+  etiquetas que el componente no emite: aside, select, option, datalist, list,
+  dropdown, item, menu, input, body, head, html, fieldset, control, form, label,
+  rama, script, svg, img, param, paquete
+```
+
+**Veintidós etiquetas ajenas, entre ellas `script`.** Salieron del propio material de
+estudio: `<aside>`, `<fieldset>` y `<label>` vienen de preguntas sobre HTML; `<svg>` e
+`<img>` de las de imágenes. `dom.js` se restauró y `git status` quedó limpio.
+
+#### Y se le puso un piso, porque si no dejaba de comprobar en silencio
+
+Esta sección revisa «lo que la base local tenga dentro». Con el banco real revisa 368 y
+dice la verdad; con el banco de juguete revisaría **8** y daría verde igual, diciéndolo en
+una línea que nadie mira. Eso es exactamente el patrón de H-023.
+
+Ahora, con menos de 100 preguntas, el veredicto no es verde:
+
+```
+MECANISMO EN PIE, PERO NO A ESCALA  ***  ESTO NO CIERRA ADR-024  ***
+
+Pero la base local trae 8 preguntas, y ADR-024 pide probarlo
+sobre el banco real. Con menos de 100 esto revisa el banco de
+juguete, que no trae los ejemplos con forma de <etiqueta> que ya rompieron
+la pagina una vez.
+
+Para probarlo de verdad, carga el respaldo versionado en la base local:
+
+  npm run datos:banco-local
+```
+
+Es un código de salida nuevo, el **4**, que `verificar-todo.mjs` traduce a `AVISO` y no a
+`OK`. Y viene con la forma de arreglarlo: `npm run datos:banco-local` vuelca
+`d1/respaldo-banco.sql` —versionado, sin nube y sin credenciales— en la base local.
+
+> **Provocado también**: se bajó la base local al banco de juguete a propósito y el guion
+> devolvió 4. No se dedujo del código.
+
+---
+
+## 🟢 Nadie comparaba la instantánea con el banco · cerrado el 2026-09-10
+
+Deuda abierta el 2026-09-08, a raíz del hallazgo de la `id 11`: la instantánea versionada
+trajo una pregunta que no era del banco y bloqueó la publicación un día. Se cazó a mano,
+comparando dos números que nadie estaba obligado a mirar.
+
+**`npm run verificar` miraba la barrera, el CSS, el escapado y las restricciones. Ninguna
+de las cuatro tocaba la instantánea.** Y es lo único que ve el estudiante el día que la
+capa de datos cae: 488 kB de banco, servidos sin que nada hubiera comprobado que
+correspondían al banco del que dicen salir.
+
+### Contra qué se compara, y por qué contra eso
+
+Contra **`d1/respaldo-banco.sql`**. Los dos archivos son dos copias del mismo estado
+producidas **en el mismo acto** por `publicar-banco.mjs` (ADR-023), así que tienen que
+decir lo mismo; si dejan de decirlo, alguien regeneró uno sin el otro o editó uno a mano.
+
+Se eligió esta comparación y no una contra D1 por un motivo que decide: **ésta corre en
+local, sin credenciales y sin red**, así que cabe dentro de `npm run verificar` y se
+ejecuta en cada comprobación. Una que necesitara la nube sólo la podría correr el autor, y
+una comprobación que hay que acordarse de correr es la que no se corre.
+
+**Lo que no dice**, escrito en su propio veredicto para que nadie lo suponga: que este par
+corresponda a lo que hay **hoy** en producción. Los dos pueden estar de acuerdo y los dos
+haberse quedado atrás. Eso lo dice `comprobar-carga.mjs`, que sí consulta D1.
+
+### Qué compara
+
+No cuenta filas. Recorre pregunta por pregunta:
+
+```
+CORRESPONDEN  ***  la instantanea dice lo mismo que el respaldo  ***
+
+  sello              entorno «nube» · generada 2026-09-10T18:41:22.766Z
+  activas en el respaldo   368
+  en la instantanea        368
+
+Comparado pregunta a pregunta, no por conteo:
+
+  el enunciado de cada una
+  sus alternativas, en su orden, texto a texto
+  cual esta marcada como correcta
+```
+
+Dos detalles que no son adorno:
+
+- **Sólo compara las activas**, porque la instantánea sale de la vista `pregunta_activa`.
+  Comparar contra todas acusaría en falso en cuanto una pregunta pase a retirada, que es
+  un estado legítimo.
+- **El orden de las columnas se lee de la propia sentencia `INSERT`**, no se supone. Si
+  una migración futura agrega una columna, suponerlo desplazaría todos los campos en
+  silencio.
+
+### Los cinco sabotajes (H-023)
+
+| Sabotaje | Qué rompe | Qué dijo |
+|---|---|---|
+| `falta` | quita una pregunta de la instantánea | `FALTA: la pregunta id 368 esta activa en el respaldo y no en la instantanea` |
+| `texto` | cambia **un carácter** de un enunciado | `ENUNCIADO DISTINTO en la id 1` |
+| `correcta` | mueve la marca de correcta una posición | `LA CORRECTA NO ES LA MISMA en la id 1, posicion 1 (letra a)` |
+| `sello` | pone el sello en «local» | `EL SELLO DICE «local»: esta instantanea no salio de la nube` |
+| `cuenta` | deja el sello diciendo un número que no es | `EL SELLO NO CUADRA CONSIGO MISMO: dice 369 preguntas y la lista trae 368` |
+
+**Los cinco cazados.** Y se revisó lo que ya falló antes: `falta` lo caza primero la
+comprobación del sello, así que se miró la lista completa de problemas para confirmar que
+la comprobación que se quería ejercitar —la de «falta una pregunta»— **también** disparó.
+Disparan las tres. Un sabotaje cazado por la comprobación de al lado deja sin probar la
+que se estaba probando, y eso ya pasó tres veces en esta iteración.
+
+Los sabotajes trabajan sobre **una copia en memoria**: ni el respaldo ni la instantánea se
+tocan en disco.
 
 ---
 
@@ -1320,7 +1488,9 @@ era una sospecha de un solo lote.
 - [x] Exportar `d1/respaldo-banco.sql` **en el mismo acto** que la instantánea
   (ADR-023): un solo paso produce las dos cosas, o no produce ninguna.
 - [ ] Medir el peso de la instantánea con el banco completo y comprobar que el sitio
-  la aguanta.
+  la aguanta. **La mitad medida está hecha** (487,8 kB, y sólo se baja si la capa de datos
+  cae: una visita normal son ~101 kB). **Falta la mitad mirada**, que no la puede dar una
+  medición.
 - [x] Retirar `static/js/data/cuestionario.js` y `scripts/build-cuestionario.py`,
   dejando constancia en la bitácora.
 - [x] Publicar, al final, con el banco cargado.
@@ -1406,9 +1576,63 @@ tabla de avance.
   final; el retiro del `.js` ocurre después de esta evidencia y no antes.
 - [ ] **El sitio aguanta el banco completo.** Se mide el peso de la instantánea y se
   comprueba `cuestionario.html` sin degradación perceptible, también en teléfono.
+  **Al 2026-09-11: medido, no mirado.** Pesos en la sección de más arriba; falta la
+  observación en pantalla y en teléfono.
 - [ ] **El contador de la portada dice la verdad** con el banco real cargado. La
   iteración 24 lo arregló y lo comprobó con 8; aquí se comprueba con 368.
-- [ ] **`npm run verificar` termina en 0** con sus comprobaciones en OK.
+  **Al 2026-09-11: sin evidencia.** El registro del servidor del autor muestra ocho
+  `GET /api/preguntas 200 OK`, así que la página se abrió —son dos peticiones por carga,
+  o sea unas cuatro cargas—, pero **eso dice que se abrió, no qué decía el contador**.
+  Deducirlo del registro sería exactamente lo que esta iteración documenta cinco veces:
+  dar por comprobado lo que no se miró.
+
+> ### Por qué estos dos siguen abiertos el 2026-09-11
+>
+> El autor corrió sus comandos y entregó las salidas: `probar:escapado` en `ESCAPADO EN
+> PIE` y `verificar` con las cinco en OK. **Eso cerró todo lo que produce salida de
+> terminal.** Estos dos no la producen: se cierran mirando la página, y lo que se vio no
+> está en ningún registro.
+>
+> Faltan tres datos, y son tres frases: qué dice la insignia del contador, cuánto pesa la
+> carga en la pestaña de red, y si en teléfono se comporta igual. **La iteración no se
+> cierra sin ellos**, no por formalismo sino porque este proyecto tiene cinco hallazgos
+> sobre comprobaciones que se dieron por hechas —H-018, H-023, H-027, H-030, H-033— y el
+> registro que los documenta no puede ser el que estrene el sexto.
+- [x] **`npm run verificar` termina en 0** con sus comprobaciones en OK. Comprobado el
+  2026-09-10 con el banco real en la base local y el servidor levantado:
+
+  ```
+    barrera        OK     la barrera de ADR-015 esta en pie, o no aplica en este terminal
+    css            OK     el CSS corresponde a su fuente y coincide con lo commiteado
+    instantanea    OK     la instantanea versionada dice lo mismo que el respaldo versionado
+    escapado       OK     el escapado aguanto el contenido hostil
+    restricciones  OK     las nueve restricciones del esquema rechazaron lo que debian
+
+  codigo de salida: 0
+  ```
+
+  **Son cinco y no cuatro**: `instantanea` es nueva de este cierre. Y el `escapado`
+  llevaba siete lotes en AVISO porque nadie levantaba el servidor local; hoy está en OK
+  y revisando las 368, no las diez de juguete.
+
+  **Repetido por el autor en su propia terminal el 2026-09-11**, que es la corrida que
+  vale, y con un resultado distinto en la primera línea:
+
+  ```
+  BARRERA NO APLICA
+  Entorno detectado: terminal normal. No hay marcadores de Claude Code.
+  ```
+
+  No es un fallo: es la comprobación **distinguiendo el entorno**, que es su trabajo. En
+  el terminal de Claude Code la misma comprobación dice «la barrera está en pie»; en el
+  del autor dice que no le aplica, porque el autor sí puede hablar con la cuenta. Que las
+  dos corridas den lecturas **distintas y correctas** es mejor evidencia que dos lecturas
+  iguales: una barrera que dijera lo mismo en los dos sitios no estaría mirando nada.
+
+  El resto, idéntico: `css`, `instantanea`, `escapado` y `restricciones` en OK, código 0.
+  Las restricciones dejaron la base con la misma huella con que la encontraron
+  —`fb020108b5b38243` antes y después, 1840 filas— **y esta vez con el banco real dentro,
+  no con las diez de juguete**.
 
 ### Nivel 0 · Del comprobador, antes de confiar en él
 

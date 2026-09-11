@@ -1926,6 +1926,40 @@ nueva sin provocar, y un rasgo común anotado. No se cierra: cerrarlo exigiría
 explicar el fallo.
 
 
+#### Actualización del 2026-09-11 · una pista concreta, que sigue sin ser una causa
+
+H-034 encontró un mecanismo real de la familia que esta ficha dejó anotada como hipótesis
+sin provocar —«la salida sucia de wrangler en Windows»—: **procesos `workerd` huérfanos que
+siguen vivos después de que su sesión terminó**, manteniendo abierta la base D1 local
+mientras otra cosa la usa. Se vieron dos a la vez, uno de ellos repuesto por su padre 24
+minutos después de que alguien matara al anterior.
+
+Eso produciría exactamente lo que esta ficha describe: fallos intermitentes, no
+reproducibles, que se arreglan solos al reiniciar.
+
+**No se cierra, y no cambia de color.** `probar-restricciones.mjs` habla con D1 por su
+cuenta y no pasa por el servidor, así que el vínculo es plausible y **no está verificado**.
+Lo que sí cambia es qué hacer la próxima vez que aparezca:
+
+> **Antes de suponer nada, mirar si hay `workerd` huérfanos vivos.**
+> `Get-CimInstance Win32_Process -Filter "Name='workerd.exe'" | Select-Object ProcessId, ParentProcessId, CreationDate`
+>
+> Son diez segundos, y hasta hoy nadie sabía que había que mirarlo. Si el fallo aparece con
+> huérfanos vivos, esto pasa de hipótesis a causa. Si aparece sin ellos, queda descartada,
+> que también vale.
+
+**Primer dato bajo la hipótesis nueva, y es débil a propósito.** El 2026-09-11, tras matar
+los huérfanos, el autor corrió las restricciones en su terminal **con el banco real dentro**
+—1840 filas, no las diez de juguete— y las nueve rechazaron, con la huella idéntica antes y
+después. Sin incidente.
+
+Una corrida limpia no prueba nada: las limpias son la norma y por eso este hallazgo lleva
+dos apariciones en muchas corridas. Se anota únicamente porque es **la primera bajo
+condiciones controladas conocidas** —sin huérfanos vivos, comprobado y no supuesto—, y
+porque hasta hoy ninguna corrida registraba ese dato. A partir de ahora conviene anotarlo
+en las dos direcciones.
+
+
 ---
 
 ### H-030 · El respaldo del banco no tenía banco dentro, y el «un solo paso» de ADR-023 no existía
@@ -2458,3 +2492,183 @@ regenerar el documento, y eso **devolvió a cero la aprobación de `m04#1`** aun
 texto volviera a ser byte a byte el mismo. La aprobación no se restauró a mano: una
 marca significa «una persona miró este texto», y restaurarla desde el guion la
 convertiría en otra cosa. Se pidió de nuevo, diciendo por qué.
+
+---
+
+### H-033 · El manual de restauración mandaba borrar una tabla que ya no existe, y no las ocho que sí
+
+**Abierto:** 2026-09-10 · **Estado:** 🟢 corregido el mismo día · **Severidad:** alta
+**Origen del hallazgo:** apareció **volcando el respaldo**, no leyendo el manual.
+
+#### Qué decía
+
+`90-manual/respaldo-y-restauracion.md`, sección «Recuperar de una pérdida real», mandaba
+esto antes de volcar `d1/respaldo-banco.sql`:
+
+```powershell
+... d1 execute <base> --remote --command "DROP TABLE IF EXISTS prueba_tuberia;"
+... d1 execute <base> --remote --file=d1/respaldo-banco.sql
+```
+
+`prueba_tuberia` era la única tabla de la base cuando ese procedimiento se escribió, en la
+iteración 13. **Hoy no existe**: se retiró al cargar el esquema del banco.
+
+#### Qué habría pasado siguiéndolo
+
+El primer comando habría tenido éxito sin hacer nada —`IF EXISTS` sobre una tabla que no
+está— y el segundo habría fallado:
+
+```
+table migracion already exists at offset 13: SQLITE_ERROR
+```
+
+El respaldo que produce `d1 export` trae `CREATE TABLE` sin `IF NOT EXISTS`, y hoy crea
+**ocho objetos**: cuatro tablas (`migracion`, `modulo`, `pregunta`, `alternativa`), tres
+índices y la vista `pregunta_activa`. El procedimiento borraba uno de ocho, y ese uno ni
+siquiera estaba.
+
+**El fallo es ruidoso, no silencioso** —se cae con un mensaje claro— y eso es lo único
+bueno que tiene. Pero llega en el peor momento posible: el procedimiento se usa cuando la
+base ya se perdió.
+
+#### Por qué esto es distinto del hallazgo de un manual mal escrito
+
+El manual **ya explicaba la regla correcta**, y la explicaba bien:
+
+> «El archivo que produce `d1 export` contiene `CREATE TABLE`, pero no `DROP TABLE`. Si lo
+> aplicas sobre una base que ya tiene esas tablas, falla porque ya existen.»
+
+Lo que envejeció no fue el razonamiento sino **la lista concreta** que lo acompañaba. El
+texto siguió siendo cierto mientras el comando de al lado dejaba de serlo, y eso es peor
+que un manual equivocado entero: la explicación correcta le da autoridad al comando
+obsoleto.
+
+#### De dónde salió, dicho con precisión
+
+**No salió de que alguien leyera el manual.** Salió de volcar `d1/respaldo-banco.sql` en la
+base local para poder probar el escapado a escala (ADR-024). El volcado se cayó con
+`table migracion already exists`, y recién al buscar por qué se miró el procedimiento
+escrito y se vio que decía lo mismo que acababa de fallar.
+
+Vale la pena anotarlo así porque **el manual llevaba desde la iteración 13 sin que nadie lo
+recorriera**, y el ensayo que lo habría recorrido está aplazado por decisión del autor. Lo
+encontró un uso real, de paso, haciendo otra cosa. Es la tercera vez en este proyecto que
+un defecto de procedimiento aparece por usarlo y no por revisarlo.
+
+#### Qué se hizo
+
+El procedimiento ya no lleva una lista escrita a mano. Manda **mirar qué crea el respaldo**
+antes de borrar:
+
+```powershell
+Select-String -Path d1/respaldo-banco.sql -Pattern '^CREATE' | ForEach-Object { $_.Line -replace '\(.*','' }
+```
+
+…y después borrar en orden inverso al de creación, porque las vistas y los índices cuelgan
+de las tablas.
+
+`scripts/banco-local.mjs` —escrito el mismo día para el lado local— hace exactamente eso de
+forma automática: deduce los `DROP` leyendo los `CREATE` del propio respaldo. **Una lista a
+mano ya se quedó corta una vez mientras se escribía ese guion**: decía cuatro tablas, y el
+respaldo también creaba la vista y tres índices. Es la misma lección que dejó H-031, donde
+arreglar por lista de excepciones habría vuelto a romperse en el módulo siguiente.
+
+#### Lo que queda abierto
+
+El lado remoto **sigue siendo una lista escrita en el manual**, aunque ahora venga con la
+instrucción de comprobarla antes de usarla. Automatizarlo como se automatizó el local es
+trabajo que nadie ha pedido todavía; queda anotado en el registro por si el ensayo aplazado
+lo vuelve a tocar.
+
+---
+
+### H-034 · Matar el proceso que escucha no apaga el servidor local: el padre lo repone
+
+**Abierto:** 2026-09-11 · **Estado:** 🟢 corregido el mismo día · **Severidad:** media
+**Lo sufrió el autor**, no quien lo causó.
+
+#### Qué pasó
+
+El autor levantó `npm run datos:dev`. El servidor anunció `Ready on
+http://127.0.0.1:8788`. En otra terminal, `npm run probar:escapado` respondió:
+
+```
+No hay nadie escuchando en http://127.0.0.1:8788.
+```
+
+Y el navegador, en esa misma dirección, se quedó cargando indefinidamente con la página en
+blanco: **ni error ni respuesta**.
+
+#### Qué había de verdad
+
+Dos generaciones de procesos, y los dos `workerd` colgando **del mismo padre**:
+
+| PID | Qué era | Creado | Padre |
+|---|---|---|---|
+| 1100 | `npm run datos:dev` | 00:14:07 | — |
+| 6612 | node | 00:14:10 | 1100 |
+| 15840 | **wrangler** | 00:14:10 | 6612 |
+| 11324 | workerd (puerto efímero) | 00:14:12 | **15840** |
+| 17600 | **workerd, escuchando en 8788** | **00:37:58** | **15840** |
+
+El árbol de las 00:14 era de una sesión anterior. A las 00:37 se mató «el proceso que
+escuchaba en 8788» —correctamente identificado por puerto— y **el wrangler padre, que
+seguía vivo, lo repuso**: eso es el PID 17600, nacido 24 minutos después que sus hermanos y
+dueño otra vez del puerto.
+
+Cuando el autor levantó su servidor, el 8788 ya estaba tomado. Lo que su navegador
+consultaba era el `workerd` huérfano, que aceptaba la conexión y no contestaba —quedaba en
+`CloseWait`—, no el servidor que él acababa de levantar.
+
+#### Las dos lecciones, que son distintas
+
+**1 · Un servidor local no se apaga por el proceso que escucha.** Se apaga por el padre.
+`wrangler` supervisa a `workerd` y lo repone si muere: matar al hijo es indistinguible, para
+el padre, de una caída que hay que reparar. Al matar el padre, los dos hijos cayeron solos.
+
+**2 · «No contesta» tiene dos causas y el consejo de una no sirve para la otra.** Éste es
+el defecto del guion, y es el de siempre en este proyecto: **el mensaje afirmaba más de lo
+que el guion sabía**. `probar-escapado.mjs` cazaba el fallo del `fetch` y concluía «no hay
+nadie escuchando», cuando lo único que sabía era «no obtuve respuesta». Había alguien. Y su
+consejo —levanta el servidor— era justo lo que no podía funcionar, porque el puerto estaba
+ocupado: cualquier servidor nuevo fallaría al tomarlo, y el que respondería seguiría siendo
+el viejo.
+
+**Mandó al autor a repetir la única acción que no podía arreglarlo.** Un mensaje de error
+equivocado cuesta más que no tener mensaje, porque se le hace caso.
+
+#### Qué se hizo
+
+Antes de decir «no hay nadie», ahora se comprueba: se abre un socket al puerto y se mira si
+conecta. Son dos veredictos distintos.
+
+- **Nadie conecta** → falta levantar el servidor. El consejo de antes, que ahí sí sirve.
+- **Conecta y no contesta** → el puerto está tomado por un proceso mudo. El mensaje dice
+  que levantar el servidor **no** lo arregla, y da los tres comandos para encontrar al
+  padre y matarlo, advirtiendo explícitamente que matar al que escucha no basta.
+
+#### Provocado en las dos direcciones (H-023)
+
+No se dedujo del código. Se ejercitaron los dos caminos:
+
+- **Sin nadie en el puerto** → `No hay nadie escuchando en http://127.0.0.1:8788.`
+- **Con alguien mudo**, levantando un servidor de seis líneas que acepta la conexión y
+  nunca responde → `HAY alguien escuchando en http://127.0.0.1:8788, pero no contesta.`
+
+El segundo reproduce exactamente lo que hacía el `workerd` huérfano.
+
+#### Relación con H-029, dicha como hipótesis y no como causa
+
+H-029 —`RESTRICCION CAIDA` visto una vez, nunca reproducido— dejó anotada una hipótesis sin
+provocar: **la salida sucia de wrangler en Windows**. Lo de hoy es un mecanismo concreto de
+esa familia: procesos `workerd` huérfanos que siguen vivos y **mantienen abierta la base D1
+local** mientras otra cosa la usa. Eso produciría exactamente lo que H-029 describe —fallos
+intermitentes, no reproducibles, que se arreglan solos al reiniciar—.
+
+**No está demostrado que sea su causa.** `probar-restricciones.mjs` habla con D1 por su
+cuenta y no pasa por el servidor, así que el vínculo es plausible y no verificado. Queda
+escrito como pista para la próxima vez que H-029 aparezca: **antes de suponer nada, mirar
+si hay `workerd` huérfanos vivos.** Es una comprobación de diez segundos que hasta hoy
+nadie sabía que había que hacer.
+
+H-029 **no se cierra** con esto. Sigue en amarillo.

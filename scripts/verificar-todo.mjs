@@ -95,6 +95,15 @@ const COMPROBADORES = [
     },
   },
   {
+    nombre: 'instantanea',
+    guion: 'comprobar-instantanea.mjs',
+    codigos: {
+      0: [OK, 'la instantanea versionada dice lo mismo que el respaldo versionado'],
+      1: [FALLO, 'DIVERGEN: la instantanea y el respaldo no cuentan el mismo banco'],
+      2: [AVISO, 'no se pudo comparar: falta el respaldo o la instantanea no se deja leer'],
+    },
+  },
+  {
     nombre: 'escapado',
     guion: 'probar-escapado.mjs',
     codigos: {
@@ -105,6 +114,11 @@ const COMPROBADORES = [
         'NO SE PUDO PROBAR. Para cerrarlo: `npm run datos:dev` en otra terminal y repetir',
       ],
       3: [FALLO, 'BASE SUCIA: el contenido hostil quedo dentro de la base local'],
+      4: [
+        AVISO,
+        'MECANISMO EN PIE PERO NO A ESCALA: la base local trae el banco de juguete. ' +
+          'Para cerrarlo: `npm run datos:banco-local`',
+      ],
     },
   },
   {
