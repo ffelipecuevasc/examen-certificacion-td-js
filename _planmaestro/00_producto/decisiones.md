@@ -1774,3 +1774,122 @@ que controla. Se paga con dos cosas:
   el índice vive junto al selector, no enfrente de él.
 - Si alguna vez el panel dejara de ser pegajoso, el motivo 2 caduca y esta ADR hay que
   revisarla.
+
+### Actualización · 2026-09-11 · el control cambia de forma, no de sitio
+
+La iteración 32 reemplaza el `<select>` por un **índice de los siete módulos**, que pasa a ser
+el único control para elegir qué practicar. Se anota aquí porque esta ADR describía el control
+además del sitio, y la mitad que describía el control queda sustituida.
+
+**Lo que NO cambia: el sitio.** Los tres motivos de arriba se sostienen enteros —el control
+sigue gobernando las barras que vienen debajo, el panel sigue siendo pegajoso mientras la zona
+derecha no lo es, y en teléfono esta columna se sigue apilando primero—. El índice hereda ese
+sitio.
+
+**Lo que cambia, y lo que hay que reponer a mano.** El `<select>` se eligió por dos ventajas
+concretas que el índice no trae gratis:
+
+- **Coste vertical.** Un desplegable ocupa una fila; siete filas suman unos 300 px en un panel
+  que ya es largo. Por eso el índice va como lista en escritorio y como rejilla compacta en
+  teléfono, y por eso la iteración 32 mantiene el criterio de la ventana de 700 px de alto.
+- **Semántica de formulario.** El `<select>` daba teclado, foco y lectura de pantalla sin
+  programar nada. El índice tiene que dar `aria-current` en el módulo activo, orden de
+  tabulación sensato y un nombre accesible por fila que diga módulo y cantidad.
+
+**Y una puerta que no se puede dejar abierta.** El aviso de pérdida de avance de la iteración
+31 está atado al `change` del selector. Al saltar desde el índice, ese salto tiene que pasar
+por la **misma** puerta: si el índice cambia de módulo por su cuenta, el aviso se esquiva sin
+que nadie lo note, y `probar-filtrado.mjs` no lo vería porque comprueba el selector.
+
+---
+
+## ADR-033 · `/api/preguntas?resumen=1`: los siete conteos por módulo, sin traerse el banco
+
+**Fecha:** 2026-09-11 · **Estado:** aceptada · **Decide:** Felipe Cuevas
+
+### Contexto
+
+La iteración 32 trae un **índice de los siete módulos** que reemplaza al selector de la 31
+como único control para elegir qué practicar. Ese índice muestra los siete a la vez, y cada
+uno con cuántas preguntas tiene.
+
+La iteración 31 había decidido **«sin número hasta que sea cierto»**: el selector no promete
+cifras y cada módulo estrena la suya cuando se dibuja. Esa regla funcionaba porque el
+selector muestra un módulo a la vez, así que cada cifra aparecía en el momento en que se
+volvía verdadera. **Con los siete a la vista deja de funcionar:** o están las siete cifras, o
+hay una y seis huecos que van rellenándose a medida que el estudiante pasea.
+
+Hoy el navegador no tiene de dónde sacarlas. `/api/preguntas` trae preguntas completas —371,8
+KB, medidos contra el servidor local—, `/api/estado` sólo el total del banco, y la
+instantánea son 500 KB que no se cargan para contar. La cuarta opción, escribir los siete
+números en el código, es literalmente el «105 preguntas» que ya mintió el 2026-09-08.
+
+### Decisión
+
+`/api/preguntas` acepta **`?resumen=1`**. En vez de las preguntas, devuelve una fila por
+módulo con su título, su ícono y **cuántas preguntas activas tiene**, contadas sobre
+`pregunta_activa` con un `COUNT(*) ... GROUP BY modulo`.
+
+Sigue siendo **solo lectura**, sobre la misma vista, y no abre ninguna ruta nueva.
+
+Reglas de la interfaz, escritas porque son la parte que se olvida:
+
+- **`resumen` y `modulo` se componen.** `?modulo=3&resumen=1` devuelve la fila del módulo 3.
+  Es una pregunta coherente y negarse a contestarla costaría más código que contestarla.
+- **Sólo vale el valor `1`.** Ausente significa «no». Cualquier otro valor —`0`, `true`,
+  `verdadero`— es `PETICION_INVALIDA`, no «no». Tratar en silencio un `resumen=true` como
+  apagado le devolvería al que pidió 0,2 KB el banco entero de 371,8 KB, que es exactamente
+  el fallo que esta ADR existe para evitar.
+- **Los nombres no se traducen** (ADR-011): `modulo`, `modulo_titulo`, `modulo_icono` y
+  `preguntas`, en snake_case, igual que en el resto de la capa.
+
+### Por qué este camino y no los otros dos
+
+1. **Un archivo generado con los siete conteos duplica un dato que D1 ya tiene.** Sería cierto
+   hasta la próxima carga del banco y después mentiría **en silencio**, que es el modo de
+   fallo más caro de los tres. El conteo vive donde viven las preguntas o no vive.
+2. **El coste es el de `/api/estado`**, que pesa 0,2 KB medido. Frente a pedir el banco para
+   contarlo, son tres órdenes de magnitud.
+3. **El filtro por estado sigue viviendo en la vista.** Al contar sobre `pregunta_activa` y no
+   sobre `pregunta`, ninguna consulta puede olvidarse de excluir borradores y retiradas
+   (ADR-020). Es el mismo motivo por el que el extremo ya leía de ahí.
+4. **Y arregla hacia atrás el selector de la 31 sin romper su regla.** Las cifras siguen
+   saliendo de un dato y no del código; lo único que cambia es que el dato llega antes.
+
+### Por qué en el mismo extremo y no en un `/api/modulos` nuevo
+
+Porque lo que se pide **es un dato sobre las preguntas** —cuántas hay por módulo—, no un
+catálogo de módulos. Un extremo aparte tendría que contar lo mismo, sobre la misma vista, y
+el día que las dos consultas divergieran el índice diría una cosa y el cuestionario dibujaría
+otra, sin que nada lo anunciara. Es el mismo razonamiento por el que
+`scripts/generar-instantanea.mjs` importa las consultas de `functions/api/preguntas.js` en vez
+de tener copia propia.
+
+### Consecuencias
+
+- **Se amplía la superficie de la capa de datos**, que ADR-007 abrió y ADR-009 acotó. Esta ADR
+  es la autorización explícita que esas dos exigen. El Worker sigue sin escribir, sin
+  renderizar páginas y sin identificar estudiantes: el alcance de ADR-009 no se mueve.
+
+- **El modo degradado carga la instantánea al abrir la página, no al elegir módulo.** Si la
+  capa de datos no contesta, los siete conteos tienen que salir del respaldo, y eso son 500 KB
+  en la carga inicial. Se acepta: es el camino degradado, y el estudiante va a necesitar ese
+  archivo igual en cuanto elija.
+
+  **Tiene un efecto secundario que mejora las cosas:** el aviso de ADR-008 pasa a aparecer al
+  abrir la página, encima del estado vacío, en vez de esperar a la primera elección. El
+  estudiante se entera de que está viendo una copia **antes** de ponerse a estudiar, que es lo
+  que ADR-008 pide con todas sus letras y lo que hasta ahora ocurría un paso más tarde.
+
+- **El conteo no pasa por la validación por fila, y eso puede desalinearse.** `/api/preguntas`
+  valida cada pregunta y puede descartar alguna; `?resumen=1` cuenta filas de la vista. Si
+  alguna vez se descartara una, **el índice prometería 61 y la página dibujaría 60**. Hoy el
+  informe de validación dice `descartadas: 0`, así que no ocurre.
+
+  No se tapa igualando los números por las malas. Se hace dos cosas: **lo dibujado manda**
+  —la cabecera del módulo y el contador de la portada siguen contando sobre el HTML— y
+  `scripts/probar-filtrado.mjs` compara el conteo del resumen contra el dibujado y **da rojo
+  si difieren**. Una discrepancia silenciosa se convierte así en un veredicto.
+
+- **`scripts/probar-filtrado.mjs` gana una comprobación**: que los siete conteos del resumen
+  coincidan con los de la base consultada aparte por wrangler, y con lo que se dibuja.

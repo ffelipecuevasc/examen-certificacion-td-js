@@ -1,5 +1,5 @@
 /**
- * Guardian del filtrado por modulo del cuestionario (iteracion 31).
+ * Guardian del filtrado por modulo del cuestionario (iteraciones 31 y 32).
  *
  * POR QUE EXISTE
  *
@@ -265,6 +265,116 @@ try {
   const totalDelBanco = porModulo.reduce((suma, f) => suma + f.cuantas, 0);
 
   // ------------------------------------------------------------------------
+  // 2b · El extremo del resumen (ADR-033), antes de montar nada
+  //
+  // Se comprueba contra el extremo REAL y contra la base consultada aparte. Es la
+  // unica parte de este guion que mira la respuesta del extremo y no el dibujo, y
+  // es correcto que lo haga: lo que se esta comprobando aqui ES el extremo.
+  // ------------------------------------------------------------------------
+
+  const pedir = async (ruta) => {
+    const res = await fetchReal(`${DIRECCION}${ruta}`, {
+      signal: AbortSignal.timeout(ESPERA_SONDEO),
+    });
+    const texto = await res.text();
+
+    let cuerpo = null;
+    try {
+      cuerpo = JSON.parse(texto);
+    } catch {
+      cuerpo = null;
+    }
+
+    return { estado: res.status, bytes: Buffer.byteLength(texto), cuerpo };
+  };
+
+  const resumen = await pedir('/api/preguntas?resumen=1');
+
+  if (resumen.estado !== 200 || !resumen.cuerpo?.ok) {
+    noSePudo(
+      '/api/preguntas?resumen=1 no contesto un resumen.',
+      JSON.stringify(resumen.cuerpo, null, 2)?.slice(0, 600)
+    );
+  }
+
+  /** modulo -> cuantas dice el resumen que hay. */
+  const delResumen = new Map(
+    (resumen.cuerpo.datos ?? []).map((f) => [f.modulo, f.preguntas])
+  );
+
+  if (delResumen.size !== porModulo.length) {
+    problemas.push(
+      `?resumen=1 devolvio ${delResumen.size} modulos y la base tiene ${porModulo.length}`
+    );
+  }
+
+  for (const fila of porModulo) {
+    if (delResumen.get(fila.modulo) !== fila.cuantas) {
+      problemas.push(
+        `?resumen=1 dice que el modulo ${fila.modulo} tiene ` +
+          `${delResumen.get(fila.modulo)} preguntas y la base tiene ${fila.cuantas}`
+      );
+    }
+  }
+
+  // Un resumen que devolviera preguntas no seria un resumen: seria el banco con
+  // otro nombre, y el gasto que este parametro existe para evitar.
+  if ((resumen.cuerpo.datos ?? []).some((f) => f.alternativas || f.enunciado)) {
+    problemas.push('?resumen=1 devolvio preguntas, no solo el conteo por modulo');
+  }
+  if (resumen.cuerpo.meta?.resumen !== true) {
+    problemas.push('?resumen=1 no se declara como resumen en meta');
+  }
+
+  // Y que pese lo que dice pesar. Sin esto, el parametro podria «funcionar»
+  // devolviendo lo mismo de siempre y nadie se enteraria hasta ver la factura de
+  // datos del estudiante.
+  const banco = await pedir('/api/preguntas');
+  const proporcion = banco.bytes / resumen.bytes;
+
+  if (proporcion < 50) {
+    problemas.push(
+      `?resumen=1 pesa ${(resumen.bytes / 1024).toFixed(1)} KB y el banco entero ` +
+        `${(banco.bytes / 1024).toFixed(1)} KB: solo ${proporcion.toFixed(0)} veces menos, ` +
+        'y no esta ahorrando lo que dice ahorrar'
+    );
+  }
+
+  // Componerse con el filtro: una fila, la suya.
+  const unModulo = await pedir(`/api/preguntas?modulo=${MODULO_DE_MUESTRA}&resumen=1`);
+  const suya = unModulo.cuerpo?.datos ?? [];
+
+  if (suya.length !== 1 || suya[0]?.modulo !== MODULO_DE_MUESTRA) {
+    problemas.push(
+      `?modulo=${MODULO_DE_MUESTRA}&resumen=1 devolvio ${suya.length} filas en vez de la suya`
+    );
+  }
+
+  // Un valor distinto de 1 se rechaza, no se trata como «no». Tratarlo como «no»
+  // le devolveria el banco entero a quien pidio el resumen, que es el gasto que
+  // ADR-033 existe para evitar. Se provocan los dos casos que mas se escriben solos.
+  for (const valor of ['true', '0']) {
+    const malo = await pedir(`/api/preguntas?resumen=${valor}`);
+
+    if (malo.estado !== 400 || malo.cuerpo?.error?.codigo !== 'PETICION_INVALIDA') {
+      problemas.push(
+        `?resumen=${valor} respondio ${malo.estado} y tenia que ser 400 PETICION_INVALIDA`
+      );
+    }
+    if (malo.cuerpo?.error?.usar_respaldo !== false) {
+      problemas.push(
+        `?resumen=${valor} pide cambiar al respaldo, y es un error de la peticion, no de la base`
+      );
+    }
+  }
+
+  notas.push(
+    `Resumen: ${delResumen.size} modulos en ${(resumen.bytes / 1024).toFixed(1)} KB, ` +
+      `frente a ${(banco.bytes / 1024).toFixed(1)} KB del banco entero ` +
+      `(${proporcion.toFixed(0)} veces menos). Valores invalidos rechazados con 400.`
+  );
+
+  // ------------------------------------------------------------------------
   // 3 · DOM falso, fetch apuntando al servidor local, y el componente real
   // ------------------------------------------------------------------------
 
@@ -281,7 +391,10 @@ try {
   //     no se ha dibujado ningun modulo y se puede comprobar que no hay ninguno.
   // ------------------------------------------------------------------------
 
-  renderCuestionario();
+  // Se espera, porque desde la iteracion 32 esta funcion pide el resumen de los
+  // siete conteos antes de terminar. Sin el await, las comprobaciones del indice
+  // mirarian un indice todavia sin cifras y dirian que faltan.
+  await renderCuestionario();
 
   const vacio = dom.html('#cuestionario');
   const idsEnVacio = idsDibujados(vacio);
@@ -294,8 +407,8 @@ try {
   if (!vacio.includes('Elige un módulo para empezar')) {
     problemas.push('el estado vacio no dice que hay que elegir un modulo');
   }
-  if (!vacio.includes('data-ir-al-selector')) {
-    problemas.push('el estado vacio no lleva el enlace al selector');
+  if (!vacio.includes('data-ir-al-indice')) {
+    problemas.push('el estado vacio no lleva el enlace al indice de modulos');
   }
   if (!dom.oculto('#contador-banco') || dom.html('#contador-banco') !== '') {
     problemas.push('el contador de la portada no esta escondido con la pagina vacia');
@@ -314,29 +427,56 @@ try {
   notas.push(`Estado vacio: 0 preguntas dibujadas, contador escondido, panel en 0.`);
 
   // ------------------------------------------------------------------------
-  // 5 · El selector trae los siete modulos, y NINGUNA cifra todavia
+  // 5 · El indice trae los siete modulos, con sus cifras, y ninguno marcado
+  //
+  // La iteracion 31 comprobaba aqui lo contrario —que NO hubiera cifras antes de
+  // elegir—, porque entonces no habia de donde sacarlas y cualquier numero habria
+  // sido inventado. Con `?resumen=1` (ADR-033) ya hay dato, asi que ahora tienen
+  // que estar las siete y tienen que ser las de la base. La regla no cambio: sigue
+  // sin haber ningun numero que no salga de un dato.
   // ------------------------------------------------------------------------
 
-  const selectorVacio = dom.html('#selector-modulo');
-  const valores = [...selectorVacio.matchAll(/<option value="(\d*)"/g)].map((m) => m[1]);
+  const indiceVacio = dom.html('#indice-modulos');
+  const ofrecidos = [...indiceVacio.matchAll(/data-modulo="(\d+)"/g)].map((m) => Number(m[1]));
 
-  if (valores[0] !== '') {
-    problemas.push('el selector no arranca con la alternativa vacia «Elige un módulo…»');
-  }
-
-  const ofrecidos = valores.slice(1).map(Number);
   if (ofrecidos.join(',') !== '2,3,4,5,6,7,8') {
-    problemas.push(`el selector ofrece «${ofrecidos.join(', ')}» y tenia que ofrecer del 2 al 8`);
+    problemas.push(`el indice ofrece «${ofrecidos.join(', ')}» y tenia que ofrecer del 2 al 8`);
   }
 
-  if (/preguntas<\/option>/.test(selectorVacio)) {
+  // Nada marcado como activo: no se ha elegido ningun modulo todavia.
+  if (indiceVacio.includes('aria-current')) {
+    problemas.push('el indice marca un modulo activo cuando todavia no se ha elegido ninguno');
+  }
+
+  // Las siete cifras, contra la base consultada aparte.
+  for (const fila of porModulo) {
+    const enElIndice = new RegExp(
+      `data-modulo="${fila.modulo}"[\\s\\S]*?>\\s*${fila.cuantas}\\s*<`
+    );
+    if (!enElIndice.test(indiceVacio)) {
+      problemas.push(
+        `el indice no muestra las ${fila.cuantas} preguntas del modulo ${fila.modulo} al abrir`
+      );
+    }
+  }
+
+  // Y que el nombre accesible diga lo mismo que la fila muestra: en pantallas
+  // angostas el titulo se esconde, asi que sin esto la fila se anunciaria como
+  // «Modulo 3, 61» y no se sabria que es.
+  const conEtiqueta = [...indiceVacio.matchAll(/aria-label="([^"]*)"/g)].map((m) => m[1]);
+  if (conEtiqueta.length !== ofrecidos.length) {
     problemas.push(
-      'el selector promete cifras antes de haber pedido ningun modulo: ese numero no puede ' +
-        'salir de ningun dato, que es el «105 preguntas» del 2026-09-08'
+      `${ofrecidos.length - conEtiqueta.length} filas del indice no tienen nombre accesible`
     );
   }
+  if (!conEtiqueta.every((e) => /M.dulo \d+: .+\d+ pregunta/.test(e))) {
+    problemas.push('algun nombre accesible del indice no dice el modulo, su titulo y su cantidad');
+  }
 
-  notas.push(`Selector: ${ofrecidos.length} modulos ofrecidos, sin cifras antes de elegir.`);
+  notas.push(
+    `Indice: ${ofrecidos.length} modulos, con sus siete cifras desde ?resumen=1, ` +
+      'ninguno marcado antes de elegir.'
+  );
 
   // ------------------------------------------------------------------------
   // 6 · Cada modulo dibuja exactamente lo suyo
@@ -408,11 +548,27 @@ try {
       );
     }
 
-    // Y el selector, ya con la cifra aprendida de lo dibujado.
-    const rotulo = new RegExp(`Módulo ${fila.modulo} · [^<]*· ${ids.length} preguntas`);
-    if (!rotulo.test(dom.html('#selector-modulo'))) {
+    // El indice marca este modulo y ningun otro.
+    const indice = dom.html('#indice-modulos');
+    const marcados = [
+      ...indice.matchAll(/data-modulo="(\d+)"[^>]*aria-current/g),
+    ].map((m) => Number(m[1]));
+
+    if (marcados.length !== 1 || marcados[0] !== fila.modulo) {
       problemas.push(
-        `modulo ${fila.modulo}: despues de dibujarlo, el selector no muestra sus ${ids.length} preguntas`
+        `modulo ${fila.modulo}: el indice marca «${marcados.join(', ') || 'ninguno'}» como activo`
+      );
+    }
+
+    // Y la cuenta que el indice prometio es la que se dibujo. Es la comprobacion
+    // que ADR-033 exige: el resumen cuenta filas de la vista y /api/preguntas
+    // valida por fila, asi que una pregunta descartada haria que el indice
+    // prometiera 61 y la pagina dibujara 60. Una discrepancia silenciosa se
+    // convierte aqui en un veredicto.
+    const prometidas = delResumen.get(fila.modulo);
+    if (prometidas !== ids.length) {
+      problemas.push(
+        `modulo ${fila.modulo}: ?resumen=1 promete ${prometidas} preguntas y se dibujaron ${ids.length}`
       );
     }
   }
@@ -423,7 +579,7 @@ try {
   );
 
   // ------------------------------------------------------------------------
-  // 7 · El selector sigue libre despues de elegir
+  // 7 · El control sigue libre despues de elegir
   // ------------------------------------------------------------------------
 
   const recorrido = [MODULO_DE_MUESTRA, 5, MODULO_DE_MUESTRA];
@@ -442,15 +598,14 @@ try {
           `preguntas en vez de ${esperadas}`
       );
     }
-    if (dom.nodo('#selector-modulo').value !== String(numero)) {
+    if (!new RegExp(`data-modulo="${numero}"[^>]*aria-current`).test(dom.html('#indice-modulos'))) {
       problemas.push(
-        `al recorrer ${recorrido.join(' → ')}, el selector quedo en ` +
-          `«${dom.nodo('#selector-modulo').value}» y el modulo dibujado es el ${numero}`
+        `al recorrer ${recorrido.join(' → ')}, el indice no quedo marcando el modulo ${numero}`
       );
     }
   }
 
-  notas.push(`Selector libre: ${vistos.join(', ')} sin recargar.`);
+  notas.push(`Control libre: ${vistos.join(', ')} sin recargar.`);
 
   // ------------------------------------------------------------------------
   // 8 · La marca de orden fijo se respeta, y el barajado se mueve
@@ -531,19 +686,29 @@ try {
   //
   // Prueba la DECISION: con respuestas dentro, cambiar de modulo no se ejecuta y
   // el aviso aparece diciendo cuantas se pierden; sin respuestas, el cambio pasa
-  // directo y el aviso no aparece. Y prueba el orden que importa —que el selector
-  // vuelva a su sitio ANTES de preguntar—, porque si se preguntara primero habria
-  // un rato en que la pantalla dice un modulo y las preguntas son de otro.
+  // directo y el aviso no aparece. Y prueba lo que importa del orden —que el indice
+  // siga marcando el modulo actual mientras el aviso pregunta—, porque si marcara
+  // el destino al pedirlo habria un rato en que la pantalla dice un modulo y las
+  // preguntas son de otro.
+  //
+  // Con el `<select>` de la iteracion 31 esa propiedad habia que reponerla a mano,
+  // deshaciendo el cambio antes de preguntar. Con botones es estructural: pulsar no
+  // mueve nada. Se sigue comprobando igual, porque lo estructural tambien se rompe
+  // editando.
   //
   // NO prueba que el aviso se VEA, ni que el foco caiga donde debe. Eso necesita
   // un navegador y se comprueba abriendo la pagina.
   // ------------------------------------------------------------------------
 
-  const selector = dom.nodo('#selector-modulo');
-
   /** Deja el componente en un modulo, esperando a que termine de dibujarlo. */
   const asentar = async (numero) => {
     await mostrarModulo(numero);
+  };
+
+  /** Que modulo esta marcando el indice ahora mismo, o null. */
+  const marcadoEnElIndice = () => {
+    const m = dom.html('#indice-modulos').match(/data-modulo="(\d+)"[^>]*aria-current/);
+    return m ? Number(m[1]) : null;
   };
 
   /** Simula que el estudiante respondio una pregunta del modulo dibujado. */
@@ -557,19 +722,22 @@ try {
     });
   };
 
-  /** Simula que el estudiante elige otra alternativa del selector. */
-  const elegirEnElSelector = (numero) => {
-    selector.value = String(numero);
-    return dom.disparar('#selector-modulo', 'change');
+  /** Simula que el estudiante pulsa una fila del indice. */
+  const elegirEnElIndice = (numero) => {
+    const fila = { dataset: { modulo: String(numero) } };
+
+    return dom.disparar('#indice-modulos', 'click', {
+      target: { closest: (s) => (s === '[data-modulo]' ? fila : null) },
+    });
   };
 
-  if (selector.oyentes.get('change') === undefined) {
-    problemas.push('el componente no se ato al selector: ningun cambio de modulo llegaria');
+  if (dom.nodo('#indice-modulos').oyentes.get('click') === undefined) {
+    problemas.push('el componente no se ato al indice: ningun cambio de modulo llegaria');
   }
 
   // --- caso A: sin nada respondido, NO avisa -------------------------------
   await asentar(MODULO_DE_MUESTRA);
-  elegirEnElSelector(5);
+  elegirEnElIndice(5);
 
   const avisoSinNadaQuePerder = dom.html('#aviso-cambio-modulo');
   if (avisoSinNadaQuePerder !== '' || !dom.oculto('#aviso-cambio-modulo')) {
@@ -600,7 +768,7 @@ try {
   }
 
   const idsAntes = idsDibujados(dom.html('#cuestionario')).join(',');
-  elegirEnElSelector(6);
+  elegirEnElIndice(6);
 
   const aviso = dom.html('#aviso-cambio-modulo');
 
@@ -616,10 +784,10 @@ try {
   if (!aviso.includes(`¿Cambiar al Módulo 6?`)) {
     problemas.push('el aviso no dice a que modulo se iba a cambiar');
   }
-  if (selector.value !== String(MODULO_DE_MUESTRA)) {
+  if (marcadoEnElIndice() !== MODULO_DE_MUESTRA) {
     problemas.push(
-      `el selector quedo en «${selector.value}» mientras el aviso preguntaba: tiene que ` +
-        'volver al modulo actual ANTES de preguntar'
+      `el indice marcaba el modulo «${marcadoEnElIndice()}» mientras el aviso preguntaba: ` +
+        'tiene que seguir senialando el modulo en el que el estudiante esta de verdad'
     );
   }
   if (idsDibujados(dom.html('#cuestionario')).join(',') !== idsAntes) {
@@ -634,8 +802,8 @@ try {
   if (!dom.oculto('#aviso-cambio-modulo') || dom.html('#aviso-cambio-modulo') !== '') {
     problemas.push('«Quedarme acá» no retiro el aviso');
   }
-  if (selector.value !== String(MODULO_DE_MUESTRA)) {
-    problemas.push('«Quedarme acá» movio el selector');
+  if (marcadoEnElIndice() !== MODULO_DE_MUESTRA) {
+    problemas.push('«Quedarme acá» movio la marca del indice');
   }
   if (dom.texto('#valor-avance') !== '1') {
     problemas.push('«Quedarme acá» perdio la respuesta igual');
@@ -666,12 +834,89 @@ try {
   }
 
   notas.push(
-    'Aviso de perdida: sin respuestas no aparece y el cambio pasa directo; con 1 respuesta ' +
-      'aparece, el selector vuelve solo y las preguntas no se tocan.'
+    'Aviso de perdida, provocado DESDE EL INDICE: sin respuestas no aparece y el cambio ' +
+      'pasa directo; con 1 respuesta aparece, el indice sigue marcando el modulo actual y ' +
+      'las preguntas no se tocan.'
   );
   notas.push(
     '«Quedarme acá» conserva la respuesta; «Cambiar de módulo» cambia y recien ahi el panel ' +
       'vuelve a cero.'
+  );
+
+  // ------------------------------------------------------------------------
+  // 8c · Las tres barras dicen su cifra y su porcentaje, y cuadran entre si
+  //
+  // Es la mitad del criterio de la iteracion 32 que se puede provocar sin
+  // navegador: que cada barra lleve su cifra absoluta y su porcentaje, y que los
+  // dos correspondan a lo que se respondio. Que se VEAN horizontales y a todo el
+  // ancho es la otra mitad, y esa se mira en la pagina.
+  //
+  // Se responde de verdad, una por una, en vez de escribir los numeros a mano: un
+  // panel que cuadra con cifras inventadas no prueba nada.
+  // ------------------------------------------------------------------------
+
+  await asentar(MODULO_DE_MUESTRA);
+
+  const delModulo = porModulo.find((f) => f.modulo === MODULO_DE_MUESTRA)?.cuantas ?? 0;
+  const CUANTAS_RESPONDER = 3;
+
+  for (let i = 0; i < CUANTAS_RESPONDER; i += 1) responderUna();
+
+  const porcentaje = (valor) => (delModulo === 0 ? 0 : Math.round((valor / delModulo) * 100));
+
+  // `responderUna()` marca la alternativa como correcta, asi que las tres van a
+  // «correctas» y ninguna a «incorrectas». Se escribe con esa asimetria a
+  // proposito: si las tres barras esperaran el mismo numero, una que copiara el
+  // valor de otra pasaria la prueba sin que nadie lo notara.
+  const barras = [
+    ['respondidas', '#valor-avance', '#pct-avance', CUANTAS_RESPONDER],
+    ['correctas', '#valor-correctas', '#pct-correctas', CUANTAS_RESPONDER],
+    ['incorrectas', '#valor-incorrectas', '#pct-incorrectas', 0],
+  ];
+
+  for (const [nombre, idValor, idPct, esperado] of barras) {
+    if (dom.texto(idValor) !== String(esperado)) {
+      problemas.push(
+        `la barra de ${nombre} dice «${dom.texto(idValor)}» y tenian que ser ${esperado}`
+      );
+    }
+
+    const esperadoPct = `${porcentaje(esperado)}%`;
+    if (dom.texto(idPct) !== esperadoPct) {
+      problemas.push(
+        `la barra de ${nombre} dice «${dom.texto(idPct)}» de porcentaje y su cifra da ${esperadoPct}`
+      );
+    }
+  }
+
+  // Y el ancho de cada barra sigue a su porcentaje. Son horizontales desde la
+  // iteracion 32, asi que lo que crece es el ancho y no el alto: si alguien las
+  // devolviera a `height`, se quedarian quietas en cero y el panel seguiria
+  // diciendo los numeros correctos al lado. Es un fallo que solo se ve mirando,
+  // y por eso se comprueba aqui.
+  const anchos = {
+    '#barra-avance': `${porcentaje(CUANTAS_RESPONDER)}%`,
+    '#barra-correctas': `${porcentaje(CUANTAS_RESPONDER)}%`,
+    '#barra-incorrectas': `${porcentaje(0)}%`,
+  };
+
+  for (const [id, esperado] of Object.entries(anchos)) {
+    const estilo = dom.nodo(id).style;
+
+    if (estilo.height !== undefined) {
+      problemas.push(
+        `${id} sigue creciendo a lo alto: las barras son horizontales desde la iteracion 32`
+      );
+    }
+    if (estilo.width !== esperado) {
+      problemas.push(`${id} quedo con un ancho de «${estilo.width}» y su cifra da ${esperado}`);
+    }
+  }
+
+  notas.push(
+    `Barras: tras responder ${CUANTAS_RESPONDER} de ${delModulo}, cada una dice su cifra y su ` +
+      `porcentaje —${porcentaje(CUANTAS_RESPONDER)}% respondidas y correctas, 0% incorrectas—, ` +
+      'y el ancho de cada una los acompana.'
   );
 
   // ------------------------------------------------------------------------
@@ -726,6 +971,51 @@ try {
       `${idsCaido.length} preguntas desde la instantanea, con el aviso de ADR-008 a la vista.`
   );
 
+  // --- 9b · y el aviso al ABRIR la pagina, no al elegir --------------------
+  //
+  // Es la consecuencia que ADR-033 declara: como los siete conteos tambien caen a
+  // la instantanea, el estudiante se entera de que esta viendo una copia antes de
+  // ponerse a estudiar, y no un paso mas tarde. Se provoca abriendo la pagina
+  // entera con el fetch ya caido.
+
+  await renderCuestionario();
+
+  const alAbrir = dom.html('#cuestionario');
+
+  if (dom.oculto('#aviso-respaldo')) {
+    problemas.push(
+      'con la capa de datos caida, abrir la pagina no avisa de que los conteos salen de ' +
+        'la copia: el aviso llegaria recien al elegir un modulo'
+    );
+  }
+  if (idsDibujados(alAbrir).length !== 0) {
+    problemas.push('al abrir la pagina con la capa caida se dibujaron preguntas sin elegir nada');
+  }
+  if (!alAbrir.includes('Elige un módulo para empezar')) {
+    problemas.push('con la capa caida, el estado vacio dejo de explicarse');
+  }
+
+  // Y los siete conteos del indice, ahora contados sobre la instantanea.
+  const indiceCaido = dom.html('#indice-modulos');
+  const enLaCopia = new Map();
+  for (const pregunta of instantanea.PREGUNTAS) {
+    enLaCopia.set(pregunta.modulo, (enLaCopia.get(pregunta.modulo) ?? 0) + 1);
+  }
+
+  for (const [numero, cuantas] of enLaCopia) {
+    const enElIndice = new RegExp(`data-modulo="${numero}"[\\s\\S]*?>\\s*${cuantas}\\s*<`);
+    if (!enElIndice.test(indiceCaido)) {
+      problemas.push(
+        `con la capa caida, el indice no muestra las ${cuantas} preguntas del modulo ${numero}`
+      );
+    }
+  }
+
+  notas.push(
+    `Modo degradado al ABRIR: el aviso de ADR-008 se ve antes de elegir nada, con el ` +
+      `estado vacio debajo y los ${enLaCopia.size} conteos del indice contados sobre la copia.`
+  );
+
   // ------------------------------------------------------------------------
   // 10 · Veredicto
   // ------------------------------------------------------------------------
@@ -759,8 +1049,9 @@ try {
       'la respuesta del extremo, y se comparo contra la base local consultada aparte.',
       '',
       'Del aviso al cambiar de modulo se probo la DECISION —cuando aparece, que dice,',
-      'y que el selector vuelva antes de preguntar—, disparando los eventos que el',
-      'componente registro.',
+      'y que el indice siga marcando el modulo actual mientras pregunta—, disparando',
+      'los eventos que el componente registro DESDE EL INDICE, que es el unico camino',
+      'por el que hoy se cambia de modulo.',
       '',
       'Lo que esto NO prueba: nada de lo que solo existe en un navegador. Que el aviso',
       'se VEA, que el foco caiga donde debe, que el teclado lo alcance y como se apila',

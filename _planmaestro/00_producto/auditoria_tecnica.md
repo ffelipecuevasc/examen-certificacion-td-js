@@ -2675,7 +2675,7 @@ H-029 **no se cierra** con esto. Sigue en amarillo.
 
 ### H-035 · Los títulos de los módulos 3, 4 y 8 están sin tildes en D1, y el sitio los muestra así
 
-**Gravedad:** 🟡 · **Estado:** ⚪ Abierto · **Detectado en:** iteración 31 · **Fecha:** 2026-09-11
+**Gravedad:** 🟡 · **Estado:** ⏸️ Aceptado con condición de cierre · **Detectado en:** iteración 31 · **Fecha:** 2026-09-11
 
 **Síntoma.** La cabecera que el cuestionario dibuja sobre las preguntas dice «Fundamentos de
 **Programacion** en JavaScript», «**Programacion** Avanzada en JavaScript» e
@@ -2703,3 +2703,19 @@ aplicada a la base local y a la de producción, más regenerar la instantánea y
 versionados, que traen los títulos dentro. Comprobación de cierre: los siete títulos de la
 tabla `modulo` coinciden carácter a carácter con los siete `titulo` de `modulesData`. La
 comparación ya está escrita —es la que encontró esto— y cabe en un `node -e`.
+
+**Decisión del autor, 2026-09-11: no se arregla ahora, y esto no es un aplazamiento sin
+fecha.** Arreglarlo exige un ciclo completo de publicación —migración en las dos bases,
+regenerar instantánea y respaldo, desplegar— y eso es caro para tres tildes.
+
+**Condición de cierre: la migración `003` se agrupa con el próximo cambio de datos que
+toque producción.** Ese es el disparador, y está escrito acá porque una deuda sin
+disparador no se paga: se olvida. Quien vaya a tocar producción por cualquier otro motivo
+tiene que mirar esta entrada antes de empezar; el coste de sumarla a un ciclo que ya va a
+ocurrir es tres líneas de SQL.
+
+**Hasta entonces, lo que se ve.** El selector del panel dice «Programación» y la cabecera
+de las preguntas, debajo, dice «Programacion». Es visible y se convive con ello a
+sabiendas. No se disimula igualando el selector hacia abajo: los nombres de
+`modulesData` están bien escritos y empeorarlos para tapar esto sería cambiar un defecto
+por dos.

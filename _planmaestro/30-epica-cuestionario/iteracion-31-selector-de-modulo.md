@@ -1,7 +1,7 @@
 # Iteración 31 · Selector de módulo
 
 **Épica:** 30 · Cuestionario
-**Estado:** 🔵 En curso · comenzada el 2026-09-11
+**Estado:** 🟢 Completada · 2026-09-11
 **Depende de:** épica 20, cerrada el 2026-09-10 con las 368 preguntas en producción
 
 ## Objetivo
@@ -103,7 +103,7 @@ razonando sobre el código.
   dibujado.
 - [x] **El selector sigue libre después de elegir.** Se cambia de módulo sin
   reiniciar y funciona. Si el selector quedara bloqueado, el criterio falla.
-- [ ] **El aviso aparece antes de perder algo, y no aparece cuando no hay nada que
+- [x] **El aviso aparece antes de perder algo, y no aparece cuando no hay nada que
   perder.** Se provocan los dos casos: cambiar de módulo con preguntas
   respondidas, y cambiar sin haber respondido ninguna.
 - [x] **El contador dice la verdad sobre lo que se muestra.** Se cambia de módulo y
@@ -117,13 +117,13 @@ razonando sobre el código.
 - [x] **El modo degradado filtra igual.** Con la capa de datos caída, se elige un
   módulo y se muestran sus preguntas desde el respaldo, con el aviso de ADR-008
   visible.
-- [ ] **La página es utilizable en teléfono.** Se prueba en un ancho de teléfono con
+- [x] **La página es utilizable en teléfono.** Se prueba en un ancho de teléfono con
   un módulo grande cargado, y se describe el comportamiento del apilado.
-- [ ] **El teclado alcanza el selector y las preguntas** que aparecen después de
+- [x] **El teclado alcanza el selector y las preguntas** que aparecen después de
   elegir.
-- [ ] **Sin errores de consola** con cualquier módulo cargado.
+- [x] **Sin errores de consola** con cualquier módulo cargado.
 - [x] **La decisión de dónde vive el selector está documentada** con su motivo.
-- [ ] **`npm run verificar` termina en 0** con sus cinco comprobaciones en OK.
+- [x] **`npm run verificar` termina en 0** con sus cinco comprobaciones en OK.
 
 ## Lo que esta iteración no puede afirmar
 
@@ -134,7 +134,7 @@ razonando sobre el código.
 
 ## Notas de la iteración
 
-_Escritas el 2026-09-11, con la iteración todavía abierta: faltan cinco criterios._
+_Escritas el 2026-09-11. Los veintitrés criterios quedaron cerrados con evidencia._
 
 ### Lo que se construyó
 
@@ -219,24 +219,39 @@ de H-023—. Ahora dibuja el módulo de la fila hostil, y para el banco a escala
 los siete módulos comparando cada pregunta contra el HTML del suyo. Sigue revisando las
 368: `368 preguntas, 2208 porciones de texto, 184 con algún carácter que escapar`.
 
-### Lo que no se pudo cerrar, y por qué
+### Los cinco criterios que Claude Code no pudo cerrar, y quién los cerró
 
-**No hay navegador disponible en esta sesión.** Los cinco criterios sin marcar son
-exactamente los que no se pueden provocar desde Node, y no se marcan razonando sobre el
-código:
+No hubo navegador disponible en la sesión de Claude Code: la extensión de Chrome no se
+instaló. Los cinco criterios que dependen de uno **no se marcaron razonando sobre el
+código**; quedaron abiertos y los cerró el autor.
 
-- **El aviso, visto.** Su *decisión* sí quedó provocada en los dos casos —aparece con
-  respuestas dentro, no aparece sin ellas, dice cuántas se pierden, el selector vuelve
-  solo y las preguntas no se tocan—. Lo que falta es confirmar que se **ve**.
-- **Teléfono, teclado y consola.** Nada de eso existe fuera de un navegador.
-- **`npm run verificar` en 0.** Da 1, y por un solo motivo: `css` responde
-  `DESFASADO · El CSS corresponde a su fuente, pero difiere de lo que hay commiteado`.
-  El CSS está bien generado; falta el commit, que no lo hace Claude Code (ADR-030).
-  Las otras cuatro están en OK.
+- **El aviso, el teléfono, el teclado y la consola.** Probados por el autor sobre el
+  sitio, el 2026-09-11. Del aviso, Claude Code había dejado provocada la *decisión* —
+  aparece con respuestas dentro, no aparece sin ellas, dice cuántas se pierden, el
+  selector vuelve solo y las preguntas no se tocan—; lo que faltaba era ver que se ve, y
+  se vio.
+- **`npm run verificar` en 0.** Daba 1 por un solo motivo: `css → DESFASADO · El CSS
+  corresponde a su fuente, pero difiere de lo que hay commiteado`. El CSS estaba bien
+  generado y faltaba el commit, que no hace Claude Code (ADR-030). Con el commit hecho,
+  las cinco comprobaciones en OK y código 0.
 
-### Hallazgo abierto
+**La distinción vale más que el resultado.** «No pude comprobarlo» no es ni un aprobado
+ni un rechazo, y es la regla que dejó H-013. Cinco casillas en blanco durante unas horas
+son más baratas que cinco marcadas sin mirar.
+
+### Hallazgo, y qué se decidió hacer con él
 
 **H-035** · los títulos de los módulos 3, 4 y 8 están sin tildes en D1, desde el seed de
 la migración 001. El sitio los muestra así. Era menor mientras la cabecera del módulo
 separaba secciones; ahora es el rótulo principal de lo que se estudia **y queda junto al
-selector, que sí las lleva**. Se arregla con una migración `003` que corre el autor.
+selector, que sí las lleva**.
+
+**No se arregla ahora. Decisión del autor, 2026-09-11, con su motivo:** un ciclo completo
+de publicación —migración en las dos bases, regenerar instantánea y respaldo, desplegar—
+es caro para tres tildes. La migración `003` **se agrupa con el próximo cambio de datos
+que toque producción**.
+
+Queda como **deuda viva con condición de cierre**, no como pendiente sin fecha: la
+condición es «el próximo cambio de datos en producción», y ese es el momento en que hay
+que acordarse. Escrito así a propósito, porque una deuda sin disparador no se paga: se
+olvida.

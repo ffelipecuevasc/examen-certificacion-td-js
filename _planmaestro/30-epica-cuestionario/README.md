@@ -35,6 +35,6 @@ errores.
 
 | # | Iteración | Estado |
 |---|---|---|
-| 31 | Selector de módulo | 🔵 En curso |
-| 32 | Rediseño del panel fijo | ⚪ No iniciada |
+| 31 | Selector de módulo | 🟢 Completada · 2026-09-11 |
+| 32 | Rediseño del panel fijo | 🔵 En curso |
 | 33 | Memoria del avance, justificaciones y repaso | ⚪ No iniciada |

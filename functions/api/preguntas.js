@@ -1,6 +1,7 @@
 /**
- * GET /api/preguntas          — el banco completo
- * GET /api/preguntas?modulo=N — solo un modulo
+ * GET /api/preguntas           — el banco completo
+ * GET /api/preguntas?modulo=N  — solo un modulo
+ * GET /api/preguntas?resumen=1 — cuantas preguntas tiene cada modulo, sin traerlas
  *
  * Es el extremo que sustituye a static/js/data/cuestionario.js como fuente del
  * cuestionario. De aca en adelante el contenido viene de fuera del repositorio,
@@ -25,6 +26,31 @@
  * instantanea de respaldo no podria corregir, y un modo degradado que no corrige
  * no sirve de nada. La consecuencia asumida —que el simulacro no puede garantizar
  * que nadie las vea antes de responder— esta escrita en esa ADR.
+ *
+ * EL RESUMEN, Y POR QUE VIVE AQUI Y NO EN UN EXTREMO PROPIO (ADR-033)
+ *
+ * `?resumen=1` devuelve una fila por modulo con cuantas preguntas activas tiene,
+ * y ninguna pregunta. Existe porque el indice de los siete modulos las muestra a
+ * la vez y necesita las siete cifras: pedirlas trayendo el banco cuesta 371,8 KB
+ * y asi cuesta lo que cuesta `/api/estado`, que son 0,2 KB medidos.
+ *
+ * Vive en ESTE archivo, y no en un `/api/modulos`, porque lo que se pide es un
+ * dato sobre las preguntas —cuantas hay por modulo— y no un catalogo de modulos.
+ * Un extremo aparte tendria que contar lo mismo sobre la misma vista, y el dia
+ * que las dos consultas divergieran el indice diria una cosa y el cuestionario
+ * dibujaria otra sin que nada lo anunciara. Es el mismo motivo por el que
+ * `scripts/generar-instantanea.mjs` importa las consultas de aqui en vez de tener
+ * copia propia.
+ *
+ * LO QUE EL RESUMEN NO HACE, Y HAY QUE TENER PRESENTE
+ *
+ * Cuenta filas de la vista. NO pasa por `validarPreguntas()`, que es por fila y
+ * puede descartar alguna. Si alguna vez descartara una, el resumen diria 61 y la
+ * pagina dibujaria 60. Hoy el informe de validacion dice `descartadas: 0`, asi que
+ * no ocurre, y ADR-033 dejo escrito como se cubre: **lo dibujado manda**, y
+ * `scripts/probar-filtrado.mjs` compara las dos cuentas y da rojo si difieren.
+ * Validar aqui las 368 para devolver siete numeros costaria exactamente lo que
+ * este parametro existe para no gastar.
  *
  * NOMBRES
  *
@@ -52,6 +78,24 @@ export const SQL_PREGUNTAS = `
          enunciado, justificacion, dificultad, orden_fijo
   FROM pregunta_activa
 `;
+
+/**
+ * Cuantas preguntas activas tiene cada modulo.
+ *
+ * Se agrupa por las tres columnas del modulo y no solo por el numero para que el
+ * titulo y el icono viajen con la cuenta: quien dibuja el indice los necesita, y
+ * pedirlos aparte seria una segunda consulta para el mismo renglon.
+ *
+ * Exportada como las otras dos, y por el mismo motivo: para que nadie tenga que
+ * escribir una segunda version de esta cuenta en otro archivo.
+ */
+export const sqlResumen = (filtrandoPorModulo) => `
+    SELECT modulo, modulo_titulo, modulo_icono, COUNT(*) AS preguntas
+    FROM pregunta_activa
+    ${filtrandoPorModulo ? 'WHERE modulo = ?1' : ''}
+    GROUP BY modulo, modulo_titulo, modulo_icono
+    ORDER BY modulo
+  `;
 
 /** Alternativas de las preguntas que la vista dejo pasar. */
 export const sqlAlternativas = (filtrandoPorModulo) => `
@@ -84,6 +128,24 @@ function leerModulo(url) {
   return valido ? numero : false;
 }
 
+/**
+ * Interpreta el parametro `resumen`.
+ *
+ * Devuelve true si vino y sirve, false si no vino, y `null` si vino y no sirve.
+ *
+ * SOLO VALE EL VALOR `1`, y eso es a proposito (ADR-033). Un `resumen=true` o un
+ * `resumen=si` no se tratan como «no»: se rechazan. Tratarlos en silencio como
+ * apagado le devolveria el banco entero —371,8 KB— a quien pidio 0,2 KB, que es
+ * exactamente el gasto que este parametro existe para evitar. Un parametro mal
+ * escrito tiene que doler enseguida y no en la factura de datos del estudiante.
+ */
+function leerResumen(url) {
+  const crudo = url.searchParams.get('resumen');
+  if (crudo === null) return false;
+  if (crudo === '1') return true;
+  return null;
+}
+
 /** Agrupa las alternativas por pregunta, en un solo recorrido. */
 function agruparAlternativas(filas) {
   const porPregunta = new Map();
@@ -106,7 +168,9 @@ function agruparAlternativas(filas) {
 }
 
 export const onRequest = soloLectura(async ({ base, request }) => {
-  const modulo = leerModulo(new URL(request.url));
+  const url = new URL(request.url);
+  const modulo = leerModulo(url);
+  const resumen = leerResumen(url);
 
   if (modulo === false) {
     return respuestaError(
@@ -115,7 +179,31 @@ export const onRequest = soloLectura(async ({ base, request }) => {
     );
   }
 
+  if (resumen === null) {
+    return respuestaError(
+      'PETICION_INVALIDA',
+      'El parametro resumen solo acepta el valor 1. Omitelo para pedir las preguntas.'
+    );
+  }
+
   const filtrandoPorModulo = modulo !== null;
+
+  // El resumen se compone con el filtro: `?modulo=3&resumen=1` es la cuenta del
+  // modulo 3, que es una pregunta coherente y negarse a contestarla costaria mas
+  // codigo que contestarla (ADR-033).
+  if (resumen) {
+    const consulta = filtrandoPorModulo
+      ? base.prepare(sqlResumen(true)).bind(modulo)
+      : base.prepare(sqlResumen(false));
+
+    const filas = await consulta.all();
+
+    return respuestaOk(filas.results ?? [], {
+      modulo: filtrandoPorModulo ? modulo : 'todos',
+      resumen: true,
+      filas_leidas: filas.meta?.rows_read ?? 0,
+    });
+  }
 
   const consultaPreguntas = filtrandoPorModulo
     ? base.prepare(`${SQL_PREGUNTAS} WHERE modulo = ?1 ORDER BY id`).bind(modulo)

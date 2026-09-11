@@ -71,73 +71,87 @@
           Preguntas de evaluación avanzada de los módulos 2 al 8 del plan formativo. Elige una alternativa y sabrás al instante si acertaste. Las alternativas se barajan en cada carga, así que no memorices posiciones: entiende el porqué. Es material de estudio no oficial: practicar acá no acredita nada ante Talento Digital para Chile.
         </p>
 
-        <!-- Selector de modulo (iteracion 31, ADR-032).
-             Vive aca y no en la zona de preguntas por tres motivos, escritos
-             enteros en ADR-032: gobierna las barras que vienen justo abajo y un
-             control no va despues de lo que manda; el panel es pegajoso y la zona
-             derecha no, asi que aca sigue alcanzable con 61 preguntas desplegadas;
-             y en telefono esta columna se apila primero, de modo que la primera
-             accion de la pagina no queda enterrada bajo el panel entero.
+        <!-- Indice de modulos (iteracion 32, ADR-032 actualizada).
+             Es el UNICO control para elegir modulo: reemplaza al <select> de la
+             iteracion 31, porque dos formas de elegir en el mismo panel, a tres
+             centimetros, es una de mas. Y es mejor control: muestra los siete
+             estados a la vez en vez de esconder seis.
 
-             Las alternativas del selector NO llevan el numero de preguntas de cada
-             modulo. Ese dato no existe en el navegador antes de pedir el modulo, y
-             escribirlo a mano es el «105 preguntas» que ya mintio el 2026-09-08.
-             Lo rellena components/cuestionario.js a medida que se van conociendo. -->
-        <div class="mt-9">
-          <label for="selector-modulo" class="font-mono text-[11px] text-mutedink">Elige el módulo que quieres practicar</label>
-          <div class="relative mt-2">
-            <select id="selector-modulo"
-                    class="w-full appearance-none bg-panel border border-panel3 rounded-lg pl-4 pr-11 py-3 font-display font-bold text-sm text-paper cursor-pointer hover:border-jsyellow focus:border-jsyellow focus:outline-none focus:ring-2 focus:ring-jsyellow/40 transition-colors">
-            </select>
-            <span class="icon i-expand-more text-xl text-jsyellow absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
-          </div>
+             Sigue viviendo aca, que es lo que ADR-032 decidio y no cambia:
+             gobierna las barras que vienen justo debajo, el panel es pegajoso y
+             la zona derecha no, y en telefono esta columna se apila primero.
+
+             Lo llena components/indice-modulos.js con los conteos que trae
+             /api/preguntas?resumen=1 (ADR-033). Las cifras NO se escriben aqui:
+             salen del dato, siempre. -->
+        <nav class="mt-9" aria-labelledby="titulo-indice">
+          <p id="titulo-indice" class="font-mono text-[11px] text-mutedink">Elige el módulo que quieres practicar</p>
+          <ul id="indice-modulos" class="mt-3 grid grid-cols-2 lg:grid-cols-1 gap-2"></ul>
 
           <!-- Aviso de perdida de avance. Vacio y oculto salvo que cambiar de
                modulo vaya a costarle respuestas al estudiante. El avance no se
                guarda hasta la iteracion 33, asi que cambiar pierde lo respondido:
-               se dice ANTES, nunca despues. Lo llena components/cuestionario.js.
+               se dice ANTES, nunca despues.
 
-               `role="alert"` y no `alertdialog`: esto NO es un modal y no atrapa el
-               foco, porque no le hace falta —el selector ya volvio a su sitio antes
-               de preguntar, asi que salirse de aqui no cuesta nada—. Anunciar un
-               dialogo modal a quien usa lector de pantalla y no darselo es peor que
-               no anunciarlo. `role="alert"` ya implica `aria-live="assertive"`. -->
+               `role="alert"` y no `alertdialog`: esto NO es un modal y no atrapa
+               el foco, porque no le hace falta —el indice sigue marcando el modulo
+               actual, asi que salirse de aqui no cuesta nada—. Anunciar un dialogo
+               modal a quien usa lector de pantalla y no darselo es peor que no
+               anunciarlo. `role="alert"` ya implica `aria-live="assertive"`. -->
           <div id="aviso-cambio-modulo" class="hidden mt-3" role="alert"></div>
-        </div>
+        </nav>
 
-        <div class="mt-9 flex items-end gap-5 sm:gap-8">
-          <div class="flex flex-col items-center gap-3">
-              <span class="font-display font-bold text-2xl text-jsyellow" id="valor-avance">0</span>
-              <div class="relative w-10 lg:w-12 h-40 xl:h-52 rounded-full bg-panel2 border border-panel3 overflow-hidden">
-                <div id="barra-avance" class="barra-vertical absolute inset-x-0 bottom-0 bg-jsyellow" style="height:0%"></div>
-              </div>
-              <span class="grid place-items-center w-8 h-8 rounded-lg bg-jsyellowdim/20 text-jsyellow"><span class="icon i-trending-up text-base" aria-hidden="true"></span></span>
-              <span class="font-mono text-[10px] text-mutedink text-center leading-tight w-16">Respondidas</span>
-            </div>
-          <div class="flex flex-col items-center gap-3">
-              <span class="font-display font-bold text-2xl text-ruby" id="valor-incorrectas">0</span>
-              <div class="relative w-10 lg:w-12 h-40 xl:h-52 rounded-full bg-panel2 border border-panel3 overflow-hidden">
-                <div id="barra-incorrectas" class="barra-vertical absolute inset-x-0 bottom-0 bg-ruby" style="height:0%"></div>
-              </div>
-              <span class="grid place-items-center w-8 h-8 rounded-lg bg-rubydim text-ruby"><span class="icon i-cancel text-base" aria-hidden="true"></span></span>
-              <span class="font-mono text-[10px] text-mutedink text-center leading-tight w-16">Incorrectas</span>
-            </div>
-          <div class="flex flex-col items-center gap-3">
-              <span class="font-display font-bold text-2xl text-esmeralda" id="valor-correctas">0</span>
-              <div class="relative w-10 lg:w-12 h-40 xl:h-52 rounded-full bg-panel2 border border-panel3 overflow-hidden">
-                <div id="barra-correctas" class="barra-vertical absolute inset-x-0 bottom-0 bg-esmeralda" style="height:0%"></div>
-              </div>
-              <span class="grid place-items-center w-8 h-8 rounded-lg bg-esmeraldadim text-esmeralda"><span class="icon i-check-circle text-base" aria-hidden="true"></span></span>
-              <span class="font-mono text-[10px] text-mutedink text-center leading-tight w-16">Correctas</span>
-            </div>
-        </div>
+        <!-- Las tres barras, horizontales desde la iteracion 32.
+             Cada una lleva su etiqueta, su cifra absoluta y su porcentaje EN LA
+             MISMA FILA, que es lo que las vuelve legibles en escala de grises: si
+             la unica diferencia entre ellas fuera el color, quien no lo distingue
+             se queda sin saber cual es cual. El color acompana, no informa solo. -->
+        <div class="mt-9 flex flex-col gap-4">
 
-        <div class="mt-8 bg-panel border border-panel3 rounded-xl p-5">
-          <div class="flex items-baseline justify-between gap-3">
-            <span class="font-mono text-[11px] text-mutedink">Avance del módulo</span>
-            <span class="font-display font-bold text-xl text-jsyellow" id="pct-avance">0%</span>
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <span class="grid place-items-center w-6 h-6 rounded bg-jsyellowdim/20 text-jsyellow shrink-0"><span class="icon i-trending-up text-sm" aria-hidden="true"></span></span>
+              <span class="font-mono text-[11px] text-mutedink">Respondidas</span>
+              <span class="ml-auto font-display font-bold text-sm text-jsyellow" id="valor-avance">0</span>
+              <span class="font-mono text-[11px] text-mutedink w-10 text-right" id="pct-avance">0%</span>
+            </div>
+            <div class="relative h-2.5 rounded-full bg-panel2 border border-panel3 overflow-hidden">
+              <div id="barra-avance" class="barra-horizontal absolute inset-y-0 left-0 bg-jsyellow" style="width:0%"></div>
+            </div>
           </div>
-          <p class="mt-2 text-sm text-muted" id="mensaje-avance">Responde la primera pregunta para comenzar.</p>
+
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <span class="grid place-items-center w-6 h-6 rounded bg-rubydim text-ruby shrink-0"><span class="icon i-cancel text-sm" aria-hidden="true"></span></span>
+              <span class="font-mono text-[11px] text-mutedink">Incorrectas</span>
+              <span class="ml-auto font-display font-bold text-sm text-ruby" id="valor-incorrectas">0</span>
+              <span class="font-mono text-[11px] text-mutedink w-10 text-right" id="pct-incorrectas">0%</span>
+            </div>
+            <div class="relative h-2.5 rounded-full bg-panel2 border border-panel3 overflow-hidden">
+              <div id="barra-incorrectas" class="barra-horizontal absolute inset-y-0 left-0 bg-ruby" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <span class="grid place-items-center w-6 h-6 rounded bg-esmeraldadim text-esmeralda shrink-0"><span class="icon i-check-circle text-sm" aria-hidden="true"></span></span>
+              <span class="font-mono text-[11px] text-mutedink">Correctas</span>
+              <span class="ml-auto font-display font-bold text-sm text-esmeralda" id="valor-correctas">0</span>
+              <span class="font-mono text-[11px] text-mutedink w-10 text-right" id="pct-correctas">0%</span>
+            </div>
+            <div class="relative h-2.5 rounded-full bg-panel2 border border-panel3 overflow-hidden">
+              <div id="barra-correctas" class="barra-horizontal absolute inset-y-0 left-0 bg-esmeralda" style="width:0%"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- El porcentaje de avance ya no se repite aca: vive en la fila de su
+             propia barra desde la iteracion 32. Esta caja se queda con lo que
+             ninguna barra puede decir: en que punto va el estudiante, en palabras,
+             y cuantas preguntas tiene el modulo que esta viendo. -->
+        <div class="mt-6 bg-panel border border-panel3 rounded-xl p-5">
+          <p class="text-sm text-muted" id="mensaje-avance">Elige un módulo para comenzar.</p>
           <p class="mt-1 font-mono text-[11px] text-mutedink">Preguntas del módulo: <span id="total-preguntas">0</span></p>
         </div>
 

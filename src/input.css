@@ -88,9 +88,12 @@
     transition: width 380ms ease;
   }
 
-  /* Barras verticales del cuestionario: crecen desde abajo. */
-  .barra-vertical {
-    transition: height 420ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Barras del cuestionario. Eran verticales y crecian desde abajo; desde la
+     iteracion 32 son horizontales y crecen hacia la derecha, para aprovechar el
+     ancho del panel y para que cada una pueda llevar al lado su etiqueta, su
+     cifra y su porcentaje. */
+  .barra-horizontal {
+    transition: width 420ms cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 9999px;
   }
 

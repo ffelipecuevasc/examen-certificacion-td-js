@@ -27,9 +27,11 @@
  *      y el vacio se explica en vez de quedarse en blanco.
  *   2. Las barras del panel miden el MODULO, no el banco. `estado.total` es la
  *      cuenta del modulo dibujado.
- *   3. El selector queda LIBRE en todo momento: se cambia de modulo cuando se
+ *   3. El control de modulo queda LIBRE en todo momento: se cambia cuando se
  *      quiera. El motivo esta en la iteracion 31 y sale de vision.md — forzar a
- *      terminar no produce constancia, produce abandono.
+ *      terminar no produce constancia, produce abandono. Desde la iteracion 32
+ *      ese control es el indice de components/indice-modulos.js, y se cambia de
+ *      modulo por una sola puerta: pedirCambioDeModulo().
  *
  * Y de la 3 sale la deuda que esta iteracion tiene que pagar en voz alta: el
  * avance no se guarda hasta la iteracion 33, asi que cambiar de modulo pierde lo
@@ -37,7 +39,13 @@
  */
 import { $, $$, esc, shuffle, icon } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
-import { modulesData } from '../data/modules.js';
+import {
+  cargarConteos,
+  conectarIndice,
+  conteoDelResumen,
+  marcarModuloActivo,
+  pintarIndice,
+} from './indice-modulos.js';
 
 const estado = {
   respondidas: 0,
@@ -58,31 +66,24 @@ const estado = {
 let bancoCargado = null;
 
 /**
- * Cuantas preguntas resulto tener cada modulo YA VISITADO en esta sesion.
+ * De donde salio lo que se esta viendo, por fuente.
  *
- * POR QUE NO ESTAN LOS SIETE DESDE EL PRINCIPIO
+ * Son dos peticiones distintas —el resumen de los siete conteos y las preguntas
+ * del modulo— y cualquiera de las dos puede haber caido a la instantanea por su
+ * cuenta. El aviso de ADR-008 tiene que aparecer si **alguna** de las dos lo hizo:
+ * decirle al estudiante «esto viene de la base» cuando la mitad viene de la copia
+ * seria mentir por omision.
  *
- * Porque antes de pedir un modulo el navegador no sabe cuantas preguntas tiene, y
- * escribir los siete numeros a mano en el codigo es exactamente el error que esta
- * pagina ya cometio: el contador decia «105 preguntas» mientras el pie decia 8, el
- * 2026-09-08. Un numero que no sale del dato que acompana miente tarde o temprano.
- *
- * Asi que el selector no promete cifras: las va diciendo a medida que se vuelven
- * ciertas. Cada modulo que el estudiante visita deja aqui su cuenta REAL, contada
- * sobre lo que se dibujo, y desde ese momento su alternativa del selector la
- * muestra. Ningun numero es mejor que un numero falso.
- *
- * Vive en memoria y muere con la pestana: no es almacenamiento del navegador, que
- * esta reservado para la iteracion 33.
+ * Cada campo guarda el sello del respaldo, o null si esa fuente contesto en vivo.
  */
-const conteoConocido = new Map();
+const origen = { resumen: null, modulo: null };
 
 /**
  * Cual es la peticion vigente.
  *
- * El selector esta libre, asi que el estudiante puede cambiar de modulo mientras
- * el anterior todavia viaja. Sin esto, una respuesta lenta del modulo 3 llegaria
- * despues de la del 5 y dibujaria el 3 sobre el 5, con el selector diciendo «5».
+ * El indice esta libre, asi que el estudiante puede cambiar de modulo mientras el
+ * anterior todavia viaja. Sin esto, una respuesta lenta del modulo 3 llegaria
+ * despues de la del 5 y dibujaria el 3 sobre el 5, con el indice marcando el 5.
  * Cada llamada toma un numero y, al volver del await, se retira si ya no es la
  * ultima.
  */
@@ -93,15 +94,21 @@ function actualizarPanel() {
   const { respondidas, correctas, incorrectas, total } = estado;
   const pct = (valor) => (total === 0 ? 0 : Math.round((valor / total) * 100));
 
-  $('#barra-avance').style.height = `${pct(respondidas)}%`;
-  $('#barra-incorrectas').style.height = `${pct(incorrectas)}%`;
-  $('#barra-correctas').style.height = `${pct(correctas)}%`;
+  // Horizontales desde la iteracion 32: crecen a lo ancho, no a lo alto.
+  $('#barra-avance').style.width = `${pct(respondidas)}%`;
+  $('#barra-incorrectas').style.width = `${pct(incorrectas)}%`;
+  $('#barra-correctas').style.width = `${pct(correctas)}%`;
 
   $('#valor-avance').textContent = respondidas;
   $('#valor-incorrectas').textContent = incorrectas;
   $('#valor-correctas').textContent = correctas;
 
+  // Cada barra lleva ahora su propio porcentaje al lado de su cifra. Es lo que la
+  // vuelve legible sin color: la fila se explica sola.
   $('#pct-avance').textContent = `${pct(respondidas)}%`;
+  $('#pct-incorrectas').textContent = `${pct(incorrectas)}%`;
+  $('#pct-correctas').textContent = `${pct(correctas)}%`;
+
   $('#total-preguntas').textContent = total;
 
   const restantes = total - respondidas;
@@ -269,9 +276,12 @@ function fechaLegible(iso) {
  * un «puede no estar al dia» sin fecha no le sirve a nadie para decidir si
  * confiar o no.
  */
-function mostrarAvisoRespaldo(sello) {
+function mostrarAvisoRespaldo() {
   const contenedor = $('#aviso-respaldo');
   if (!contenedor) return;
+
+  // Basta con que UNA de las dos fuentes venga de la copia. Ver `origen`.
+  const sello = origen.resumen ?? origen.modulo;
 
   if (!sello) {
     contenedor.innerHTML = '';
@@ -317,21 +327,21 @@ function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '') {
 /**
  * El estado vacio con el que arranca la pagina.
  *
- * Lleva un enlace al selector, y no es un adorno: en telefono las dos columnas se
+ * Lleva un enlace al indice, y no es un adorno: en telefono las dos columnas se
  * apilan y este mensaje queda por debajo del panel entero, de modo que «elige un
  * modulo arriba» manda a desplazarse a ciegas. El enlace cierra esa distancia. En
- * escritorio sobra, porque el selector esta a la vista en la mitad izquierda, y
- * no molesta.
+ * escritorio sobra, porque el indice esta a la vista en la mitad izquierda, y no
+ * molesta.
  */
 function mostrarEstadoVacio(contenedor) {
   dibujarMensaje(
     contenedor,
     'quiz',
     'Elige un módulo para empezar.',
-    'En el panel está el selector con los siete módulos del examen. Cuando elijas uno, sus preguntas aparecen acá.',
-    `<a href="#selector-modulo" data-ir-al-selector
+    'En el panel está el índice con los siete módulos del examen. Cuando elijas uno, sus preguntas aparecen acá.',
+    `<a href="#indice-modulos" data-ir-al-indice
           class="mt-5 inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
-         ${icon('expand-more', 'text-base text-jsyellow')}Ir al selector
+         ${icon('layers', 'text-base text-jsyellow')}Ir al índice de módulos
        </a>`
   );
 }
@@ -382,7 +392,7 @@ function mostrarContador(grupos) {
   const contar = (cantidad, singular, plural) =>
     `${cantidad} ${cantidad === 1 ? singular : plural}`;
 
-  // Los modulos se cuentan de los datos, no del selector: si alguna vez llegara
+  // Los modulos se cuentan de los datos, no del indice: si alguna vez llegara
   // una fila de otro modulo, el contador lo diria en vez de taparlo.
   const cual =
     grupos.length === 1
@@ -397,37 +407,8 @@ function mostrarContador(grupos) {
 }
 
 // ---------------------------------------------------------------------------
-// El selector de modulo
+// La puerta unica hacia el cambio de modulo
 // ---------------------------------------------------------------------------
-
-/**
- * Rehace las alternativas del selector.
- *
- * Los siete modulos salen de data/modules.js, que ya es la lista de modulos del
- * sitio: asi el selector se dibuja sin red y esta disponible antes de que la capa
- * de datos conteste, o aunque no conteste nunca.
- *
- * La cifra de cada modulo se anade solo si `conteoConocido` la tiene, es decir,
- * solo despues de haberla contado sobre preguntas dibujadas de verdad.
- */
-function refrescarSelector() {
-  const selector = $('#selector-modulo');
-  if (!selector) return;
-
-  const alternativas = modulesData.map((modulo) => {
-    const cuantas = conteoConocido.get(modulo.numero);
-    const cifra = cuantas === undefined ? '' : ` · ${cuantas} preguntas`;
-    const rotulo = `Módulo ${modulo.numero} · ${modulo.titulo}${cifra}`;
-
-    return `<option value="${esc(modulo.numero)}">${esc(rotulo)}</option>`;
-  });
-
-  selector.innerHTML = `<option value="">Elige un módulo…</option>${alternativas.join('')}`;
-
-  // Rehacer las alternativas borra la seleccion: se repone despues, siempre desde
-  // el estado y nunca desde el DOM, que es lo que la mantiene sincronizada.
-  selector.value = estado.modulo === null ? '' : String(estado.modulo);
-}
 
 /** Esconde el aviso de cambio de modulo y lo deja vacio. */
 function ocultarAvisoCambio() {
@@ -447,16 +428,22 @@ function ocultarAvisoCambio() {
  * aspecto de error del sistema, y el navegador puede decidir suprimirlo. Un aviso
  * que el navegador puede callar no sirve para lo unico que tiene que hacer.
  *
- * EL ORDEN IMPORTA MAS QUE EL TEXTO
+ * QUE CAMBIO AL PASAR DEL SELECTOR AL INDICE (iteracion 32)
  *
- * Cuando se llega aqui, el selector YA fue devuelto al modulo actual por
- * alCambiarSelector(). Si el estudiante ignora este bloque, recarga o se va, el
- * selector sigue diciendo la verdad y no se perdio nada. Preguntar primero y
- * revertir despues dejaria una ventana en que la pantalla dice un modulo y las
- * preguntas son de otro.
+ * Con el `<select>` habia que **deshacer** el cambio antes de preguntar: el
+ * navegador ya habia movido la seleccion y, mientras el aviso esperaba, la
+ * pantalla decia un modulo y las preguntas eran de otro.
  *
- * No atrapa el foco y no es un modal: como el selector ya volvio a su sitio, el
- * resto de la pagina puede seguir usandose sin que nada se pierda por descuido.
+ * Con el indice ese problema desaparece de raiz, y conviene entender por que: un
+ * boton no cambia ningun estado al pulsarlo. El indice marca el modulo activo
+ * **cuando el modulo se carga**, no cuando se pide, asi que mientras este aviso
+ * pregunta, el indice sigue senialando —correctamente— el modulo en el que el
+ * estudiante todavia esta. La propiedad que antes habia que reponer a mano ahora
+ * es estructural. Se sigue comprobando igual, porque una propiedad estructural
+ * tambien se puede romper editando.
+ *
+ * No atrapa el foco y no es un modal: como nada se ha movido todavia, el resto de
+ * la pagina puede seguir usandose sin que nada se pierda por descuido.
  */
 function pedirConfirmacion(destino) {
   const contenedor = $('#aviso-cambio-modulo');
@@ -488,56 +475,50 @@ function pedirConfirmacion(destino) {
   $('[data-confirmar-cambio]', contenedor)?.focus?.();
 }
 
-/** Decide que hacer cuando el estudiante elige otra alternativa del selector. */
-function alCambiarSelector(selector) {
-  const elegido = Number(selector.value);
-
-  // La alternativa vacia («Elige un módulo…») no hace nada: volver a ella no es
-  // una orden de descargar lo que ya esta puesto.
-  if (!Number.isInteger(elegido) || elegido === 0) {
-    selector.value = estado.modulo === null ? '' : String(estado.modulo);
-    return;
-  }
-
-  if (elegido === estado.modulo) return;
+/**
+ * **La unica puerta por la que se cambia de modulo.**
+ *
+ * Todo lo que quiera cambiar de modulo pasa por aqui, y eso no es una preferencia
+ * de estilo: el aviso de perdida de avance de la iteracion 31 vive dentro. Un
+ * segundo camino que llame a `mostrarModulo()` directo lo esquivaria, y lo
+ * esquivaria **en silencio** —el estudiante perderia lo respondido sin que nada se
+ * lo hubiera dicho—, que es exactamente lo que esa iteracion existe para impedir.
+ *
+ * Por eso `mostrarModulo()` es de esta casa y el indice no la conoce: avisa por
+ * `conectarIndice()` y quien decide es esta funcion.
+ */
+function pedirCambioDeModulo(numero) {
+  if (numero === estado.modulo) return;
 
   if (estado.respondidas === 0) {
     ocultarAvisoCambio();
-    mostrarModulo(elegido);
+    mostrarModulo(numero);
     return;
   }
 
-  // Primero se deshace el cambio, y recien despues se pregunta. Ver
-  // pedirConfirmacion().
-  selector.value = String(estado.modulo);
-  pedirConfirmacion(elegido);
+  pedirConfirmacion(numero);
 }
 
-/** Conecta el selector y los dos botones del aviso de cambio. */
-function conectarSelector() {
-  const selector = $('#selector-modulo');
-  if (!selector || selector.dataset.bound) return;
-
-  selector.addEventListener('change', () => alCambiarSelector(selector));
-  selector.dataset.bound = 'true';
-
+/** Conecta los dos botones del aviso de cambio. */
+function conectarAvisoCambio() {
   const aviso = $('#aviso-cambio-modulo');
-  if (aviso && !aviso.dataset.bound) {
-    aviso.addEventListener('click', (evento) => {
-      const confirmar = evento.target.closest('[data-confirmar-cambio]');
-      if (confirmar) {
-        ocultarAvisoCambio();
-        mostrarModulo(Number(confirmar.dataset.confirmarCambio));
-        return;
-      }
+  if (!aviso || aviso.dataset.bound) return;
 
-      if (evento.target.closest('[data-cancelar-cambio]')) {
-        ocultarAvisoCambio();
-        selector.focus?.();
-      }
-    });
-    aviso.dataset.bound = 'true';
-  }
+  aviso.addEventListener('click', (evento) => {
+    const confirmar = evento.target.closest('[data-confirmar-cambio]');
+    if (confirmar) {
+      ocultarAvisoCambio();
+      mostrarModulo(Number(confirmar.dataset.confirmarCambio));
+      return;
+    }
+
+    if (evento.target.closest('[data-cancelar-cambio]')) {
+      ocultarAvisoCambio();
+      $('#indice-modulos')?.querySelector?.('[aria-current]')?.focus?.();
+    }
+  });
+
+  aviso.dataset.bound = 'true';
 }
 
 /**
@@ -551,11 +532,12 @@ function conectarCuestionario(contenedor) {
   if (contenedor.dataset.bound) return;
 
   contenedor.addEventListener('click', (evento) => {
-    const irAlSelector = evento.target.closest('[data-ir-al-selector]');
-    if (irAlSelector) {
+    const irAlIndice = evento.target.closest('[data-ir-al-indice]');
+    if (irAlIndice) {
       // El salto por ancla ya desplaza; el foco se mueve a mano para que el
-      // teclado y el lector de pantalla lleguen al mismo sitio que el ojo.
-      $('#selector-modulo')?.focus?.();
+      // teclado y el lector de pantalla lleguen al mismo sitio que el ojo. Va a
+      // la primera fila del indice, que es la primera decision que hay que tomar.
+      $('#indice-modulos')?.querySelector?.('[data-modulo]')?.focus?.();
       return;
     }
 
@@ -595,7 +577,6 @@ export async function mostrarModulo(numero) {
   estado.total = 0;
   bancoCargado = null;
 
-  refrescarSelector();
   conectarCuestionario(contenedor);
   mostrarContador(null);
   actualizarPanel();
@@ -616,7 +597,8 @@ export async function mostrarModulo(numero) {
   // Antes de dibujar nada: si esto viene del respaldo, que se vea. Va primero
   // para que el aviso aparezca tambien cuando el modulo venga vacio y la pagina
   // termine en un mensaje en vez de en preguntas.
-  mostrarAvisoRespaldo(respuesta.meta?.respaldo);
+  origen.modulo = respuesta.meta?.respaldo ?? null;
+  mostrarAvisoRespaldo();
 
   if (!respuesta.ok) {
     mostrarContador(null);
@@ -640,36 +622,72 @@ export async function mostrarModulo(numero) {
   bancoCargado = agruparPorModulo(respuesta.datos);
   mostrarContador(bancoCargado);
 
-  // La cifra del selector se aprende de lo dibujado, y por eso se guarda despues
-  // de agrupar y no de la respuesta cruda.
-  conteoConocido.set(
-    numero,
-    bancoCargado.reduce((suma, grupo) => suma + grupo.preguntas.length, 0)
-  );
-  refrescarSelector();
+  // El indice marca el modulo activo AHORA, cuando ya esta dibujado, y no cuando
+  // se pidio: mientras el aviso de perdida pregunta, tiene que seguir senialando
+  // el modulo en el que el estudiante esta de verdad.
+  marcarModuloActivo(numero);
 
   pintar();
+  avisarSiElResumenNoCuadra(numero);
+}
+
+/**
+ * Deja constancia si el indice prometio una cantidad y se dibujo otra.
+ *
+ * ADR-033 lo anticipa: `?resumen=1` cuenta filas de `pregunta_activa` y
+ * `/api/preguntas` valida por fila y puede descartar alguna. Si eso pasara, el
+ * indice diria 61 y la pagina dibujaria 60.
+ *
+ * Aqui no se corrige el numero del indice ni se esconde la diferencia: **lo
+ * dibujado manda** y ya es lo que muestran el contador y la cabecera. Lo que se
+ * hace es dejarlo dicho en la consola, para que quien mire encuentre el motivo en
+ * vez de un descuadre sin explicacion. Y `scripts/probar-filtrado.mjs` lo
+ * convierte en un veredicto rojo, que es donde de verdad se caza.
+ */
+function avisarSiElResumenNoCuadra(numero) {
+  const prometidas = conteoDelResumen(numero);
+  if (prometidas === undefined) return;
+
+  const dibujadas = estado.total;
+  if (prometidas === dibujadas) return;
+
+  console.warn(
+    `El indice dice que el modulo ${numero} tiene ${prometidas} preguntas y se ` +
+      `dibujaron ${dibujadas}. Manda lo dibujado. Ver ADR-033.`
+  );
 }
 
 /**
  * Deja la pagina lista y vacia, esperando una eleccion.
  *
- * No pide nada a la capa de datos: hasta que el estudiante elija un modulo no hay
- * nada que pedir. Es el cambio de fondo de la iteracion 31 — antes esta funcion
- * se traia el banco entero.
+ * No pide ninguna PREGUNTA: hasta que el estudiante elija un modulo no hay ninguna
+ * que pedir, y ese fue el cambio de fondo de la iteracion 31 —antes esta funcion
+ * se traia el banco entero, 371,8 KB—.
+ *
+ * Lo unico que pide es el resumen de los siete conteos, que son 0,9 KB (ADR-033).
+ * El indice se dibuja antes de que llegue, con los nombres de data/modules.js, asi
+ * que la pagina es utilizable aunque el resumen tarde o no llegue nunca: lo unico
+ * que faltaria son las cifras, y faltar es mejor que inventarlas.
  */
-export function renderCuestionario() {
+export async function renderCuestionario() {
   const contenedor = $('#cuestionario');
   if (!contenedor) return;
 
-  refrescarSelector();
-  conectarSelector();
+  pintarIndice();
+  conectarIndice(pedirCambioDeModulo);
+  conectarAvisoCambio();
   conectarCuestionario(contenedor);
 
   mostrarContador(null);
-  mostrarAvisoRespaldo(null);
   mostrarEstadoVacio(contenedor);
   actualizarPanel();
+
+  // El resumen puede caer a la instantanea por su cuenta. Si lo hace, el aviso de
+  // ADR-008 aparece AQUI, al abrir la pagina, y no al elegir el primer modulo: el
+  // estudiante se entera de que esta viendo una copia antes de ponerse a estudiar,
+  // que es lo que esa ADR pide con todas sus letras.
+  origen.resumen = await cargarConteos();
+  mostrarAvisoRespaldo();
 }
 
 /** Conecta el botón que reinicia las respuestas del módulo que se está viendo. */

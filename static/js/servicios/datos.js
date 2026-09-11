@@ -118,6 +118,8 @@ export const consultarEstado = () => consultar('/api/estado');
  *
  * Sustituye a leerPrueba(), que consultaba la tabla de juguete prueba_tuberia y
  * se retiro junto con ella en la iteracion 22.
+ *
+ * Para saber CUANTAS hay sin traerlas, esta `leerResumen()` mas abajo.
  */
 export async function leerPreguntas(modulo) {
   const ruta = modulo == null ? '/api/preguntas' : `/api/preguntas?modulo=${modulo}`;
@@ -133,24 +135,45 @@ export async function leerPreguntas(modulo) {
 }
 
 /**
+ * Cuantas preguntas tiene cada modulo, sin traerse ninguna.
+ *
+ * Es `/api/preguntas?resumen=1`, autorizado por ADR-033. Devuelve una fila por
+ * modulo con `modulo`, `modulo_titulo`, `modulo_icono` y `preguntas`.
+ *
+ * Existe porque el indice del panel muestra los siete modulos a la vez y necesita
+ * las siete cifras. La regla que trajo la iteracion 31 —«sin numero hasta que sea
+ * cierto»— no se afloja: las cifras siguen saliendo de un dato y no del codigo, y
+ * lo unico que cambia es que el dato llega antes. Escribir los siete numeros a
+ * mano seria el «105 preguntas» que ya mintio el 2026-09-08.
+ *
+ * Cae a la instantanea con las mismas reglas que `leerPreguntas()`: solo el fallo
+ * del SERVICIO cambia al respaldo, y cuando lo hace se dice.
+ */
+export async function leerResumen(modulo) {
+  const ruta =
+    modulo == null
+      ? '/api/preguntas?resumen=1'
+      : `/api/preguntas?modulo=${modulo}&resumen=1`;
+
+  const respuesta = await consultar(ruta);
+
+  if (respuesta.ok || !respuesta.usar_respaldo) return respuesta;
+
+  return (await resumirLaInstantanea(modulo)) ?? respuesta;
+}
+
+/**
  * Carga la instantanea versionada del banco (ADR-008).
  *
  * Se importa a proposito de forma dinamica: el archivo trae el banco entero y no
  * tiene por que viajar en la carga normal de la pagina, que es la que ocurre
  * siempre. Aca se descarga solo el dia que hace falta.
  *
- * Devuelve la misma forma que `consultar()` para que ningun componente tenga que
- * saber de donde salieron las preguntas, con una diferencia declarada:
- * `meta.respaldo` trae el sello del archivo —contra que base se genero y cuando—,
- * y de ahi sale el aviso al estudiante. **Si esto devolviera preguntas sin decir
- * que son del respaldo, el sitio mentiria en silencio**, que es justo lo que
- * ADR-008 prohibe.
- *
- * Devuelve null si la instantanea no esta o no se puede cargar: entonces quien
- * llama se queda con el error original, que es la verdad —no hay banco— en vez de
+ * Devuelve null si no esta o no se puede leer, que NO es lo mismo que estar vacia:
+ * quien llama tiene que poder quedarse con su error original en vez de inventar
  * una pagina vacia sin explicacion.
  */
-async function leerDesdeInstantanea(modulo) {
+async function cargarInstantanea() {
   let instantanea;
 
   try {
@@ -164,12 +187,70 @@ async function leerDesdeInstantanea(modulo) {
 
   if (!Array.isArray(todas) || !sello) return null;
 
-  const datos = modulo == null ? todas : todas.filter((p) => p.modulo === modulo);
+  return { todas, sello };
+}
+
+/**
+ * Las preguntas, desde la instantanea.
+ *
+ * Devuelve la misma forma que `consultar()` para que ningun componente tenga que
+ * saber de donde salieron, con una diferencia declarada: `meta.respaldo` trae el
+ * sello del archivo —contra que base se genero y cuando—, y de ahi sale el aviso
+ * al estudiante. **Si esto devolviera preguntas sin decir que son del respaldo, el
+ * sitio mentiria en silencio**, que es justo lo que ADR-008 prohibe.
+ */
+async function leerDesdeInstantanea(modulo) {
+  const copia = await cargarInstantanea();
+  if (!copia) return null;
+
+  const datos = modulo == null ? copia.todas : copia.todas.filter((p) => p.modulo === modulo);
 
   return {
     ok: true,
     datos,
-    meta: { origen: 'instantanea', respaldo: sello, vacio: datos.length === 0 },
+    meta: { origen: 'instantanea', respaldo: copia.sello, vacio: datos.length === 0 },
+    vacio: datos.length === 0,
+  };
+}
+
+/**
+ * El resumen, contado sobre la instantanea.
+ *
+ * Cuesta cargar el archivo entero para devolver siete numeros, y se acepta a
+ * sabiendas (ADR-033): es el camino degradado, y el estudiante va a necesitar ese
+ * archivo igual en cuanto elija un modulo. A cambio, el aviso de ADR-008 aparece al
+ * ABRIR la pagina y no al elegir, que es antes y es mejor.
+ *
+ * Se cuenta recorriendo las preguntas y no se lee del sello: el sello trae el total
+ * del banco, no el reparto por modulo, y deducirlo de ahi seria inventarlo.
+ */
+async function resumirLaInstantanea(modulo) {
+  const copia = await cargarInstantanea();
+  if (!copia) return null;
+
+  const porModulo = new Map();
+
+  for (const pregunta of copia.todas) {
+    if (modulo != null && pregunta.modulo !== modulo) continue;
+
+    const fila = porModulo.get(pregunta.modulo);
+
+    if (fila) fila.preguntas += 1;
+    else
+      porModulo.set(pregunta.modulo, {
+        modulo: pregunta.modulo,
+        modulo_titulo: pregunta.modulo_titulo,
+        modulo_icono: pregunta.modulo_icono,
+        preguntas: 1,
+      });
+  }
+
+  const datos = [...porModulo.values()].sort((a, b) => a.modulo - b.modulo);
+
+  return {
+    ok: true,
+    datos,
+    meta: { origen: 'instantanea', respaldo: copia.sello, resumen: true, vacio: datos.length === 0 },
     vacio: datos.length === 0,
   };
 }
