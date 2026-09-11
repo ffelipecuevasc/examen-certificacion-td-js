@@ -13,20 +13,80 @@
  * esc() antes de tocar innerHTML.** No hay ningun campo de confianza. El titulo
  * del modulo tampoco, y el nombre del icono menos que ninguno, porque va dentro
  * de un atributo.
+ *
+ * SE DIBUJA UN MODULO, NO EL BANCO (iteracion 31)
+ *
+ * Hasta el 2026-09-11 esta pagina pedia el banco entero y lo dibujaba de una vez.
+ * Con 105 preguntas se sostenia; con 368 dejo de ser una opcion de diseno para
+ * quien estudia desde el telefono con conexion modesta, que es parte del publico
+ * descrito en vision.md. Ahora el estudiante elige un modulo y solo ese viaja.
+ *
+ * De ahi salen tres consecuencias que ordenan el resto del archivo:
+ *
+ *   1. La pagina arranca VACIA. No hay nada que dibujar hasta que haya eleccion,
+ *      y el vacio se explica en vez de quedarse en blanco.
+ *   2. Las barras del panel miden el MODULO, no el banco. `estado.total` es la
+ *      cuenta del modulo dibujado.
+ *   3. El selector queda LIBRE en todo momento: se cambia de modulo cuando se
+ *      quiera. El motivo esta en la iteracion 31 y sale de vision.md — forzar a
+ *      terminar no produce constancia, produce abandono.
+ *
+ * Y de la 3 sale la deuda que esta iteracion tiene que pagar en voz alta: el
+ * avance no se guarda hasta la iteracion 33, asi que cambiar de modulo pierde lo
+ * respondido. **Se avisa antes, nunca despues.** Eso es pedirConfirmacion().
  */
 import { $, $$, esc, shuffle, icon } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
+import { modulesData } from '../data/modules.js';
 
-const estado = { respondidas: 0, correctas: 0, incorrectas: 0, total: 0 };
+const estado = {
+  respondidas: 0,
+  correctas: 0,
+  incorrectas: 0,
+  total: 0,
+  /** Modulo que se esta mostrando. null mientras no se haya elegido ninguno. */
+  modulo: null,
+};
 
 /**
- * El banco que se esta mostrando, ya agrupado por modulo.
+ * El modulo que se esta mostrando, ya agrupado.
  *
- * Se guarda para que reiniciar vuelva a dibujar sin pedir el banco de nuevo: el
+ * Se guarda para que reiniciar vuelva a dibujar sin pedir el modulo de nuevo: el
  * estudiante que reinicia quiere las mismas preguntas barajadas otra vez, no una
  * espera y la posibilidad de que la capa de datos se haya caido entre medio.
  */
 let bancoCargado = null;
+
+/**
+ * Cuantas preguntas resulto tener cada modulo YA VISITADO en esta sesion.
+ *
+ * POR QUE NO ESTAN LOS SIETE DESDE EL PRINCIPIO
+ *
+ * Porque antes de pedir un modulo el navegador no sabe cuantas preguntas tiene, y
+ * escribir los siete numeros a mano en el codigo es exactamente el error que esta
+ * pagina ya cometio: el contador decia «105 preguntas» mientras el pie decia 8, el
+ * 2026-09-08. Un numero que no sale del dato que acompana miente tarde o temprano.
+ *
+ * Asi que el selector no promete cifras: las va diciendo a medida que se vuelven
+ * ciertas. Cada modulo que el estudiante visita deja aqui su cuenta REAL, contada
+ * sobre lo que se dibujo, y desde ese momento su alternativa del selector la
+ * muestra. Ningun numero es mejor que un numero falso.
+ *
+ * Vive en memoria y muere con la pestana: no es almacenamiento del navegador, que
+ * esta reservado para la iteracion 33.
+ */
+const conteoConocido = new Map();
+
+/**
+ * Cual es la peticion vigente.
+ *
+ * El selector esta libre, asi que el estudiante puede cambiar de modulo mientras
+ * el anterior todavia viaja. Sin esto, una respuesta lenta del modulo 3 llegaria
+ * despues de la del 5 y dibujaria el 3 sobre el 5, con el selector diciendo «5».
+ * Cada llamada toma un numero y, al volver del await, se retira si ya no es la
+ * ultima.
+ */
+let peticionVigente = 0;
 
 /** Actualiza las tres barras verticales y los contadores del panel izquierdo. */
 function actualizarPanel() {
@@ -45,12 +105,18 @@ function actualizarPanel() {
   $('#total-preguntas').textContent = total;
 
   const restantes = total - respondidas;
+
+  // El primer caso no es cosmetico: con la pagina recien abierta no hay ninguna
+  // «primera pregunta» que responder, y decirlo seria mandar al estudiante a
+  // hacer algo que todavia no puede hacer.
   $('#mensaje-avance').textContent =
-    respondidas === 0
-      ? 'Responde la primera pregunta para comenzar.'
-      : restantes === 0
-        ? `¡Terminaste! Acertaste ${correctas} de ${total}.`
-        : `Te quedan ${restantes} preguntas por responder.`;
+    estado.modulo === null
+      ? 'Elige un módulo para comenzar.'
+      : respondidas === 0
+        ? 'Responde la primera pregunta para comenzar.'
+        : restantes === 0
+          ? `¡Terminaste el módulo! Acertaste ${correctas} de ${total}.`
+          : `Te quedan ${restantes} preguntas por responder.`;
 }
 
 /** Marca la alternativa elegida y revela la correcta. */
@@ -91,10 +157,11 @@ function responder(boton) {
 /**
  * Agrupa la lista plana del extremo en secciones por modulo.
  *
- * El extremo devuelve las preguntas ordenadas por modulo y por id, con el titulo
- * y el icono del modulo repetidos en cada fila (vienen de la vista, que ya cruzo
- * la tabla `modulo`). Aca se doblan en secciones, que es como las dibuja la
- * pagina.
+ * Desde la iteracion 31 la lista trae un solo modulo y el resultado es un grupo
+ * unico. La funcion se conserva agrupando igual, y no se simplifica a «un modulo,
+ * una seccion», por un motivo concreto: si algun dia el extremo devolviera una
+ * fila de otro modulo, dibujar dos secciones lo deja a la vista en vez de
+ * mezclarlo dentro de la cabecera equivocada.
  */
 function agruparPorModulo(preguntas) {
   const grupos = [];
@@ -230,32 +297,52 @@ function mostrarAvisoRespaldo(sello) {
   contenedor.classList.remove('hidden');
 }
 
-/** Mensaje a pantalla completa cuando no hay preguntas que dibujar. */
-function dibujarMensaje(contenedor, nombreIcono, titulo, detalle) {
+/**
+ * Mensaje a pantalla completa cuando no hay preguntas que dibujar.
+ *
+ * `pie` es marcado escrito aqui dentro, no dato: es el unico parametro que NO se
+ * escapa, y por eso lleva ese nombre y no «detalle2». Quien lo use con algo que
+ * venga de la capa de datos rompe la regla del archivo.
+ */
+function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '') {
   contenedor.innerHTML = `
       <div class="bg-panel border border-panel3 rounded-xl p-8 text-center">
         <span class="grid place-items-center w-12 h-12 mx-auto rounded-lg bg-panel2 text-jsyellow">${icon(nombreIcono, 'text-2xl')}</span>
         <p class="mt-4 font-display font-bold text-paper">${esc(titulo)}</p>
         <p class="mt-2 text-sm text-muted">${esc(detalle)}</p>
+        ${pie}
       </div>`;
 }
 
-/** Dibuja el banco que ya esta cargado en memoria. */
+/**
+ * El estado vacio con el que arranca la pagina.
+ *
+ * Lleva un enlace al selector, y no es un adorno: en telefono las dos columnas se
+ * apilan y este mensaje queda por debajo del panel entero, de modo que «elige un
+ * modulo arriba» manda a desplazarse a ciegas. El enlace cierra esa distancia. En
+ * escritorio sobra, porque el selector esta a la vista en la mitad izquierda, y
+ * no molesta.
+ */
+function mostrarEstadoVacio(contenedor) {
+  dibujarMensaje(
+    contenedor,
+    'quiz',
+    'Elige un módulo para empezar.',
+    'En el panel está el selector con los siete módulos del examen. Cuando elijas uno, sus preguntas aparecen acá.',
+    `<a href="#selector-modulo" data-ir-al-selector
+          class="mt-5 inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
+         ${icon('expand-more', 'text-base text-jsyellow')}Ir al selector
+       </a>`
+  );
+}
+
+/** Dibuja el modulo que ya esta cargado en memoria. */
 function pintar() {
   const contenedor = $('#cuestionario');
   if (!contenedor || !bancoCargado) return;
 
   contenedor.innerHTML = bancoCargado.map(dibujarGrupo).join('');
   estado.total = bancoCargado.reduce((suma, grupo) => suma + grupo.preguntas.length, 0);
-
-  if (!contenedor.dataset.bound) {
-    contenedor.addEventListener('click', (evento) => {
-      const boton = evento.target.closest('.quiz-option');
-      if (!boton || boton.disabled) return;
-      responder(boton);
-    });
-    contenedor.dataset.bound = 'true';
-  }
 
   actualizarPanel();
 }
@@ -268,12 +355,14 @@ function pintar() {
  * preguntas)» en el pie, al mismo tiempo. Un numero que no sale del dato que
  * acompana es un numero que va a mentir tarde o temprano, y este mintio.
  *
- * Se llama en los tres finales de renderCuestionario(), tambien en los dos que no
- * dibujan preguntas: si no hay nada que contar, el contador se esconde. **Ningun
- * numero es mejor que un numero falso.**
+ * Se llama en todos los finales de mostrarModulo(), tambien en los que no dibujan
+ * preguntas, y en el estado vacio: si no hay nada que contar, el contador se
+ * esconde. **Ningun numero es mejor que un numero falso.**
  *
- * Los modulos se cuentan igual que las preguntas, de los datos. Eran «7» fijos, y
- * el banco puede llegar sin alguno.
+ * Desde la iteracion 31 cuenta un modulo y no el banco, asi que dice tambien cual:
+ * «52 preguntas · módulo 2». Sin esa segunda mitad el mismo numero podria leerse
+ * como el tamano del banco entero, que es la confusion que este contador existe
+ * para evitar.
  */
 function mostrarContador(grupos) {
   const contenedor = $('#contador-banco');
@@ -290,45 +379,249 @@ function mostrarContador(grupos) {
     return;
   }
 
-  const modulos = grupos.length;
   const contar = (cantidad, singular, plural) =>
     `${cantidad} ${cantidad === 1 ? singular : plural}`;
 
+  // Los modulos se cuentan de los datos, no del selector: si alguna vez llegara
+  // una fila de otro modulo, el contador lo diria en vez de taparlo.
+  const cual =
+    grupos.length === 1
+      ? `módulo ${grupos[0].numero}`
+      : contar(grupos.length, 'módulo', 'módulos');
+
   contenedor.innerHTML =
-    `${icon('quiz', 'text-base')}<span>${esc(contar(preguntas, 'pregunta', 'preguntas'))} · ` +
-    `${esc(contar(modulos, 'módulo', 'módulos'))}</span>`;
+    `${icon('quiz', 'text-base')}<span>${esc(contar(preguntas, 'pregunta', 'preguntas'))} · ${esc(cual)}</span>`;
 
   contenedor.classList.remove('hidden');
   contenedor.classList.add('inline-flex');
 }
 
+// ---------------------------------------------------------------------------
+// El selector de modulo
+// ---------------------------------------------------------------------------
+
 /**
- * Pide el banco y lo dibuja.
+ * Rehace las alternativas del selector.
  *
- * Los tres finales posibles se tratan distinto a proposito, y la diferencia es
- * la misma que explica functions/api/_comun.js: una lista vacia es una respuesta
- * correcta y no un fallo, asi que no dispara el respaldo ni se anuncia como
- * error.
+ * Los siete modulos salen de data/modules.js, que ya es la lista de modulos del
+ * sitio: asi el selector se dibuja sin red y esta disponible antes de que la capa
+ * de datos conteste, o aunque no conteste nunca.
+ *
+ * La cifra de cada modulo se anade solo si `conteoConocido` la tiene, es decir,
+ * solo despues de haberla contado sobre preguntas dibujadas de verdad.
  */
-export async function renderCuestionario() {
+function refrescarSelector() {
+  const selector = $('#selector-modulo');
+  if (!selector) return;
+
+  const alternativas = modulesData.map((modulo) => {
+    const cuantas = conteoConocido.get(modulo.numero);
+    const cifra = cuantas === undefined ? '' : ` · ${cuantas} preguntas`;
+    const rotulo = `Módulo ${modulo.numero} · ${modulo.titulo}${cifra}`;
+
+    return `<option value="${esc(modulo.numero)}">${esc(rotulo)}</option>`;
+  });
+
+  selector.innerHTML = `<option value="">Elige un módulo…</option>${alternativas.join('')}`;
+
+  // Rehacer las alternativas borra la seleccion: se repone despues, siempre desde
+  // el estado y nunca desde el DOM, que es lo que la mantiene sincronizada.
+  selector.value = estado.modulo === null ? '' : String(estado.modulo);
+}
+
+/** Esconde el aviso de cambio de modulo y lo deja vacio. */
+function ocultarAvisoCambio() {
+  const contenedor = $('#aviso-cambio-modulo');
+  if (!contenedor) return;
+
+  contenedor.innerHTML = '';
+  contenedor.classList.add('hidden');
+}
+
+/**
+ * Pregunta antes de que el estudiante pierda lo que lleva respondido.
+ *
+ * POR QUE NO ES UN window.confirm()
+ *
+ * Porque es un dialogo del navegador: sale en el idioma del navegador, con
+ * aspecto de error del sistema, y el navegador puede decidir suprimirlo. Un aviso
+ * que el navegador puede callar no sirve para lo unico que tiene que hacer.
+ *
+ * EL ORDEN IMPORTA MAS QUE EL TEXTO
+ *
+ * Cuando se llega aqui, el selector YA fue devuelto al modulo actual por
+ * alCambiarSelector(). Si el estudiante ignora este bloque, recarga o se va, el
+ * selector sigue diciendo la verdad y no se perdio nada. Preguntar primero y
+ * revertir despues dejaria una ventana en que la pantalla dice un modulo y las
+ * preguntas son de otro.
+ *
+ * No atrapa el foco y no es un modal: como el selector ya volvio a su sitio, el
+ * resto de la pagina puede seguir usandose sin que nada se pierda por descuido.
+ */
+function pedirConfirmacion(destino) {
+  const contenedor = $('#aviso-cambio-modulo');
+  if (!contenedor) return;
+
+  const cuantas = estado.respondidas;
+  const respuestas = cuantas === 1 ? '1 respuesta' : `${cuantas} respuestas`;
+
+  contenedor.innerHTML = `
+      <div class="border border-jsyellow/40 bg-jsyellow/5 rounded-xl px-4 py-4">
+        <p id="aviso-cambio-titulo" class="font-display font-bold text-paper text-sm">¿Cambiar al Módulo ${esc(destino)}?</p>
+        <p class="mt-1 text-sm text-muted">Vas a perder las ${esc(respuestas)} del Módulo ${esc(estado.modulo)}. El avance todavía no se guarda: eso llega más adelante.</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button type="button" data-confirmar-cambio="${esc(destino)}"
+                  class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-xs px-4 py-2.5 rounded hover:bg-jsyellowdim transition-colors">
+            ${icon('swap-horiz', 'text-base')}Cambiar de módulo
+          </button>
+          <button type="button" data-cancelar-cambio
+                  class="inline-flex items-center gap-2 border border-panel3 text-muted font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow hover:text-paper transition-colors">
+            Quedarme acá
+          </button>
+        </div>
+      </div>`;
+
+  contenedor.classList.remove('hidden');
+
+  // El foco va al boton que cambia, no al que cancela: el estudiante llego aqui
+  // pidiendo cambiar, y la tecla Enter tiene que hacer lo que pidio.
+  $('[data-confirmar-cambio]', contenedor)?.focus?.();
+}
+
+/** Decide que hacer cuando el estudiante elige otra alternativa del selector. */
+function alCambiarSelector(selector) {
+  const elegido = Number(selector.value);
+
+  // La alternativa vacia («Elige un módulo…») no hace nada: volver a ella no es
+  // una orden de descargar lo que ya esta puesto.
+  if (!Number.isInteger(elegido) || elegido === 0) {
+    selector.value = estado.modulo === null ? '' : String(estado.modulo);
+    return;
+  }
+
+  if (elegido === estado.modulo) return;
+
+  if (estado.respondidas === 0) {
+    ocultarAvisoCambio();
+    mostrarModulo(elegido);
+    return;
+  }
+
+  // Primero se deshace el cambio, y recien despues se pregunta. Ver
+  // pedirConfirmacion().
+  selector.value = String(estado.modulo);
+  pedirConfirmacion(elegido);
+}
+
+/** Conecta el selector y los dos botones del aviso de cambio. */
+function conectarSelector() {
+  const selector = $('#selector-modulo');
+  if (!selector || selector.dataset.bound) return;
+
+  selector.addEventListener('change', () => alCambiarSelector(selector));
+  selector.dataset.bound = 'true';
+
+  const aviso = $('#aviso-cambio-modulo');
+  if (aviso && !aviso.dataset.bound) {
+    aviso.addEventListener('click', (evento) => {
+      const confirmar = evento.target.closest('[data-confirmar-cambio]');
+      if (confirmar) {
+        ocultarAvisoCambio();
+        mostrarModulo(Number(confirmar.dataset.confirmarCambio));
+        return;
+      }
+
+      if (evento.target.closest('[data-cancelar-cambio]')) {
+        ocultarAvisoCambio();
+        selector.focus?.();
+      }
+    });
+    aviso.dataset.bound = 'true';
+  }
+}
+
+/**
+ * Conecta la zona de preguntas: responder, y el enlace del estado vacio.
+ *
+ * Se delega en el contenedor y se ata una sola vez, porque su contenido se
+ * reescribe entero cada vez que cambia el modulo y los oyentes de los botones se
+ * irian con el.
+ */
+function conectarCuestionario(contenedor) {
+  if (contenedor.dataset.bound) return;
+
+  contenedor.addEventListener('click', (evento) => {
+    const irAlSelector = evento.target.closest('[data-ir-al-selector]');
+    if (irAlSelector) {
+      // El salto por ancla ya desplaza; el foco se mueve a mano para que el
+      // teclado y el lector de pantalla lleguen al mismo sitio que el ojo.
+      $('#selector-modulo')?.focus?.();
+      return;
+    }
+
+    const boton = evento.target.closest('.quiz-option');
+    if (!boton || boton.disabled) return;
+    responder(boton);
+  });
+
+  contenedor.dataset.bound = 'true';
+}
+
+// ---------------------------------------------------------------------------
+// Cargar y dibujar un modulo
+// ---------------------------------------------------------------------------
+
+/**
+ * Pide un modulo a la capa de datos y lo dibuja.
+ *
+ * Es el unico camino por el que aparecen preguntas en la pagina, y esta exportada
+ * a proposito: scripts/probar-escapado.mjs y scripts/probar-filtrado.mjs corren
+ * este mismo codigo contra el extremo real y miran el HTML que deja.
+ *
+ * Los finales posibles se tratan distinto a proposito, y la diferencia es la misma
+ * que explica functions/api/_comun.js: una lista vacia es una respuesta correcta y
+ * no un fallo, asi que no dispara el respaldo ni se anuncia como error.
+ */
+export async function mostrarModulo(numero) {
   const contenedor = $('#cuestionario');
   if (!contenedor) return;
 
-  const respuesta = await leerPreguntas();
+  const miPeticion = (peticionVigente += 1);
+
+  estado.modulo = numero;
+  estado.respondidas = 0;
+  estado.correctas = 0;
+  estado.incorrectas = 0;
+  estado.total = 0;
+  bancoCargado = null;
+
+  refrescarSelector();
+  conectarCuestionario(contenedor);
+  mostrarContador(null);
+  actualizarPanel();
+
+  dibujarMensaje(
+    contenedor,
+    'database',
+    `Cargando el Módulo ${numero}…`,
+    'Pidiendo sus preguntas al banco.'
+  );
+
+  const respuesta = await leerPreguntas(numero);
+
+  // Si mientras tanto se pidio otro modulo, esta respuesta ya no es la que la
+  // pantalla esta esperando y dibujarla la dejaria mintiendo.
+  if (miPeticion !== peticionVigente) return;
 
   // Antes de dibujar nada: si esto viene del respaldo, que se vea. Va primero
-  // para que el aviso aparezca tambien cuando el banco venga vacio y la pagina
+  // para que el aviso aparezca tambien cuando el modulo venga vacio y la pagina
   // termine en un mensaje en vez de en preguntas.
   mostrarAvisoRespaldo(respuesta.meta?.respaldo);
 
   if (!respuesta.ok) {
     mostrarContador(null);
-    dibujarMensaje(
-      contenedor,
-      'database',
-      'No se pudo cargar el banco de preguntas.',
-      respuesta.mensaje
-    );
+    dibujarMensaje(contenedor, 'database', 'No se pudo cargar el módulo.', respuesta.mensaje);
+    actualizarPanel();
     return;
   }
 
@@ -337,26 +630,62 @@ export async function renderCuestionario() {
     dibujarMensaje(
       contenedor,
       'database',
-      'Todavía no hay preguntas cargadas.',
-      'El banco está conectado pero vacío.'
+      `El Módulo ${numero} todavía no tiene preguntas.`,
+      'El banco está conectado, pero este módulo está vacío. Prueba con otro.'
     );
+    actualizarPanel();
     return;
   }
 
   bancoCargado = agruparPorModulo(respuesta.datos);
   mostrarContador(bancoCargado);
+
+  // La cifra del selector se aprende de lo dibujado, y por eso se guarda despues
+  // de agrupar y no de la respuesta cruda.
+  conteoConocido.set(
+    numero,
+    bancoCargado.reduce((suma, grupo) => suma + grupo.preguntas.length, 0)
+  );
+  refrescarSelector();
+
   pintar();
 }
 
-/** Conecta el botón que reinicia todas las respuestas. */
+/**
+ * Deja la pagina lista y vacia, esperando una eleccion.
+ *
+ * No pide nada a la capa de datos: hasta que el estudiante elija un modulo no hay
+ * nada que pedir. Es el cambio de fondo de la iteracion 31 — antes esta funcion
+ * se traia el banco entero.
+ */
+export function renderCuestionario() {
+  const contenedor = $('#cuestionario');
+  if (!contenedor) return;
+
+  refrescarSelector();
+  conectarSelector();
+  conectarCuestionario(contenedor);
+
+  mostrarContador(null);
+  mostrarAvisoRespaldo(null);
+  mostrarEstadoVacio(contenedor);
+  actualizarPanel();
+}
+
+/** Conecta el botón que reinicia las respuestas del módulo que se está viendo. */
 export function setupReinicio() {
   const boton = $('#reiniciar');
   if (!boton) return;
 
   boton.addEventListener('click', () => {
+    // Sin modulo cargado no hay nada que reiniciar, y volver a dibujar el estado
+    // vacio encima de si mismo solo desplazaria la pagina sin motivo.
+    if (!bancoCargado) return;
+
     estado.respondidas = 0;
     estado.correctas = 0;
     estado.incorrectas = 0;
+    ocultarAvisoCambio();
     pintar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });

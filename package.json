@@ -30,6 +30,7 @@
     "verificar:barrera": "node scripts/verificar-barrera.mjs",
     "verificar:css": "node scripts/verificar.mjs",
     "probar:escapado": "node scripts/probar-escapado.mjs",
+    "probar:filtrado": "node scripts/probar-filtrado.mjs",
     "probar:restricciones": "node scripts/probar-restricciones.mjs",
     "probar:instantanea": "node scripts/comprobar-instantanea.mjs"
   },

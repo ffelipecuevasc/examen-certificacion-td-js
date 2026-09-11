@@ -2672,3 +2672,34 @@ si hay `workerd` huérfanos vivos.** Es una comprobación de diez segundos que h
 nadie sabía que había que hacer.
 
 H-029 **no se cierra** con esto. Sigue en amarillo.
+
+### H-035 · Los títulos de los módulos 3, 4 y 8 están sin tildes en D1, y el sitio los muestra así
+
+**Gravedad:** 🟡 · **Estado:** ⚪ Abierto · **Detectado en:** iteración 31 · **Fecha:** 2026-09-11
+
+**Síntoma.** La cabecera que el cuestionario dibuja sobre las preguntas dice «Fundamentos de
+**Programacion** en JavaScript», «**Programacion** Avanzada en JavaScript» e
+«**Implementacion** de API Backend Node Express». Los mismos tres títulos aparecen con sus
+tildes en la guía de `index.html`.
+
+**Causa.** El seed de la tabla `modulo`, en `d1/migraciones/001-banco-de-preguntas.sql:41-42`,
+se escribió sin tildes. Las preguntas traen `modulo_titulo` desde esa tabla a través de la
+vista `pregunta_activa`, así que el sitio muestra lo que la base tiene. No es un fallo del
+escapado: `esc()` no toca las tildes, y se comprobó.
+
+**Impacto.** Contradice el principio de «español de primera clase» de `vision.md` en un texto
+visible. Era menor mientras la cabecera del módulo era un separador entre secciones; con el
+filtrado por módulo de la iteración 31 la cabecera pasa a ser **el rótulo principal de lo que
+se está estudiando**, y además queda a la vista junto al selector, que sí las lleva porque sus
+nombres salen de `static/js/data/modules.js`. Los dos textos se leen juntos y se contradicen.
+
+**Por qué no se arregló en la iteración 31.** Es contenido de D1, no de la página: la
+iteración 31 declara fuera de alcance «cualquier cambio en el origen de los datos». Y
+arreglarlo exige correr una migración contra las dos bases, lo que por ADR-015 y por la regla
+de producción ejecuta el autor, nunca Claude Code.
+
+**Propuesta.** Una migración `003` con tres `UPDATE modulo SET titulo = ... WHERE numero = ...`,
+aplicada a la base local y a la de producción, más regenerar la instantánea y el respaldo
+versionados, que traen los títulos dentro. Comprobación de cierre: los siete títulos de la
+tabla `modulo` coinciden carácter a carácter con los siete `titulo` de `modulesData`. La
+comparación ya está escrita —es la que encontró esto— y cabe en un `node -e`.

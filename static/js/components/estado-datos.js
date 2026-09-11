@@ -20,9 +20,37 @@
  * Discreto a proposito: al estudiante no le sirve de nada saber que hay una base
  * de datos detras. Lo que si le va a servir, cuando llegue el momento, es que le
  * digan que lo que esta viendo puede no estar al dia.
+ *
+ * POR QUE YA NO PIDE EL BANCO (iteracion 31)
+ *
+ * Hasta el 2026-09-11 esta linea llamaba a `leerPreguntas()` **solo para contar**
+ * cuantas preguntas habia. Con el banco de juguete costaba nada; con el banco real
+ * eran 371,8 KB descargados en cada carga de la pagina, medidos contra el servidor
+ * local. Estaba anotado en el registro desde el 2026-09-05 como una peticion
+ * duplicada sin consecuencias visibles.
+ *
+ * Con el filtrado por modulo dejo de ser una duplicacion inofensiva y paso a ser lo
+ * contrario de lo que la pagina promete: el cuestionario arranca vacio, sin pedir
+ * nada, para no descargarle el banco entero a quien estudia desde el telefono con
+ * conexion modesta... y el pie lo descargaba igual, antes de que el estudiante
+ * tocara nada.
+ *
+ * El numero sale ahora de `/api/estado`, que ya lo cuenta en la base —`preguntas_activas`,
+ * de la misma vista de la que come el sitio— y pesa 0,2 KB. Se pide una sola cosa,
+ * una sola vez.
+ *
+ * LO QUE ESTA LINEA DEJO DE PODER AFIRMAR, Y DONDE SE DICE AHORA
+ *
+ * Ya no sabe si la instantanea de respaldo cargo, porque ya no la carga. Antes lo
+ * decia —«la copia guardada tampoco cargo»— y era cierto. Ahora, cuando la capa de
+ * datos no contesta, esta linea dice **solo eso**: que no hay conexion. Lo que pase
+ * con la copia lo dice la zona de preguntas, que es donde el estudiante lo necesita
+ * y donde ADR-008 lo exige: o el aviso de la copia, o el mensaje de que el modulo no
+ * se pudo cargar. Prometer aqui abajo una copia que a lo mejor no carga seria
+ * exactamente la clase de afirmacion que este pie no puede sostener.
  */
 import { $, esc, icon } from '../utils/dom.js';
-import { consultarEstado, leerPreguntas } from '../servicios/datos.js';
+import { consultarEstado } from '../servicios/datos.js';
 
 /** Pinta una linea de estado en el pie. */
 function mostrar(contenedor, nombreIcono, texto) {
@@ -51,43 +79,27 @@ export async function renderEstadoDatos() {
   if (!contenedor) return;
 
   const estado = await consultarEstado();
-  const banco = await leerPreguntas();
-
-  // El respaldo se mira PRIMERO, y por eso se pide el banco antes de decidir
-  // nada: cuando la capa de datos cae, `estado` viene con error y `banco` viene
-  // con preguntas igual, salidas de la instantanea. Preguntar solo por el estado
-  // haria decir «sin conexion» debajo de un cuestionario que se esta usando.
-  const sello = banco.meta?.respaldo;
-
-  if (sello) {
-    mostrar(
-      contenedor,
-      'database',
-      `Banco de preguntas: copia guardada en el sitio (${sello.preguntas} preguntas). Sin conexión con el servidor.`
-    );
-    return;
-  }
 
   if (!estado.ok) {
-    // Se distingue el fallo del servicio del error de peticion: solo el primero
-    // justifica cambiar a la instantanea, y si se llego hasta aqui es que ni
-    // siquiera la instantanea se pudo cargar.
+    // Se distingue el fallo del servicio del error de peticion. En el primer caso
+    // no se dice nada de la copia: ver la cabecera de este archivo.
     const texto = estado.usar_respaldo
-      ? `Banco de preguntas: sin conexión, y la copia guardada tampoco cargó.`
+      ? 'Banco de preguntas: sin conexión con el servidor.'
       : `Banco de preguntas: ${estado.mensaje}`;
     mostrar(contenedor, 'database', texto);
     return;
   }
 
-  if (!banco.ok) {
-    mostrar(contenedor, 'database', 'Banco de preguntas: conectado, sin poder leer.');
-    return;
-  }
+  // El numero es el del BANCO, no el del modulo que se este mirando. Son dos cosas
+  // distintas y cada una tiene su sitio: el contador de la portada dice lo que hay
+  // dibujado, y esta linea dice lo que hay en la base.
+  const activas = estado.datos?.preguntas_activas ?? 0;
 
-  // Una lista vacia es una respuesta correcta, no un fallo. Se dice tal cual.
-  const texto = banco.vacio
-    ? 'Banco de preguntas: conectado, todavía sin contenido.'
-    : `Banco de preguntas: conectado (${banco.datos.length} preguntas).`;
+  // Un banco vacio es una respuesta correcta, no un fallo. Se dice tal cual.
+  const texto =
+    activas === 0
+      ? 'Banco de preguntas: conectado, todavía sin contenido.'
+      : `Banco de preguntas: conectado (${activas} preguntas).`;
 
   mostrar(contenedor, 'database', texto + sufijoDeEntorno(estado.datos?.entorno));
 }

@@ -71,6 +71,40 @@
           Preguntas de evaluación avanzada de los módulos 2 al 8 del plan formativo. Elige una alternativa y sabrás al instante si acertaste. Las alternativas se barajan en cada carga, así que no memorices posiciones: entiende el porqué. Es material de estudio no oficial: practicar acá no acredita nada ante Talento Digital para Chile.
         </p>
 
+        <!-- Selector de modulo (iteracion 31, ADR-032).
+             Vive aca y no en la zona de preguntas por tres motivos, escritos
+             enteros en ADR-032: gobierna las barras que vienen justo abajo y un
+             control no va despues de lo que manda; el panel es pegajoso y la zona
+             derecha no, asi que aca sigue alcanzable con 61 preguntas desplegadas;
+             y en telefono esta columna se apila primero, de modo que la primera
+             accion de la pagina no queda enterrada bajo el panel entero.
+
+             Las alternativas del selector NO llevan el numero de preguntas de cada
+             modulo. Ese dato no existe en el navegador antes de pedir el modulo, y
+             escribirlo a mano es el «105 preguntas» que ya mintio el 2026-09-08.
+             Lo rellena components/cuestionario.js a medida que se van conociendo. -->
+        <div class="mt-9">
+          <label for="selector-modulo" class="font-mono text-[11px] text-mutedink">Elige el módulo que quieres practicar</label>
+          <div class="relative mt-2">
+            <select id="selector-modulo"
+                    class="w-full appearance-none bg-panel border border-panel3 rounded-lg pl-4 pr-11 py-3 font-display font-bold text-sm text-paper cursor-pointer hover:border-jsyellow focus:border-jsyellow focus:outline-none focus:ring-2 focus:ring-jsyellow/40 transition-colors">
+            </select>
+            <span class="icon i-expand-more text-xl text-jsyellow absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+          </div>
+
+          <!-- Aviso de perdida de avance. Vacio y oculto salvo que cambiar de
+               modulo vaya a costarle respuestas al estudiante. El avance no se
+               guarda hasta la iteracion 33, asi que cambiar pierde lo respondido:
+               se dice ANTES, nunca despues. Lo llena components/cuestionario.js.
+
+               `role="alert"` y no `alertdialog`: esto NO es un modal y no atrapa el
+               foco, porque no le hace falta —el selector ya volvio a su sitio antes
+               de preguntar, asi que salirse de aqui no cuesta nada—. Anunciar un
+               dialogo modal a quien usa lector de pantalla y no darselo es peor que
+               no anunciarlo. `role="alert"` ya implica `aria-live="assertive"`. -->
+          <div id="aviso-cambio-modulo" class="hidden mt-3" role="alert"></div>
+        </div>
+
         <div class="mt-9 flex items-end gap-5 sm:gap-8">
           <div class="flex flex-col items-center gap-3">
               <span class="font-display font-bold text-2xl text-jsyellow" id="valor-avance">0</span>
@@ -100,16 +134,16 @@
 
         <div class="mt-8 bg-panel border border-panel3 rounded-xl p-5">
           <div class="flex items-baseline justify-between gap-3">
-            <span class="font-mono text-[11px] text-mutedink">Avance total</span>
+            <span class="font-mono text-[11px] text-mutedink">Avance del módulo</span>
             <span class="font-display font-bold text-xl text-jsyellow" id="pct-avance">0%</span>
           </div>
           <p class="mt-2 text-sm text-muted" id="mensaje-avance">Responde la primera pregunta para comenzar.</p>
-          <p class="mt-1 font-mono text-[11px] text-mutedink">Total de preguntas: <span id="total-preguntas">0</span></p>
+          <p class="mt-1 font-mono text-[11px] text-mutedink">Preguntas del módulo: <span id="total-preguntas">0</span></p>
         </div>
 
         <div class="mt-6 flex flex-wrap gap-3">
           <button id="reiniciar" type="button" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
-            <span class="icon i-restart-alt text-base" aria-hidden="true"></span>Reiniciar cuestionario
+            <span class="icon i-restart-alt text-base" aria-hidden="true"></span>Reiniciar el módulo
           </button>
           <a href="index.html#modulos" class="inline-flex items-center gap-2 border border-panel3 text-muted font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow hover:text-paper transition-colors">
             <span class="icon i-menu-book text-base" aria-hidden="true"></span>Repasar la materia

@@ -1706,3 +1706,71 @@ lista blanca, `LISTA_COPIA`, y esa lista no nombra `_planmaestro/`. Nada dentro 
   comprobación no existe hoy porque hoy no hace falta.
 - Las rutas selladas en los siete encargos quedan firmes, y **su coincidencia sigue
   siendo demostrable**, que es lo que el retiro del banco viejo acaba de demostrar.
+
+---
+
+## ADR-032 · El selector de módulo vive en el panel fijo, sobre las barras de avance
+
+**Fecha:** 2026-09-11 · **Estado:** aceptada · **Decide:** Felipe Cuevas
+
+### Contexto
+
+La iteración 31 convierte `cuestionario.html` en una página que dibuja **un módulo a la
+vez** en lugar del banco entero. El archivo de la iteración cerró dos decisiones —se filtra
+por módulo, y el selector queda libre en todo momento— y dejó una abierta a propósito:
+**dónde vive el selector**.
+
+La página tiene dos zonas. A la izquierda, un panel con la explicación, las barras de
+progreso y los botones; es `lg:sticky` con su propio desplazamiento. A la derecha, las
+preguntas. Ese reparto se mantiene y no está en discusión. Pero el selector puede ir en
+cualquiera de las dos, y no da lo mismo: en `lg:` la izquierda acompaña a la orientación y
+queda visible al desplazarse, mientras que la derecha encabeza lo que controla y es lo
+primero que se mira al llegar. Y en teléfono, donde las dos zonas se apilan en el orden del
+documento —izquierda primero—, la elección cambia qué aparece antes en pantalla.
+
+### Decisión
+
+El selector va en **el panel fijo, después del párrafo de presentación y antes de las tres
+barras de avance**. El bloque que avisa de la pérdida de respuestas va pegado a él, en el
+mismo sitio.
+
+### Por qué
+
+1. **Un control no puede ir después de lo que gobierna.** Al filtrar por módulo, las tres
+   barras dejan de medir el banco y pasan a medir el módulo elegido: `estado.total` deja de
+   ser 368 y pasa a ser 61, 49 o 45. Las barras, el porcentaje y «Preguntas del módulo» son
+   consecuencia directa del selector. Ponerlo debajo obliga a leer los números antes de
+   saber de qué son.
+
+2. **En escritorio, el panel es pegajoso y la zona derecha no.** Un módulo de 61 preguntas
+   mide varias pantallas. Con el selector en la zona derecha se iría con ellas, y cambiar de
+   módulo exigiría volver arriba del todo. Eso contradice la decisión de la iteración 31 de
+   **dejar el selector libre en todo momento**: un control libre pero inalcanzable está
+   bloqueado en la práctica.
+
+3. **En teléfono, esta columna se apila primero.** Con el selector en la zona derecha
+   quedaría por debajo del panel entero —título, párrafo, tres barras, caja de avance, dos
+   botones y dos enlaces—: la primera acción de la página, enterrada bajo pantalla y media.
+   El público de `vision.md` estudia desde el teléfono, en sesiones cortas e interrumpidas.
+
+### Lo que se pierde, y cómo se compensa
+
+El argumento a favor de la zona derecha es real: allí el selector encabezaría exactamente lo
+que controla. Se paga con dos cosas:
+
+- El estado vacío de la zona derecha **no se limita a decir «elige un módulo»**: lleva un
+  enlace `#selector-modulo` que además mueve el foco al selector. En escritorio es
+  redundante; en teléfono es lo que cierra la distancia entre el mensaje y el control que lo
+  resuelve.
+- La cabecera de módulo se conserva sobre las preguntas, de modo que la zona derecha sigue
+  diciendo qué se está mirando sin depender de que el panel esté a la vista.
+
+### Consecuencias
+
+- El rótulo «Avance total» pasa a «Avance del módulo», y «Reiniciar cuestionario» a
+  «Reiniciar el módulo». Medían el banco y ahora miden un módulo: dejarlos habría sido dejar
+  dos rótulos mintiendo, que es el mismo defecto que ya corrigió el contador de la portada.
+- La iteración 32, que trae el índice de módulos con avance individual, hereda este sitio:
+  el índice vive junto al selector, no enfrente de él.
+- Si alguna vez el panel dejara de ser pegajoso, el motivo 2 caduca y esta ADR hay que
+  revisarla.

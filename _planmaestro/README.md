@@ -7,12 +7,12 @@ decisiones vale tanto como el código que las implementa.
 
 ## Iteración activa
 
-| Campo         | Valor                                                                          |
-|---------------|--------------------------------------------------------------------------------|
-| **Iteración** | **ninguna**                                                                    |
-| **Épica**     | —                                                                              |
-| **Estado**    | 🟢 La épica 20 se cerró el 2026-09-11                                          |
-| **Siguiente** | La candidata natural es `31-banco-completo.md` (épica 30), que ya existe y depende de la 20. **La elige el autor**, no se da por iniciada acá. |
+| Campo         | Valor                                                                                                                                              |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Iteración** | iteracion-31-selector-de-modulo.md                                                                                                                 |
+| **Épica**     | 30 - Cuestionario                                                                                                                                  |
+| **Estado**    | 🔵 En curso                                                                                                                                        |
+| **Siguiente** | La siguiente es `iteracion-32-panel-horizontal.md` (épica 30). |
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -36,8 +36,8 @@ decisiones vale tanto como el código que las implementa.
 | #  | Épica                           | Estado         | Entrega                                                                     |
 |----|---------------------------------|----------------|-----------------------------------------------------------------------------|
 | 10 | Plataforma Cloudflare           | 🟢 Completada  | Sitio en Pages, capa de datos y dos bases D1 operativas                     |
-| 20 | Persistencia de preguntas       | 🔵 En curso    | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
-| 30 | Cuestionario                    | ⚪ No iniciada | `cuestionario.html` con el banco completo y barras horizontales             |
+| 20 | Persistencia de preguntas       | 🟢 Completada  | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
+| 30 | Cuestionario                    | 🔵 En curso    | `cuestionario.html` con el banco completo y barras horizontales             |
 | 40 | Simulacro de examen             | ⚪ No iniciada | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
 | 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos               |
 

@@ -59,6 +59,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { prepararDomFalso } from './dom-falso.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
@@ -171,35 +172,6 @@ function consultar(sql) {
   } catch {
     return null;
   }
-}
-
-/** DOM falso, solo para capturar el HTML que el componente escribe. */
-function prepararDomFalso(capturado) {
-  const elemento = (selector) => ({
-    dataset: {},
-    style: {},
-    classList: { add() {}, remove() {}, contains: () => false },
-    set innerHTML(valor) {
-      if (selector === '#cuestionario') capturado.html = valor;
-      this._html = valor;
-    },
-    get innerHTML() {
-      return this._html ?? '';
-    },
-    set textContent(v) {
-      this._t = v;
-    },
-    get textContent() {
-      return this._t ?? '';
-    },
-    addEventListener() {},
-    querySelector: (s) => elemento(s),
-    querySelectorAll: () => [],
-    closest: () => null,
-  });
-
-  globalThis.document = { querySelector: elemento, querySelectorAll: () => [] };
-  globalThis.window = { matchMedia: () => ({ matches: false }) };
 }
 
 /** Anuncia un veredicto con el mismo formato siempre, para leerlo de un vistazo. */
@@ -328,8 +300,7 @@ try {
 // 2 · Cargar el contenido hostil
 // ---------------------------------------------------------------------------
 
-const capturado = { html: '' };
-prepararDomFalso(capturado);
+const dom = prepararDomFalso();
 
 let codigo = EN_PIE;
 let cargado = false;
@@ -360,18 +331,31 @@ try {
   }
 
   // --- 4 · correr el componente real --------------------------------------
+  //
+  // Se pide EL MODULO de la fila hostil, y no el banco entero, porque desde la
+  // iteracion 31 la pagina dibuja un modulo a la vez: `renderCuestionario()` ya no
+  // dibuja preguntas, deja el estado vacio esperando una eleccion. Llamarla aqui
+  // capturaria un HTML sin preguntas y esta prueba daria verde sin haber mirado
+  // nada, que es el patron de H-023.
   globalThis.fetch = (ruta, opciones) => fetchReal(DIRECCION + ruta, opciones);
 
-  const { renderCuestionario } = await import(
+  const { mostrarModulo } = await import(
     pathToFileURL(join(SITIO, 'components', 'cuestionario.js')).href
   );
   const { esc } = await import(pathToFileURL(join(SITIO, 'utils', 'dom.js')).href);
 
-  await renderCuestionario();
-  const html = capturado.html;
+  await mostrarModulo(MODULO_HOSTIL);
+  const html = dom.html('#cuestionario');
 
   if (!html) {
     sinVeredicto('El componente no escribio ningun HTML.');
+  }
+
+  if (!html.includes('data-pregunta=')) {
+    sinVeredicto(
+      `El componente dibujo algo, pero ninguna pregunta del modulo ${MODULO_HOSTIL}.`,
+      html.slice(0, 400)
+    );
   }
 
   // --- 5 · comprobar ------------------------------------------------------
@@ -430,6 +414,15 @@ try {
   // modulo concreto. Reusarlo aqui dejaria la comprobacion mirando un solo modulo
   // y anunciando que reviso «el banco real»: 52 de 368. Es el patron de H-023
   // —una comprobacion que dice mas de lo que mira— y por eso se pide aparte.
+  //
+  // DESDE LA ITERACION 31 HAY QUE DIBUJAR SIETE VECES
+  //
+  // La pagina ya no dibuja el banco de una vez: dibuja el modulo elegido. Asi que
+  // la lista de las 368 se sigue pidiendo entera —es contra ella que se comprueba
+  // que no falte texto—, pero el HTML contra el que se compara cada pregunta es el
+  // de SU modulo, dibujado recorriendo los siete. Comparar las 368 contra el HTML
+  // de un solo modulo gritaria «se perdio texto» en las 316 que no se dibujaron,
+  // y seria la prueba mintiendo, no la pagina.
   let todo;
   try {
     const respuesta = await fetchReal(`${DIRECCION}/api/preguntas`, {
@@ -443,6 +436,27 @@ try {
   if (!todo?.ok) sinVeredicto('El extremo no devolvio el banco entero.', JSON.stringify(todo, null, 2));
 
   const delBanco = todo.datos.filter((p) => p.id !== ID_HOSTIL);
+
+  // Se recorren los modulos que el banco dice tener, no los siete escritos a mano:
+  // si el banco llegara sin alguno, la prueba lo acompana en vez de exigir uno que
+  // no existe.
+  const modulosDelBanco = [...new Set(todo.datos.map((p) => p.modulo))].sort((a, b) => a - b);
+  const htmlPorModulo = new Map();
+
+  for (const numero of modulosDelBanco) {
+    await mostrarModulo(numero);
+    const dibujado = dom.html('#cuestionario');
+
+    if (!dibujado || !dibujado.includes('data-pregunta=')) {
+      sinVeredicto(
+        `El componente no dibujo ninguna pregunta del modulo ${numero}.`,
+        String(dibujado).slice(0, 400)
+      );
+    }
+
+    htmlPorModulo.set(numero, dibujado);
+  }
+
   let textosRevisados = 0;
   let justificacionesVistas = 0;
   let justificacionesDibujadas = 0;
@@ -450,6 +464,9 @@ try {
   const problemasDelBanco = [];
 
   for (const p of delBanco) {
+    // El HTML de SU modulo, que es donde esta pregunta se dibuja.
+    const html = htmlPorModulo.get(p.modulo) ?? '';
+
     // Lo que el componente DIBUJA hoy. La justificacion no esta aqui a
     // proposito: no se muestra todavia —es trabajo de la epica 30, iteracion
     // 33—, asi que exigir que su forma escapada aparezca en el HTML seria
@@ -513,9 +530,14 @@ try {
 
   for (const p of problemasDelBanco) problemas.push(p);
 
+  // La busqueda de etiquetas ajenas mira los SIETE modulos dibujados, no uno: una
+  // etiqueta colada en el modulo 6 no aparece en el HTML del 2.
   const PROPIAS = new Set(['section', 'header', 'ul', 'li', 'div', 'p', 'span', 'button']);
+  const todoElHtml = [html, ...htmlPorModulo.values()].join('');
   const presentes = [
-    ...new Set([...html.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)].map((m) => m[1].toLowerCase())),
+    ...new Set(
+      [...todoElHtml.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)].map((m) => m[1].toLowerCase())
+    ),
   ];
   const intrusas = presentes.filter((etiqueta) => !PROPIAS.has(etiqueta));
 
@@ -548,6 +570,9 @@ try {
       `Y ademas se reviso EL BANCO REAL: ${delBanco.length} preguntas, ${textosRevisados}`,
       `porciones de texto, de las cuales ${conCaracteresPeligrosos} traian algun caracter`,
       'que escapar. Ninguna aparecio cruda en el HTML y ninguna se perdio.',
+      '',
+      `Cada pregunta se comparo contra el HTML de SU modulo: se dibujaron los`,
+      `modulos ${modulosDelBanco.join(', ')}, uno por uno, como los dibuja la pagina.`,
       '',
       `Etiquetas en el HTML: ${presentes.sort().join(', ')}`,
       'Ninguna ajena al componente.',

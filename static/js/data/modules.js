@@ -1,10 +1,16 @@
 /**
  * Contenido de los modulos 2 al 8 del plan formativo evaluados en el examen.
  * Cada entrada relaciona el modulo del bootcamp con la parte correspondiente del examen.
+ *
+ * `numero` es el modulo como numero, y `modulo` el mismo dato como rotulo. Se
+ * anadio en la iteracion 31: el selector del cuestionario necesita el numero para
+ * pedirle el modulo a la capa de datos, y sacarlo de la cadena 'Modulo 3' con una
+ * expresion regular seria inventar un dato que aqui se puede escribir.
  */
 export const modulesData = [
   {
     parte: 'Parte 1',
+    numero: 2,
     modulo: 'Módulo 2',
     icono: 'devices',
     titulo: 'Fundamentos de Desarrollo Front-End',
@@ -32,6 +38,7 @@ export const modulesData = [
   },
   {
     parte: 'Parte 2',
+    numero: 3,
     modulo: 'Módulo 3',
     icono: 'data-object',
     titulo: 'Fundamentos de Programación en JavaScript',
@@ -58,6 +65,7 @@ export const modulesData = [
   },
   {
     parte: 'Parte 3',
+    numero: 4,
     modulo: 'Módulo 4',
     icono: 'bolt',
     titulo: 'Programación Avanzada en JavaScript',
@@ -78,6 +86,7 @@ export const modulesData = [
   },
   {
     parte: 'Parte 4',
+    numero: 5,
     modulo: 'Módulo 5',
     icono: 'database',
     titulo: 'Fundamentos de Bases de Datos Relacionales',
@@ -112,6 +121,7 @@ export const modulesData = [
   },
   {
     parte: 'Parte 5',
+    numero: 6,
     modulo: 'Módulo 6',
     icono: 'dns',
     titulo: 'Desarrollo de Aplicaciones Web Node Express',
@@ -136,6 +146,7 @@ export const modulesData = [
   },
   {
     parte: 'Parte 6',
+    numero: 7,
     modulo: 'Módulo 7',
     icono: 'layers',
     titulo: 'Acceso a Datos en Aplicaciones Node',
@@ -165,6 +176,7 @@ export const modulesData = [
   },
   {
     parte: 'Parte 7',
+    numero: 8,
     modulo: 'Módulo 8',
     icono: 'shield-lock',
     titulo: 'Implementación de API Backend Node Express',
