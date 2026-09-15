@@ -227,5 +227,5 @@ probando.
 ### Lo que esta épica no cubrió
 
 Mostrar la justificación al responder **no está implementado, y no es un defecto**: es
-trabajo de la épica 30, iteración 33. Se confirma acá para que nadie lo confunda al ver el
+trabajo de la épica 30, iteración 34 —era la 33 hasta la reorganización del 2026-09-15—. Se confirma acá para que nadie lo confunda al ver el
 banco cargado con 368 justificaciones que la página todavía no dibuja.

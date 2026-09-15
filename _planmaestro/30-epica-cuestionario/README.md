@@ -37,7 +37,7 @@ explica cada respuesta y permite repasar solo los errores.
 | #  | Iteración                                | Estado                     |
 |----|------------------------------------------|----------------------------|
 | 31 | Selector de módulo                       | 🟢 Completada · 2026-09-11 |
-| 32 | Rediseño del panel fijo                  | 🔵 En curso                |
+| 32 | Rediseño del panel fijo                  | 🟢 Completada · 2026-09-15 |
 | 33 | Memoria del avance                       | ⚪ No iniciada             |
 | 34 | Justificación y repaso                   | ⚪ No iniciada             |
 | 35 | Transición de carga                      | ⚪ No iniciada             |

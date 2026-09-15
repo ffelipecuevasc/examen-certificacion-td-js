@@ -9,10 +9,10 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | iteracion-32-panel-horizontal.md                                                                                                                   |
+| **Iteración** | iteracion-33-memoria-del-avance.md                                                                                                                 |
 | **Épica**     | 30 - Cuestionario                                                                                                                                  |
-| **Estado**    | 🔵 En curso · desde el 2026-09-11                                                                                                                  |
-| **Siguiente** | La siguiente es `iteracion-33-memoria-justificaciones-repaso.md` (épica 30). |
+| **Estado**    | ⚪ No iniciada                                                                                                                                      |
+| **Siguiente** | La siguiente es `iteracion-34-justificacion-y-repaso.md` (épica 30). |
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -30,6 +30,7 @@ decisiones vale tanto como el código que las implementa.
 | 24 - Preparar producción               | 20 - Persistencia preguntas | 2026-09-09 | 🟢 Completada |
 | 25 - Llenar el banco                   | 20 - Persistencia preguntas | 2026-09-11 | 🟢 Completada |
 | 31 - Selector de módulo                | 30 - Cuestionario           | 2026-09-11 | 🟢 Completada |
+| 32 - Rediseño del panel fijo           | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

@@ -507,7 +507,7 @@ try {
   // Que el banco real traiga de verdad algo que escapar es parte de lo que hay
   // que comprobar. Un banco sin un solo caracter peligroso volveria esta seccion
   // un tramite que siempre pasa, que es el patron de H-023.
-  // O NINGUNA justificacion se dibuja —porque la iteracion 33 todavia no las
+  // O NINGUNA justificacion se dibuja —porque la iteracion 34 todavia no las
   // muestra— o se dibujan TODAS. Un intermedio significa que algunas se estan
   // perdiendo por el camino, y ese si seria el fallo.
   //
