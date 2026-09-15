@@ -37,12 +37,13 @@
  * avance no se guarda hasta la iteracion 33, asi que cambiar de modulo pierde lo
  * respondido. **Se avisa antes, nunca despues.** Eso es pedirConfirmacion().
  */
-import { $, $$, esc, shuffle, icon } from '../utils/dom.js';
+import { $, $$, esc, shuffle, icon, prefersReducedMotion } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
 import {
   cargarConteos,
   conectarIndice,
   conteoDelResumen,
+  filaDelModulo,
   marcarModuloActivo,
   pintarIndice,
 } from './indice-modulos.js';
@@ -88,6 +89,25 @@ const origen = { resumen: null, modulo: null };
  * ultima.
  */
 let peticionVigente = 0;
+
+/**
+ * Que modulo se esta pidiendo ahora mismo, o null si no se esta pidiendo ninguno.
+ *
+ * `peticionVigente` sirve para descartar respuestas que llegan tarde; esto sirve
+ * para algo distinto: **no salir a pedir dos veces lo mismo**.
+ *
+ * El reintento de una carga fallida —que es de esta misma iteracion— abrio la
+ * puerta sin querer: se permite volver a pedir el modulo que ya esta puesto cuando
+ * `bancoCargado` es null, y eso tambien es cierto MIENTRAS carga. En una conexion
+ * modesta, que es el publico de vision.md, la barra tarda lo suficiente como para
+ * que el estudiante pulse otra vez creyendo que no registro el toque, y cada toque
+ * eran 44 a 65 KB mas por la misma pregunta.
+ *
+ * Con esto, pulsar durante la carga no hace nada. Y en cuanto la carga termina
+ * —bien o mal— vuelve a null, asi que el reintento tras un fallo sigue disponible,
+ * que es justo lo que no se puede perder.
+ */
+let moduloCargando = null;
 
 /** Actualiza las tres barras verticales y los contadores del panel izquierdo. */
 function actualizarPanel() {
@@ -236,7 +256,7 @@ function dibujarGrupo(grupo) {
 
   return `
       <section class="scroll-mt-24" id="grupo-modulo-${esc(grupo.numero)}">
-        <header class="sticky top-16 z-10 -mx-1 px-1 py-3 bg-ink/95 backdrop-blur flex items-center gap-3">
+        <header id="cabecera-modulo-${esc(grupo.numero)}" tabindex="-1" class="sticky top-16 z-10 -mx-1 px-1 py-3 bg-ink/95 backdrop-blur flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-jsyellow/40 rounded">
           <span class="grid place-items-center w-9 h-9 rounded-lg bg-panel2 text-jsyellow shrink-0">${icon(grupo.icono, 'text-xl')}</span>
           <span class="font-display font-bold text-jsyellow text-sm shrink-0">Módulo ${esc(grupo.numero)}</span>
           <span class="font-display font-semibold text-paper text-sm truncate">${esc(grupo.titulo)}</span>
@@ -316,7 +336,7 @@ function mostrarAvisoRespaldo() {
  */
 function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '') {
   contenedor.innerHTML = `
-      <div class="bg-panel border border-panel3 rounded-xl p-8 text-center">
+      <div id="mensaje-cuestionario" tabindex="-1" class="bg-panel border border-panel3 rounded-xl p-8 text-center focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
         <span class="grid place-items-center w-12 h-12 mx-auto rounded-lg bg-panel2 text-jsyellow">${icon(nombreIcono, 'text-2xl')}</span>
         <p class="mt-4 font-display font-bold text-paper">${esc(titulo)}</p>
         <p class="mt-2 text-sm text-muted">${esc(detalle)}</p>
@@ -406,6 +426,68 @@ function mostrarContador(grupos) {
   contenedor.classList.add('inline-flex');
 }
 
+/**
+ * Deja al estudiante en la cabecera del modulo recien cargado.
+ *
+ * POR QUE HACE FALTA, Y NO BASTA CON DIBUJAR
+ *
+ * Hasta la iteracion 32 esto no existia: se elegia un modulo y la pagina lo
+ * dibujaba sin moverse. Eso funciona solo si las preguntas ya estan a la vista, y
+ * no lo estan en ninguna de las dos formas en que se usa el sitio:
+ *
+ *   - En telefono las dos columnas se apilan y las preguntas quedan pantalla y
+ *     media por debajo del indice. Elegir un modulo no mostraba nada: habia que
+ *     adivinar que tocaba desplazarse.
+ *   - En escritorio el panel es pegajoso, asi que se puede elegir un modulo con
+ *     la pagina ya desplazada. La zona derecha se reescribe entera y el
+ *     desplazamiento se queda donde estaba: el estudiante aterriza a mitad de un
+ *     modulo que acaba de empezar.
+ *
+ * Decision del autor, 2026-09-11. Se aplica igual venga el cambio directo del
+ * indice o del boton «Cambiar de módulo» del aviso, porque el problema es el
+ * mismo por los dos caminos.
+ *
+ * DOS COSAS DEL COMO
+ *
+ * `prefers-reduced-motion` manda sobre el desplazamiento suave. Y el foco se pide
+ * con `preventScroll`, porque enfocar desplaza por su cuenta y esa segunda
+ * sacudida pelearia con la primera.
+ *
+ * Devuelve false si la cabecera no esta —carga fallida o modulo vacio—, para que
+ * quien llama lleve el foco a otra parte en vez de a un sitio que no existe.
+ */
+function irALaCabecera(numero) {
+  // La primera condicion es la que manda, y no la busqueda en el DOM: si no hay
+  // modulo cargado no hay cabecera dibujada, se mire donde se mire. Preguntarselo
+  // al estado y no al arbol tambien es lo que permite comprobarlo desde Node.
+  if (!bancoCargado) return false;
+
+  const seccion = $(`#grupo-modulo-${numero}`);
+  const cabecera = $(`#cabecera-modulo-${numero}`);
+
+  if (!seccion || !cabecera) return false;
+
+  seccion.scrollIntoView?.({
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    block: 'start',
+  });
+
+  cabecera.focus?.({ preventScroll: true });
+  return true;
+}
+
+/**
+ * Lleva el foco al mensaje que explica por que no hay preguntas.
+ *
+ * Es el otro final de irALaCabecera(): cuando la carga falla o el modulo viene
+ * vacio no hay ninguna cabecera a la que ir, y dejar el foco donde estaba —o
+ * peor, en el body— deja a quien navega con teclado sin saber que paso. El
+ * mensaje si lo explica, asi que el foco va ahi.
+ */
+function irAlMensaje() {
+  $('#mensaje-cuestionario')?.focus?.({ preventScroll: true });
+}
+
 // ---------------------------------------------------------------------------
 // La puerta unica hacia el cambio de modulo
 // ---------------------------------------------------------------------------
@@ -434,13 +516,15 @@ function ocultarAvisoCambio() {
  * navegador ya habia movido la seleccion y, mientras el aviso esperaba, la
  * pantalla decia un modulo y las preguntas eran de otro.
  *
- * Con el indice ese problema desaparece de raiz, y conviene entender por que: un
- * boton no cambia ningun estado al pulsarlo. El indice marca el modulo activo
- * **cuando el modulo se carga**, no cuando se pide, asi que mientras este aviso
- * pregunta, el indice sigue senialando —correctamente— el modulo en el que el
- * estudiante todavia esta. La propiedad que antes habia que reponer a mano ahora
- * es estructural. Se sigue comprobando igual, porque una propiedad estructural
- * tambien se puede romper editando.
+ * Con el indice no hay nada que deshacer, y el motivo es el orden y no el tipo de
+ * control: **este aviso se muestra ANTES de pedir el modulo.** El indice marca al
+ * pedir —ver `marcarModuloActivo()`—, asi que mientras la pregunta sigue en pie no
+ * se ha pedido nada y no se ha movido nada. Si el estudiante ignora el aviso,
+ * recarga o se va, la pantalla sigue diciendo la verdad.
+ *
+ * Que no haya nada que deshacer no lo vuelve incomprobable: el orden se puede
+ * invertir editando dos lineas, y `scripts/probar-filtrado.mjs` comprueba que el
+ * indice siga marcando el modulo anterior mientras el aviso pregunta.
  *
  * No atrapa el foco y no es un modal: como nada se ha movido todavia, el resto de
  * la pagina puede seguir usandose sin que nada se pierda por descuido.
@@ -488,7 +572,17 @@ function pedirConfirmacion(destino) {
  * `conectarIndice()` y quien decide es esta funcion.
  */
 function pedirCambioDeModulo(numero) {
-  if (numero === estado.modulo) return;
+  // Volver a pulsar el modulo que ya esta puesto no hace nada... salvo que no haya
+  // quedado puesto. Si la carga fallo o el modulo vino vacio, `estado.modulo` ya
+  // apunta a el y `bancoCargado` sigue en null: entonces pulsarlo es un reintento,
+  // y era lo unico que el estudiante podia hacer. Sin esa segunda condicion, el
+  // unico camino de vuelta era recargar la pagina. Encontrado en la auditoria de
+  // la iteracion 32.
+  //
+  // Pero «no hay nada cargado» tambien es cierto MIENTRAS carga, y ahi pulsar otra
+  // vez no es un reintento: es la misma peticion dos veces. Por eso la tercera
+  // condicion. Ver `moduloCargando`.
+  if (numero === estado.modulo && (bancoCargado || moduloCargando === numero)) return;
 
   if (estado.respondidas === 0) {
     ocultarAvisoCambio();
@@ -507,6 +601,11 @@ function conectarAvisoCambio() {
   aviso.addEventListener('click', (evento) => {
     const confirmar = evento.target.closest('[data-confirmar-cambio]');
     if (confirmar) {
+      // Retirar el aviso destruye el boton que acaba de pulsarse, y con el se cae
+      // el foco. No se repone aqui: `mostrarModulo()` lo lleva a la cabecera del
+      // modulo nuevo, que es donde el estudiante queria llegar. Lo que NO puede
+      // pasar es que se quede en el body mientras tanto, y por eso el foco se
+      // aparca en el mensaje de «Cargando…» antes de esperar la respuesta.
       ocultarAvisoCambio();
       mostrarModulo(Number(confirmar.dataset.confirmarCambio));
       return;
@@ -514,7 +613,10 @@ function conectarAvisoCambio() {
 
     if (evento.target.closest('[data-cancelar-cambio]')) {
       ocultarAvisoCambio();
-      $('#indice-modulos')?.querySelector?.('[aria-current]')?.focus?.();
+      // De vuelta a la fila del modulo en el que se sigue estando, que es de donde
+      // el estudiante salio. `filaDelModulo` en vez de buscar `[aria-current]`
+      // porque dice lo mismo sin depender de como se marque el activo.
+      filaDelModulo(estado.modulo)?.focus?.();
     }
   });
 
@@ -569,6 +671,7 @@ export async function mostrarModulo(numero) {
   if (!contenedor) return;
 
   const miPeticion = (peticionVigente += 1);
+  moduloCargando = numero;
 
   estado.modulo = numero;
   estado.respondidas = 0;
@@ -588,11 +691,34 @@ export async function mostrarModulo(numero) {
     'Pidiendo sus preguntas al banco.'
   );
 
+  // El indice marca el modulo pedido YA, antes de saber si va a llegar.
+  //
+  // Hasta la auditoria de la iteracion 32 esto ocurria solo al final, y solo si la
+  // carga salia bien: con una carga fallida, `estado.modulo` apuntaba al modulo
+  // nuevo y el indice seguia marcando el anterior. La pantalla contaba dos cosas
+  // distintas —la zona derecha decia «no se pudo cargar el Módulo 5» y el indice
+  // decia que el activo era el 3— y no habia forma de saber cual creer.
+  //
+  // El aviso de perdida no se ve afectado: cuando pregunta, todavia no se ha
+  // llamado a esta funcion, asi que el indice sigue marcando el modulo de verdad.
+  marcarModuloActivo(numero);
+
+  // Y el foco se aparca en ese mensaje mientras se espera. Si venimos del boton
+  // «Cambiar de módulo», el boton que lo tenia acaba de ser destruido y el foco
+  // estaria en el body durante toda la consulta.
+  irAlMensaje();
+
   const respuesta = await leerPreguntas(numero);
 
   // Si mientras tanto se pidio otro modulo, esta respuesta ya no es la que la
-  // pantalla esta esperando y dibujarla la dejaria mintiendo.
+  // pantalla esta esperando y dibujarla la dejaria mintiendo. Se sale SIN bajar la
+  // bandera: la carga que sigue viva es la otra, y es suya.
   if (miPeticion !== peticionVigente) return;
+
+  // De aqui en adelante esta carga es la vigente y ya termino de viajar, salga
+  // bien o mal. Bajar la bandera aqui —y no en cada final— es lo que garantiza que
+  // el reintento quede disponible tambien cuando la carga falla.
+  moduloCargando = null;
 
   // Antes de dibujar nada: si esto viene del respaldo, que se vea. Va primero
   // para que el aviso aparezca tambien cuando el modulo venga vacio y la pagina
@@ -600,10 +726,20 @@ export async function mostrarModulo(numero) {
   origen.modulo = respuesta.meta?.respaldo ?? null;
   mostrarAvisoRespaldo();
 
+  // Los dos finales sin preguntas terminan igual: el foco va al mensaje que
+  // explica lo que paso. No hay ninguna cabecera a la que ir, y desplazarse a una
+  // que no existe o dejar el foco en el body serian las dos formas de que quien
+  // navega con teclado se quede sin saber que ocurrio.
   if (!respuesta.ok) {
     mostrarContador(null);
-    dibujarMensaje(contenedor, 'database', 'No se pudo cargar el módulo.', respuesta.mensaje);
+    dibujarMensaje(
+      contenedor,
+      'database',
+      'No se pudo cargar el módulo.',
+      `${respuesta.mensaje} Puedes volver a elegirlo en el índice para reintentar.`
+    );
     actualizarPanel();
+    irAlMensaje();
     return;
   }
 
@@ -616,18 +752,23 @@ export async function mostrarModulo(numero) {
       'El banco está conectado, pero este módulo está vacío. Prueba con otro.'
     );
     actualizarPanel();
+    irAlMensaje();
     return;
   }
 
   bancoCargado = agruparPorModulo(respuesta.datos);
   mostrarContador(bancoCargado);
 
-  // El indice marca el modulo activo AHORA, cuando ya esta dibujado, y no cuando
-  // se pidio: mientras el aviso de perdida pregunta, tiene que seguir senialando
-  // el modulo en el que el estudiante esta de verdad.
+  // El indice ya quedo marcando este modulo antes de la consulta. Se repinta para
+  // que la fila recoja la cifra que el resumen haya aprendido entre medio.
   marcarModuloActivo(numero);
 
   pintar();
+
+  // Y recien ahora, con las preguntas dibujadas, se lleva al estudiante hasta
+  // ellas. Antes de `pintar()` la cabecera no existe todavia.
+  irALaCabecera(numero);
+
   avisarSiElResumenNoCuadra(numero);
 }
 
@@ -705,6 +846,13 @@ export function setupReinicio() {
     estado.incorrectas = 0;
     ocultarAvisoCambio();
     pintar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Reiniciar deja al estudiante donde empieza el modulo, no arriba del todo:
+    // arriba del todo esta la portada, y desde ahi hay que volver a bajar. Y el
+    // desplazamiento suave respeta `prefers-reduced-motion`, que hasta la
+    // iteracion 32 esta llamada ignoraba aunque el sitio ya tuviera la utilidad.
+    if (!irALaCabecera(estado.modulo)) {
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+    }
   });
 }

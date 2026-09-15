@@ -2719,3 +2719,23 @@ de las preguntas, debajo, dice «Programacion». Es visible y se convive con ell
 sabiendas. No se disimula igualando el selector hacia abajo: los nombres de
 `modulesData` están bien escritos y empeorarlos para tapar esto sería cambiar un defecto
 por dos.
+
+**Actualización · 2026-09-11 · comprobado con el índice ya puesto, y sigue igual.** El índice
+de la iteración 32 toma sus títulos de `static/js/data/modules.js` y la cabecera de las
+preguntas los toma del `modulo_titulo` que viaja en el resumen y en las preguntas, o sea de
+la tabla `modulo`. Se compararon los siete:
+
+| Módulo | Índice (`modulesData`) | Cabecera (`modulo_titulo`) |
+|---|---|---|
+| 3 | Fundamentos de **Programación** en JavaScript | Fundamentos de **Programacion** en JavaScript |
+| 4 | **Programación** Avanzada en JavaScript | **Programacion** Avanzada en JavaScript |
+| 8 | **Implementación** de API Backend Node Express | **Implementacion** de API Backend Node Express |
+
+Los módulos 2, 5, 6 y 7 coinciden carácter a carácter. **En los tres de la tabla, el índice y
+la cabecera se leen juntos en la misma pantalla y dicen cosas distintas**, que es justo lo que
+esta entrada anticipaba al cambiar el selector por el índice.
+
+No se corrige acá, y tampoco se disimula haciendo que el índice lea `modulo_titulo`: eso
+igualaría los dos textos por el lado equivocado —los dos sin tilde— y perdería el único sitio
+del sitio donde el nombre está bien escrito. La condición de cierre no cambia: la migración
+`003`, agrupada con el próximo cambio de datos que toque producción.

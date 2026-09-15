@@ -120,4 +120,14 @@ razonando sobre el código.
 
 ## Notas de la iteración
 
-_Pendiente._
+_Se redactan al cerrar. Lo único anotado hasta entonces es lo de abajo._
+
+### Adelantado de la 33
+
+**«Reiniciar el módulo» vuelve a la cabecera del módulo en vez de a la portada, y respeta
+`prefers-reduced-motion`.** Salió al implementar el desplazamiento y el foco de esta
+iteración: la llamada ya existía, mandaba al tope de la página —donde está la portada, no el
+módulo— e ignoraba la preferencia de movimiento reducido aunque el sitio ya tuviera
+`prefersReducedMotion()` en `utils/dom.js`. Es el criterio «al reiniciar, el foco queda en un
+lugar razonable para quien navega con teclado» de la iteración 33, resuelto antes de tiempo
+porque el arreglo era la misma línea que ya se estaba tocando.

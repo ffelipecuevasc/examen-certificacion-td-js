@@ -1799,7 +1799,41 @@ concretas que el índice no trae gratis:
 **Y una puerta que no se puede dejar abierta.** El aviso de pérdida de avance de la iteración
 31 está atado al `change` del selector. Al saltar desde el índice, ese salto tiene que pasar
 por la **misma** puerta: si el índice cambia de módulo por su cuenta, el aviso se esquiva sin
-que nadie lo note, y `probar-filtrado.mjs` no lo vería porque comprueba el selector.
+que nadie lo note. `probar-filtrado.mjs` tiene que pasar a provocar el cambio desde el índice,
+porque mientras siguiera disparando el selector no vería nada de esto.
+
+### Actualización · 2026-09-11 · elegir un módulo deja al estudiante en su cabecera
+
+**Decisión del autor.** Cuando un módulo termina de cargar, el estudiante queda en la cabecera
+de ese módulo: se desplaza hasta ahí y el foco va ahí. Se aplica igual venga el cambio directo
+del índice —sin respuestas que perder— o del botón «Cambiar de módulo» del aviso. «Quedarme
+acá» devuelve el foco a la fila del módulo actual en el índice.
+
+**Por qué.** Hasta ahora elegir un módulo lo dibujaba sin mover la página, y eso solo funciona
+si las preguntas ya están a la vista. No lo están en ninguno de los dos usos reales del sitio:
+
+- En **teléfono** las dos columnas se apilan y las preguntas quedan pantalla y media por
+  debajo del índice. Elegir un módulo no mostraba nada; había que adivinar que tocaba
+  desplazarse.
+- En **escritorio** el panel es pegajoso, así que se puede elegir con la página ya desplazada.
+  La zona derecha se reescribe entera y el desplazamiento se queda donde estaba: el estudiante
+  aterriza **a mitad** de un módulo que acaba de empezar.
+
+**Esto modifica la compensación que esta ADR describía.** El enlace «Ir al índice de módulos»
+del estado vacío se justificaba como la mitad de un viaje que el estudiante tenía que completar
+a mano: bajaba al índice, elegía, y volvía a subir por su cuenta. Ahora **la vuelta la hace el
+sitio**. El enlace se conserva —sigue resolviendo la ida, que es real: el mensaje está debajo
+del panel y hay que llegar al control—, pero deja de ser la única compensación del sitio
+elegido para el índice, y pasa a ser la mitad de una ida y vuelta completa.
+
+**Dos detalles del cómo, que son parte de la decisión y no del código.** El desplazamiento
+suave respeta `prefers-reduced-motion`, y el foco se pide con `preventScroll` para que enfocar
+no produzca una segunda sacudida que pelee con la primera.
+
+**Y los dos finales sin preguntas se tratan aparte.** Si la carga falla o el módulo viene
+vacío no hay ninguna cabecera a la que ir: el foco va al mensaje que explica lo que pasó.
+Desplazarse a una cabecera inexistente, o dejar el foco donde estaba, deja a quien navega con
+teclado sin saber qué ocurrió.
 
 ---
 
@@ -1838,7 +1872,7 @@ Reglas de la interfaz, escritas porque son la parte que se olvida:
   Es una pregunta coherente y negarse a contestarla costaría más código que contestarla.
 - **Sólo vale el valor `1`.** Ausente significa «no». Cualquier otro valor —`0`, `true`,
   `verdadero`— es `PETICION_INVALIDA`, no «no». Tratar en silencio un `resumen=true` como
-  apagado le devolvería al que pidió 0,2 KB el banco entero de 371,8 KB, que es exactamente
+  apagado le devolvería al que pidió 0,9 KB el banco entero de 371,8 KB, que es exactamente
   el fallo que esta ADR existe para evitar.
 - **Los nombres no se traducen** (ADR-011): `modulo`, `modulo_titulo`, `modulo_icono` y
   `preguntas`, en snake_case, igual que en el resto de la capa.
@@ -1848,8 +1882,11 @@ Reglas de la interfaz, escritas porque son la parte que se olvida:
 1. **Un archivo generado con los siete conteos duplica un dato que D1 ya tiene.** Sería cierto
    hasta la próxima carga del banco y después mentiría **en silencio**, que es el modo de
    fallo más caro de los tres. El conteo vive donde viven las preguntas o no vive.
-2. **El coste es el de `/api/estado`**, que pesa 0,2 KB medido. Frente a pedir el banco para
-   contarlo, son tres órdenes de magnitud.
+2. **El coste es despreciable frente a traerse el banco.** Medido contra el servidor local una
+   vez construido: **0,9 KB las siete filas, frente a 371,8 KB el banco entero. 410 veces
+   menos.** Al escribir esta ADR se estimó en 0,2 KB extrapolando de `/api/estado`, que
+   devuelve un objeto y no siete filas con título e ícono; la diferencia no cambia la
+   decisión, y se corrige acá para que el número que queda escrito sea el medido.
 3. **El filtro por estado sigue viviendo en la vista.** Al contar sobre `pregunta_activa` y no
    sobre `pregunta`, ninguna consulta puede olvidarse de excluir borradores y retiradas
    (ADR-020). Es el mismo motivo por el que el extremo ya leía de ahí.

@@ -32,7 +32,7 @@
  * `?resumen=1` devuelve una fila por modulo con cuantas preguntas activas tiene,
  * y ninguna pregunta. Existe porque el indice de los siete modulos las muestra a
  * la vez y necesita las siete cifras: pedirlas trayendo el banco cuesta 371,8 KB
- * y asi cuesta lo que cuesta `/api/estado`, que son 0,2 KB medidos.
+ * y asi cuesta 0,9 KB. Los dos numeros estan medidos contra el servidor local.
  *
  * Vive en ESTE archivo, y no en un `/api/modulos`, porque lo que se pide es un
  * dato sobre las preguntas —cuantas hay por modulo— y no un catalogo de modulos.
@@ -135,7 +135,7 @@ function leerModulo(url) {
  *
  * SOLO VALE EL VALOR `1`, y eso es a proposito (ADR-033). Un `resumen=true` o un
  * `resumen=si` no se tratan como «no»: se rechazan. Tratarlos en silencio como
- * apagado le devolveria el banco entero —371,8 KB— a quien pidio 0,2 KB, que es
+ * apagado le devolveria el banco entero —371,8 KB— a quien pidio 0,9 KB, que es
  * exactamente el gasto que este parametro existe para evitar. Un parametro mal
  * escrito tiene que doler enseguida y no en la factura de datos del estudiante.
  */

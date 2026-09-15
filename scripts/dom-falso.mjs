@@ -30,12 +30,23 @@
  * serian sobre el dibujo, nunca sobre la conducta.
  *
  * Lo que un evento disparado aqui NO prueba: que el navegador lo entregue igual,
- * que el foco se mueva, ni que nada de eso se vea. Prueba la DECISION del
+ * que el foco se vea, ni que nada de eso se pinte. Prueba la DECISION del
  * componente, que es la mitad que se puede comprobar sin navegador.
+ *
+ * EL FOCO, DESDE LA ITERACION 32
+ *
+ * `document.activeElement` se lleva de verdad: quien llama a `focus()` queda
+ * apuntado ahi, y quien se va del arbol —porque alguien reescribio el innerHTML
+ * de su padre— deja el foco en un `body` de mentira, igual que en el navegador.
+ *
+ * Sin esto no habia forma de comprobar desde Node que un camino deje el foco
+ * perdido, que es el defecto que la auditoria de la iteracion 32 encontro en tres
+ * sitios a la vez. Lo que se mide es a QUE elemento fue a parar el foco; que se
+ * vea el anillo amarillo alrededor sigue siendo cosa del navegador.
  */
 
 /** Un nodo de mentira, con lo justo para que los componentes lo usen. */
-function crearNodo(selector, registrar) {
+function crearNodo(selector, registrar, foco) {
   const clases = new Set();
   const oyentes = new Map();
 
@@ -46,6 +57,14 @@ function crearNodo(selector, registrar) {
     value: '',
     disabled: false,
     oyentes,
+    /**
+     * De que nodo cuelga, cuando se obtuvo con querySelector sobre otro.
+     *
+     * Sirve para una sola cosa, y es la que importa: cuando alguien reescribe el
+     * innerHTML de un nodo, todo lo que colgaba de el deja de existir, y el foco
+     * que estuviera ahi dentro se pierde. Igual que en el navegador.
+     */
+    padre: null,
     classList: {
       add: (...nombres) => nombres.forEach((n) => clases.add(n)),
       remove: (...nombres) => nombres.forEach((n) => clases.delete(n)),
@@ -56,6 +75,10 @@ function crearNodo(selector, registrar) {
     _html: '',
     _texto: '',
     set innerHTML(valor) {
+      // Reescribir el contenido tira lo que colgaba. Si el foco estaba ahi dentro,
+      // se cae al body, que es exactamente lo que hace el navegador y lo que la
+      // iteracion 32 tuvo que arreglar en tres caminos distintos.
+      if (foco.dentroDe(nodo)) foco.soltar();
       this._html = valor;
     },
     get innerHTML() {
@@ -71,17 +94,18 @@ function crearNodo(selector, registrar) {
       if (!oyentes.has(tipo)) oyentes.set(tipo, []);
       oyentes.get(tipo).push(oyente);
     },
-    /** Cuantas veces se le pidio el foco. Es lo unico del foco que se puede saber. */
+    /** Cuantas veces se le pidio el foco. */
     focos: 0,
     focus() {
       nodo.focos += 1;
+      foco.tomar(nodo);
     },
     // Devolver un nodo y no null es lo que permite que responder() llegue hasta
     // el final: recorre hacia arriba y hacia los lados buscando la tarjeta de la
     // pregunta y sus alternativas. Con null se caia en la primera linea.
-    closest: (s) => registrar(`${selector} closest ${s}`),
-    querySelector: (s) => registrar(`${selector} > ${s}`),
-    querySelectorAll: (s) => [registrar(`${selector} >> ${s}`)],
+    closest: (s) => registrar(`${selector} closest ${s}`, nodo),
+    querySelector: (s) => registrar(`${selector} > ${s}`, nodo),
+    querySelectorAll: (s) => [registrar(`${selector} >> ${s}`, nodo)],
   };
 
   return nodo;
@@ -97,14 +121,45 @@ function crearNodo(selector, registrar) {
 export function prepararDomFalso() {
   const nodos = new Map();
 
-  const registrar = (selector) => {
-    if (!nodos.has(selector)) nodos.set(selector, crearNodo(selector, registrar));
-    return nodos.get(selector);
+  /**
+   * Donde esta el foco.
+   *
+   * `body` es el sitio al que cae cuando nadie lo tiene, y es el valor que delata
+   * un camino roto: un estudiante con teclado que llega ahi perdio su lugar en la
+   * pagina y tiene que volver a tabular desde el principio.
+   */
+  const foco = {
+    actual: null,
+    tomar(nodo) {
+      foco.actual = nodo;
+    },
+    soltar() {
+      foco.actual = null;
+    },
+    /** Si el foco esta en `nodo` o en algo que cuelgue de el. */
+    dentroDe(nodo) {
+      for (let n = foco.actual; n; n = n.padre) if (n === nodo) return true;
+      return false;
+    },
   };
+
+  const registrar = (selector, padre = null) => {
+    if (!nodos.has(selector)) nodos.set(selector, crearNodo(selector, registrar, foco));
+
+    const nodo = nodos.get(selector);
+    if (padre && !nodo.padre) nodo.padre = padre;
+
+    return nodo;
+  };
+
+  const body = crearNodo('body', registrar, foco);
 
   globalThis.document = {
     querySelector: registrar,
     querySelectorAll: () => [],
+    get activeElement() {
+      return foco.actual ?? body;
+    },
   };
 
   globalThis.window = {
@@ -113,6 +168,12 @@ export function prepararDomFalso() {
   };
 
   return {
+    /**
+     * El selector del elemento que tiene el foco, o 'body' si no lo tiene nadie.
+     *
+     * 'body' es el resultado que hay que vigilar: significa que el foco se cayo.
+     */
+    enfocado: () => (foco.actual ? foco.actual.selector : 'body'),
     /** El nodo de un selector, creandolo si nadie lo habia pedido. */
     nodo: registrar,
     /**

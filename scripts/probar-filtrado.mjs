@@ -24,6 +24,12 @@
  *
  * CUATRO VEREDICTOS
  *
+ * Desde la auditoria de la iteracion 32 comprueba tambien **donde queda el foco**.
+ * Es lo unico del teclado que se puede saber sin navegador —a que elemento fue a
+ * parar—, y alcanza para cazar el defecto que importa: que se caiga al `body`.
+ * Cuando eso pasa, quien navega con teclado pierde su lugar y tiene que volver a
+ * tabular desde la barra de navegacion, y no hay nada en pantalla que lo anuncie.
+ *
  *   FILTRADO CORRECTO     0   se probo y cada modulo dibuja lo suyo
  *   FILTRADO ROTO         1   se probo y NO
  *   NO SE PUDO PROBAR     2   nadie llego a probar nada
@@ -384,6 +390,9 @@ try {
   const { mostrarModulo, renderCuestionario } = await import(
     pathToFileURL(join(SITIO, 'components', 'cuestionario.js')).href
   );
+  const { pintarIndice } = await import(
+    pathToFileURL(join(SITIO, 'components', 'indice-modulos.js')).href
+  );
   const { esc } = await import(pathToFileURL(join(SITIO, 'utils', 'dom.js')).href);
 
   // ------------------------------------------------------------------------
@@ -473,9 +482,33 @@ try {
     problemas.push('algun nombre accesible del indice no dice el modulo, su titulo y su cantidad');
   }
 
+  // El titulo tiene que aparecer en el mismo punto de corte en que la lista pasa a
+  // una columna. Estuvo en `xl` mientras la lista pasaba a una columna en `lg`, asi
+  // que entre 1024 y 1280 px habia una columna ancha mostrando solo «Módulo 3».
+  if (/hidden xl:inline/.test(indiceVacio)) {
+    problemas.push(
+      'el titulo del modulo se esconde hasta xl, y la lista es de una columna desde lg: ' +
+        'entre 1024 y 1280 px queda una fila ancha sin titulo'
+    );
+  }
+  if (!/hidden lg:inline/.test(indiceVacio)) {
+    problemas.push('el titulo del modulo no aparece en lg, que es donde la fila se ensancha');
+  }
+
+  // Y el modulo activo tiene que distinguirse por algo que no sea color. Aqui se
+  // comprueba que la diferencia estructural exista —la barra de 4 px a la
+  // izquierda, presente en todas las filas y solo pintada en la activa—; que se
+  // vea en escala de grises lo comprueba el autor con una captura.
+  if (!/border-l-4/.test(indiceVacio)) {
+    problemas.push(
+      'las filas del indice no reservan la barra izquierda: sin ella el activo solo se ' +
+        'distingue por color'
+    );
+  }
+
   notas.push(
     `Indice: ${ofrecidos.length} modulos, con sus siete cifras desde ?resumen=1, ` +
-      'ninguno marcado antes de elegir.'
+      'ninguno marcado antes de elegir, titulo visible desde lg y barra de 4 px reservada.'
   );
 
   // ------------------------------------------------------------------------
@@ -557,6 +590,17 @@ try {
     if (marcados.length !== 1 || marcados[0] !== fila.modulo) {
       problemas.push(
         `modulo ${fila.modulo}: el indice marca «${marcados.join(', ') || 'ninguno'}» como activo`
+      );
+    }
+
+    // La barra izquierda pintada aparece una vez y solo una: en el activo.
+    const conBarra = (indice.match(/border-l-jsyellow/g) ?? []).length;
+    const sinBarra = (indice.match(/border-l-transparent/g) ?? []).length;
+
+    if (conBarra !== 1 || sinBarra !== ofrecidos.length - 1) {
+      problemas.push(
+        `modulo ${fila.modulo}: ${conBarra} filas con la barra pintada y ${sinBarra} sin ella, ` +
+          `y tenian que ser 1 y ${ofrecidos.length - 1}`
       );
     }
 
@@ -686,15 +730,18 @@ try {
   //
   // Prueba la DECISION: con respuestas dentro, cambiar de modulo no se ejecuta y
   // el aviso aparece diciendo cuantas se pierden; sin respuestas, el cambio pasa
-  // directo y el aviso no aparece. Y prueba lo que importa del orden —que el indice
-  // siga marcando el modulo actual mientras el aviso pregunta—, porque si marcara
-  // el destino al pedirlo habria un rato en que la pantalla dice un modulo y las
-  // preguntas son de otro.
+  // directo y el aviso no aparece.
   //
-  // Con el `<select>` de la iteracion 31 esa propiedad habia que reponerla a mano,
-  // deshaciendo el cambio antes de preguntar. Con botones es estructural: pulsar no
-  // mueve nada. Se sigue comprobando igual, porque lo estructural tambien se rompe
-  // editando.
+  // Y prueba el ORDEN, que es lo que sostiene todo lo demas: el aviso se muestra
+  // ANTES de pedir el modulo. El indice marca al pedir, asi que mientras la
+  // pregunta sigue en pie tiene que seguir marcando el modulo anterior. Si alguien
+  // invirtiera el orden —pedir primero y preguntar despues— habria un rato en que
+  // la pantalla dice un modulo y las preguntas son de otro, y el aviso llegaria
+  // tarde a avisar de algo ya perdido.
+  //
+  // Con el `<select>` de la iteracion 31 habia ademas que deshacer el cambio a mano
+  // antes de preguntar, porque el navegador ya habia movido la seleccion. Eso ya no
+  // hace falta; lo que se comprueba es lo mismo.
   //
   // NO prueba que el aviso se VEA, ni que el foco caiga donde debe. Eso necesita
   // un navegador y se comprueba abriendo la pagina.
@@ -920,6 +967,252 @@ try {
   );
 
   // ------------------------------------------------------------------------
+  // 8d · Donde queda el foco, camino por camino
+  //
+  // El defecto que esto caza es de los que no se ven: el foco se cae al `body` y
+  // la pantalla queda igual de bonita. Solo lo nota quien navega con teclado, y lo
+  // nota teniendo que volver a tabular desde la barra de navegacion.
+  //
+  // Tres caminos lo provocaban a la vez —cargar un modulo, confirmar el aviso, y
+  // la llegada de los conteos—, porque los tres reescriben el `innerHTML` de algo
+  // que podia tener el foco dentro.
+  // ------------------------------------------------------------------------
+
+  // --- elegir un modulo sin nada respondido --------------------------------
+  await asentar(5);
+  elegirEnElIndice(6);
+  await new Promise((listo) => setTimeout(listo, 1500));
+
+  if (dom.enfocado() === 'body') {
+    problemas.push('elegir un modulo sin respuestas dejo el foco en el body');
+  }
+  if (dom.enfocado() !== '#cabecera-modulo-6') {
+    problemas.push(
+      `tras cargar el modulo 6 el foco quedo en «${dom.enfocado()}» y tenia que quedar en ` +
+        'su cabecera: en telefono las preguntas estan pantalla y media mas abajo'
+    );
+  }
+
+  // --- confirmar el aviso ---------------------------------------------------
+  responderUna();
+  elegirEnElIndice(7);
+
+  dom.disparar('#aviso-cambio-modulo', 'click', {
+    target: {
+      closest: (sel) =>
+        sel === '[data-confirmar-cambio]' ? { dataset: { confirmarCambio: '7' } } : null,
+    },
+  });
+  await new Promise((listo) => setTimeout(listo, 1500));
+
+  if (dom.enfocado() === 'body') {
+    problemas.push('confirmar el cambio de modulo dejo el foco en el body');
+  }
+  if (dom.enfocado() !== '#cabecera-modulo-7') {
+    problemas.push(
+      `tras confirmar el cambio al modulo 7 el foco quedo en «${dom.enfocado()}»`
+    );
+  }
+
+  // --- cancelar el aviso ----------------------------------------------------
+  responderUna();
+  elegirEnElIndice(8);
+
+  dom.disparar('#aviso-cambio-modulo', 'click', {
+    target: { closest: (sel) => (sel === '[data-cancelar-cambio]' ? {} : null) },
+  });
+
+  if (dom.enfocado() === 'body') {
+    problemas.push('«Quedarme acá» dejo el foco en el body');
+  }
+  if (!dom.enfocado().includes('data-modulo="7"')) {
+    problemas.push(
+      `«Quedarme acá» dejo el foco en «${dom.enfocado()}» y tenia que devolverlo a la fila ` +
+        'del modulo 7, que es de donde el estudiante salio'
+    );
+  }
+
+  // --- la llegada tardia de los conteos -------------------------------------
+  //
+  // El estudiante esta recorriendo el indice con el tabulador cuando llega el
+  // resumen y la lista se repinta entera. Se simula poniendo el foco en una fila
+  // —con su `data-modulo`, como lo lleva el boton de verdad— y repintando.
+  const filaTres = dom.nodo('#indice-modulos > [data-modulo="3"]');
+  filaTres.dataset.modulo = '3';
+  filaTres.focus();
+
+  pintarIndice();
+
+  if (dom.enfocado() === 'body') {
+    problemas.push(
+      'repintar el indice —lo que pasa cuando llegan los conteos— tiro el foco al body'
+    );
+  }
+  if (!dom.enfocado().includes('data-modulo="3"')) {
+    problemas.push(
+      `tras repintar el indice el foco quedo en «${dom.enfocado()}» en vez de volver a su fila`
+    );
+  }
+
+  notas.push(
+    'Foco: elegir y confirmar dejan en la cabecera del modulo; cancelar devuelve a su fila ' +
+      'del indice; y repintar el indice conserva la fila que lo tenia. Ninguno cae al body.'
+  );
+
+  // ------------------------------------------------------------------------
+  // 8d-bis · Pulsar dos veces mientras carga NO pide dos veces
+  //
+  // El reintento tras una carga fallida abrio esta puerta sin querer: «no hay nada
+  // cargado» tambien es cierto mientras carga. En una conexion modesta el
+  // estudiante pulsa otra vez creyendo que no registro el toque, y cada toque son
+  // 44 a 65 KB por la misma pregunta.
+  //
+  // Se provoca de verdad: se retrasa la respuesta del modulo y se pulsa tres veces
+  // seguidas, contando cuantas peticiones salen.
+  // ------------------------------------------------------------------------
+
+  const MODULO_DOBLE = 5;
+  const RETRASO_MS = 700;
+
+  await asentar(7);
+
+  let peticionesDelModulo = 0;
+  const fetchSinRetraso = globalThis.fetch;
+
+  globalThis.fetch = (ruta, opciones) => {
+    const texto = String(ruta);
+
+    if (texto.includes(`modulo=${MODULO_DOBLE}`) && !texto.includes('resumen')) {
+      peticionesDelModulo += 1;
+      return new Promise((listo) => {
+        setTimeout(() => listo(fetchSinRetraso(ruta, opciones)), RETRASO_MS);
+      });
+    }
+
+    return fetchSinRetraso(ruta, opciones);
+  };
+
+  // Tres toques seguidos, como los daria alguien que cree que no paso nada.
+  elegirEnElIndice(MODULO_DOBLE);
+  elegirEnElIndice(MODULO_DOBLE);
+  elegirEnElIndice(MODULO_DOBLE);
+
+  await new Promise((listo) => setTimeout(listo, RETRASO_MS + 1500));
+  globalThis.fetch = fetchSinRetraso;
+
+  if (peticionesDelModulo !== 1) {
+    problemas.push(
+      `pulsar 3 veces el modulo ${MODULO_DOBLE} mientras cargaba salio a pedirlo ` +
+        `${peticionesDelModulo} veces: cada una son decenas de KB por lo mismo`
+    );
+  }
+
+  const trasLosTresToques = idsDibujados(dom.html('#cuestionario'));
+  const esperadasDelDoble = porModulo.find((f) => f.modulo === MODULO_DOBLE)?.cuantas ?? 0;
+
+  if (trasLosTresToques.length !== esperadasDelDoble) {
+    problemas.push(
+      `tras pulsar 3 veces el modulo ${MODULO_DOBLE} quedaron ${trasLosTresToques.length} ` +
+        `preguntas dibujadas y tenian que ser ${esperadasDelDoble}`
+    );
+  }
+
+  notas.push(
+    `Doble toque: 3 pulsaciones sobre el modulo ${MODULO_DOBLE} mientras cargaba salieron a ` +
+      `pedirlo ${peticionesDelModulo} vez, y quedo dibujado entero.`
+  );
+
+  // ------------------------------------------------------------------------
+  // 8e · Una carga fallida deja las dos mitades hablando del mismo modulo
+  //
+  // Se provoca de verdad, haciendo que la capa de datos rechace la peticion de un
+  // modulo concreto. Se elige un rechazo con `usar_respaldo: false` a proposito:
+  // es el unico fallo que NO cae a la instantanea, asi que es el que deja al
+  // estudiante sin preguntas y con un mensaje.
+  // ------------------------------------------------------------------------
+
+  const MODULO_QUE_FALLA = 2;
+  const fetchDelServidor = globalThis.fetch;
+
+  globalThis.fetch = (ruta, opciones) => {
+    if (String(ruta).includes(`modulo=${MODULO_QUE_FALLA}`) && !String(ruta).includes('resumen')) {
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            ok: false,
+            error: {
+              codigo: 'PETICION_INVALIDA',
+              mensaje: 'Rechazo provocado por la prueba.',
+              usar_respaldo: false,
+            },
+          }),
+          { status: 400, headers: { 'content-type': 'application/json' } }
+        )
+      );
+    }
+    return fetchDelServidor(ruta, opciones);
+  };
+
+  await asentar(MODULO_QUE_FALLA);
+
+  const trasFallar = dom.html('#cuestionario');
+
+  if (!trasFallar.includes('No se pudo cargar el módulo')) {
+    problemas.push('una carga rechazada no dijo que no se pudo cargar');
+  }
+  if (idsDibujados(trasFallar).length !== 0) {
+    problemas.push('una carga rechazada dejo preguntas dibujadas');
+  }
+
+  // Las dos mitades tienen que hablar del mismo modulo. Antes de la auditoria, la
+  // zona derecha decia «no se pudo cargar el Módulo 2» y el indice seguia marcando
+  // el anterior.
+  if (marcadoEnElIndice() !== MODULO_QUE_FALLA) {
+    problemas.push(
+      `tras fallar la carga del modulo ${MODULO_QUE_FALLA}, el indice marca ` +
+        `«${marcadoEnElIndice()}»: las dos mitades de la pantalla dicen modulos distintos`
+    );
+  }
+
+  // Y el foco en el mensaje, no en una cabecera que no existe ni en el body.
+  if (dom.enfocado() === 'body') {
+    problemas.push('una carga rechazada dejo el foco en el body');
+  }
+  if (dom.enfocado() !== '#mensaje-cuestionario') {
+    problemas.push(
+      `tras una carga rechazada el foco quedo en «${dom.enfocado()}» en vez de en el mensaje ` +
+        'que explica lo que paso'
+    );
+  }
+  if (dom.enfocado().includes('cabecera-modulo')) {
+    problemas.push('tras una carga rechazada se fue a una cabecera que no existe');
+  }
+
+  // Pulsar el mismo modulo reintenta. Antes no hacia nada —`numero === estado.modulo`
+  // cortaba— y el unico camino de vuelta era recargar la pagina.
+  globalThis.fetch = fetchDelServidor;
+  elegirEnElIndice(MODULO_QUE_FALLA);
+  await new Promise((listo) => setTimeout(listo, 1500));
+
+  const trasReintentar = idsDibujados(dom.html('#cuestionario'));
+  const esperadasTrasReintentar =
+    porModulo.find((f) => f.modulo === MODULO_QUE_FALLA)?.cuantas ?? 0;
+
+  if (trasReintentar.length !== esperadasTrasReintentar) {
+    problemas.push(
+      `pulsar el modulo ${MODULO_QUE_FALLA} despues de que fallara dibujo ` +
+        `${trasReintentar.length} preguntas y tenia que reintentar y dibujar ` +
+        `${esperadasTrasReintentar}`
+    );
+  }
+
+  notas.push(
+    `Carga fallida: el indice y la zona derecha hablan del modulo ${MODULO_QUE_FALLA}, el foco ` +
+      'queda en el mensaje que lo explica, y volver a pulsarlo reintenta —la guarda del doble ' +
+      'toque no estorba al reintento—.'
+  );
+
+  // ------------------------------------------------------------------------
   // 9 · El modo degradado filtra igual (ADR-008)
   //
   // Se provoca la caida de verdad: se deja el fetch inservible, que es lo que ve
@@ -1053,9 +1346,14 @@ try {
       'los eventos que el componente registro DESDE EL INDICE, que es el unico camino',
       'por el que hoy se cambia de modulo.',
       '',
+      'Del foco se probo A QUE ELEMENTO va a parar en cada camino, que es lo unico',
+      'que se puede saber sin navegador, y alcanza para cazar el defecto que importa:',
+      'que se caiga al body.',
+      '',
       'Lo que esto NO prueba: nada de lo que solo existe en un navegador. Que el aviso',
-      'se VEA, que el foco caiga donde debe, que el teclado lo alcance y como se apila',
-      'en telefono no se comprueban con un DOM falso: hay que abrir la pagina.',
+      'se VEA, que el anillo del foco se pinte, que el tabulador recorra el indice en',
+      'un orden razonable, que el desplazamiento llegue donde se ve, y como se apila',
+      'en telefono. Eso se comprueba abriendo la pagina.',
     ]);
   }
 } catch (error) {
