@@ -54,6 +54,10 @@ Consecuencias concretas para el diseño de la memoria:
 - [ ] Definir qué ocurre con el avance guardado si el banco cambia y una pregunta
       guardada ya no existe.
 - [ ] Llevar el foco al lugar correcto al reiniciar o cambiar de modo.
+- [ ] Dar una transición al cargar un módulo. Hoy la zona de preguntas pasa de
+    vacía a llena de golpe y se siente burdo. Va una barra que refleje la
+    **carga real**, con el logotipo de JavaScript encima, y un mínimo visible
+    de unos 400 ms para que no parpadee cuando la respuesta es instantánea.
 
 ## Criterios de aceptación
 
@@ -69,6 +73,11 @@ Consecuencias concretas para el diseño de la memoria:
       comportamiento está documentado.
 - [ ] Al reiniciar, el foco queda en un lugar razonable para quien navega con
       teclado.
+- [ ] **La transición refleja la carga real, no un tiempo inventado.** Se
+  demuestra con una respuesta lenta y con una instantánea: en la primera la
+  barra acompaña, en la segunda hay un destello breve y no una espera.
+- [ ] **Nadie espera de más.** El tiempo entre elegir un módulo y verlo no crece
+  respecto de lo que tarda la consulta más el mínimo visible.
 
 ## Notas de la iteración
 

@@ -38,3 +38,4 @@ errores.
 | 31 | Selector de módulo | 🟢 Completada · 2026-09-11 |
 | 32 | Rediseño del panel fijo | 🔵 En curso |
 | 33 | Memoria del avance, justificaciones y repaso | ⚪ No iniciada |
+| 34 | Orientación del estudiante en la portada | ⚪ No iniciada |
