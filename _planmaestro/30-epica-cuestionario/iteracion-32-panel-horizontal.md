@@ -116,9 +116,18 @@ Cada criterio con su evidencia y quién la produjo. `probar-filtrado.mjs` y
 HTML que se dibujó; lo que solo existe en un navegador lo comprobó el autor, en local y en
 producción, el 2026-09-15.
 
+**Los 16 criterios se reparten así: 9 los cerró el guion, 4 el autor en el navegador, y 3 los
+dos.** El recuento se escribe aquí a propósito, porque la primera vez se informó mal: la fila
+de las barras horizontales deletreaba sus dos autores en vez de decir «los dos», y quedó
+contada en los dos montones a la vez —10 + 4 + 3 = 17 sobre 16 criterios—. La columna «Quién»
+usa ahora tres valores y nada más, para que el recuento se pueda repetir sin interpretar nada.
+
+Los tres criterios de la segunda tabla —los que añadió la auditoría— **no entran en esas
+cifras**: no estaban en la lista de aceptación de esta iteración.
+
 | Criterio | Evidencia | Quién |
 |---|---|---|
-| Las tres barras son horizontales y ocupan el ancho del panel | Punto 6 de la pasada: EXITOSO. El guion cubre la otra mitad: los tres `style.width` siguen al porcentaje y ninguno usa `height` | autor · navegador **y** Claude Code · guion |
+| Las tres barras son horizontales y ocupan el ancho del panel | Punto 6 de la pasada: EXITOSO. El guion cubre la otra mitad: los tres `style.width` siguen al porcentaje y ninguno usa `height` | los dos |
 | Cada barra muestra su etiqueta, su cifra absoluta y su porcentaje | `Barras: tras responder 3 de 61, cada una dice su cifra y su porcentaje —5 % respondidas y correctas, 0 % incorrectas—, y el ancho de cada una los acompaña` | Claude Code · guion |
 | El índice muestra los siete módulos con su cantidad real | `Dibujado por modulo: 2=52, 3=61, 4=61, 5=49, 6=52, 7=48, 8=45`, contado sobre el HTML y comparado contra la base consultada aparte por wrangler | Claude Code · guion |
 | El índice es el único control | `Control libre: 3→61, 5→49, 3→61 sin recargar`. El `<select>` ya no existe en el HTML servido, comprobado sobre la respuesta del servidor | Claude Code · guion |
@@ -128,11 +137,11 @@ producción, el 2026-09-15.
 | Un valor distinto de `1` responde `PETICION_INVALIDA` | Provocado con `resumen=true` y `resumen=0`: **400**, `usar_respaldo: false` en los dos | Claude Code · guion |
 | El conteo del resumen coincide con el dibujado, módulo a módulo | Comparado en los siete. Rojo provocado poniendo `COUNT(*) + 1` en el extremo: 20 problemas, incluidos los siete «promete 53 y se dibujaron 52» | Claude Code · guion |
 | El modo degradado trae los siete conteos, con el aviso de ADR-008 al abrir | `Modo degradado al ABRIR: el aviso de ADR-008 se ve antes de elegir nada, con el estado vacío debajo y los 7 conteos del índice contados sobre la copia` | Claude Code · guion |
-| En una ventana de 700 px de alto el panel sigue siendo usable | Punto 7 de la pasada: EXITOSO | autor · navegador |
+| En una ventana de 700 px de alto el panel sigue siendo usable | Punto 7 de la pasada: EXITOSO | autor |
 | Bajo el punto de corte el panel se apila sin romperse | Puntos 4 y 5 de la pasada: teléfono 390 × 844 y apilado bajo `lg`, EXITOSO. El guion cubre el punto de corte del título: falla si vuelve a ser `xl` | los dos |
-| Una captura en escala de grises distingue qué representa cada barra | Punto 8 de la pasada: EXITOSO, con captura tomada, y cubriendo además el módulo activo | autor · navegador |
+| Una captura en escala de grises distingue qué representa cada barra | Punto 8 de la pasada: EXITOSO, con captura tomada, y cubriendo además el módulo activo | autor |
 | El diseño mantiene la identidad del sitio | Los trece colores usados en el panel, el índice y el componente salen de la paleta de `tailwind.config.cjs`; cero literales hexadecimales y cero valores arbitrarios de color | Claude Code · guion |
-| Sin errores de consola con cualquier módulo cargado | Punto 1 de la pasada: los siete módulos, en local y en producción, EXITOSO | autor · navegador |
+| Sin errores de consola con cualquier módulo cargado | Punto 1 de la pasada: los siete módulos, en local y en producción, EXITOSO | autor |
 | `npm run verificar` termina en 0 | Salida completa del autor tras el commit: `VERIFICADO`, las cinco comprobaciones en OK, código 0 | autor |
 
 ### Los tres criterios que la auditoría añadió, y no estaban en la lista original

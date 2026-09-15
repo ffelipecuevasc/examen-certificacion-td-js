@@ -45,4 +45,11 @@ explica cada respuesta y permite repasar solo los errores.
 
 **Reorganizado el 2026-09-15, por decisión del autor.** La antigua iteración 33 («Memoria del avance, justificaciones y
 repaso») juntaba ocho frentes y se partió en tres: 33, 34 y 35. La orientación en la portada pasó de la 34 a la 36.
-Ninguna de las iteraciones renumeradas estaba iniciada, así que ninguna bitácora ni ADR queda apuntando al vacío.
+Ninguna de las iteraciones renumeradas estaba iniciada, así que ninguna ADR queda apuntando al
+vacío. **Sí quedan citas antiguas a la numeración vieja, y no se reescriben:** la iteración 25
+—líneas 462, 836 y 913— y tres bitácoras —`2026-09-10-cierre-epica-20.md`,
+`2026-09-10-iteracion-25-modulo-03.md` y `2026-09-10-iteracion-25-modulo-04.md`— citan la
+**justificación visible** como iteración 33. Eran ciertas el día que se escribieron, y las
+bitácoras y las iteraciones cerradas son registro histórico: se leen para saber qué se sabía
+entonces, no para saber dónde está hoy cada cosa. Por eso se dejan como están, y la corrección
+vive acá: **la justificación visible es hoy la iteración 34.**
