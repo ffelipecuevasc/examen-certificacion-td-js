@@ -9,10 +9,10 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | iteracion-33-memoria-del-avance.md                                                                                                                 |
+| **Iteración** | iteracion-36-orientacion-en-la-portada.md                                                                                                          |
 | **Épica**     | 30 - Cuestionario                                                                                                                                  |
 | **Estado**    | ⚪ No iniciada                                                                                                                                      |
-| **Siguiente** | La siguiente es `iteracion-34-justificacion-y-repaso.md` (épica 30). |
+| **Siguiente** | La siguiente es `iteracion-34-justificacion-y-repaso.md` (épica 30). El orden de trabajo de la épica 30 es **33 → 36 → 34 → 35**, decidido por el autor el 2026-09-15: la portada publica una cifra falsa y la 36 no depende de las otras tres. |
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -31,6 +31,7 @@ decisiones vale tanto como el código que las implementa.
 | 25 - Llenar el banco                   | 20 - Persistencia preguntas | 2026-09-11 | 🟢 Completada |
 | 31 - Selector de módulo                | 30 - Cuestionario           | 2026-09-11 | 🟢 Completada |
 | 32 - Rediseño del panel fijo           | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
+| 33 - Memoria del avance                | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

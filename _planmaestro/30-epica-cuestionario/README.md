@@ -38,10 +38,16 @@ explica cada respuesta y permite repasar solo los errores.
 |----|------------------------------------------|----------------------------|
 | 31 | Selector de módulo                       | 🟢 Completada · 2026-09-11 |
 | 32 | Rediseño del panel fijo                  | 🟢 Completada · 2026-09-15 |
-| 33 | Memoria del avance                       | ⚪ No iniciada             |
+| 33 | Memoria del avance                       | 🟢 Completada · 2026-09-15 |
 | 34 | Justificación y repaso                   | ⚪ No iniciada             |
 | 35 | Transición de carga                      | ⚪ No iniciada             |
-| 36 | Orientación del estudiante en la portada | ⚪ No iniciada             |
+| 36 | [Orientación del estudiante en la portada](iteracion-36-orientacion-en-la-portada.md) | ⚪ No iniciada |
+
+**Orden de trabajo: 33 → 36 → 34 → 35.** Decidido por el autor el **2026-09-15**, al cerrar la 33.
+La 36 se adelanta a la 34 y la 35 porque **la portada publica hoy una cifra falsa**, que es un
+defecto a la vista de cualquiera que entre, y porque **la 36 no depende de la 33, la 34 ni la 35**:
+toca `index.html`, no el cuestionario. Las otras dos siguen después, en su orden, y ninguna se
+descarta.
 
 **Reorganizado el 2026-09-15, por decisión del autor.** La antigua iteración 33 («Memoria del avance, justificaciones y
 repaso») juntaba ocho frentes y se partió en tres: 33, 34 y 35. La orientación en la portada pasó de la 34 a la 36.
