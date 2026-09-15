@@ -24,6 +24,7 @@ explica cada respuesta y permite repasar solo los errores.
 - Justificación visible al responder.
 - Modo repaso de errores, por módulo.
 - Transición al cargar un módulo, fiel a la carga real.
+- Portada y navegación orientadas a quien no da por supuestas las convenciones de la web.
 
 ## Fuera de alcance
 
@@ -39,7 +40,7 @@ explica cada respuesta y permite repasar solo los errores.
 | 31 | Selector de módulo                       | 🟢 Completada · 2026-09-11 |
 | 32 | Rediseño del panel fijo                  | 🟢 Completada · 2026-09-15 |
 | 33 | Memoria del avance                       | 🟢 Completada · 2026-09-15 |
-| 34 | Justificación y repaso                   | ⚪ No iniciada             |
+| 34 | Orientación del estudiante en la portada | ⚪ No iniciada |
 | 35 | Transición de carga                      | ⚪ No iniciada             |
 | 36 | [Orientación del estudiante en la portada](iteracion-36-orientacion-en-la-portada.md) | ⚪ No iniciada |
 

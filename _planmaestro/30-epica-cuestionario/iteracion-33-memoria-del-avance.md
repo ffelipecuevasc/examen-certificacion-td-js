@@ -194,6 +194,10 @@ condición: la cifra del índice se entiende sin color, y el nombre accesible de
 - [x] Agregar la comprobación de alternativas con texto repetido y provocar su rojo.
 - [x] Anotar en `registro_log.md` «borrar todo el avance» como idea a evaluar con el uso. Hecho en el cierre de la 32
   (`registro_log.md:169`).
+- [ ] Dar una transición al cargar un módulo. Hoy la zona de preguntas pasa de
+    vacía a llena de golpe y se siente burdo. Va una barra que refleje la
+    **carga real**, con el logotipo de JavaScript encima, y un mínimo visible
+    de unos 400 ms para que no parpadee cuando la respuesta es instantánea.
 
 ## Criterios de aceptación
 
@@ -219,6 +223,11 @@ lo comprueba el autor.
   vigente.
 - [x] **El avance no sale del dispositivo.** Ninguna petición que haga el sitio durante las pruebas incluye datos del
   avance.
+- [ ] **La transición refleja la carga real, no un tiempo inventado.** Se
+  demuestra con una respuesta lenta y con una instantánea: en la primera la
+  barra acompaña, en la segunda hay un destello breve y no una espera.
+- [ ] **Nadie espera de más.** El tiempo entre elegir un módulo y verlo no crece
+  respecto de lo que tarda la consulta más el mínimo visible.
 
 **El banco cambia** (todo interceptando la respuesta, decisión 12)
 
