@@ -46,7 +46,7 @@
  *   npm run probar:filtrado
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { prepararDomFalso } from './dom-falso.mjs';
@@ -374,10 +374,127 @@ try {
     }
   }
 
+  // ------------------------------------------------------------------------
+  // 2c · Los ids del resumen (iteracion 33, enmienda de ADR-033)
+  //
+  // El resumen pasa a traer los ids de las preguntas activas de cada modulo, que es
+  // contra lo que el indice filtra el avance guardado. Si estos ids no fueran
+  // exactamente los de la base, el indice contaria avance sobre preguntas que el
+  // banco ya no tiene, que es justo lo que la memoria existe para no hacer.
+  // ------------------------------------------------------------------------
+
+  for (const fila of resumen.cuerpo.datos ?? []) {
+    const suyos = fila.preguntas_ids;
+
+    if (!Array.isArray(suyos)) {
+      problemas.push(`?resumen=1 no trae los ids del modulo ${fila.modulo}`);
+      continue;
+    }
+
+    const enLaBase = [...(idsDelBanco.get(fila.modulo) ?? [])].sort((a, b) => a - b);
+
+    if (suyos.join(',') !== enLaBase.join(',')) {
+      problemas.push(
+        `los ids del modulo ${fila.modulo} no son los de la base:\n` +
+          `      resumen: ${suyos.length} ids\n      base:    ${enLaBase.length} ids`
+      );
+    }
+    if (suyos.length !== fila.preguntas) {
+      problemas.push(
+        `el modulo ${fila.modulo} dice tener ${fila.preguntas} preguntas y trae ${suyos.length} ids`
+      );
+    }
+    if (suyos.some((id) => !Number.isInteger(id))) {
+      problemas.push(`los ids del modulo ${fila.modulo} no son numeros: llegaron sin convertir`);
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // 2d · Y que traerlos siga siendo barato. ANTES Y DESPUES, EN ESTA MISMA
+  //      EJECUCION Y SOBRE ESTA MISMA BASE.
+  //
+  // «Antes» es la respuesta sin los ids, reconstruida desde la respuesta de ahora.
+  // No es una estimacion: comprobado el 2026-09-15 contra el extremo anterior, la
+  // reconstruccion da 929 bytes, que es exactamente lo que ese extremo devolvia.
+  //
+  // Para las filas leidas se comparan los PLANES de las dos consultas. La de antes
+  // se deriva quitandole el `group_concat` a la de ahora —no se copia a mano, que
+  // seria una segunda version de la consulta esperando a divergir—, y si los dos
+  // planes coinciden, la de ahora recorre exactamente las mismas filas. Es la unica
+  // forma de medir las filas de la consulta vieja sin dejar su codigo en el sitio.
+  //
+  // El umbral es de la iteracion 33 y no se relaja: 5 KB, y las filas no suben.
+  // ------------------------------------------------------------------------
+
+  const TECHO_DEL_RESUMEN = 5 * 1024;
+
+  const bytesDespues = resumen.bytes;
+  const bytesAntes = Buffer.byteLength(
+    JSON.stringify({
+      ...resumen.cuerpo,
+      datos: (resumen.cuerpo.datos ?? []).map(({ preguntas_ids, ...fila }) => fila),
+    })
+  );
+
+  const filasDespues = resumen.cuerpo.meta?.filas_leidas;
+  const filasDelBanco = banco.cuerpo?.meta?.filas_leidas;
+
+  if (bytesDespues > TECHO_DEL_RESUMEN) {
+    problemas.push(
+      `?resumen=1 pesa ${bytesDespues} bytes y el techo son ${TECHO_DEL_RESUMEN}: los ids salieron ` +
+        'mas caros de lo que la iteracion 33 acepta'
+    );
+  }
+
+  const { sqlResumen } = await import(
+    pathToFileURL(join(RAIZ, 'functions', 'api', 'preguntas.js')).href
+  );
+
+  const consultaDeAhora = sqlResumen(false);
+  const consultaDeAntes = consultaDeAhora.replace(/,\s*\n\s*group_concat\(id\) AS preguntas_ids/, '');
+
+  if (consultaDeAntes === consultaDeAhora) {
+    problemas.push(
+      'no pude derivar la consulta de antes quitandole los ids a la de ahora: la comparacion de ' +
+        'planes estaria comparando la consulta consigo misma y no diria nada'
+    );
+  }
+
+  const plan = (sql) =>
+    (consultar(`EXPLAIN QUERY PLAN ${sql.trim().replace(/;$/, '')};`) ?? [])
+      .map((f) => f.detail)
+      .join(' | ');
+
+  const planAntes = plan(consultaDeAntes);
+  const planAhora = plan(consultaDeAhora);
+
+  if (planAntes === '' || planAhora === '') {
+    problemas.push('no pude leer el plan de las consultas del resumen para comparar filas leidas');
+  } else if (planAntes !== planAhora) {
+    problemas.push(
+      `agregar los ids cambio el plan de la consulta, asi que puede estar leyendo mas filas:\n` +
+        `      antes: ${planAntes}\n      ahora: ${planAhora}`
+    );
+  }
+
+  if (!Number.isInteger(filasDespues) || !Number.isInteger(filasDelBanco)) {
+    problemas.push('la capa de datos no informo filas_leidas: no se puede medir si el resumen subio');
+  } else if (filasDespues >= filasDelBanco) {
+    problemas.push(
+      `?resumen=1 leyo ${filasDespues} filas y el banco entero ${filasDelBanco}: el resumen dejo ` +
+        'de ser barato en filas'
+    );
+  }
+
   notas.push(
     `Resumen: ${delResumen.size} modulos en ${(resumen.bytes / 1024).toFixed(1)} KB, ` +
       `frente a ${(banco.bytes / 1024).toFixed(1)} KB del banco entero ` +
       `(${proporcion.toFixed(0)} veces menos). Valores invalidos rechazados con 400.`
+  );
+  notas.push(
+    `Coste de los ids, medido en esta ejecucion: ${bytesAntes} bytes antes y ${bytesDespues} ` +
+      `despues (techo ${TECHO_DEL_RESUMEN}). filas_leidas ${filasDespues}, con el mismo plan de ` +
+      `consulta que sin los ids, frente a ${filasDelBanco} del banco entero.`
   );
 
   // ------------------------------------------------------------------------
@@ -458,13 +575,18 @@ try {
   }
 
   // Las siete cifras, contra la base consultada aparte.
+  //
+  // Desde la iteracion 33 la fila dice «respondidas/total». Aqui no hay nada
+  // respondido —este guion corre sin almacenamiento, que es lo que instala
+  // prepararDomFalso() por defecto—, asi que las siete tienen que decir «0/N». Que
+  // el cero se mueva con lo guardado se prueba en scripts/probar-memoria.mjs.
   for (const fila of porModulo) {
     const enElIndice = new RegExp(
-      `data-modulo="${fila.modulo}"[\\s\\S]*?>\\s*${fila.cuantas}\\s*<`
+      `data-modulo="${fila.modulo}"[\\s\\S]*?>\\s*0/${fila.cuantas}\\s*<`
     );
     if (!enElIndice.test(indiceVacio)) {
       problemas.push(
-        `el indice no muestra las ${fila.cuantas} preguntas del modulo ${fila.modulo} al abrir`
+        `el indice no muestra «0/${fila.cuantas}» en el modulo ${fila.modulo} al abrir`
       );
     }
   }
@@ -724,29 +846,32 @@ try {
   }
 
   // ------------------------------------------------------------------------
-  // 8b · El aviso antes de perder el avance
+  // 8b · El cambio de modulo: sin aviso, y por una sola puerta
   //
-  // LO QUE ESTA SECCION PRUEBA, Y LO QUE NO
+  // QUE SE FUE DE AQUI, Y POR QUE
   //
-  // Prueba la DECISION: con respuestas dentro, cambiar de modulo no se ejecuta y
-  // el aviso aparece diciendo cuantas se pierden; sin respuestas, el cambio pasa
-  // directo y el aviso no aparece.
+  // Esta seccion probaba el aviso de perdida de avance de las iteraciones 31 y 32:
+  // cuando aparecia, que decia, y que apareciera ANTES de pedir el modulo. La
+  // iteracion 33 lo retiro entero, porque con memoria cambiar de modulo ya no cuesta
+  // nada y un aviso que no protege de nada entrena a ignorar los avisos. Probar que
+  // ya no aparece es probar que el cambio pasa directo, que es el caso A.
   //
-  // Y prueba el ORDEN, que es lo que sostiene todo lo demas: el aviso se muestra
-  // ANTES de pedir el modulo. El indice marca al pedir, asi que mientras la
-  // pregunta sigue en pie tiene que seguir marcando el modulo anterior. Si alguien
-  // invirtiera el orden —pedir primero y preguntar despues— habria un rato en que
-  // la pantalla dice un modulo y las preguntas son de otro, y el aviso llegaria
-  // tarde a avisar de algo ya perdido.
+  // QUE SE QUEDA, Y ES LO QUE SOSTIENE EL RESTO
   //
-  // Con el `<select>` de la iteracion 31 habia ademas que deshacer el cambio a mano
-  // antes de preguntar, porque el navegador ya habia movido la seleccion. Eso ya no
-  // hace falta; lo que se comprueba es lo mismo.
+  //   A. Que el cambio pase DIRECTO, con respuestas dentro y sin ellas. Si algo se
+  //      quedara preguntando por el medio, el modulo nuevo no se dibujaria.
+  //   B. Que la puerta unica siga siendo unica. Su motivo cambio —ya no guarda el
+  //      aviso, sino la guarda contra la doble peticion y el reintento tras una
+  //      carga fallida— pero el defecto que evita es el mismo: un segundo camino a
+  //      mostrarModulo() se las salta EN SILENCIO.
+  //   C. Que no quede ni un resto del aviso en el sitio ni en los guiones. Un
+  //      identificador huerfano es una funcion que nadie llama hasta que alguien la
+  //      llama.
   //
-  // NO prueba que el aviso se VEA, ni que el foco caiga donde debe. Eso necesita
-  // un navegador y se comprueba abriendo la pagina.
+  // Lo que la memoria recuerda se prueba aparte, en scripts/probar-memoria.mjs: para
+  // eso hay que abrir la pagina varias veces, y eso no se puede fingir dentro de un
+  // solo proceso.
   // ------------------------------------------------------------------------
-
   /** Deja el componente en un modulo, esperando a que termine de dibujarlo. */
   const asentar = async (numero) => {
     await mostrarModulo(numero);
@@ -782,26 +907,19 @@ try {
     problemas.push('el componente no se ato al indice: ningun cambio de modulo llegaria');
   }
 
-  // --- caso A: sin nada respondido, NO avisa -------------------------------
+  /** Cuantas preguntas dice la base que tiene un modulo. */
+  const cuantasTiene = (numero) => porModulo.find((f) => f.modulo === numero)?.cuantas;
+
+  // --- caso A: el cambio pasa directo, con respuestas dentro y sin ellas ----
+
   await asentar(MODULO_DE_MUESTRA);
   elegirEnElIndice(5);
-
-  const avisoSinNadaQuePerder = dom.html('#aviso-cambio-modulo');
-  if (avisoSinNadaQuePerder !== '' || !dom.oculto('#aviso-cambio-modulo')) {
-    problemas.push(
-      'cambiar de modulo SIN nada respondido saco el aviso igual: avisar cuando no hay ' +
-        'nada que perder entrena a ignorar los avisos'
-    );
-  }
-
-  // El cambio ademas tiene que haber ocurrido de verdad.
   await new Promise((listo) => setTimeout(listo, 1500));
-  if (idsDibujados(dom.html('#cuestionario')).length !==
-      porModulo.find((f) => f.modulo === 5)?.cuantas) {
+
+  if (idsDibujados(dom.html('#cuestionario')).length !== cuantasTiene(5)) {
     problemas.push('sin nada respondido, el cambio de modulo no llego a dibujarse');
   }
 
-  // --- caso B: con algo respondido, SI avisa y NO cambia --------------------
   await asentar(MODULO_DE_MUESTRA);
   const oyentesDelClic = responderUna();
 
@@ -814,80 +932,138 @@ try {
     );
   }
 
-  const idsAntes = idsDibujados(dom.html('#cuestionario')).join(',');
   elegirEnElIndice(6);
-
-  const aviso = dom.html('#aviso-cambio-modulo');
-
-  if (dom.oculto('#aviso-cambio-modulo') || aviso === '') {
-    problemas.push(
-      'cambiar de modulo con 1 respuesta dentro NO avisó: se perderia en silencio, que es ' +
-        'lo que esta iteracion existe para impedir'
-    );
-  }
-  if (!aviso.includes('1 respuesta')) {
-    problemas.push('el aviso no dice cuantas respuestas se van a perder');
-  }
-  if (!aviso.includes(`¿Cambiar al Módulo 6?`)) {
-    problemas.push('el aviso no dice a que modulo se iba a cambiar');
-  }
-  if (marcadoEnElIndice() !== MODULO_DE_MUESTRA) {
-    problemas.push(
-      `el indice marcaba el modulo «${marcadoEnElIndice()}» mientras el aviso preguntaba: ` +
-        'tiene que seguir senialando el modulo en el que el estudiante esta de verdad'
-    );
-  }
-  if (idsDibujados(dom.html('#cuestionario')).join(',') !== idsAntes) {
-    problemas.push('el aviso aparecio DESPUES de redibujar: el avance ya estaba perdido');
-  }
-
-  // --- caso C: «Quedarme acá» deja todo como estaba ------------------------
-  dom.disparar('#aviso-cambio-modulo', 'click', {
-    target: { closest: (s) => (s === '[data-cancelar-cambio]' ? {} : null) },
-  });
-
-  if (!dom.oculto('#aviso-cambio-modulo') || dom.html('#aviso-cambio-modulo') !== '') {
-    problemas.push('«Quedarme acá» no retiro el aviso');
-  }
-  if (marcadoEnElIndice() !== MODULO_DE_MUESTRA) {
-    problemas.push('«Quedarme acá» movio la marca del indice');
-  }
-  if (dom.texto('#valor-avance') !== '1') {
-    problemas.push('«Quedarme acá» perdio la respuesta igual');
-  }
-
-  // --- caso D: «Cambiar de módulo» si cambia, y recien ahi se pierde --------
-  dom.disparar('#aviso-cambio-modulo', 'click', {
-    target: {
-      closest: (s) =>
-        s === '[data-confirmar-cambio]' ? { dataset: { confirmarCambio: '6' } } : null,
-    },
-  });
-
   await new Promise((listo) => setTimeout(listo, 1500));
 
-  const tras = idsDibujados(dom.html('#cuestionario'));
-  if (tras.length !== porModulo.find((f) => f.modulo === 6)?.cuantas) {
+  const trasElSalto = idsDibujados(dom.html('#cuestionario'));
+
+  if (trasElSalto.length !== cuantasTiene(6)) {
     problemas.push(
-      `tras confirmar el cambio se dibujaron ${tras.length} preguntas y el modulo 6 tiene ` +
-        `${porModulo.find((f) => f.modulo === 6)?.cuantas}`
+      `con 1 respuesta dentro, saltar al modulo 6 dibujo ${trasElSalto.length} preguntas y tiene ` +
+        `${cuantasTiene(6)}: algo se quedo preguntando por el medio, y el aviso de perdida esta ` +
+        'retirado desde la iteracion 33'
     );
   }
-  if (dom.texto('#valor-avance') !== '0') {
-    problemas.push('tras confirmar el cambio, el panel no partio de cero');
-  }
-  if (!dom.oculto('#aviso-cambio-modulo')) {
-    problemas.push('el aviso siguio en pantalla despues de cambiar');
+  if (marcadoEnElIndice() !== 6) {
+    problemas.push(
+      `tras saltar con respuestas dentro, el indice marca el modulo «${marcadoEnElIndice()}»`
+    );
   }
 
   notas.push(
-    'Aviso de perdida, provocado DESDE EL INDICE: sin respuestas no aparece y el cambio ' +
-      'pasa directo; con 1 respuesta aparece, el indice sigue marcando el modulo actual y ' +
-      'las preguntas no se tocan.'
+    'Cambio de modulo con 1 respuesta dentro: paso directo al modulo 6, sin preguntar nada. El ' +
+      'aviso de perdida ya no existe.'
   );
+
+  // --- caso B: la puerta unica sigue cazando --------------------------------
+  //
+  // Se pide el mismo modulo dos veces seguidas, sin esperar a que llegue la primera.
+  // Por la puerta, la segunda no sale a la red. Saltandosela —que es lo que haria un
+  // segundo camino a mostrarModulo()— sale, y son 44 a 65 KB por la misma pregunta
+  // en una conexion modesta, que es el publico de vision.md.
+
+  const contarPeticiones = () => {
+    const anterior = globalThis.fetch;
+    let cuantas = 0;
+
+    globalThis.fetch = (ruta, opciones) => {
+      if (String(ruta).includes('/api/preguntas?modulo=')) cuantas += 1;
+      return anterior(ruta, opciones);
+    };
+
+    return () => {
+      globalThis.fetch = anterior;
+      return cuantas;
+    };
+  };
+
+  await asentar(MODULO_DE_MUESTRA);
+
+  let cerrarCuenta = contarPeticiones();
+  elegirEnElIndice(2);
+  elegirEnElIndice(2);
+  await new Promise((listo) => setTimeout(listo, 1500));
+  const porLaPuerta = cerrarCuenta();
+
+  await asentar(MODULO_DE_MUESTRA);
+
+  cerrarCuenta = contarPeticiones();
+  mostrarModulo(4);
+  mostrarModulo(4);
+  await new Promise((listo) => setTimeout(listo, 1500));
+  const saltandosela = cerrarCuenta();
+
+  if (porLaPuerta !== 1) {
+    problemas.push(
+      `pulsar dos veces el mismo modulo en el indice lo pidio ${porLaPuerta} veces: la guarda ` +
+        'contra la doble peticion no esta en la puerta, o la puerta dejo de ser el unico camino'
+    );
+  }
+  if (saltandosela <= porLaPuerta) {
+    problemas.push(
+      `saltarse la puerta cuesta lo mismo que pasar por ella (${saltandosela} contra ` +
+        `${porLaPuerta} peticiones): esta prueba ya no distingue una cosa de la otra, asi que ` +
+        'dejo de vigilar que la puerta sea unica'
+    );
+  }
+
   notas.push(
-    '«Quedarme acá» conserva la respuesta; «Cambiar de módulo» cambia y recien ahi el panel ' +
-      'vuelve a cero.'
+    `Puerta unica: dos pulsaciones seguidas del mismo modulo salieron a la red ${porLaPuerta} vez; ` +
+      `llamando a mostrarModulo() por fuera, ${saltandosela}. La guarda vive en la puerta.`
+  );
+
+  // --- caso C: no queda ni un resto del aviso -------------------------------
+  //
+  // Se buscan los identificadores que SOLO existian para el aviso. Se buscan esos y
+  // no la palabra «aviso», porque las ADR y las bitacoras lo siguen nombrando —y
+  // deben: son registro historico de por que estuvo y por que se fue—. Lo que no
+  // puede quedar es el mecanismo.
+  //
+  // Este archivo queda fuera del barrido por un motivo evidente: es el que lleva la
+  // lista. Nombrarlos aqui es lo contrario de tenerlos vivos.
+
+  const RESTOS_DEL_AVISO = [
+    'aviso-cambio-modulo',
+    'confirmar-cambio',
+    'cancelar-cambio',
+    'pedirConfirmacion',
+    'Quedarme acá',
+    'El avance todavía no se guarda',
+  ];
+
+  const DONDE_BARRER = [
+    join(RAIZ, 'cuestionario.html'),
+    join(RAIZ, 'index.html'),
+    join(SITIO, 'components', 'cuestionario.js'),
+    join(SITIO, 'components', 'indice-modulos.js'),
+    join(SITIO, 'components', 'estado-datos.js'),
+    join(SITIO, 'cuestionario-main.js'),
+    join(SITIO, 'main.js'),
+    join(SITIO, 'servicios', 'datos.js'),
+    join(SITIO, 'servicios', 'memoria.js'),
+    join(AQUI, 'probar-escapado.mjs'),
+    join(AQUI, 'probar-memoria.mjs'),
+    join(AQUI, 'dom-falso.mjs'),
+  ];
+
+  for (const archivo of DONDE_BARRER) {
+    if (!existsSync(archivo)) continue;
+
+    const contenido = readFileSync(archivo, 'utf8');
+
+    for (const resto of RESTOS_DEL_AVISO) {
+      if (contenido.includes(resto)) {
+        problemas.push(
+          `queda un resto del aviso de perdida: «${resto}» sigue en ` +
+            `${archivo.replace(RAIZ, '').replace(/^[\\/]/, '')}`
+        );
+      }
+    }
+  }
+
+  notas.push(
+    `Aviso retirado: ninguno de sus ${RESTOS_DEL_AVISO.length} identificadores queda en las dos ` +
+      `paginas, los componentes ni los guiones (${DONDE_BARRER.length} archivos barridos).`
   );
 
   // ------------------------------------------------------------------------
@@ -976,6 +1152,11 @@ try {
   // Tres caminos lo provocaban a la vez —cargar un modulo, confirmar el aviso, y
   // la llegada de los conteos—, porque los tres reescriben el `innerHTML` de algo
   // que podia tener el foco dentro.
+  //
+  // Con el aviso retirado en la iteracion 33 quedan dos, y el que se fue no se
+  // reemplaza por nada: cambiar de modulo con respuestas dentro es ahora el mismo
+  // camino que cambiarlo sin ellas. Que siga terminando en la cabecera del modulo
+  // nuevo se comprueba igual, porque es la parte que no cambio.
   // ------------------------------------------------------------------------
 
   // --- elegir un modulo sin nada respondido --------------------------------
@@ -993,42 +1174,22 @@ try {
     );
   }
 
-  // --- confirmar el aviso ---------------------------------------------------
+  // --- elegir otro modulo CON respuestas dentro ------------------------------
+  //
+  // Antes este camino pasaba por el aviso y habia que confirmarlo. Ahora es directo,
+  // y el foco tiene que terminar en el mismo sitio: la cabecera del modulo nuevo. Si
+  // quedara en el body, quien navega con teclado se quedaria sin saber que su
+  // eleccion se cumplio.
   responderUna();
   elegirEnElIndice(7);
-
-  dom.disparar('#aviso-cambio-modulo', 'click', {
-    target: {
-      closest: (sel) =>
-        sel === '[data-confirmar-cambio]' ? { dataset: { confirmarCambio: '7' } } : null,
-    },
-  });
   await new Promise((listo) => setTimeout(listo, 1500));
 
   if (dom.enfocado() === 'body') {
-    problemas.push('confirmar el cambio de modulo dejo el foco en el body');
+    problemas.push('cambiar de modulo con respuestas dentro dejo el foco en el body');
   }
   if (dom.enfocado() !== '#cabecera-modulo-7') {
     problemas.push(
-      `tras confirmar el cambio al modulo 7 el foco quedo en «${dom.enfocado()}»`
-    );
-  }
-
-  // --- cancelar el aviso ----------------------------------------------------
-  responderUna();
-  elegirEnElIndice(8);
-
-  dom.disparar('#aviso-cambio-modulo', 'click', {
-    target: { closest: (sel) => (sel === '[data-cancelar-cambio]' ? {} : null) },
-  });
-
-  if (dom.enfocado() === 'body') {
-    problemas.push('«Quedarme acá» dejo el foco en el body');
-  }
-  if (!dom.enfocado().includes('data-modulo="7"')) {
-    problemas.push(
-      `«Quedarme acá» dejo el foco en «${dom.enfocado()}» y tenia que devolverlo a la fila ` +
-        'del modulo 7, que es de donde el estudiante salio'
+      `tras cambiar al modulo 7 con respuestas dentro, el foco quedo en «${dom.enfocado()}»`
     );
   }
 
@@ -1055,8 +1216,8 @@ try {
   }
 
   notas.push(
-    'Foco: elegir y confirmar dejan en la cabecera del modulo; cancelar devuelve a su fila ' +
-      'del indice; y repintar el indice conserva la fila que lo tenia. Ninguno cae al body.'
+    'Foco: elegir un modulo deja en su cabecera, con respuestas dentro y sin ellas, y repintar ' +
+      'el indice conserva la fila que lo tenia. Ninguno cae al body.'
   );
 
   // ------------------------------------------------------------------------
@@ -1296,10 +1457,10 @@ try {
   }
 
   for (const [numero, cuantas] of enLaCopia) {
-    const enElIndice = new RegExp(`data-modulo="${numero}"[\\s\\S]*?>\\s*${cuantas}\\s*<`);
+    const enElIndice = new RegExp(`data-modulo="${numero}"[\\s\\S]*?>\\s*0/${cuantas}\\s*<`);
     if (!enElIndice.test(indiceCaido)) {
       problemas.push(
-        `con la capa caida, el indice no muestra las ${cuantas} preguntas del modulo ${numero}`
+        `con la capa caida, el indice no muestra «0/${cuantas}» en el modulo ${numero}`
       );
     }
   }
@@ -1341,10 +1502,11 @@ try {
       'Todo lo anterior se conto sobre el HTML que el componente escribio, no sobre',
       'la respuesta del extremo, y se comparo contra la base local consultada aparte.',
       '',
-      'Del aviso al cambiar de modulo se probo la DECISION —cuando aparece, que dice,',
-      'y que el indice siga marcando el modulo actual mientras pregunta—, disparando',
-      'los eventos que el componente registro DESDE EL INDICE, que es el unico camino',
-      'por el que hoy se cambia de modulo.',
+      'Del cambio de modulo se probo la DECISION —que pase directo con respuestas',
+      'dentro, y que la puerta unica siga cazando la doble peticion—, disparando los',
+      'eventos que el componente registro DESDE EL INDICE, que es el unico camino por',
+      'el que hoy se cambia de modulo. Lo que la memoria recuerda se prueba aparte, en',
+      'scripts/probar-memoria.mjs.',
       '',
       'Del foco se probo A QUE ELEMENTO va a parar en cada camino, que es lo unico',
       'que se puede saber sin navegador, y alcanza para cazar el defecto que importa:',

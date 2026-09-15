@@ -81,24 +81,18 @@
              gobierna las barras que vienen justo debajo, el panel es pegajoso y
              la zona derecha no, y en telefono esta columna se apila primero.
 
-             Lo llena components/indice-modulos.js con los conteos que trae
-             /api/preguntas?resumen=1 (ADR-033). Las cifras NO se escriben aqui:
-             salen del dato, siempre. -->
+             Lo llena components/indice-modulos.js con los conteos y los ids que
+             trae /api/preguntas?resumen=1 (ADR-033, enmendada en la iteracion 33).
+             Las cifras NO se escriben aqui: salen del dato, siempre.
+
+             Desde la iteracion 33 cada fila dice «respondidas/total», cruzando esos
+             ids con lo que el navegador guardo. El aviso de perdida de avance que
+             vivia aqui se retiro entero: con memoria ya no hay nada que perder al
+             cambiar de modulo, y un aviso que no protege de nada entrena a ignorar
+             los avisos. -->
         <nav class="mt-9" aria-labelledby="titulo-indice">
           <p id="titulo-indice" class="font-mono text-[11px] text-mutedink">Elige el módulo que quieres practicar</p>
           <ul id="indice-modulos" class="mt-3 grid grid-cols-2 lg:grid-cols-1 gap-2"></ul>
-
-          <!-- Aviso de perdida de avance. Vacio y oculto salvo que cambiar de
-               modulo vaya a costarle respuestas al estudiante. El avance no se
-               guarda hasta la iteracion 33, asi que cambiar pierde lo respondido:
-               se dice ANTES, nunca despues.
-
-               `role="alert"` y no `alertdialog`: esto NO es un modal y no atrapa
-               el foco, porque no le hace falta —el indice sigue marcando el modulo
-               actual, asi que salirse de aqui no cuesta nada—. Anunciar un dialogo
-               modal a quien usa lector de pantalla y no darselo es peor que no
-               anunciarlo. `role="alert"` ya implica `aria-live="assertive"`. -->
-          <div id="aviso-cambio-modulo" class="hidden mt-3" role="alert"></div>
         </nav>
 
         <!-- Las tres barras, horizontales desde la iteracion 32.
@@ -185,6 +179,16 @@
              respondio. Va aqui arriba y no en el pie a proposito: el estudiante
              tiene que enterarse antes de ponerse a estudiar, no despues. -->
         <div id="aviso-respaldo" class="hidden mb-8" role="status" aria-live="polite"></div>
+
+        <!-- Aviso de que este navegador no deja guardar el avance (iteracion 33).
+             Vacio y oculto salvo que el almacenamiento este denegado: ventana
+             privada, cookies bloqueadas, o cuota cero. Vive aqui y no en el panel
+             de la izquierda porque ese panel ya esta contabilizado al milimetro
+             desde ADR-032 —la ventana de 700 px de alto tiene que seguir
+             alcanzando hasta el boton de reiniciar—, y porque este aviso es raro:
+             no puede quitarle sitio al indice de los siete modulos, que se usa
+             siempre. -->
+        <div id="aviso-almacenamiento" class="hidden mb-8" role="status" aria-live="polite"></div>
         <div id="cuestionario" class="flex flex-col gap-12"></div>
       </div>
   </div>

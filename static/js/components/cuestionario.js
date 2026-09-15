@@ -33,17 +33,32 @@
  *      ese control es el indice de components/indice-modulos.js, y se cambia de
  *      modulo por una sola puerta: pedirCambioDeModulo().
  *
- * Y de la 3 sale la deuda que esta iteracion tiene que pagar en voz alta: el
- * avance no se guarda hasta la iteracion 33, asi que cambiar de modulo pierde lo
- * respondido. **Se avisa antes, nunca despues.** Eso es pedirConfirmacion().
+ * LA MEMORIA DEL AVANCE (iteracion 33, ADR-034)
+ *
+ * Cambiar de modulo ya no pierde nada, y recargar tampoco: cada respuesta se guarda
+ * en el navegador **al responderla**, y al volver al modulo se restaura. La 31 y la
+ * 32 avisaban antes de perder el avance; ese aviso se retiro entero, porque ya no
+ * hay nada que perder y un aviso que no protege de nada entrena a ignorar los
+ * avisos.
+ *
+ * Lo que se guarda —id de la pregunta y texto de la alternativa elegida, nunca el
+ * veredicto— y por que, esta en servicios/memoria.js y en ADR-034. Lo que le toca a
+ * este archivo es la otra mitad, que es la que importa para el estudiante:
+ *
+ *   **el veredicto se recalcula contra el banco dibujado, cada vez.** Ver
+ *   restaurarDesdeLaMemoria(). Si el banco cambio, manda el banco; si la
+ *   alternativa que eligio ya no existe con ese texto, la pregunta vuelve a quedar
+ *   sin responder. Se pierde una respuesta; no se afirma nada falso.
  */
 import { $, $$, esc, shuffle, icon, prefersReducedMotion } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
+import { borrarAvance, guardarRespuesta, leerAvance, sePuedeGuardar } from '../servicios/memoria.js';
 import {
+  avanceDelResumen,
   cargarConteos,
   conectarIndice,
   conteoDelResumen,
-  filaDelModulo,
+  fijarAvanceDibujado,
   marcarModuloActivo,
   pintarIndice,
 } from './indice-modulos.js';
@@ -144,9 +159,59 @@ function actualizarPanel() {
         : restantes === 0
           ? `¡Terminaste el módulo! Acertaste ${correctas} de ${total}.`
           : `Te quedan ${restantes} preguntas por responder.`;
+
+  // Y la fila del indice de este modulo cuenta lo mismo que estas barras, porque
+  // es lo dibujado lo que manda mientras el modulo esta abierto (decision 9 de la
+  // iteracion 33). Con nada cargado se olvida: las siete filas vuelven a contar
+  // sobre el resumen. El indice solo se repinta si la cifra cambio de verdad.
+  fijarAvanceDibujado(bancoCargado ? estado.modulo : null, respondidas, total);
 }
 
-/** Marca la alternativa elegida y revela la correcta. */
+/**
+ * Lo que dice la pagina despues de responder.
+ *
+ * Sale de aqui y no de dos sitios porque hay dos caminos que llegan al mismo
+ * estado: responder ahora, y restaurar lo respondido en otra visita. Si cada uno
+ * escribiera su propia frase, el dia que una cambie el estudiante veria una cosa al
+ * responder y otra al volver.
+ */
+const veredictoDibujado = (acerto) =>
+  acerto
+    ? `${icon('task-alt', 'text-base text-esmeralda mt-0.5')}<span>Correcto. Sigue así.</span>`
+    : `${icon('lightbulb', 'text-base text-jsyellow mt-0.5')}<span>La alternativa correcta está marcada en amarillo.</span>`;
+
+/**
+ * La pregunta a la que pertenece un boton, y la alternativa que se pulso.
+ *
+ * Se resuelve contra `bancoCargado` y no contra el DOM a proposito: el texto que
+ * hay que guardar es el del banco, sin escapar. Sacarlo del HTML obligaria a
+ * desescaparlo, y ese viaje de ida y vuelta es justo donde se cuela un `&amp;` en
+ * la memoria del estudiante para no volver a coincidir con nada nunca.
+ *
+ * Devuelve null si no se puede identificar, y quien llama sigue adelante sin
+ * guardar: responder tiene que funcionar igual aunque la memoria no pueda anotarlo.
+ */
+function deDondeSalio(boton) {
+  if (!bancoCargado) return null;
+
+  const item = boton.closest?.('[data-pregunta]');
+  const preguntaId = Number(String(item?.dataset?.pregunta ?? '').replace(/^q/, ''));
+  const alternativaId = Number(boton.dataset?.alternativa);
+
+  if (!Number.isInteger(preguntaId) || !Number.isInteger(alternativaId)) return null;
+
+  for (const grupo of bancoCargado) {
+    for (const pregunta of grupo.preguntas) {
+      if (pregunta.id !== preguntaId) continue;
+      const alternativa = pregunta.alternativas.find((a) => a.id === alternativaId);
+      return alternativa ? { pregunta, alternativa } : null;
+    }
+  }
+
+  return null;
+}
+
+/** Marca la alternativa elegida, revela la correcta y anota la respuesta. */
 function responder(boton) {
   const item = boton.closest('[data-pregunta]');
   const acerto = boton.dataset.correct === 'true';
@@ -168,16 +233,30 @@ function responder(boton) {
     }
   });
 
+  // La misma marca que deja el dibujo restaurado, para que las dos visitas se
+  // vean iguales y para que se pueda comprobar cual se eligio.
+  boton.dataset.elegida = 'true';
+
   const aviso = $('.quiz-feedback', item);
   aviso.classList.remove('hidden');
-  aviso.innerHTML = acerto
-    ? `${icon('task-alt', 'text-base text-esmeralda mt-0.5')}<span>Correcto. Sigue así.</span>`
-    : `${icon('lightbulb', 'text-base text-jsyellow mt-0.5')}<span>La alternativa correcta está marcada en amarillo.</span>`;
+  aviso.innerHTML = veredictoDibujado(acerto);
 
   item.dataset.answered = 'true';
   estado.respondidas += 1;
   if (acerto) estado.correctas += 1;
   else estado.incorrectas += 1;
+
+  // Se guarda AQUI, al responder, y no al cambiar de modulo ni al salir: cerrar la
+  // pestana a mitad de un modulo no puede perder nada, y la memoria no puede
+  // depender de que el estudiante salga por una puerta concreta.
+  //
+  // Se guarda el texto de la alternativa, nunca el veredicto: el veredicto se
+  // vuelve a calcular al restaurar, contra el banco que este vigente ese dia.
+  const origenDelClic = deDondeSalio(boton);
+  if (origenDelClic) {
+    guardarRespuesta(estado.modulo, origenDelClic.pregunta.id, origenDelClic.alternativa.texto);
+  }
+
   actualizarPanel();
 }
 
@@ -210,12 +289,44 @@ function agruparPorModulo(preguntas) {
   return grupos;
 }
 
-/** Dibuja una alternativa. Su texto viene de la base: se escapa siempre. */
-function dibujarAlternativa(alternativa) {
-  return `
+/**
+ * Dibuja una alternativa. Su texto viene de la base: se escapa siempre.
+ *
+ * `elegida` es la alternativa que el estudiante ya habia respondido en otra visita,
+ * o null si la pregunta esta sin responder. Con ella, la alternativa sale ya
+ * marcada: es asi como se restaura el avance, dibujandolo, y no simulando clics
+ * despues de dibujar.
+ *
+ * `data-alternativa` lleva el id de la fila, que es lo unico que hace falta para
+ * volver a encontrarla en el banco cargado al pulsarla. **El id no se guarda en la
+ * memoria del estudiante** —cambia con cada correccion del banco, ver
+ * servicios/memoria.js—: vive en el HTML y muere con el, que es un sitio donde
+ * cambiar de id no le hace dano a nadie.
+ */
+function dibujarAlternativa(alternativa, elegida) {
+  const esCorrecta = alternativa.es_correcta === 1;
+  const esLaElegida = elegida !== null && alternativa.id === elegida.id;
+
+  if (elegida === null) {
+    return `
               <button type="button" class="quiz-option flex items-start gap-3 text-left w-full border border-panel3 rounded-lg px-4 py-3 text-sm text-paper/90 hover:border-jsyellow transition-colors"
-                      data-correct="${alternativa.es_correcta === 1}">
+                      data-correct="${esCorrecta}" data-alternativa="${esc(alternativa.id)}">
                 <span class="quiz-mark text-lg opacity-0 shrink-0">${icon('check-circle')}</span>
+                <span>${esc(alternativa.texto)}</span>
+              </button>`;
+  }
+
+  // Las mismas tres marcas que deja responder(), y por el mismo orden: la correcta
+  // siempre se revela, la elegida se senala si no lo era, y el resto se apaga.
+  const estadoVisual = esCorrecta ? 'correct' : esLaElegida ? 'wrong' : 'dimmed';
+  const marca = esCorrecta ? icon('check-circle') : esLaElegida ? icon('cancel') : '';
+  const opacidad = estadoVisual === 'dimmed' ? 'opacity-0' : '';
+
+  return `
+              <button type="button" disabled class="quiz-option flex items-start gap-3 text-left w-full border border-panel3 rounded-lg px-4 py-3 text-sm text-paper/90 transition-colors"
+                      data-correct="${esCorrecta}" data-alternativa="${esc(alternativa.id)}"
+                      data-state="${estadoVisual}"${esLaElegida ? ' data-elegida="true"' : ''}>
+                <span class="quiz-mark text-lg ${opacidad} shrink-0">${marca}</span>
                 <span>${esc(alternativa.texto)}</span>
               </button>`;
 }
@@ -229,29 +340,36 @@ function dibujarAlternativa(alternativa) {
  * posicion, asi que barajar no rompe nada y aca no hace falta ninguna rama
  * especial mas alla de decidir si se baraja o no.
  */
-function dibujarPregunta(pregunta, numero) {
+function dibujarPregunta(pregunta, numero, respondida) {
   const orden =
     pregunta.orden_fijo === 1
       ? pregunta.alternativas.slice().sort((a, b) => a.orden - b.orden)
       : shuffle(pregunta.alternativas);
 
-  const alternativas = orden.map(dibujarAlternativa).join('');
+  const elegida = respondida?.alternativa ?? null;
+  const alternativas = orden.map((a) => dibujarAlternativa(a, elegida)).join('');
+
+  // El barajado de ADR-006 y la memoria no se estorban: lo guardado es el TEXTO de
+  // la alternativa, asi que da igual en que posicion le toque salir hoy.
+  const veredicto = respondida
+    ? `<p class="quiz-feedback mt-4 text-sm text-muted border-l-2 border-jsyellow pl-3 flex gap-2">${veredictoDibujado(respondida.acerto)}</p>`
+    : '<p class="quiz-feedback hidden mt-4 text-sm text-muted border-l-2 border-jsyellow pl-3 flex gap-2"></p>';
 
   return `
-          <li class="bg-panel border border-panel3 rounded-xl p-5 sm:p-6" data-pregunta="q${pregunta.id}">
+          <li class="bg-panel border border-panel3 rounded-xl p-5 sm:p-6" data-pregunta="q${pregunta.id}"${respondida ? ' data-answered="true"' : ''}>
             <div class="flex items-baseline gap-3">
               <span class="font-mono text-xs text-mutedink shrink-0">${String(numero).padStart(2, '0')}</span>
               <p class="font-display font-bold text-paper leading-snug">${esc(pregunta.enunciado)}</p>
             </div>
             <div class="mt-4 grid gap-2">${alternativas}</div>
-            <p class="quiz-feedback hidden mt-4 text-sm text-muted border-l-2 border-jsyellow pl-3 flex gap-2"></p>
+            ${veredicto}
           </li>`;
 }
 
-/** Dibuja la seccion de un modulo. */
-function dibujarGrupo(grupo) {
+/** Dibuja la seccion de un modulo, con lo respondido ya puesto. */
+function dibujarGrupo(grupo, vigentes) {
   const preguntas = grupo.preguntas
-    .map((pregunta, i) => dibujarPregunta(pregunta, i + 1))
+    .map((pregunta, i) => dibujarPregunta(pregunta, i + 1, vigentes.get(pregunta.id)))
     .join('');
 
   return `
@@ -328,6 +446,43 @@ function mostrarAvisoRespaldo() {
 }
 
 /**
+ * Aviso de que este navegador no deja guardar el avance.
+ *
+ * Va en la zona de preguntas, al lado del aviso de ADR-008 y por el mismo motivo:
+ * el panel de la izquierda ya esta contabilizado al milimetro desde ADR-032 —la
+ * ventana de 700 px de alto tiene que seguir alcanzando todo—, y un aviso que solo
+ * aparece en un caso raro no puede empujar el indice fuera de pantalla para los
+ * demas. Aca no le quita sitio a nada mientras no exista.
+ *
+ * Y se dice, no se calla. El sitio sigue sirviendo sin memoria —se elige modulo, se
+ * responde, se corrige— y lo unico que se pierde es el recuerdo entre visitas. Pero
+ * un estudiante que responde treinta preguntas y las pierde al recargar, sin que
+ * nadie se lo hubiera advertido, tiene todo el derecho a pensar que el sitio esta
+ * roto. Es el mismo argumento de ADR-008: degradar si, en silencio no.
+ */
+function mostrarAvisoAlmacenamiento() {
+  const contenedor = $('#aviso-almacenamiento');
+  if (!contenedor) return;
+
+  if (sePuedeGuardar()) {
+    contenedor.innerHTML = '';
+    contenedor.classList.add('hidden');
+    return;
+  }
+
+  contenedor.innerHTML = `
+      <div class="flex items-start gap-3 border border-panel3 bg-panel rounded-xl px-5 py-4">
+        ${icon('restart-alt', 'text-xl text-jsyellow shrink-0 mt-0.5')}
+        <div>
+          <p class="font-display font-bold text-paper text-sm">Tu avance no se está guardando.</p>
+          <p class="mt-1 text-sm text-muted">Este navegador no permite guardar datos del sitio: puede ser una ventana privada o el bloqueo de cookies. Puedes practicar igual y las respuestas se corrigen como siempre, pero al recargar la página el módulo va a empezar de cero.</p>
+        </div>
+      </div>`;
+
+  contenedor.classList.remove('hidden');
+}
+
+/**
  * Mensaje a pantalla completa cuando no hay preguntas que dibujar.
  *
  * `pie` es marcado escrito aqui dentro, no dato: es el unico parametro que NO se
@@ -352,6 +507,17 @@ function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '') {
  * modulo arriba» manda a desplazarse a ciegas. El enlace cierra esa distancia. En
  * escritorio sobra, porque el indice esta a la vista en la mitad izquierda, y no
  * molesta.
+ *
+ * Y AQUI SE DICE QUE EL AVANCE ES DE ESTE DISPOSITIVO (iteracion 33)
+ *
+ * Porque este mensaje es lo primero que se ve en cada visita —la pagina arranca
+ * vacia y se queda asi hasta que el estudiante elige—, y porque el panel de la
+ * izquierda no tiene sitio que regalar (ADR-032, la ventana de 700 px). Se dice
+ * antes de que el estudiante invierta media hora de respuestas, no despues de
+ * perderlas: el avance no viaja a ninguna parte, y eso tiene una cara buena —nadie
+ * lo ve, no hay cuenta ni registro— y una mala —no esta en el telefono si se
+ * respondio en el computador, y se va con los datos del navegador—. Las dos se
+ * dicen en la misma frase, que es lo honesto.
  */
 function mostrarEstadoVacio(contenedor) {
   dibujarMensaje(
@@ -359,20 +525,75 @@ function mostrarEstadoVacio(contenedor) {
     'quiz',
     'Elige un módulo para empezar.',
     'En el panel está el índice con los siete módulos del examen. Cuando elijas uno, sus preguntas aparecen acá.',
-    `<a href="#indice-modulos" data-ir-al-indice
+    `<p class="mt-4 text-sm text-mutedink max-w-prose mx-auto">
+         Tu avance se guarda <strong class="text-muted">solo en este dispositivo</strong>: no se envía a ningún servidor y no hace falta crear ninguna cuenta. Por lo mismo, no lo vas a encontrar en otro equipo ni si borras los datos del navegador.
+       </p>
+       <a href="#indice-modulos" data-ir-al-indice
           class="mt-5 inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
          ${icon('layers', 'text-base text-jsyellow')}Ir al índice de módulos
        </a>`
   );
 }
 
-/** Dibuja el modulo que ya esta cargado en memoria. */
+/**
+ * Cruza lo guardado con el banco dibujado, y recalcula cada veredicto.
+ *
+ * **Es el punto donde la memoria no puede mentir**, y por eso esta escrito aparte y
+ * no repartido por el dibujo. Tres cosas ocurren aqui, y las tres son la iteracion
+ * 33 entera:
+ *
+ *   1. **Una pregunta que ya no esta dibujada no cuenta.** Si se retiro del banco,
+ *      o si la validacion por fila la descarto, no aparece en `grupos` y su
+ *      respuesta guardada se ignora sin mas. No se borra de la memoria: puede haber
+ *      desaparecido solo hoy —un modo degradado sobre una instantanea vieja, una
+ *      carga a medias— y borrarla seria castigar al estudiante por un problema del
+ *      banco.
+ *
+ *   2. **Una alternativa cuyo texto cambio deja la pregunta sin responder.** Es la
+ *      consecuencia asumida de anclar en el texto: se pierde una respuesta, y no se
+ *      afirma nada falso. La pregunta vuelve a estar contestable.
+ *
+ *   3. **El veredicto sale de `es_correcta` del banco de hoy**, nunca de lo
+ *      guardado, porque lo guardado no lo trae. Si el autor corrigio cual era la
+ *      correcta, el estudiante ve el veredicto nuevo.
+ */
+function restaurarDesdeLaMemoria(grupos, guardadas) {
+  const vigentes = new Map();
+
+  for (const grupo of grupos) {
+    for (const pregunta of grupo.preguntas) {
+      const texto = guardadas.get(pregunta.id);
+      if (texto === undefined) continue;
+
+      const alternativa = pregunta.alternativas.find((a) => a.texto === texto);
+      if (!alternativa) continue;
+
+      vigentes.set(pregunta.id, { alternativa, acerto: alternativa.es_correcta === 1 });
+    }
+  }
+
+  return vigentes;
+}
+
+/**
+ * Dibuja el modulo que ya esta cargado en memoria, con lo respondido restaurado.
+ *
+ * Las tres barras salen de aqui y no de un contador que se vaya sumando: se cuentan
+ * sobre lo que se acaba de dibujar. Asi «lo dibujado manda» no es una intencion,
+ * sino la unica forma que tiene el codigo de contar.
+ */
 function pintar() {
   const contenedor = $('#cuestionario');
   if (!contenedor || !bancoCargado) return;
 
-  contenedor.innerHTML = bancoCargado.map(dibujarGrupo).join('');
+  const vigentes = restaurarDesdeLaMemoria(bancoCargado, leerAvance(estado.modulo));
+
+  contenedor.innerHTML = bancoCargado.map((grupo) => dibujarGrupo(grupo, vigentes)).join('');
+
   estado.total = bancoCargado.reduce((suma, grupo) => suma + grupo.preguntas.length, 0);
+  estado.respondidas = vigentes.size;
+  estado.correctas = [...vigentes.values()].filter((r) => r.acerto).length;
+  estado.incorrectas = estado.respondidas - estado.correctas;
 
   actualizarPanel();
 }
@@ -492,84 +713,41 @@ function irAlMensaje() {
 // La puerta unica hacia el cambio de modulo
 // ---------------------------------------------------------------------------
 
-/** Esconde el aviso de cambio de modulo y lo deja vacio. */
-function ocultarAvisoCambio() {
-  const contenedor = $('#aviso-cambio-modulo');
-  if (!contenedor) return;
-
-  contenedor.innerHTML = '';
-  contenedor.classList.add('hidden');
-}
-
-/**
- * Pregunta antes de que el estudiante pierda lo que lleva respondido.
- *
- * POR QUE NO ES UN window.confirm()
- *
- * Porque es un dialogo del navegador: sale en el idioma del navegador, con
- * aspecto de error del sistema, y el navegador puede decidir suprimirlo. Un aviso
- * que el navegador puede callar no sirve para lo unico que tiene que hacer.
- *
- * QUE CAMBIO AL PASAR DEL SELECTOR AL INDICE (iteracion 32)
- *
- * Con el `<select>` habia que **deshacer** el cambio antes de preguntar: el
- * navegador ya habia movido la seleccion y, mientras el aviso esperaba, la
- * pantalla decia un modulo y las preguntas eran de otro.
- *
- * Con el indice no hay nada que deshacer, y el motivo es el orden y no el tipo de
- * control: **este aviso se muestra ANTES de pedir el modulo.** El indice marca al
- * pedir —ver `marcarModuloActivo()`—, asi que mientras la pregunta sigue en pie no
- * se ha pedido nada y no se ha movido nada. Si el estudiante ignora el aviso,
- * recarga o se va, la pantalla sigue diciendo la verdad.
- *
- * Que no haya nada que deshacer no lo vuelve incomprobable: el orden se puede
- * invertir editando dos lineas, y `scripts/probar-filtrado.mjs` comprueba que el
- * indice siga marcando el modulo anterior mientras el aviso pregunta.
- *
- * No atrapa el foco y no es un modal: como nada se ha movido todavia, el resto de
- * la pagina puede seguir usandose sin que nada se pierda por descuido.
- */
-function pedirConfirmacion(destino) {
-  const contenedor = $('#aviso-cambio-modulo');
-  if (!contenedor) return;
-
-  const cuantas = estado.respondidas;
-  const respuestas = cuantas === 1 ? '1 respuesta' : `${cuantas} respuestas`;
-
-  contenedor.innerHTML = `
-      <div class="border border-jsyellow/40 bg-jsyellow/5 rounded-xl px-4 py-4">
-        <p id="aviso-cambio-titulo" class="font-display font-bold text-paper text-sm">¿Cambiar al Módulo ${esc(destino)}?</p>
-        <p class="mt-1 text-sm text-muted">Vas a perder las ${esc(respuestas)} del Módulo ${esc(estado.modulo)}. El avance todavía no se guarda: eso llega más adelante.</p>
-        <div class="mt-3 flex flex-wrap gap-2">
-          <button type="button" data-confirmar-cambio="${esc(destino)}"
-                  class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-xs px-4 py-2.5 rounded hover:bg-jsyellowdim transition-colors">
-            ${icon('swap-horiz', 'text-base')}Cambiar de módulo
-          </button>
-          <button type="button" data-cancelar-cambio
-                  class="inline-flex items-center gap-2 border border-panel3 text-muted font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow hover:text-paper transition-colors">
-            Quedarme acá
-          </button>
-        </div>
-      </div>`;
-
-  contenedor.classList.remove('hidden');
-
-  // El foco va al boton que cambia, no al que cancela: el estudiante llego aqui
-  // pidiendo cambiar, y la tecla Enter tiene que hacer lo que pidio.
-  $('[data-confirmar-cambio]', contenedor)?.focus?.();
-}
-
 /**
  * **La unica puerta por la que se cambia de modulo.**
  *
  * Todo lo que quiera cambiar de modulo pasa por aqui, y eso no es una preferencia
- * de estilo: el aviso de perdida de avance de la iteracion 31 vive dentro. Un
- * segundo camino que llame a `mostrarModulo()` directo lo esquivaria, y lo
- * esquivaria **en silencio** —el estudiante perderia lo respondido sin que nada se
- * lo hubiera dicho—, que es exactamente lo que esa iteracion existe para impedir.
+ * de estilo.
+ *
+ * SU MOTIVO CAMBIO EN LA ITERACION 33, Y LA PUERTA SE QUEDA
+ *
+ * Hasta la 32, lo que vivia dentro era el aviso de perdida de avance: cambiar de
+ * modulo costaba lo respondido, y un segundo camino a `mostrarModulo()` habria
+ * perdido el avance del estudiante sin decir nada. Ese aviso se retiro, porque con
+ * memoria ya no se pierde nada.
+ *
+ * La puerta no se retira con el, porque concentra otras tres guardas, y las tres se
+ * saltarian **en silencio**, que es la peor forma de romperse:
+ *
+ *   1. **La doble peticion.** Pulsar el mismo modulo mientras carga no vuelve a
+ *      pedirlo. Sin esto, cada toque impaciente son 44 a 65 KB mas por lo mismo, en
+ *      una conexion modesta, que es el publico de vision.md.
+ *   2. **El reintento tras una carga fallida.** Volver a pulsar el modulo que ya
+ *      esta puesto NO hace nada, salvo que no haya quedado puesto. Esa excepcion es
+ *      el unico camino de vuelta cuando la capa de datos falla, y sin ella habria
+ *      que recargar la pagina.
+ *   3. **El viaje a la cabecera.** `mostrarModulo()` deja al estudiante en la
+ *      cabecera del modulo, con el foco y el desplazamiento (ADR-032). Un camino
+ *      que dibujara por su cuenta dejaria a quien navega con teclado sin saber que
+ *      paso.
  *
  * Por eso `mostrarModulo()` es de esta casa y el indice no la conoce: avisa por
  * `conectarIndice()` y quien decide es esta funcion.
+ *
+ * **Y la memoria no depende de esta puerta.** El avance se guarda al responder, no
+ * al salir del modulo: cerrar la pestana a mitad de un modulo no pierde nada. Si la
+ * memoria dependiera de pasar por aqui, este seria otra vez el archivo con una sola
+ * salida buena y cinco malas.
  */
 function pedirCambioDeModulo(numero) {
   // Volver a pulsar el modulo que ya esta puesto no hace nada... salvo que no haya
@@ -584,43 +762,7 @@ function pedirCambioDeModulo(numero) {
   // condicion. Ver `moduloCargando`.
   if (numero === estado.modulo && (bancoCargado || moduloCargando === numero)) return;
 
-  if (estado.respondidas === 0) {
-    ocultarAvisoCambio();
-    mostrarModulo(numero);
-    return;
-  }
-
-  pedirConfirmacion(numero);
-}
-
-/** Conecta los dos botones del aviso de cambio. */
-function conectarAvisoCambio() {
-  const aviso = $('#aviso-cambio-modulo');
-  if (!aviso || aviso.dataset.bound) return;
-
-  aviso.addEventListener('click', (evento) => {
-    const confirmar = evento.target.closest('[data-confirmar-cambio]');
-    if (confirmar) {
-      // Retirar el aviso destruye el boton que acaba de pulsarse, y con el se cae
-      // el foco. No se repone aqui: `mostrarModulo()` lo lleva a la cabecera del
-      // modulo nuevo, que es donde el estudiante queria llegar. Lo que NO puede
-      // pasar es que se quede en el body mientras tanto, y por eso el foco se
-      // aparca en el mensaje de «Cargando…» antes de esperar la respuesta.
-      ocultarAvisoCambio();
-      mostrarModulo(Number(confirmar.dataset.confirmarCambio));
-      return;
-    }
-
-    if (evento.target.closest('[data-cancelar-cambio]')) {
-      ocultarAvisoCambio();
-      // De vuelta a la fila del modulo en el que se sigue estando, que es de donde
-      // el estudiante salio. `filaDelModulo` en vez de buscar `[aria-current]`
-      // porque dice lo mismo sin depender de como se marque el activo.
-      filaDelModulo(estado.modulo)?.focus?.();
-    }
-  });
-
-  aviso.dataset.bound = 'true';
+  mostrarModulo(numero);
 }
 
 /**
@@ -790,12 +932,26 @@ function avisarSiElResumenNoCuadra(numero) {
   if (prometidas === undefined) return;
 
   const dibujadas = estado.total;
-  if (prometidas === dibujadas) return;
 
-  console.warn(
-    `El indice dice que el modulo ${numero} tiene ${prometidas} preguntas y se ` +
-      `dibujaron ${dibujadas}. Manda lo dibujado. Ver ADR-033.`
-  );
+  if (prometidas !== dibujadas) {
+    console.warn(
+      `El indice dice que el modulo ${numero} tiene ${prometidas} preguntas y se ` +
+        `dibujaron ${dibujadas}. Manda lo dibujado. Ver ADR-033.`
+    );
+  }
+
+  // Y lo mismo para el avance (decision 9 de la iteracion 33). Es la otra mitad del
+  // mismo descuadre: si una pregunta que el resumen cuenta no llego a dibujarse, y
+  // el estudiante la tenia respondida, la cuenta del resumen diria 12 y las barras
+  // dirian 11. La fila del indice ya muestra lo dibujado; esto deja dicho por que,
+  // para que quien mire la consola encuentre el motivo y no un descuadre a secas.
+  const avancePrometido = avanceDelResumen(numero);
+  if (avancePrometido !== undefined && avancePrometido !== estado.respondidas) {
+    console.warn(
+      `El indice contaba ${avancePrometido} respuestas guardadas del modulo ${numero} y se ` +
+        `restauraron ${estado.respondidas}. Manda lo dibujado. Ver ADR-033.`
+    );
+  }
 }
 
 /**
@@ -805,10 +961,11 @@ function avisarSiElResumenNoCuadra(numero) {
  * que pedir, y ese fue el cambio de fondo de la iteracion 31 —antes esta funcion
  * se traia el banco entero, 371,8 KB—.
  *
- * Lo unico que pide es el resumen de los siete conteos, que son 0,9 KB (ADR-033).
- * El indice se dibuja antes de que llegue, con los nombres de data/modules.js, asi
- * que la pagina es utilizable aunque el resumen tarde o no llegue nunca: lo unico
- * que faltaria son las cifras, y faltar es mejor que inventarlas.
+ * Lo unico que pide es el resumen de los siete conteos y sus ids, que son unos
+ * 2,4 KB (ADR-033). El indice se dibuja antes de que llegue, con los nombres de
+ * data/modules.js, asi que la pagina es utilizable aunque el resumen tarde o no
+ * llegue nunca: lo unico que faltaria son las cifras, y faltar es mejor que
+ * inventarlas.
  */
 export async function renderCuestionario() {
   const contenedor = $('#cuestionario');
@@ -816,11 +973,11 @@ export async function renderCuestionario() {
 
   pintarIndice();
   conectarIndice(pedirCambioDeModulo);
-  conectarAvisoCambio();
   conectarCuestionario(contenedor);
 
   mostrarContador(null);
   mostrarEstadoVacio(contenedor);
+  mostrarAvisoAlmacenamiento();
   actualizarPanel();
 
   // El resumen puede caer a la instantanea por su cuenta. Si lo hace, el aviso de
@@ -831,7 +988,21 @@ export async function renderCuestionario() {
   mostrarAvisoRespaldo();
 }
 
-/** Conecta el botón que reinicia las respuestas del módulo que se está viendo. */
+/**
+ * Conecta el botón que reinicia las respuestas del módulo que se está viendo.
+ *
+ * **Borra tambien lo guardado de ese modulo**, y es el unico control de borrado que
+ * existe (decision 2 de la iteracion 33). Si solo limpiara la pantalla, el
+ * estudiante reiniciaria, recargaria, y le volveria todo: un boton que miente.
+ *
+ * Y borra **solo lo suyo**. Los otros seis modulos no se tocan: quien quiera
+ * empezar de cero del todo lo hace modulo por modulo. No hay «borrar todo el
+ * avance», y su ausencia es una decision anotada, no un olvido.
+ *
+ * El orden importa: primero se olvida, despues se dibuja. `pintar()` cuenta las
+ * barras sobre lo que restaura de la memoria, asi que dibujar antes de borrar
+ * repondria en pantalla justo lo que se acaba de pedir olvidar.
+ */
 export function setupReinicio() {
   const boton = $('#reiniciar');
   if (!boton) return;
@@ -841,10 +1012,7 @@ export function setupReinicio() {
     // vacio encima de si mismo solo desplazaria la pagina sin motivo.
     if (!bancoCargado) return;
 
-    estado.respondidas = 0;
-    estado.correctas = 0;
-    estado.incorrectas = 0;
-    ocultarAvisoCambio();
+    borrarAvance(estado.modulo);
     pintar();
 
     // Reiniciar deja al estudiante donde empieza el modulo, no arriba del todo:

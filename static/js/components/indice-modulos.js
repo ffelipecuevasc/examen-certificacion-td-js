@@ -22,33 +22,79 @@
  *   - cada fila lleva `aria-label` con el modulo, su titulo y su cantidad,
  *     porque en pantallas angostas el titulo se esconde para que quepan dos
  *     columnas y sin la etiqueta la fila se anunciaria como «Modulo 3, 61»;
+ *     desde la iteracion 33 la etiqueta dice tambien cuantas van respondidas,
+ *     porque la cifra de la fila pasa a ser «12/61» y un «12 barra 61» leido en
+ *     voz alta no significa nada;
  *   - y el foco se salva a mano en cada repintado, porque reescribir el
  *     `innerHTML` de la lista destruye el boton que lo tenia. Ver pintarIndice().
  *
  * DE DONDE SALEN LAS CIFRAS
  *
- * De `/api/preguntas?resumen=1` (ADR-033), que cuenta en la base y pesa 0,9 KB
- * frente a los 371,8 KB de traerse el banco. **Nunca del codigo.** La regla que
- * dejo la iteracion 31 sigue en pie —ningun numero que no salga de un dato— y lo
- * unico que cambio es que ahora el dato llega antes de elegir, no despues.
+ * De `/api/preguntas?resumen=1` (ADR-033), que cuenta en la base y pesa unos
+ * 2,4 KB frente a los 371,8 KB de traerse el banco. **Nunca del codigo.** La regla
+ * que dejo la iteracion 31 sigue en pie —ningun numero que no salga de un dato— y
+ * lo unico que cambio es que ahora el dato llega antes de elegir, no despues.
  *
  * Si el resumen no llega, las filas se dibujan igual, sin cifra: los nombres de
  * los siete modulos viven en data/modules.js y no dependen de la red. Un indice
  * sin numeros sigue sirviendo para elegir; un indice con numeros inventados, no.
  *
+ * EL AVANCE, DESDE LA ITERACION 33
+ *
+ * Cada fila dice **respondidas sobre total**, y eso son dos datos de dos sitios: el
+ * total y los ids activos vienen del resumen; las respondidas, de lo que el
+ * navegador guardo (servicios/memoria.js). Se cruzan aqui: cuenta una respuesta
+ * guardada **solo si su pregunta sigue entre las activas**. Sin ese cruce, una
+ * pregunta retirada seguiria sumando avance para siempre.
+ *
+ * Tres reglas que no son de estilo:
+ *
+ *   1. **Sin ids no hay avance** (decision 7). Si el resumen no llego y la
+ *      instantanea tampoco, la fila vuelve a no decir nada. Mostrar lo guardado sin
+ *      filtrar seria la alternativa que la decision 4 descarto: una cifra que el
+ *      banco no sostiene.
+ *   2. **Lo dibujado manda** (decision 9, extiende ADR-033). Mientras un modulo
+ *      esta abierto, su fila cuenta sobre lo que hay dibujado y no sobre los ids del
+ *      resumen. Las dos mitades de la pantalla no pueden decir cosas distintas.
+ *   3. **Respondidas sobre total, y nada mas** (decision 6). Ni aciertos ni fallos:
+ *      el veredicto no se guarda y el resumen no trae correctas, asi que saberlo de
+ *      un modulo cerrado exigiria traerse su banco, que es lo que `?resumen=1`
+ *      existe para evitar. Aciertos y fallos estan en las barras, al abrirlo.
+ *
  * LO QUE ESTE ARCHIVO NO HACE
  *
  * No cambia de modulo. Avisa a quien lo monto, con `alElegir(numero)`, y ese es
- * el unico camino: el aviso de perdida de avance de la iteracion 31 vive del otro
- * lado, y si este componente cargara el modulo por su cuenta lo estaria
- * esquivando sin que nadie se enterara.
+ * el unico camino: la puerta unica vive del otro lado y concentra la guarda contra
+ * la doble peticion, el reintento y el viaje del foco a la cabecera. Si este
+ * componente cargara el modulo por su cuenta se saltaria las tres en silencio.
  */
 import { $, esc, icon } from '../utils/dom.js';
 import { leerResumen } from '../servicios/datos.js';
+import { leerAvance } from '../servicios/memoria.js';
 import { modulesData } from '../data/modules.js';
 
 /** numero de modulo -> cuantas preguntas tiene, segun el dato. */
 const conteos = new Map();
+
+/**
+ * numero de modulo -> Set con los ids de sus preguntas activas, segun el dato.
+ *
+ * Es contra esto que se filtra lo guardado. Un Set y no una lista porque la
+ * pregunta que se hace es siempre la misma —«¿este id sigue activo?»— y hacerla
+ * recorriendo una lista de 61 elementos por cada respuesta guardada seria trabajo
+ * al cuadrado para responder lo mismo.
+ */
+const idsActivos = new Map();
+
+/**
+ * El avance del modulo que se esta viendo, tal como quedo dibujado.
+ *
+ * `null` cuando no hay ninguno dibujado. Lo pone el cuestionario con
+ * `fijarAvanceDibujado()`, y manda sobre la cuenta del resumen mientras dura
+ * (decision 9). Vive aca y no en el cuestionario porque quien dibuja la fila es
+ * este archivo.
+ */
+let dibujado = null;
 
 /** El modulo que se esta mostrando, o null si todavia no hay ninguno. */
 let activo = null;
@@ -56,14 +102,58 @@ let activo = null;
 /** A quien avisarle cuando el estudiante elige. Lo pone conectarIndice(). */
 let alElegir = null;
 
-/** Texto de la cantidad, o cadena vacia mientras no se sepa. */
+/**
+ * El avance de un modulo: `{ respondidas, total }`, o null si no se puede saber.
+ *
+ * Null no es cero. Cero es «no ha respondido ninguna» y se dice; null es «no hay
+ * con que contarlo» y no se dice nada, que es la decision 7.
+ */
+function avanceDe(numero) {
+  // Lo dibujado manda mientras el modulo esta abierto (decision 9).
+  if (dibujado && dibujado.modulo === numero) {
+    return { respondidas: dibujado.respondidas, total: dibujado.total };
+  }
+
+  const total = conteos.get(numero);
+  const activos = idsActivos.get(numero);
+  if (total === undefined || !activos) return null;
+
+  let respondidas = 0;
+  for (const id of leerAvance(numero).keys()) if (activos.has(id)) respondidas += 1;
+
+  return { respondidas, total };
+}
+
+/**
+ * Texto de la cifra de la fila, o cadena vacia mientras no se sepa nada.
+ *
+ * Tres estados, y los tres se leen sin un solo color: «12/61» cuando se sabe el
+ * avance, «61» cuando solo se sabe el total, y nada cuando no llego el dato.
+ */
 function cifra(numero) {
+  const avance = avanceDe(numero);
+  if (avance) return `${avance.respondidas}/${avance.total}`;
+
   const cuantas = conteos.get(numero);
   return cuantas === undefined ? '' : String(cuantas);
 }
 
-/** Nombre que oye quien no ve la fila. Dice siempre lo mismo que la fila muestra. */
+/**
+ * Nombre que oye quien no ve la fila. Dice siempre lo mismo que la fila muestra.
+ *
+ * La cifra se lee «12/61», que en voz alta no es nada. Aca se dice entera, y con
+ * el titulo del modulo delante, porque bajo `lg` ese titulo se esconde.
+ */
 function nombreAccesible(modulo) {
+  const avance = avanceDe(modulo.numero);
+
+  if (avance) {
+    return (
+      `Módulo ${modulo.numero}: ${modulo.titulo}, ${avance.respondidas} de ` +
+      `${avance.total} ${avance.total === 1 ? 'pregunta respondida' : 'preguntas respondidas'}`
+    );
+  }
+
   const cuantas = conteos.get(modulo.numero);
   const cantidad =
     cuantas === undefined
@@ -193,11 +283,59 @@ export async function cargarConteos() {
   }
 
   for (const fila of respuesta.datos) {
-    if (Number.isInteger(fila?.modulo)) conteos.set(fila.modulo, fila.preguntas);
+    if (!Number.isInteger(fila?.modulo)) continue;
+
+    conteos.set(fila.modulo, fila.preguntas);
+
+    // Los ids solo se guardan si vinieron y son una lista. Una respuesta sin ellos
+    // deja el modulo sin avance (decision 7) en vez de con un avance sin filtrar:
+    // es lo mismo que hace el conteo cuando no llega, y por el mismo motivo.
+    if (Array.isArray(fila.preguntas_ids)) {
+      idsActivos.set(fila.modulo, new Set(fila.preguntas_ids));
+    }
   }
 
   pintarIndice();
   return respuesta.meta?.respaldo ?? null;
+}
+
+/**
+ * El avance que el resumen sostiene para un modulo, sin mirar lo dibujado.
+ *
+ * Lo usa el cuestionario para comparar contra lo que de verdad dibujo, igual que
+ * `conteoDelResumen()` con las cantidades. Devuelve undefined si no hay ids con que
+ * contarlo, que no es lo mismo que cero.
+ */
+export function avanceDelResumen(numero) {
+  const activos = idsActivos.get(numero);
+  if (!activos) return undefined;
+
+  let respondidas = 0;
+  for (const id of leerAvance(numero).keys()) if (activos.has(id)) respondidas += 1;
+
+  return respondidas;
+}
+
+/**
+ * Le dice al indice cuanto lleva dibujado el modulo que se esta viendo.
+ *
+ * Con `numero` en null se olvida: no hay ningun modulo dibujado y las siete filas
+ * vuelven a contar sobre el resumen. Repinta solo si algo cambio de verdad, porque
+ * esto se llama en cada respuesta y repintar el indice entero por una cifra que no
+ * se movio es trabajo que no se ve pero se paga.
+ */
+export function fijarAvanceDibujado(numero, respondidas, total) {
+  const igual =
+    (dibujado === null && numero === null) ||
+    (dibujado !== null &&
+      dibujado.modulo === numero &&
+      dibujado.respondidas === respondidas &&
+      dibujado.total === total);
+
+  if (igual) return;
+
+  dibujado = numero === null ? null : { modulo: numero, respondidas, total };
+  pintarIndice();
 }
 
 /**

@@ -137,8 +137,10 @@ export async function leerPreguntas(modulo) {
 /**
  * Cuantas preguntas tiene cada modulo, sin traerse ninguna.
  *
- * Es `/api/preguntas?resumen=1`, autorizado por ADR-033. Devuelve una fila por
- * modulo con `modulo`, `modulo_titulo`, `modulo_icono` y `preguntas`.
+ * Es `/api/preguntas?resumen=1`, autorizado por ADR-033 y enmendado por la
+ * iteracion 33. Devuelve una fila por modulo con `modulo`, `modulo_titulo`,
+ * `modulo_icono`, `preguntas` y `preguntas_ids` —los ids de las preguntas activas
+ * de ese modulo, que es contra lo que el indice filtra el avance guardado—.
  *
  * Existe porque el indice del panel muestra los siete modulos a la vez y necesita
  * las siete cifras. La regla que trajo la iteracion 31 —«sin numero hasta que sea
@@ -223,6 +225,18 @@ async function leerDesdeInstantanea(modulo) {
  *
  * Se cuenta recorriendo las preguntas y no se lee del sello: el sello trae el total
  * del banco, no el reparto por modulo, y deducirlo de ahi seria inventarlo.
+ *
+ * LOS IDS TAMBIEN EN MODO DEGRADADO (iteracion 33)
+ *
+ * La fila trae `preguntas_ids` igual que la del extremo, y por el mismo motivo: sin
+ * ellos el indice no podria decir cuanto lleva el estudiante en los siete modulos.
+ * Salen de la misma lista que ya se esta recorriendo, asi que no cuestan una
+ * segunda pasada.
+ *
+ * Son los ids de la COPIA, que puede estar desfasada respecto de la base. Se acepta
+ * a sabiendas: toda la pagina trabaja entonces sobre la instantanea —el modulo que
+ * se abra saldra de ahi tambien—, asi que el indice y lo dibujado cuentan sobre lo
+ * mismo y no se contradicen. El desfase ya lo declara el aviso de ADR-008.
  */
 async function resumirLaInstantanea(modulo) {
   const copia = await cargarInstantanea();
@@ -235,13 +249,16 @@ async function resumirLaInstantanea(modulo) {
 
     const fila = porModulo.get(pregunta.modulo);
 
-    if (fila) fila.preguntas += 1;
-    else
+    if (fila) {
+      fila.preguntas += 1;
+      fila.preguntas_ids.push(pregunta.id);
+    } else
       porModulo.set(pregunta.modulo, {
         modulo: pregunta.modulo,
         modulo_titulo: pregunta.modulo_titulo,
         modulo_icono: pregunta.modulo_icono,
         preguntas: 1,
+        preguntas_ids: [pregunta.id],
       });
   }
 

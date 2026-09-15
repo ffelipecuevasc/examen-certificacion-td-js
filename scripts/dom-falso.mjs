@@ -112,13 +112,61 @@ function crearNodo(selector, registrar, foco) {
 }
 
 /**
+ * Un `localStorage` de mentira, para los guiones que prueban la memoria.
+ *
+ * NO es el almacenamiento del navegador y no pretende serlo: prueba la DECISION del
+ * componente —que guarde, que lea, que borre lo suyo y no lo ajeno— sobre un
+ * almacen que se comporta como el. Que el navegador de verdad persista de una visita
+ * a otra se comprueba en un navegador, y esta en la lista del autor.
+ *
+ * Vive fuera de `prepararDomFalso()` a proposito: el almacen tiene que **sobrevivir**
+ * a que se rehaga el DOM, porque eso es exactamente lo que significa recargar la
+ * pagina. Quien prueba lo crea una vez y lo va pasando a cada arranque.
+ *
+ * `escrituraProhibida` reproduce la ventana privada de Safari, que deja leer y lanza
+ * al escribir. `lecturaProhibida` reproduce un almacen que tampoco deja leer.
+ */
+export function almacenDeMentira({ escrituraProhibida = false, lecturaProhibida = false } = {}) {
+  const datos = new Map();
+
+  return {
+    getItem(clave) {
+      if (lecturaProhibida) throw new Error('lectura denegada por el navegador de mentira');
+      return datos.has(clave) ? datos.get(clave) : null;
+    },
+    setItem(clave, valor) {
+      if (escrituraProhibida) throw new Error('cuota cero: ventana privada de mentira');
+      datos.set(clave, String(valor));
+    },
+    removeItem(clave) {
+      if (escrituraProhibida) throw new Error('cuota cero: ventana privada de mentira');
+      datos.delete(clave);
+    },
+    /** Lo guardado, para poder mirarlo desde la prueba. No es parte de la API real. */
+    datos,
+  };
+}
+
+/**
  * Instala el DOM falso en `globalThis` y devuelve con que leerlo.
  *
- * Se llama UNA vez por proceso, antes de importar los componentes: los modulos ES
- * se evaluan al importarse, y un componente que lea `document` durante su carga no
- * lo encontraria.
+ * Se llama antes de importar los componentes: los modulos ES se evaluan al
+ * importarse, y un componente que lea `document` durante su carga no lo
+ * encontraria. Llamarla otra vez deja un DOM nuevo y vacio, que es la forma de
+ * simular que la pagina se volvio a abrir; para que eso sea una recarga de verdad
+ * hay que reimportar los componentes con un especificador distinto, porque si no
+ * conservan su estado del arranque anterior.
+ *
+ * `almacen` decide que encuentra el sitio en `globalThis.localStorage`:
+ *
+ *   - sin nada (por defecto): no existe. Es el navegador que no trae almacenamiento,
+ *     y es lo que ven los guiones que no prueban la memoria.
+ *   - un objeto: se instala tal cual. Ahi va `almacenDeMentira()`.
+ *   - una funcion: se instala como getter, asi que **leer la propiedad lanza**. Es
+ *     Chrome con las cookies bloqueadas, donde el acceso falla antes de llamar a
+ *     nada, y es el caso que mas facil se olvida al escribir el codigo.
  */
-export function prepararDomFalso() {
+export function prepararDomFalso({ almacen } = {}) {
   const nodos = new Map();
 
   /**
@@ -166,6 +214,18 @@ export function prepararDomFalso() {
     matchMedia: () => ({ matches: false }),
     scrollTo() {},
   };
+
+  // El almacen se reinstala en cada arranque, incluso el mismo objeto: lo que se
+  // rehace es el entorno, no lo guardado. Se borra primero para que un arranque sin
+  // almacen no herede el del anterior, que es justo el caso que hay que poder
+  // provocar.
+  delete globalThis.localStorage;
+
+  if (typeof almacen === 'function') {
+    Object.defineProperty(globalThis, 'localStorage', { get: almacen, configurable: true });
+  } else if (almacen) {
+    Object.defineProperty(globalThis, 'localStorage', { value: almacen, configurable: true, writable: true });
+  }
 
   return {
     /**

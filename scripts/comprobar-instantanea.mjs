@@ -42,6 +42,21 @@
  *   --sabotaje=correcta    mueve la marca de correcta a otra alternativa
  *   --sabotaje=sello       pone el sello en «local»
  *   --sabotaje=cuenta      deja el sello diciendo un numero que no es
+ *   --sabotaje=repetida    le pone a una pregunta dos alternativas con el mismo texto
+ *
+ * LO QUE VIGILA ADEMAS, DESDE LA ITERACION 33
+ *
+ * Que ninguna pregunta tenga dos alternativas con el MISMO TEXTO. Hoy se cumple —0
+ * de 368— pero dejo de ser una casualidad afortunada: la memoria del avance guarda
+ * el texto de la alternativa elegida (ADR-034), asi que dos alternativas con el
+ * mismo texto vuelven imposible saber cual eligio el estudiante. Se restauraria
+ * siempre la primera, y la mitad de las veces seria la equivocada —con su veredicto
+ * puesto—, que es exactamente la clase de mentira que esa ADR existe para evitar.
+ *
+ * Se comprueba aqui, y no con una restriccion del esquema, porque una restriccion
+ * exigiria una migracion contra las dos bases de la nube. Y se comprueba sobre la
+ * instantanea porque es el archivo que ya se revisa entero en cada `npm run
+ * verificar`, sin necesidad de wrangler ni de una base levantada.
  *
  * Codigos de salida:
  *   0  CORRESPONDEN
@@ -79,7 +94,7 @@ const sinVeredicto = (motivo, detalle = []) =>
 const argumentos = process.argv.slice(2);
 const conSabotaje = argumentos.find((a) => a.startsWith('--sabotaje='));
 const sabotaje = conSabotaje ? conSabotaje.slice('--sabotaje='.length) : null;
-const SABOTAJES = ['falta', 'texto', 'correcta', 'sello', 'cuenta'];
+const SABOTAJES = ['falta', 'texto', 'correcta', 'sello', 'cuenta', 'repetida'];
 
 if (sabotaje && !SABOTAJES.includes(sabotaje)) {
   sinVeredicto(`No conozco el sabotaje «${sabotaje}».`, [`Los que hay: ${SABOTAJES.join(', ')}`]);
@@ -256,6 +271,13 @@ if (sabotaje === 'cuenta') {
   sello = { ...sello, preguntas: sello.preguntas + 1 };
   queSeRompio = `el sello dice ${sello.preguntas} preguntas y la lista trae ${preguntas.length}`;
 }
+if (sabotaje === 'repetida') {
+  const p = preguntas[0];
+  p.alternativas[1].texto = p.alternativas[0].texto;
+  queSeRompio =
+    `la pregunta id ${p.id} quedo con dos alternativas de texto identico, que es lo que ` +
+    'volveria imposible saber cual eligio el estudiante';
+}
 
 // ---------------------------------------------------------------------------
 // Comparar
@@ -335,6 +357,29 @@ for (const [id] of delRespaldo) {
   problemas.push(`FALTA: la pregunta id ${id} esta activa en el respaldo y no en la instantanea.`);
 }
 
+// --- Dos alternativas con el mismo texto (iteracion 33, decision 14) ---------
+//
+// No se compara contra el respaldo: es una regla que el banco tiene que cumplir por
+// si mismo, este donde este. Si las dos copias trajeran la misma pregunta con dos
+// alternativas identicas, estarian de acuerdo entre si y las dos estarian mal.
+let conTextoRepetido = 0;
+
+for (const p of preguntas) {
+  const textos = (p.alternativas ?? []).map((a) => String(a.texto).trim());
+  const distintos = new Set(textos);
+
+  if (distintos.size === textos.length) continue;
+
+  conTextoRepetido += 1;
+
+  const repetido = textos.find((t, i) => textos.indexOf(t) !== i);
+  problemas.push(
+    `ALTERNATIVAS REPETIDAS en la id ${p.id}: dos dicen «${repetido.slice(0, 60)}».\n` +
+      '      La memoria del avance guarda el texto de la alternativa elegida (ADR-034), asi que\n' +
+      '      con dos identicas no hay forma de saber cual eligio el estudiante.'
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Veredicto
 // ---------------------------------------------------------------------------
@@ -346,6 +391,7 @@ const resumen = [
   `  sello              entorno «${sello.entorno}» · generada ${sello.generada_en}`,
   `  activas en el respaldo   ${String(delRespaldo.size).padStart(3)}`,
   `  en la instantanea        ${String(preguntas.length).padStart(3)}`,
+  `  con alternativas de texto repetido   ${String(conTextoRepetido).padStart(3)}`,
 ];
 
 if (sabotaje) {

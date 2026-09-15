@@ -1835,6 +1835,51 @@ vacío no hay ninguna cabecera a la que ir: el foco va al mensaje que explica lo
 Desplazarse a una cabecera inexistente, o dejar el foco donde estaba, deja a quien navega con
 teclado sin saber qué ocurrió.
 
+### Actualización · 2026-09-15 · el aviso de pérdida se retira, y la puerta se queda
+
+La iteración 33 le da memoria al cuestionario (ADR-034). Esta actualización se escribe porque,
+sin ella, esta ADR quedaría describiendo en presente un mecanismo que ya no existe.
+
+**Lo que se retira: el aviso de pérdida de avance.** Y con él, todo lo que existía solo para
+sostenerlo: su contenedor en `cuestionario.html`, sus dos botones, el paso de confirmación en
+`cuestionario.js` y el bloque que lo probaba en `scripts/probar-filtrado.mjs`. Existía porque
+cambiar de módulo costaba lo respondido. Con memoria ya no cuesta nada, y **un aviso que no
+protege de nada entrena a ignorar los avisos** —que es el mismo argumento con el que la
+iteración 31 decidió no mostrarlo cuando no había nada que perder—. Cambiar de módulo pasa
+directo, siempre.
+
+Queda sin efecto, por lo tanto, el párrafo «una puerta que no se puede dejar abierta» de la
+actualización del 2026-09-11, en la parte en que ata el aviso al cambio de módulo y le pide a
+`probar-filtrado.mjs` que lo provoque desde el índice.
+
+**Lo que NO se retira: la puerta única.** `pedirCambioDeModulo()` sigue siendo el único camino
+para cambiar de módulo. Lo que cambia es su motivo, y hay que dejarlo escrito porque el motivo
+viejo se fue con el aviso. Hoy concentra tres guardas, y las tres se saltarían **en silencio**:
+
+1. **La doble petición.** Pulsar el mismo módulo mientras carga no vuelve a pedirlo.
+2. **El reintento tras una carga fallida.** Volver a pulsar el módulo que ya está puesto no hace
+   nada, salvo que no haya quedado puesto; esa excepción es el único camino de vuelta cuando la
+   capa de datos falla.
+3. **El viaje a la cabecera**, con el foco y el desplazamiento, que es lo que decidió la
+   actualización anterior de esta misma ADR.
+
+`scripts/probar-filtrado.mjs` pasa a comprobarlo midiendo: dos pulsaciones seguidas del mismo
+módulo desde el índice salen a la red **una** vez; llamando a `mostrarModulo()` por fuera,
+**dos**. Si algún día las dos cifras se igualaran, la prueba lo dice, porque entonces habría
+dejado de distinguir una cosa de la otra.
+
+**Y la memoria no depende de esta puerta.** El avance se guarda al responder, no al salir del
+módulo: cerrar la pestaña a mitad de un módulo no pierde nada. Que la memoria dependiera de
+pasar por un sitio concreto sería reponer, en otra forma, el problema que esta puerta existe
+para no tener.
+
+**El sitio del control no se mueve**, y los tres motivos de esta ADR siguen enteros. Lo que sí
+se anota, porque toca el coste vertical que esta ADR contabilizó: el avance de cada módulo se
+dibuja **dentro de su fila** del índice, junto a la cantidad —«12/61»—, y los dos textos nuevos
+de la iteración 33 —que el avance vive solo en este dispositivo, y que no se está guardando—
+viven en la **zona de preguntas**, no en el panel. El panel no crece ni una fila, y la ventana
+de 700 px de alto sigue alcanzando hasta el botón de reiniciar.
+
 ---
 
 ## ADR-033 · `/api/preguntas?resumen=1`: los siete conteos por módulo, sin traerse el banco
@@ -1930,3 +1975,185 @@ de tener copia propia.
 
 - **`scripts/probar-filtrado.mjs` gana una comprobación**: que los siete conteos del resumen
   coincidan con los de la base consultada aparte por wrangler, y con lo que se dibuja.
+
+### Actualización · 2026-09-15 · el resumen trae también los ids, y «lo dibujado manda» vale también para el avance
+
+La iteración 33 le da memoria al cuestionario, y con eso el índice tiene que decir cuánto lleva
+el estudiante en los siete módulos **sin abrir ninguno**. Esta ADR se enmienda en dos puntos.
+No se sustituye: sigue siendo lectura, sobre la misma vista, en el mismo extremo y por el mismo
+motivo. **ADR-009 no se mueve.**
+
+**1 · La fila gana `preguntas_ids`.** Los ids de las preguntas activas de ese módulo, en la
+misma consulta, con `group_concat(id)`. Son necesarios porque el avance se guarda por id de
+pregunta (ADR-034) y contarlo sin saber qué ids siguen activos haría que una pregunta retirada
+sumara avance para siempre. Ese es justo el número falso que esta ADR existe para no tener.
+
+**Van en la misma consulta y no en una segunda** porque son exactamente las filas que ya se
+leen para contarlas. Una consulta aparte las leería dos veces para responder lo mismo.
+
+**El coste, medido el 2026-09-15 contra la base local, antes y después en la misma ejecución:**
+
+| | bytes | `filas_leidas` |
+|---|---|---|
+| Sin los ids | 929 | 1111 |
+| Con los ids | 2419 | 1111 |
+| El banco entero, para comparar | 380 688 | 4783 |
+
+Las filas leídas **no suben**, y no es casualidad: el plan de las dos consultas es el mismo
+—`SEARCH p USING COVERING INDEX pregunta_por_estado_y_modulo`—, porque el índice que ya se
+recorría trae el id consigo. `scripts/probar-filtrado.mjs` compara los dos planes en cada
+corrida, y además impone un techo de **5 KB** a la respuesta. Si algún día los ids la pasaran,
+da rojo antes de que nadie lo note en la factura de datos del estudiante.
+
+**2 · «Lo dibujado manda» se extiende al avance.** Esta ADR ya decía que si el resumen contara
+61 y la página dibujara 60, mandaría lo dibujado. Con memoria aparece la otra mitad del mismo
+descuadre: si una pregunta **respondida** es de las que el resumen cuenta y el extremo descarta,
+el índice diría 12 respuestas y las barras 11.
+
+La regla es la misma. **Mientras un módulo está abierto, su fila del índice cuenta el avance
+sobre las preguntas dibujadas**, no sobre los ids del resumen, y `avisarSiElResumenNoCuadra()`
+deja dicho en la consola que hubo descuadre —ahora dos veces: por la cantidad y por el avance—.
+Las dos mitades de la pantalla no pueden decir cosas distintas, y menos sobre lo que el
+estudiante cree llevar hecho.
+
+**3 · Y en modo degradado, los ids salen de la instantánea.** `resumirLaInstantanea()` los
+arma recorriendo la copia, que es la misma lista que ya recorría para contar. Pueden estar
+desfasados respecto de la base, y se acepta a sabiendas: si la capa de datos no responde, el
+módulo que se abra también sale de la copia, así que el índice y lo dibujado cuentan sobre lo
+mismo. El desfase ya lo declara el aviso de ADR-008.
+
+---
+
+## ADR-034 · El avance del estudiante se guarda en su navegador, y nunca afirma lo que el banco ya no sostiene
+
+**Fecha:** 2026-09-15 · **Estado:** aceptada · **Decide:** Felipe Cuevas
+
+### Contexto
+
+El banco tiene 368 preguntas. Nadie las responde de una sentada, y el público de `vision.md`
+estudia «a deshora, en sesiones cortas e interrumpidas». Sin memoria, cada visita empieza de
+cero y el banco grande —que es la mejor propiedad del sitio— se vuelve un obstáculo: cuanto más
+crece, menos se avanza.
+
+`vision.md` deja fuera las cuentas de usuario, así que no hay dónde guardar el avance salvo en
+el propio navegador del estudiante.
+
+Esta ADR tiene **dos partes**. La primera es la decisión de guardar, que es un cambio de
+naturaleza del sitio comparable al de ADR-007: hasta hoy el sitio no recordaba nada de nadie.
+La segunda es el formato, que hay que fijar porque lo guardado sobrevive a los despliegues.
+
+---
+
+### Parte 1 · La decisión de guardar
+
+**Decisión.** El sitio guarda el avance del estudiante **en el almacenamiento local de su
+navegador**, sin pedirle nada y sin identificarlo.
+
+**Los límites, que son parte de la decisión:**
+
+- **El avance nunca sale del dispositivo.** Ninguna petición al Worker lo lleva: la capa de
+  datos sigue siendo de solo lectura y sigue sin saber quién pregunta (ADR-009). Se comprueba,
+  no se promete: `scripts/probar-memoria.mjs` mira todas las peticiones de todas sus visitas y
+  da rojo si alguna lleva cuerpo o si alguna respuesta guardada aparece en una ruta.
+- **No hay cuentas, ni correo, ni inicio de sesión, ni cookies, ni analítica.** Nada de lo que
+  `vision.md` pone fuera de alcance entra por esta puerta. Guardar en el navegador es
+  precisamente lo que permite tener memoria **sin** tener cuentas.
+- **No hay banner de consentimiento**, y no es un olvido. `vision.md` lo prohíbe expresamente, y
+  aquí no hace falta: no se rastrea a nadie, no se comparte nada con terceros y lo guardado es
+  lo que el propio estudiante acaba de responder, en su propio equipo. Lo que sí hay es una
+  frase que lo dice, en el estado vacío, donde se lee sin buscarla.
+
+**Motivo.** Es el único mecanismo que cumple las dos cosas a la vez: recordar el avance y no
+identificar a nadie. Cualquier alternativa que sincronice entre dispositivos exige saber quién
+es el estudiante, y eso contradice el principio de cero fricción que `vision.md` declara.
+
+**Consecuencias, y se dicen en la página:**
+
+- El avance **no se comparte entre dispositivos**. Quien responde en el computador no lo
+  encuentra en el teléfono.
+- **Se pierde al limpiar los datos del navegador**, y no hay copia en ninguna parte.
+- **Si el navegador no permite guardar** —ventana privada, cookies bloqueadas, cuota cero— el
+  sitio sigue sirviendo: se elige módulo, se responde y se corrige igual. Lo único que se pierde
+  es el recuerdo entre visitas, **y se avisa**. Es la misma regla de ADR-008: degradar sí, en
+  silencio no.
+- **Dos pestañas abiertas a la vez se pisan.** Gana la última que guarda. Se asume: el caso es
+  raro y la alternativa —coordinar pestañas— cuesta más que lo que evita.
+
+**Alternativa descartada · no guardar nada.** Es lo que había, y es lo que vuelve inútil un
+banco de 368 preguntas para quien estudia en ratos sueltos.
+
+**Alternativa descartada · guardar en el servidor.** Exige identificar al estudiante. Está
+fuera de alcance por `vision.md` y ampliaría el papel del Worker, que ADR-009 acota.
+
+---
+
+### Parte 2 · El formato
+
+**Decisión.** Una clave por módulo, con la versión del formato **dentro del dato**:
+
+```
+  clave:  examen-td-js.avance.modulo-3
+  valor:  {"v":1,"modulo":3,"respuestas":{"53":"V8 Engine","54":"Bloquea todas las animaciones."}}
+```
+
+**Qué se guarda: el id de la pregunta y el texto de la alternativa elegida.**
+
+- **El id de la pregunta sí sirve.** ADR-020: ninguna pregunta se borra, se retira. Su id es
+  estable de por vida.
+- **El id de la alternativa no sirve.** `banco:actualizar` borra las cuatro alternativas de la
+  pregunta y las vuelve a insertar con ids nuevos, aunque lo corregido sea una coma del
+  enunciado (`scripts/administrar-banco.mjs`). Anclar ahí dejaría huérfano todo lo respondido de
+  esa pregunta a la primera corrección.
+- **El texto es lo único que ningún reemplazo de filas puede falsear.** Es la lección de la
+  iteración 25, que ancló la comprobación de la carga en el texto de la correcta y no en su
+  letra ni en su posición.
+
+**Y el veredicto NO se guarda.** Ni «acertó» ni «falló». Se recalcula contra el banco vigente
+cada vez que se restaura. **Es la decisión central de esta ADR:** un veredicto guardado es una
+afirmación que sobrevive a la corrección que la desmiente, y le enseñaría al estudiante una
+regla falsa con la cara de quien sabe.
+
+**Una clave por módulo, y no una sola con los siete dentro.** «Reiniciar el módulo» borra lo
+suyo y no puede tocar los otros seis: con una clave por módulo eso es un borrado, y con una
+clave única sería leer-modificar-escribir, que es justo donde dos pestañas se pisan. Y un dato
+corrupto se lleva por delante un módulo en vez de los siete.
+
+**Un dato que no se entiende se ignora, en silencio.** Versión desconocida, JSON roto, forma
+inesperada: el módulo arranca vacío, la página no falla ni avisa, y la siguiente respuesta lo
+reemplaza con el formato vigente. **No se avisa porque hoy no existe versión anterior que
+perder** —esta es la primera— y porque un aviso sobre un formato interno no le dice nada a quien
+está estudiando. El día que el formato cambie, la ADR que lo cambie decide si hay migración, y
+esa decisión se toma sabiendo qué se estaría migrando.
+
+**La versión va dentro del dato y no en el nombre de la clave** para que un dato viejo se pueda
+**leer y reconocer** antes de decidir qué hacer con él. Con la versión en la clave, el sitio
+nuevo no vería el dato viejo: lo dejaría ahí para siempre, ocupando sitio y sin que nadie
+pudiera decidir nada sobre él.
+
+### Lo que esta ADR le exige al banco
+
+Que **ninguna pregunta tenga dos alternativas con el mismo texto**. Si las tuviera, no habría
+forma de saber cuál eligió el estudiante, y se restauraría siempre la primera —con su veredicto
+puesto—, que es la clase de mentira que esta ADR existe para evitar.
+
+Hoy se cumple: 0 de 368. Pero pasa de ser una casualidad afortunada a ser una propiedad
+vigilada, porque ahora algo depende de ella: `scripts/comprobar-instantanea.mjs` la comprueba en
+cada `npm run verificar`, y se prueba rompiéndola con `--sabotaje=repetida`.
+
+**No se convierte en restricción del esquema**, que sería lo más fuerte, porque exigiría una
+migración contra las dos bases de la nube. Queda anotado: si alguna vez hay una migración por
+otro motivo, este `UNIQUE (pregunta_id, texto)` se sube con ella.
+
+### Consecuencias
+
+- **El aviso de pérdida de avance de las iteraciones 31 y 32 se retira** (ver la actualización
+  de ADR-032). Existía porque cambiar de módulo costaba lo respondido; con memoria ya no cuesta
+  nada.
+- **«Reiniciar el módulo» borra también lo guardado de ese módulo.** Es el único control de
+  borrado que existe. Si solo limpiara la pantalla, el estudiante reiniciaría, recargaría y le
+  volvería todo: un botón que miente.
+- **No hay «borrar todo el avance».** Se borra módulo por módulo. La idea queda anotada en
+  `registro_log.md` para evaluarla con el uso, no como pendiente.
+- **Lo que el sitio puede afirmar sobre el avance queda acotado:** que está en este dispositivo
+  y que el veredicto sale del banco de hoy. Nada más. En modo degradado sale de la instantánea,
+  que puede estar desfasada, y eso ya lo declara el aviso de ADR-008.

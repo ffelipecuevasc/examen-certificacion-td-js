@@ -32,7 +32,8 @@
     "probar:escapado": "node scripts/probar-escapado.mjs",
     "probar:filtrado": "node scripts/probar-filtrado.mjs",
     "probar:restricciones": "node scripts/probar-restricciones.mjs",
-    "probar:instantanea": "node scripts/comprobar-instantanea.mjs"
+    "probar:instantanea": "node scripts/comprobar-instantanea.mjs",
+    "probar:memoria": "node scripts/probar-memoria.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",

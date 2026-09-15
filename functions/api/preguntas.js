@@ -29,10 +29,24 @@
  *
  * EL RESUMEN, Y POR QUE VIVE AQUI Y NO EN UN EXTREMO PROPIO (ADR-033)
  *
- * `?resumen=1` devuelve una fila por modulo con cuantas preguntas activas tiene,
- * y ninguna pregunta. Existe porque el indice de los siete modulos las muestra a
- * la vez y necesita las siete cifras: pedirlas trayendo el banco cuesta 371,8 KB
- * y asi cuesta 0,9 KB. Los dos numeros estan medidos contra el servidor local.
+ * `?resumen=1` devuelve una fila por modulo con cuantas preguntas activas tiene
+ * y **con los ids de esas preguntas**, pero ninguna pregunta. Existe porque el
+ * indice de los siete modulos las muestra a la vez y necesita las siete cifras:
+ * pedirlas trayendo el banco cuesta 371,8 KB y asi cuesta unos 2,4 KB. Los dos
+ * numeros estan medidos contra el servidor local.
+ *
+ * LOS IDS, Y PARA QUE SIRVEN (iteracion 33, enmienda de ADR-033)
+ *
+ * Desde la iteracion 33 el navegador guarda el avance del estudiante por modulo,
+ * anotando el id de cada pregunta respondida. Para decir cuanto lleva en los siete
+ * modulos sin abrir ninguno hace falta saber **que ids siguen activos**: sin eso,
+ * una pregunta retirada seguiria contando como avance y el indice mostraria una
+ * cifra que el banco ya no sostiene.
+ *
+ * Los ids se traen en la MISMA consulta, con `group_concat`, y no en una segunda:
+ * las filas que hay que leer son exactamente las mismas que ya se leen para
+ * contarlas, asi que el conteo de filas leidas no sube. Una consulta aparte las
+ * leeria dos veces para responder lo mismo.
  *
  * Vive en ESTE archivo, y no en un `/api/modulos`, porque lo que se pide es un
  * dato sobre las preguntas —cuantas hay por modulo— y no un catalogo de modulos.
@@ -80,22 +94,50 @@ export const SQL_PREGUNTAS = `
 `;
 
 /**
- * Cuantas preguntas activas tiene cada modulo.
+ * Cuantas preguntas activas tiene cada modulo, y cuales.
  *
  * Se agrupa por las tres columnas del modulo y no solo por el numero para que el
  * titulo y el icono viajen con la cuenta: quien dibuja el indice los necesita, y
  * pedirlos aparte seria una segunda consulta para el mismo renglon.
  *
+ * `group_concat(id)` es la unica forma que tiene SQLite de sacar los ids de un
+ * grupo sin repetir el recorrido. Va en la misma consulta a proposito: son las
+ * mismas filas que ya se estaban leyendo para contarlas.
+ *
  * Exportada como las otras dos, y por el mismo motivo: para que nadie tenga que
  * escribir una segunda version de esta cuenta en otro archivo.
  */
 export const sqlResumen = (filtrandoPorModulo) => `
-    SELECT modulo, modulo_titulo, modulo_icono, COUNT(*) AS preguntas
+    SELECT modulo, modulo_titulo, modulo_icono,
+           COUNT(*) AS preguntas,
+           group_concat(id) AS preguntas_ids
     FROM pregunta_activa
     ${filtrandoPorModulo ? 'WHERE modulo = ?1' : ''}
     GROUP BY modulo, modulo_titulo, modulo_icono
     ORDER BY modulo
   `;
+
+/**
+ * Los ids de un grupo, ya en numeros y ordenados.
+ *
+ * `group_concat` devuelve una cadena separada por comas. Se parte aqui y no en el
+ * navegador porque quien pide un resumen quiere ids, no una cadena que haya que
+ * aprender a leer en dos archivos distintos. El nombre del campo no se traduce
+ * (ADR-011): sale con el alias de su columna.
+ *
+ * El orden lo pone este lado. `group_concat` no promete ninguno, y dos peticiones
+ * identicas que devuelvan la misma lista en distinto orden son ruido puro para
+ * quien las compare, empezando por scripts/probar-filtrado.mjs.
+ */
+function idsDelGrupo(crudo) {
+  if (typeof crudo !== 'string' || crudo === '') return [];
+
+  return crudo
+    .split(',')
+    .map(Number)
+    .filter(Number.isInteger)
+    .sort((a, b) => a - b);
+}
 
 /** Alternativas de las preguntas que la vista dejo pasar. */
 export const sqlAlternativas = (filtrandoPorModulo) => `
@@ -198,7 +240,14 @@ export const onRequest = soloLectura(async ({ base, request }) => {
 
     const filas = await consulta.all();
 
-    return respuestaOk(filas.results ?? [], {
+    // Los ids salen de la cadena de `group_concat` y entran como lista. El resto
+    // de la fila viaja tal cual, con el nombre de su columna.
+    const datos = (filas.results ?? []).map(({ preguntas_ids, ...fila }) => ({
+      ...fila,
+      preguntas_ids: idsDelGrupo(preguntas_ids),
+    }));
+
+    return respuestaOk(datos, {
       modulo: filtrandoPorModulo ? modulo : 'todos',
       resumen: true,
       filas_leidas: filas.meta?.rows_read ?? 0,
