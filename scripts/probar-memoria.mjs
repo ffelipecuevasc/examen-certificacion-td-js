@@ -35,9 +35,10 @@
  *
  * Que el navegador guarde de verdad. El almacen es de mentira y vive en un archivo:
  * prueba la DECISION del componente —que guarde al responder, que restaure, que
- * recalcule, que borre solo lo suyo—. Que Chrome persista al recargar, que Safari en
- * ventana privada lance, y que lo guardado se vea en DevTools, lo comprueba el autor
- * en un navegador. Esta escrito en los criterios de la iteracion, repartido en dos
+ * recalcule, que borre solo lo suyo—. Que Chrome persista al recargar, que un almacen
+ * denegado de verdad lance —cookies bloqueadas, o «Bloquear todas las cookies» en
+ * Safari—, y que lo guardado se vea en DevTools, lo comprueba el autor en un
+ * navegador. Esta escrito en los criterios de la iteracion, repartido en dos
  * listas a proposito.
  *
  * CUATRO VEREDICTOS
@@ -1356,7 +1357,7 @@ anunciar('MEMORIA CORRECTA', [
   ...resumenFinal,
   '',
   'Lo que esto NO prueba, y comprueba el autor en un navegador: que el navegador de',
-  'verdad persista al recargar, que la ventana privada de Safari lance como este',
+  'verdad persista al recargar, que un almacen denegado de verdad lance como este',
   'almacen de mentira, y que lo guardado se vea donde se dice en DevTools.',
 ]);
 

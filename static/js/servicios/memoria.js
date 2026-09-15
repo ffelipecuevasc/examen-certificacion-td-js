@@ -56,7 +56,13 @@ const VERSION = 1;
 /** Prefijo de las claves. Lleva el nombre del sitio porque el origen es compartido. */
 const PREFIJO = 'examen-td-js.avance.modulo-';
 
-/** Clave con la que se prueba si este navegador deja guardar. */
+/**
+ * Clave con la que se prueba si este navegador deja guardar.
+ *
+ * Se escribe y se borra en cada carga de la pagina, una sola vez, ANTES de que
+ * haya nada del estudiante en juego. El valor es un `'1'` fijo: la sonda no
+ * guarda nada suyo, y lo que escribe deja de existir en la linea siguiente.
+ */
 const CLAVE_DE_PRUEBA = 'examen-td-js.prueba-de-escritura';
 
 const clave = (modulo) => `${PREFIJO}${modulo}`;
@@ -71,10 +77,25 @@ const clave = (modulo) => `${PREFIJO}${modulo}`;
  *   1. No existe `localStorage`.
  *   2. Existe pero leerlo lanza. Pasa en Chrome con las cookies bloqueadas: el
  *      acceso a la propiedad lanza `SecurityError`, antes de llamar a nada.
- *   3. Existe, se deja leer, y lanza al ESCRIBIR. Es la ventana privada de Safari,
- *      que da cuota cero. Por eso la prueba escribe de verdad y no se conforma con
- *      encontrar el objeto: un almacen que se deja mirar y no deja guardar habria
- *      pasado por bueno, y el estudiante se enteraria al recargar.
+ *   3. Existe, se deja leer, y lanza al ESCRIBIR. Es el almacen que esta ahi pero
+ *      no acepta escrituras: lleno —`QuotaExceededError`—, o una configuracion que
+ *      deniega el guardado a este origen sin quitar el objeto de en medio, como
+ *      «Bloquear todas las cookies» en Safari.
+ *
+ * POR QUE LA SONDA ESCRIBE DE VERDAD, Y SE CONSERVA
+ *
+ * Porque el caso 3 no se ve de ninguna otra forma. Encontrar el objeto y leerlo no
+ * distingue un almacen sano de uno que no admite una sola escritura mas, y esa
+ * diferencia solo aparece al intentarla: sin sonda, el sitio daria por bueno el
+ * almacen, prometeria memoria y el estudiante se enteraria al recargar, que es
+ * justo el fallo silencioso que ADR-034 no admite.
+ *
+ * Lo que la sonda NO detecta, y conviene no atribuirle: la ventana privada. Desde
+ * Safari 11 el `localStorage` de las sesiones efimeras vive en memoria (WebKit
+ * 157010), asi que en navegacion privada —Safari, Chrome o Firefox— se lee y se
+ * escribe con normalidad; lo que no hace es sobrevivir al cierre de la ventana.
+ * Para la sonda ese navegador SI guarda, y es correcto que lo diga: mientras la
+ * ventana siga abierta, el avance se recuerda de verdad.
  */
 let almacenRecordado;
 

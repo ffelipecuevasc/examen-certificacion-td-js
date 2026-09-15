@@ -123,8 +123,10 @@ function crearNodo(selector, registrar, foco) {
  * a que se rehaga el DOM, porque eso es exactamente lo que significa recargar la
  * pagina. Quien prueba lo crea una vez y lo va pasando a cada arranque.
  *
- * `escrituraProhibida` reproduce la ventana privada de Safari, que deja leer y lanza
- * al escribir. `lecturaProhibida` reproduce un almacen que tampoco deja leer.
+ * `escrituraProhibida` reproduce un almacen que se deja leer y lanza al ESCRIBIR:
+ * el almacen lleno, o el que deniega el guardado a este origen sin desaparecer.
+ * NO es la ventana privada: desde Safari 11 esa escribe sin problemas, en memoria
+ * (WebKit 157010). `lecturaProhibida` reproduce un almacen que tampoco deja leer.
  */
 export function almacenDeMentira({ escrituraProhibida = false, lecturaProhibida = false } = {}) {
   const datos = new Map();
@@ -135,11 +137,11 @@ export function almacenDeMentira({ escrituraProhibida = false, lecturaProhibida 
       return datos.has(clave) ? datos.get(clave) : null;
     },
     setItem(clave, valor) {
-      if (escrituraProhibida) throw new Error('cuota cero: ventana privada de mentira');
+      if (escrituraProhibida) throw new Error('escritura denegada por el navegador de mentira');
       datos.set(clave, String(valor));
     },
     removeItem(clave) {
-      if (escrituraProhibida) throw new Error('cuota cero: ventana privada de mentira');
+      if (escrituraProhibida) throw new Error('escritura denegada por el navegador de mentira');
       datos.delete(clave);
     },
     /** Lo guardado, para poder mirarlo desde la prueba. No es parte de la API real. */

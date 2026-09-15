@@ -475,7 +475,7 @@ function mostrarAvisoAlmacenamiento() {
         ${icon('restart-alt', 'text-xl text-jsyellow shrink-0 mt-0.5')}
         <div>
           <p class="font-display font-bold text-paper text-sm">Tu avance no se está guardando.</p>
-          <p class="mt-1 text-sm text-muted">Este navegador no permite guardar datos del sitio: puede ser una ventana privada o el bloqueo de cookies. Puedes practicar igual y las respuestas se corrigen como siempre, pero al recargar la página el módulo va a empezar de cero.</p>
+          <p class="mt-1 text-sm text-muted">Este navegador no permite guardar datos del sitio: puede ser el bloqueo de cookies o que el almacenamiento esté lleno. Puedes practicar igual y las respuestas se corrigen como siempre, pero al recargar la página el módulo va a empezar de cero.</p>
         </div>
       </div>`;
 

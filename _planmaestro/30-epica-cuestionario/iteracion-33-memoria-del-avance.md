@@ -27,6 +27,13 @@ navegador.
   archivo: probar con
   `banco:actualizar` sobrescribía la instantánea versionada, el criterio de «barato» no podía fallar, una tarea ya
   estaba hecha y el criterio del formato viejo se cumplía solo.
+- **2026-09-15 · tres correcciones tras la revisión del autor a la entrega.** El criterio del almacenamiento denegado
+  nombraba la ventana privada de Safari como forma de provocarlo, y no sirve: desde Safari 11 el `localStorage` de las
+  sesiones efímeras vive en memoria (WebKit 157010), así que ahí se lee y se escribe y la sonda no se dispara. Ahora
+  nombra las dos formas que sí lo provocan. Se añade a «Lo que esta iteración no puede afirmar» el descuadre del índice
+  ante una alternativa corregida, que el autor aceptó y declaró en ADR-034 en vez de resolverlo. Y se añade un criterio
+  de navegador: que la cifra del índice se lea como avance y no como nota, que es lo único de la revisión que no se
+  puede juzgar sin verlo en pantalla.
 
 ## Lo que hereda de la 32
 
@@ -254,9 +261,10 @@ lo comprueba el autor.
 ### Los comprueba el autor en el navegador
 
 - [ ] **La persistencia es real:** responder, recargar de verdad y volver conserva todo, en escritorio y en teléfono.
-- [ ] **Con el almacenamiento denegado** (ventana privada de Safari, o cookies bloqueadas), el sitio sirve y dice que no
+- [ ] **Con el almacenamiento denegado** (cookies bloqueadas en Chrome, o «Bloquear todas las cookies» en Safari), el sitio sirve y dice que no
   está guardando.
 - [ ] **El estado vacío declara que el avance es local** y se lee sin buscarlo.
+- [ ] **La cifra del índice se entiende como avance y no como nota en el primer uso.**
 - [ ] **El índice con avance se entiende en escala de grises.**
 - [ ] **La ventana de 700 px de alto** sigue permitiendo alcanzar todo el panel.
 - [ ] **En teléfono**, el índice con avance no empuja el estado vacío fuera de alcance.
@@ -273,6 +281,10 @@ lo comprueba el autor.
 - **Que dos pestañas abiertas a la vez no se pisen.** Se asume que gana la última que guarda.
 - **Que en modo degradado coincidan con la base** el veredicto o el conteo del índice. Los dos se calculan contra la
   instantánea, que puede estar desfasada; el aviso de ADR-008 ya lo declara.
+- **Que el índice deje de contar en el acto una respuesta cuyo texto de alternativa el autor corrigió.** Mientras el
+  módulo esté cerrado, su fila la sigue contando; el conteo se corrige solo al abrirlo. Aceptado y declarado en la
+  actualización de ADR-034: notarlo antes exigiría que el resumen trajera los textos de las alternativas, que es el
+  peso que ADR-033 existe para no traer.
 - **Que el camino real de `banco:actualizar` se haya ejercitado.** Se simula su efecto, comprobado en el código; no se
   ejecuta.
 - Que responder mal enseñe algo: la justificación es de la 34.

@@ -1991,6 +1991,16 @@ sumara avance para siempre. Ese es justo el número falso que esta ADR existe pa
 **Van en la misma consulta y no en una segunda** porque son exactamente las filas que ya se
 leen para contarlas. Una consulta aparte las leería dos veces para responder lo mismo.
 
+**Y los trae también la forma compuesta.** `?modulo=3&resumen=1` devuelve la fila del módulo 3
+**con sus `preguntas_ids`**, igual que la forma sin filtro devuelve las siete con los suyos. No
+es un añadido: es lo que la regla de composición de esta ADR ya exigía. `resumen` decide *qué
+forma* tiene la respuesta y `modulo` decide *sobre qué filas* se calcula; si al componerlos la
+fila perdiera los ids, `resumen` significaría una cosa solo y otra cosa acompañado, que es
+exactamente la incoherencia que esta ADR cerró al negarse a tratar `resumen=true` como «no».
+En el código es la misma `sqlResumen()` con un `WHERE modulo = ?1` añadido —una sola
+definición de la cuenta, como manda esta ADR—, así que la coherencia no depende de acordarse:
+no hay dos sitios donde pudiera divergir.
+
 **El coste, medido el 2026-09-15 contra la base local, antes y después en la misma ejecución:**
 
 | | bytes | `filas_leidas` |
@@ -2072,7 +2082,7 @@ es el estudiante, y eso contradice el principio de cero fricción que `vision.md
 - El avance **no se comparte entre dispositivos**. Quien responde en el computador no lo
   encuentra en el teléfono.
 - **Se pierde al limpiar los datos del navegador**, y no hay copia en ninguna parte.
-- **Si el navegador no permite guardar** —ventana privada, cookies bloqueadas, cuota cero— el
+- **Si el navegador no permite guardar** —cookies bloqueadas, o el almacén lleno— el
   sitio sigue sirviendo: se elige módulo, se responde y se corrige igual. Lo único que se pierde
   es el recuerdo entre visitas, **y se avisa**. Es la misma regla de ADR-008: degradar sí, en
   silencio no.
@@ -2157,3 +2167,79 @@ otro motivo, este `UNIQUE (pregunta_id, texto)` se sube con ella.
 - **Lo que el sitio puede afirmar sobre el avance queda acotado:** que está en este dispositivo
   y que el veredicto sale del banco de hoy. Nada más. En modo degradado sale de la instantánea,
   que puede estar desfasada, y eso ya lo declara el aviso de ADR-008.
+
+### Actualización · 2026-09-15 · la sonda de escritura, el nombre de las claves, y el descuadre que se acepta
+
+Tres puntos que la revisión de la iteración 33 dejó abiertos. Ninguno cambia la decisión ni el
+formato: uno corrige el motivo escrito de un mecanismo que se conserva, otro fija una convención
+para que la épica 40 no choque, y el tercero declara un límite en vez de dejarlo implícito.
+
+**1 · La sonda de escritura se conserva, y su justificación se corrige.**
+
+`static/js/servicios/memoria.js` no se conforma con encontrar `localStorage`: **escribe la clave
+`examen-td-js.prueba-de-escritura` con un `'1'` y la borra en la línea siguiente**, una sola vez
+por carga de la página y antes de que haya nada del estudiante en juego. No guarda ningún dato
+suyo y no deja nada detrás.
+
+**Qué detecta de verdad:** un almacén que **existe y se deja leer, pero no acepta escrituras**.
+Son dos casos reales —el almacén **lleno**, que responde `QuotaExceededError`, y las
+configuraciones que **deniegan el guardado a este origen** sin quitar el objeto de en medio,
+como «Bloquear todas las cookies» en Safari— y ninguno de los dos se ve mirando si el objeto
+está ahí. Sin la sonda, el sitio daría por bueno ese almacén, prometería memoria, y el
+estudiante se enteraría al recargar: el fallo silencioso que esta ADR no admite. **Por eso se
+conserva.**
+
+**Qué NO detecta, y es lo que estaba mal escrito.** La ventana privada. Se documentaba como el
+caso 3 —«Safari da cuota cero»— y eso dejó de ser cierto hace años: **desde Safari 11, WebKit
+hace que el `localStorage` de las sesiones efímeras viva en memoria** (WebKit 157010), así que
+en navegación privada —Safari, Chrome o Firefox— **se lee y se escribe con normalidad**; lo que
+no hace es sobrevivir al cierre de la ventana. El comportamiento «deja leer y falla al
+escribir» era de Safari 10. Para la sonda, una ventana privada de hoy **sí guarda**, y eso es
+correcto: mientras esa ventana siga abierta, el avance se recuerda de verdad. La consecuencia
+de más arriba —«si el navegador no permite guardar»— y el aviso de la página quedan corregidos
+en consecuencia: las causas que nombran son el bloqueo de cookies y el almacén lleno, no la
+navegación privada.
+
+**2 · Los nombres de las claves llevan prefijo por funcionalidad: `examen-td-js.<funcionalidad>.`**
+
+El origen es **uno solo para todo el sitio**: lo que escriba `simulacro.html` en la épica 40 va
+a convivir en el mismo almacén que lo que escribe `cuestionario.html` hoy, y ninguna de las dos
+páginas puede enumerar las claves de la otra para saber cuáles no pisar. La convención lo
+resuelve sin coordinación:
+
+```
+  examen-td-js.avance.modulo-3          el avance del cuestionario (esta ADR)
+  examen-td-js.prueba-de-escritura      la sonda; sin funcionalidad, es de toda la página
+  examen-td-js.<funcionalidad>.<lo que sea>   lo que venga
+```
+
+El primer tramo es el sitio, porque el origen puede compartirse. El segundo es **la
+funcionalidad, y es el que evita el choque**: el simulacro de la épica 40 guarda bajo el suyo
+—`examen-td-js.simulacro.`— y no hay forma de que su estado colisione con el del cuestionario,
+ni de que «reiniciar el módulo» le borre nada. La versión del formato **no entra en el nombre**:
+sigue dentro del dato, por el motivo ya escrito más arriba.
+
+**3 · Un descuadre que se acepta y se declara: el índice cuenta una respuesta corregida hasta
+que se abre su módulo.**
+
+Cuando el autor corrige el texto de una alternativa que un estudiante había elegido, esa
+respuesta deja de coincidir y la pregunta vuelve a quedar sin responder —ya está escrito arriba
+y se asume—. **Lo que se declara acá es cuándo se entera cada mitad de la pantalla.** El módulo
+abierto se entera enseguida: dibuja sus preguntas con sus alternativas, no encuentra el texto
+guardado y la pregunta queda en blanco. **El índice no.** Mientras ese módulo esté cerrado, su
+fila sigue contando esa respuesta, y el conteo se corrige solo cuando el estudiante lo abre.
+
+**Se acepta. No se agrega ningún mecanismo.** El índice cuenta cruzando lo guardado contra los
+`preguntas_ids` del resumen (ADR-033), y **los ids son todo lo que el resumen trae**. Para
+notar que un texto guardado ya no corresponde a ninguna alternativa vigente haría falta
+comparar textos, y eso obligaría a que **el resumen trajera los textos de las alternativas de
+las 368 preguntas: exactamente el peso que ADR-033 existe para no traer.** Pagar 371,8 KB en
+cada apertura de la página para adelantar la corrección de un conteo que se corrige solo al
+abrir el módulo es el peor cambio de los dos.
+
+El error, además, es **acotado y a la baja**: dura lo que tarde el estudiante en abrir ese
+módulo, afecta a las preguntas que el autor haya corregido, y **nunca afirma un veredicto
+falso** —el veredicto no se guarda, se recalcula contra el banco vigente—. Es una cifra de
+avance momentáneamente optimista, no una regla equivocada enseñada con cara de quien sabe, que
+es lo que esta ADR existe para impedir. Sigue valiendo «lo dibujado manda» de ADR-033: en
+cuanto el módulo se abre, mandan sus preguntas.
