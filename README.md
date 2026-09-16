@@ -10,7 +10,7 @@ Este repositorio no reemplaza las clases ni el material oficial del programa: su
 
 1. **Revisa el mapa del examen** y el orden de los módulos evaluados.
 2. **Abre cada módulo** para ver sus temas y el código de ejemplo.
-3. **Practica en el cuestionario** (`cuestionario.html`): eliges un módulo en el índice y respondes sus preguntas a tu ritmo. Cada respuesta se corrige al instante y **muestra su justificación**, se acierte o no, para que la practiques entendiendo el porqué y no memorizando posiciones —las alternativas se barajan en cada carga—.
+3. **Practica en el cuestionario** (`cuestionario.html`): eliges un módulo en el índice y respondes sus preguntas a tu ritmo. Mientras el módulo se carga verás una transición que dura **lo que tarde de verdad**, y si la conexión está lenta te avisa que está tardando más de lo normal en vez de dejarte esperando en silencio. Cada respuesta se corrige al instante y **muestra su justificación**, se acierte o no, para que la practiques entendiendo el porqué y no memorizando posiciones —las alternativas se barajan en cada carga—.
 4. **Vuelve sobre lo que fallaste** con «Repasar mis errores», que deja en pantalla solo las preguntas falladas **de ese módulo** para intentarlas de nuevo.
 5. **Sigue practicando** en los cuadernos de NotebookLM enlazados en la página.
 

@@ -9,10 +9,15 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | iteracion-35-transicion-de-carga.md                                                                                                                |
-| **Épica**     | 30 - Cuestionario                                                                                                                                  |
+| **Iteración** | Ninguna en curso                                                                                                                                   |
+| **Épica**     | 40 - Simulacro de examen                                                                                                                           |
 | **Estado**    | ⚪ No iniciada                                                                                                                                      |
-| **Siguiente** | Con la 35 se cierra el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15, y con ella la épica 30. La 34 cerró el 2026-09-16. |
+| **Siguiente** | **Iteración 41 · Presentación y motor.** La épica 30 cerró el 2026-09-16 con la iteración 35, y con ella el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15. La 40 es la siguiente por el orden escrito más abajo: «las épicas se ejecutan en orden». |
+
+> **Antes de abrir la iteración 41.** Los archivos de la épica 40 **fueron reescritos el
+> 2026-09-16** y tienen decisiones pendientes: su propio README pide verificar, antes de
+> empezar, que las cifras de 120 preguntas, 30 segundos, 60 minutos y 60 % de aprobación
+> coincidan con `00_producto/contexto-del-examen.md`. Eso se resuelve primero.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -34,6 +39,7 @@ decisiones vale tanto como el código que las implementa.
 | 33 - Memoria del avance                | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | 36 - Orientación en la portada         | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | 34 - Justificación y repaso            | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
+| 35 - Transición de carga               | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas
@@ -42,8 +48,8 @@ decisiones vale tanto como el código que las implementa.
 |----|---------------------------------|----------------|-----------------------------------------------------------------------------|
 | 10 | Plataforma Cloudflare           | 🟢 Completada  | Sitio en Pages, capa de datos y dos bases D1 operativas                     |
 | 20 | Persistencia de preguntas       | 🟢 Completada  | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
-| 30 | Cuestionario                    | 🔵 En curso    | `cuestionario.html` con el banco completo y barras horizontales             |
-| 40 | Simulacro de examen             | ⚪ No iniciada | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
+| 30 | Cuestionario                    | 🟢 Completada  | `cuestionario.html` por módulo, con memoria del avance, justificación, repaso y transición de carga |
+| 40 | Simulacro de examen             | 🔵 Activa      | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
 | 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos               |
 
 Las épicas se ejecutan en orden: cada una depende de la anterior. La 10 va primera porque el banco de preguntas vive en
