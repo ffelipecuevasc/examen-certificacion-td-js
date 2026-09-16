@@ -1,6 +1,6 @@
 # Épica 40 · Simulacro de examen
 
-**Estado:** 🔵 En curso · decisiones de diseño cerradas el 2026-09-16; lista para la lectura de alcance de la iteración 41
+**Estado:** 🔵 En curso · iteración 41 en tres etapas
 **Depende de:** épica 20 (banco en D1) y épica 30 cerrada (capa de datos con modo degradado, escapado, justificación
 dibujada, transición de carga, memoria en el navegador y guiones de prueba con intercepción).
 
@@ -23,9 +23,10 @@ certificación. El cuestionario permite pensar indefinidamente; el examen real, 
 
 ## Lo que sabemos del examen real
 
-Según el autor, a partir de información oficial y pública de Talento Digital para Chile, el examen dura **120 minutos 
-en total**, y en ese tiempo las preguntas de alternativas y las de programación **vienen mezcladas en orden 
-aleatorio**. Se documenta en `_planmaestro/00_producto/contexto-del-examen.md`.
+Según el autor, a partir de información oficial y pública de Talento Digital para Chile (**enlace pendiente de
+citar**), el examen dura **120 minutos en total**, y en ese tiempo las preguntas de alternativas y las de programación
+**vienen mezcladas en orden aleatorio**, de modo parecido al examen PCEP del Python Institute. Se documenta en
+`_planmaestro/00_producto/contexto-del-examen.md`.
 
 **Consecuencia:** el examen real no tiene un bloque separado de alternativas ni, hasta donde sabemos, un límite de
 tiempo por pregunta. El simulacro no reproduce el examen: **entrena una parte de él** —responder alternativas bajo
@@ -70,9 +71,12 @@ No vienen del examen real: son decisiones para entrenar.
 - **Las justificaciones no viajan con el intento**: el resumen las pide por los mismos ids, con la instantánea como
   respaldo.
 - **El intento se guarda en el navegador al ocurrir** (patrón de la iteración 33, bajo el espacio
-  `examen-td-js.simulacro.` que reservó ADR-034), **con sus preguntas tal como llegaron**, para que una corrección del
-  banco no cambie un intento empezado. Al volver, se retoma con el tiempo real.
-- **Una sola pestaña escribe el intento**: la que abre último lo toma, y la otra se bloquea con un aviso.
+  `examen-td-js.simulacro.` que reservó ADR-034), **con sus preguntas tal como llegaron**. **El resultado se calcula con lo
+  que el estudiante vio**; si una pregunta se corrigió después, la revisión lo avisa. Al volver, se retoma con el tiempo real.
+- **Todo se pide al pulsar «Comenzar»**; la presentación no pide nada.
+- **Si el almacenamiento falla a mitad del intento**, se avisa en pantalla y el intento sigue.
+- **Una sola pestaña escribe el intento**: la que abre último lo toma, y la otra se bloquea con un aviso. Se construye en la
+  iteración 42, porque necesita un vencimiento por tiempo y la infraestructura del reloj.
 - **El último resultado se conserva** en el navegador hasta que se empieza otro intento. No hay historial.
 
 ## Vocabulario del resultado · actualización de ADR-022
@@ -84,8 +88,8 @@ certificar nada. Se enmienda con una actualización fechada:
 - **Siguen prohibidas:** «aprobado» y «reprobado» sin «el simulacro», «nota», «puntaje oficial», «calificación»,
   «certificación» y cualquier fórmula que sugiera validez de certificación.
 
-La actualización debe escribirse en `decisiones.md` **antes de abrir la iteración 41**, porque la presentación ya
-habla de aprobar, y debe corregir la fila que repite la lista en `registro_log.md`.
+**Escrita el 2026-09-16** al final de ADR-022 en `decisiones.md`, con la fila que repetía la lista en `registro_log.md`
+marcada como actualizada.
 
 ## Fuera de alcance
 
@@ -102,7 +106,7 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 
 | # | Iteración | Estado |
 |---|---|---|
-| 41 | Presentación, selección y protección del intento | ⚪ No iniciada |
+| 41 | Presentación, selección y protección del intento | 🔵 En curso · en tres etapas |
 | 45 | Dirección visual del simulacro | ⚪ No iniciada |
 | 42 | Cronómetros | ⚪ No iniciada |
 | 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada |

@@ -53,19 +53,26 @@ Se piden por los ids del intento al extremo de la 41, con la instantánea como r
 con **una sola pieza extraída de la iteración 34**, que recibe la pregunta y nada más; el cuestionario pasa a usar esa misma
 pieza.
 
-### 4 · Se conserva el último resultado
+### 4 · Si una pregunta se corrigió después del intento
+
+Decidido por el autor el 2026-09-16, en la lectura de alcance de la 41. **El resultado se calcula con las preguntas tal como
+las vio el estudiante.** Al pedir las justificaciones al banco vigente, el resumen compara: si una pregunta cambió desde el
+intento, **la revisión muestra la versión corregida con un aviso** del tipo «Esta pregunta se corrigió después de tu intento».
+Nadie aprende una regla que la corrección desmintió.
+
+### 5 · Se conserva el último resultado
 
 El resumen queda en el navegador hasta que se empieza otro intento, que lo reemplaza. No hay historial.
 
 ## Decisiones sin resolver
 
-### 5 · Los enlaces a la guía (la decide el autor tras la lectura de alcance)
+### 6 · Los enlaces a la guía (la decide el autor tras la lectura de alcance)
 
 Enlazar a `#modulo-N` no funciona tal como está la portada. Caminos posibles: enlazar a `index.html#modulos`, que siempre
 existe; o cambiar la portada para que cada módulo tenga un ancla con su número y se abra al llegar, lo que toca
 `modules.js`. **Pendiente.**
 
-### 6 · El desempate del desglose (propuesta a confirmar)
+### 7 · El desempate del desglose (propuesta a confirmar)
 
 Propuesta: de peor a mejor por porcentaje de correctas; a igual porcentaje, primero el módulo con más omitidas; si sigue el
 empate, por número de módulo. **Pendiente de confirmar** en la lectura de alcance.
@@ -74,12 +81,13 @@ empate, por número de módulo. **Pendiente de confirmar** en la lectura de alca
 
 - [ ] Extraer la pieza de la justificación de la 34 y hacer que el cuestionario la use, sin cambiar lo que muestra.
 - [ ] Resultado global: correctas, respondidas mal, omitidas, porcentaje y resultado del simulacro.
-- [ ] Desglose por módulo, ordenado de peor a mejor (decisión 6).
+- [ ] Desglose por módulo, ordenado de peor a mejor (decisión 7).
 - [ ] Tiempo transcurrido total y promedio por pregunta.
 - [ ] Revisión agrupada por módulo (decisión 2).
 - [ ] Pedir las justificaciones con respaldo (decisión 3).
-- [ ] Enlaces a la guía (decisión 5).
-- [ ] Conservar el último resultado (decisión 4) y botón para rendir otro intento.
+- [ ] Enlaces a la guía (decisión 6).
+- [ ] Aviso de pregunta corregida después del intento (decisión 4).
+- [ ] Conservar el último resultado (decisión 5) y botón para rendir otro intento.
 
 ## Criterios de aceptación
 
@@ -91,15 +99,17 @@ el reloj controlable de la 42.
 - [ ] **Las cifras cuadran**: correctas + respondidas mal + omitidas = 120.
 - [ ] **El umbral es exacto en el borde**: 72 correctas dicen «Aprobaste el simulacro» y 71 «Reprobaste el simulacro».
 - [ ] **Una agotada con alternativa marcada** cuenta según esa alternativa; **una agotada sin alternativa**, como omitida.
-- [ ] **El desglose por módulo suma 120** y respeta el orden y el desempate de la decisión 6.
+- [ ] **El desglose por módulo suma 120** y respeta el orden y el desempate de la decisión 7.
 - [ ] **La revisión agrupa por módulo, en el orden del desglose**, con incorrectas y omitidas abiertas y correctas plegadas.
 - [ ] **Cada pregunta de la revisión muestra la alternativa dada o que se omitió, la correcta y la justificación correcta.**
+- [ ] **Con una pregunta cambiada en el banco después del intento**, simulado interceptando, el resultado no cambia y la
+  revisión muestra la versión corregida con el aviso.
 - [ ] **Con el extremo caído al pedir las justificaciones**, simulado interceptando, salen de la instantánea.
 - [ ] **La justificación se dibuja con la pieza extraída** en el resumen y en el cuestionario: `probar:memoria` y
   `probar:filtrado` siguen en verde sin cambios de comportamiento.
 - [ ] **El texto dibujado del resumen no contiene ninguna palabra prohibida** por la actualización de ADR-022, y el resultado
   usa exactamente una de las dos frases permitidas.
-- [ ] **Los enlaces a la guía llevan a un destino que existe una vez dibujada la portada**, según la decisión 5.
+- [ ] **Los enlaces a la guía llevan a un destino que existe una vez dibujada la portada**, según la decisión 6.
 - [ ] **Tras simular una recarga en el resumen**, se muestra el mismo resultado; **al empezar otro intento**, el anterior
   deja de estar guardado.
 - [ ] **Rendir otro intento pide una selección nueva** y no reutiliza la anterior.
