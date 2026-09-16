@@ -136,16 +136,76 @@ export async function cifraDeLaInstantanea(archivo = INSTANTANEA) {
 }
 
 /**
+ * El unico sello con el que la portada se deja escribir.
+ *
+ * ES LA PROTECCION DE ADR-023, EXTENDIDA A LA PORTADA. La instantanea ya estaba
+ * defendida por dos lados: `generar-instantanea.mjs` se niega a pisar una
+ * instantanea de la nube con una local, y `comprobar-instantanea.mjs` da rojo si
+ * el sello no dice «nube». La portada no tenia ninguna de las dos, y por ahi se
+ * colaba esto:
+ *
+ *   alguien corre el generador contra la base LOCAL para probar el modo degradado
+ *   —con PERMITIR_INSTANTANEA_LOCAL=1, que es un camino legitimo—, la instantanea
+ *   queda con las diez filas de juguete, y la portada se reescribia con esa cifra.
+ *
+ * El numero publicado pasaba a ser el del banco de juguete. No era un agujero
+ * silencioso —`comprobar-instantanea` gritaba por el sello y por la comparacion
+ * contra el respaldo— pero el grito venia del vecino: nada defendia la cifra
+ * misma, y quien mirara solo la linea `cifra` de `npm run verificar` la veia en
+ * verde, porque portada e instantanea coincidian en un numero falso.
+ *
+ * Con esta puerta, la cifra de la portada solo puede salir de una instantanea que
+ * de verdad venga del banco publicado.
+ */
+export const ENTORNO_PUBLICABLE = 'nube';
+
+/** Si de esta instantanea se puede sacar una cifra para publicar. */
+export const selloPublicable = (sello) => sello?.entorno === ENTORNO_PUBLICABLE;
+
+/** El porque y el como salir, para que cada guion lo cuente a su manera. */
+export function motivoDelRechazo(sello) {
+  const dice = sello?.entorno ? `«${sello.entorno}»` : '(sin sello)';
+
+  return [
+    `EL SELLO DE LA INSTANTANEA DICE ${dice}, y la portada solo publica cifras de «${ENTORNO_PUBLICABLE}».`,
+    '',
+    'Una instantanea que no salio de la nube es el banco de juguete: diez filas de',
+    'ejemplo. Escribir su cifra dejaria la portada anunciando ese numero como si',
+    'fuera el banco real, y el error solo se veria publicado.',
+    '',
+    'Es la misma proteccion de ADR-023 que ya defiende la instantanea, puesta',
+    'tambien sobre la portada.',
+    '',
+    'Si estabas probando el modo degradado en local, esto es lo correcto y no hay',
+    'nada que arreglar: la portada se queda con la cifra del banco publicado.',
+    'Cuando vuelvas a generar la instantanea desde la nube, la cifra se escribe',
+    'sola. Para reponerla a mano:',
+    '',
+    '  npm run datos:cifra',
+  ];
+}
+
+/**
  * Deja la portada diciendo `cifra`. Devuelve que paso, sin imprimir nada:
  * quien llama decide como contarlo.
+ *
+ * Recibe la instantanea entera —`{ cifra, sello }`, tal como la devuelve
+ * `cifraDeLaInstantanea`— y no el numero suelto, a proposito: el sello es
+ * condicion para escribir, asi que quien pida la escritura tiene que haber
+ * mirado de donde sale el numero. Con la firma anterior se podia pasar un
+ * entero sin mas, y eso es justo lo que dejaba entrar la cifra del juguete.
  *
  * `archivo` existe para poder demostrar esto sobre una copia temporal. Escribir
  * sobre el `index.html` versionado desde una prueba seria exactamente lo que la
  * regla 4 de la iteracion prohibe.
  */
-export function escribirCifraEnPortada(cifra, archivo = PORTADA) {
+export function escribirCifraEnPortada({ cifra, sello }, archivo = PORTADA) {
+  if (!selloPublicable(sello)) {
+    return { ok: false, negada: true, sello, motivo: motivoDelRechazo(sello) };
+  }
+
   if (!existsSync(archivo)) {
-    return { ok: false, motivo: `No existe ${archivo.replace(RAIZ, '.')}.` };
+    return { ok: false, motivo: [`No existe ${archivo.replace(RAIZ, '.')}.`] };
   }
 
   const antes = readFileSync(archivo, 'utf8');
@@ -154,7 +214,7 @@ export function escribirCifraEnPortada(cifra, archivo = PORTADA) {
   if (marcadas.length === 0) {
     return {
       ok: false,
-      motivo: 'No encontre ninguna cifra marcada con data-cifra-banco.',
+      motivo: ['No encontre ninguna cifra marcada con data-cifra-banco.'],
     };
   }
 

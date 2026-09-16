@@ -36,9 +36,11 @@
  *   --sabotaje=desfasada   la portada dice otro numero que la instantanea
  *   --sabotaje=sin-marca   se le quitan las marcas data-cifra-banco a la portada
  *   --sabotaje=discrepan   las dos cifras de la portada dicen cosas distintas
+ *   --sabotaje=sello-local la instantanea trae sello «local», con la cifra correcta
  *
- * Los tres se aplican **sobre la copia en memoria**. Este guion no escribe en
- * ningun archivo, ni siquiera saboteado: no tiene ninguna llamada de escritura.
+ * Los cuatro se aplican **sobre la copia en memoria**: los tres primeros sobre el
+ * HTML leido, el cuarto sobre el sello leido. Este guion no escribe en ningun
+ * archivo, ni siquiera saboteado: no tiene ninguna llamada de escritura.
  *
  * Codigos de salida:
  *   0  COINCIDE
@@ -53,6 +55,7 @@ import {
   cifraDeLaInstantanea,
   cifrasEnHtml,
   formasReconocidas,
+  selloPublicable,
 } from './cifra-portada.mjs';
 
 const COINCIDE = 0;
@@ -83,7 +86,7 @@ const sinVeredicto = (motivo, detalle = []) =>
 const argumentos = process.argv.slice(2);
 const conSabotaje = argumentos.find((a) => a.startsWith('--sabotaje='));
 const sabotaje = conSabotaje ? conSabotaje.slice('--sabotaje='.length) : null;
-const SABOTAJES = ['desfasada', 'sin-marca', 'discrepan'];
+const SABOTAJES = ['desfasada', 'sin-marca', 'discrepan', 'sello-local'];
 
 if (sabotaje && !SABOTAJES.includes(sabotaje)) {
   sinVeredicto(`No conozco el sabotaje «${sabotaje}».`, [`Los que hay: ${SABOTAJES.join(', ')}`]);
@@ -95,9 +98,15 @@ if (sabotaje && !SABOTAJES.includes(sabotaje)) {
 
 if (!existsSync(PORTADA)) sinVeredicto(`No existe ${PORTADA.replace(RAIZ, '.')}.`);
 
-const { cifra: enLaInstantanea, sello, error } = await cifraDeLaInstantanea();
+const instantanea = await cifraDeLaInstantanea();
 
-if (error) sinVeredicto(error);
+if (instantanea.error) sinVeredicto(instantanea.error);
+
+const enLaInstantanea = instantanea.cifra;
+// `sello` es lo unico que un sabotaje toca de este lado, asi que es lo unico que
+// se declara mutable. La cifra no se altera nunca: los sabotajes de la cifra van
+// sobre el HTML.
+let sello = instantanea.sello;
 
 let html = readFileSync(PORTADA, 'utf8');
 
@@ -118,6 +127,14 @@ if (sabotaje === 'sin-marca') {
 if (sabotaje === 'discrepan') {
   html = html.replace(/(<span data-cifra-banco\s*>)(\d+)(<\/span>)/, `$1${enLaInstantanea - 3}$3`);
   queSeRompio = 'las dos cifras marcadas de la portada dicen numeros distintos';
+}
+
+if (sabotaje === 'sello-local') {
+  // La portada NO se toca: la cifra sigue coincidiendo. Lo unico que cambia es de
+  // donde dice venir la instantanea. Es el caso que este sabotaje existe para
+  // cazar, y el que antes pasaba en verde.
+  sello = { ...sello, entorno: 'local' };
+  queSeRompio = `el sello quedo diciendo «local» con la cifra correcta (${enLaInstantanea}) en la portada`;
 }
 
 // ---------------------------------------------------------------------------
@@ -150,7 +167,29 @@ if (distintas.size > 1) {
   );
 }
 
-// El sello no decide —manda el largo de PREGUNTAS— pero si discrepa hay que verlo.
+/**
+ * LA CIFRA PUBLICADA SOLO PUEDE VENIR DE LA NUBE.
+ *
+ * Se comprueba aunque el numero coincida, y ese «aunque» es el punto entero:
+ * cuando alguien regenera la instantanea contra la base LOCAL, la portada y la
+ * instantanea quedan de acuerdo —las dos dicen diez— y la comparacion de arriba
+ * no tiene nada que objetar. Lo que esta mal no es que discrepen, es que las dos
+ * digan lo mismo y lo que dicen sea el banco de juguete.
+ *
+ * `comprobar-instantanea.mjs` ya cazaba ese estado, por el sello y por la
+ * comparacion contra d1/respaldo-banco.sql. Esto no reemplaza aquello: pone el
+ * aviso tambien donde el problema se ve publicado, para que quien lea la linea
+ * «cifra» de `npm run verificar` no la encuentre en verde mientras la portada
+ * anuncia diez preguntas.
+ */
+if (!selloPublicable(sello)) {
+  problemas.push(
+    `EL SELLO DICE «${sello?.entorno ?? '(ninguno)'}»: la cifra de la portada tiene que salir de una ` +
+      'instantanea de la nube, no del banco de juguete (ADR-023). La cifra coincide, pero coincide con lo que no es.'
+  );
+}
+
+// El sello no decide la cifra —manda el largo de PREGUNTAS— pero si discrepa hay que verlo.
 if (sello && sello.preguntas !== enLaInstantanea) {
   problemas.push(
     `el SELLO de la instantanea dice ${sello.preguntas} y su arreglo PREGUNTAS trae ${enLaInstantanea}`

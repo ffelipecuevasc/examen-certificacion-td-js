@@ -45,6 +45,8 @@ import {
   cifrasEnHtml,
   escribirCifraEnPortada,
   formasReconocidas,
+  motivoDelRechazo,
+  selloPublicable,
 } from './cifra-portada.mjs';
 
 const HECHO = 0;
@@ -87,27 +89,48 @@ const relativa = portada.startsWith(RAIZ) ? portada.replace(RAIZ, '.').replace(/
  * restaurara dejaria una ventana en la que el archivo versionado esta cambiado, y
  * si el proceso muere ahi dentro, cambiado se queda.
  */
-function ensayar(archivo, valor) {
+function ensayar(archivo, valor, selloLeido) {
+  // El ensayo tiene que contestar lo mismo que contestaria la escritura de
+  // verdad, empezando por la negativa: un ensayo que dijera «habria escrito» y
+  // luego no escribiera seria peor que no tener ensayo.
+  if (!selloPublicable(selloLeido)) {
+    return { ok: false, negada: true, motivo: motivoDelRechazo(selloLeido) };
+  }
+
   if (!existsSync(archivo)) {
-    return { ok: false, motivo: `No existe ${archivo.replace(RAIZ, '.')}.` };
+    return { ok: false, motivo: [`No existe ${archivo.replace(RAIZ, '.')}.`] };
   }
 
   const marcadas = cifrasEnHtml(readFileSync(archivo, 'utf8'));
 
   if (marcadas.length === 0) {
-    return { ok: false, motivo: 'No encontre ninguna cifra marcada con data-cifra-banco.' };
+    return { ok: false, motivo: ['No encontre ninguna cifra marcada con data-cifra-banco.'] };
   }
 
   const cambiadas = marcadas.filter((m) => m.valor !== valor);
   return { ok: true, marcadas, cambiadas, cambio: cambiadas.length > 0 };
 }
 
-const resultado = ensayo ? ensayar(portada, cifra) : escribirCifraEnPortada(cifra, portada);
+const resultado = ensayo
+  ? ensayar(portada, cifra, sello)
+  : escribirCifraEnPortada({ cifra, sello }, portada);
 
+/**
+ * AQUI LA NEGATIVA TERMINA EL GUION, porque el guion no hace ninguna otra cosa.
+ *
+ * Esta es la herramienta de reparacion a mano: lo unico que se le pidio fue
+ * escribir la cifra. Si no se puede escribir, no hay nada que continuar, y salir
+ * con codigo distinto de 0 es lo que permite encadenarla sin que el fallo pase
+ * inadvertido.
+ */
 if (!resultado.ok) {
   veredicto(
-    'NO SE ESCRIBIO  ***  la portada no tiene donde recibir la cifra  ***',
-    [resultado.motivo, '', 'Formas reconocidas:', ...formasReconocidas().map((f) => `  ${f}`)],
+    resultado.negada
+      ? 'NO SE ESCRIBIO  ***  la instantanea no es publicable  ***'
+      : 'NO SE ESCRIBIO  ***  la portada no tiene donde recibir la cifra  ***',
+    resultado.negada
+      ? resultado.motivo
+      : [...resultado.motivo, '', 'Formas reconocidas:', ...formasReconocidas().map((f) => `  ${f}`)],
     NO_ESCRITA
   );
 }

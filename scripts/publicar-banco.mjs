@@ -555,14 +555,29 @@ try {
  * reescribia y nadie la miraba; ahora la reescribe esto, y la mira
  * scripts/comprobar-cifra.mjs dentro de `npm run verificar`.
  */
-const cifraPortada = escribirCifraEnPortada(activasEnInstantanea);
+const cifraPortada = escribirCifraEnPortada({ cifra: activasEnInstantanea, sello });
 
+/**
+ * AQUI LA NEGATIVA SI DETIENE EL GUION, al reves que en generar-instantanea.mjs.
+ *
+ * Porque aqui un sello que no diga «nube» no es un camino legitimo: es una
+ * contradiccion. Para llegar hasta esta linea la instantanea ya quedo instalada
+ * como la que publica el sitio, y un publicado contra la nube ya paso por la
+ * barrera de mas arriba que exige ese mismo sello. Si la puerta de la portada se
+ * cierra justo ahora, algo dejo de cuadrar entre las dos comprobaciones, y seguir
+ * como si nada es lo unico que no se puede hacer: dejaria la instantanea nueva
+ * versionada con la portada anunciando el banco anterior, que es exactamente el
+ * «a medias» que ADR-023 existe para que no ocurra.
+ *
+ * Se detiene con el mismo veredicto que el resto del guion, para que el estado
+ * quede a la vista en lugar de descubrirse despues en un `git diff`.
+ */
 if (!cifraPortada.ok) {
-  noSePublico(`Los dos archivos quedaron instalados, pero la portada no: ${cifraPortada.motivo}`, [
-    'El banco se publico bien. Lo que falta es la cifra de index.html, que hay que',
-    'reponer antes de commitear:',
+  noSePublico('Los dos archivos quedaron instalados, y la portada no se dejo escribir.', [
+    ...cifraPortada.motivo,
     '',
-    '  npm run datos:cifra',
+    'Revisa el estado antes de commitear: la instantanea y el respaldo estan',
+    'nuevos y la cifra de index.html es la de antes.',
   ]);
 }
 

@@ -571,8 +571,24 @@ writeFileSync(SALIDA, contenido, 'utf8');
  * publicar-banco.mjs, que todavia puede decidir no instalarlo; reescribir la
  * portada ahi dejaria la cifra de un banco que no llego a publicarse. En ese
  * camino la reescribe publicar-banco.mjs despues de instalar los dos archivos.
+ *
+ * AQUI LA NEGATIVA NO DETIENE EL GUION, Y ES LA UNICA DE LAS TRES QUE NO LO HACE.
+ *
+ * El motivo es que este es el unico lugar donde un sello que no dice «nube» es un
+ * resultado LEGITIMO y buscado: correr el generador contra la base local para
+ * probar el modo degradado es un camino que el propio guion documenta, protegido
+ * con PERMITIR_INSTANTANEA_LOCAL=1. Hacer fallar la generacion entera porque la
+ * portada no se dejo escribir castigaria ese camino por hacer justo lo que se le
+ * pidio.
+ *
+ * Y no deja nada «a medias»: la portada conserva la cifra del banco PUBLICADO,
+ * que sigue siendo la verdadera. Lo que queda desparejo es la instantanea local
+ * contra el respaldo versionado, que es un estado que no se debe commitear —y que
+ * `comprobar-instantanea` ya denuncia por el sello y por la comparacion, y
+ * `comprobar-cifra` denuncia ahora tambien por el sello—. La incoherencia se
+ * anuncia por tres bocas distintas en vez de esconderse en la portada.
  */
-const cifraPortada = SALIDA === SALIDA_CANONICA ? escribirCifraEnPortada(validas.length) : null;
+const cifraPortada = SALIDA === SALIDA_CANONICA ? escribirCifraEnPortada({ cifra: validas.length, sello }) : null;
 
 // Con `--salida=` el archivo puede caer fuera del repositorio, y ahi el recorte
 // por longitud producia una ruta cortada por la mitad. Se recorta solo si de
@@ -597,7 +613,11 @@ veredicto(
                 : `ya decia ${validas.length}`
             }`,
           ]
-        : [`Portada   NO SE PUDO ESCRIBIR: ${cifraPortada.motivo}`, '          Reponla con: npm run datos:cifra']
+        : [
+            'Portada   NO SE ESCRIBIO. La instantanea si.',
+            '',
+            ...cifraPortada.motivo.map((l) => (l ? `  ${l}` : '')),
+          ]
       : []),
     ...(informe.descartadas
       ? [
