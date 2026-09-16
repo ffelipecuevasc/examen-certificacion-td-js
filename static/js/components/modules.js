@@ -66,12 +66,33 @@ function codeBlock(ejercicio, codeId) {
  * Y ES DECORATIVO: `alt=""`. El titular que va al lado ya dice lo que significa,
  * asi que describirlo otra vez solo obligaria a un lector de pantalla a oir dos
  * veces lo mismo.
+ *
+ * EL ALTO DEL ICONO CAMBIA CON EL ANCHO (decision 11)
+ *
+ * De `sm` hacia arriba el icono mide lo mismo de alto que el bloque del titular y
+ * el subtitulo juntos: el envoltorio lleva `self-stretch`, que le da el alto de la
+ * fila, y la imagen `h-full w-auto`, que lo ocupa entero conservando su proporcion
+ * cuadrada. No hay ninguna medida escrita a mano: si manana el titular cambia de
+ * tamaño, el icono lo sigue solo.
+ *
+ * DEBAJO DE `sm` SE CONGELA en `w-8 h-8`, y esa es la parte que importa. Ahi el
+ * titular se parte en dos o tres lineas, asi que el bloque crece; si el icono
+ * creciera con el, se comeria el ancho que le queda al texto y el titular se
+ * partiria todavia mas —cada linea nueva agranda el icono, que roba mas ancho, que
+ * fuerza otra linea—. Un tamaño fijo corta esa realimentacion.
+ *
+ * El envoltorio `<span>` no es decorativo: `self-stretch` sobre la imagen sola
+ * dependeria de como cada navegador resuelve el alto de un elemento reemplazado
+ * estirado, y el resultado es dispar. Estirando una caja normal y midiendo la
+ * imagen contra ella, el comportamiento es el mismo en todas partes.
  */
 function avisoDeProgramacion(m) {
   return `
             <div class="mt-7 mb-10 rounded-xl bg-jsyellow p-5 sm:p-6">
               <div class="flex items-start gap-3">
-                <img src="static/resources/alert-loop.svg" alt="" class="w-8 h-8 shrink-0">
+                <span class="shrink-0 self-start sm:self-stretch flex">
+                  <img src="static/resources/alert-loop.svg" alt="" class="w-8 h-8 sm:w-auto sm:h-full">
+                </span>
                 <div class="min-w-0">
                   <p class="font-display font-bold text-xl sm:text-2xl text-ink leading-snug">En el examen real deberás programar</p>
                   <p class="mt-1 font-display font-semibold text-sm sm:text-base text-ink">En el Módulo ${esc(m.numero)} te tocará programar en ${esc(m.lenguaje)}</p>
@@ -86,6 +107,31 @@ function avisoDeProgramacion(m) {
                 Esto sale del testimonio de estudiantes que rindieron el examen 2026. No es información oficial de Talento Digital para Chile.
               </p>
             </div>`;
+}
+
+/**
+ * El rotulo que dice que son los bloques de codigo que vienen abajo.
+ *
+ * VUELVE PORQUE EL REDISEÑO LO DEJO SIN NADA (decision 12). Antes del aviso
+ * amarillo, los bloques los encabezaba «Código de ejemplo»; el rediseño de la
+ * decision 9 sustituyo aquella tarjeta entera y con ella se fue el rotulo, de modo
+ * que los bloques quedaron colgando de una advertencia que habla del examen, no de
+ * ellos. **No reemplaza al aviso: se suma**, y por eso va debajo.
+ *
+ * MISMO ESTILO QUE «Temas evaluados», a proposito: son los dos rotulos de las dos
+ * mitades de la tarjeta abierta, y el estudiante tiene que poder reconocerlos como
+ * la misma clase de cosa. Quien cambie uno tiene que cambiar el otro; estan a
+ * pocas lineas para que se vea.
+ *
+ * QUE AFIRMA, Y POR QUE ESE VERBO. «Podrían salir» y no «salen»: estos ejercicios
+ * son los que una estudiante transcribio al terminar su examen, corroborados por
+ * otros que tambien lo rindieron. Son fieles a lo que cayo ese año, no una promesa
+ * de lo que caera en el proximo. El origen completo esta en
+ * _planmaestro/00_producto/contexto-del-examen.md.
+ */
+function rotuloDeLosBloques() {
+  return `
+            <p class="font-mono text-[11px] text-mutedink mb-3 flex items-center gap-2">${icon('commit', 'text-base')}Código de ejercicios que podrían salir en tu examen</p>`;
 }
 
 /**
@@ -174,6 +220,7 @@ export function renderModules() {
             <p class="font-mono text-[11px] text-mutedink mb-3 flex items-center gap-2">${icon('history-edu', 'text-base')}Temas evaluados</p>
             <ul class="flex flex-col gap-2">${temas}</ul>
             ${avisoDeProgramacion(m)}
+            ${rotuloDeLosBloques()}
             ${ejercicios}
           </div>
         </div>

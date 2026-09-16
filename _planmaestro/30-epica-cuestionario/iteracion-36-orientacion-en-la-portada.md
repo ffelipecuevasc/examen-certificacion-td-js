@@ -56,6 +56,11 @@ preguntas de práctica. Son 368 (`index.html:115`, `data-count="21"`, escrito a 
   decisiones 6 y 8 (decisión 10). Aportó además dos datos testimoniales nuevos: en los
   siete módulos el examen pide programar **o revisar código y señalar el error**, y el
   lenguaje de cada módulo.
+- **2026-09-15 · ajustes tras implementar el aviso.** El autor ajustó el párrafo del
+  aviso para incluir la revisión de código (decisión 9), pidió que el ícono acompañe el
+  alto del titular y el subtítulo (decisión 11) y que vuelva un rótulo sobre los bloques
+  de código, con un texto nuevo (decisión 12). Se excluye `alert-loop.svg` del generador
+  de íconos, que había producido una clase CSS muerta.
 
 ## Alcance
 
@@ -222,8 +227,14 @@ examen pide programar en **los siete módulos**. El lenguaje es **un dato de cad
 módulo**, no un texto escrito siete veces: el número y el lenguaje del subtítulo salen
 de ahí.
 
-**El párrafo explicativo y la nota testimonial se conservan** con su texto actual, que el
-autor aprobó.
+**La nota testimonial se conserva** con su texto de `ce8f606`. **El párrafo se ajustó**
+por decisión del autor, con el dato de que el examen también pide revisar código y
+señalar el error. Texto aprobado:
+
+> En el examen, ejercicios como estos se responden escribiendo el código en un cuadro de
+> texto vacío, o revisando código y señalando el error: **sin autocompletado, sin
+> marcado de errores y sin poder ejecutarlo**. Practícalos escribiéndolos de memoria, no
+> solo leyéndolos.
 
 **La tarjeta respira:** su separación con el título que viene después es claramente
 mayor que la actual, para que se lea como una advertencia aparte y no como parte del
@@ -264,6 +275,26 @@ licencia (Material Line Icons, de Vjacheslav Trushkin) dentro.
   para pausarlo. Este no lo tiene.
 - **El dibujo inicial puede ocurrir sin que nadie lo vea:** si la imagen se carga con la
   tarjeta cerrada, al abrirla el triángulo ya estará dibujado. El pulso sí se verá.
+
+### 11 · El ícono del aviso acompaña el alto del titular y el subtítulo, salvo en teléfono
+
+Decidido por el autor el 2026-09-15. **En pantallas anchas, el ícono tiene el mismo alto
+que el bloque del titular y el subtítulo juntos**, a su izquierda. **En teléfono conserva
+un tamaño fijo**, parecido al de escritorio, y no crece cuando el titular se parte en
+varias líneas: un ícono que crece con el texto le quita ancho al titular, que es lo que
+hay que leer.
+
+### 12 · Vuelve un rótulo sobre los bloques de código
+
+Decidido por el autor el 2026-09-15. El rediseño de la decisión 9 dejó los bloques de
+código sin nada que dijera qué son. Se agrega un rótulo **entre el aviso y el primer
+bloque**, con el mismo estilo que «Temas evaluados». **No reemplaza al aviso: se suma.**
+Su texto es el que figure en la implementación, elegido por el autor al enviar el prompt.
+
+**Origen de esos ejercicios, según el autor:** los transcribió una estudiante que rindió
+el examen, al terminarlo, para ayudar a quienes venían después, y otros estudiantes que
+también lo rindieron los corroboraron. Se registra en `contexto-del-examen.md`, sin
+nombres.
 
 ### Sobre «Inicio» junto al logotipo, frente a ADR-032
 
@@ -309,6 +340,12 @@ información de Talento Digital, y lo que diga la portada tiene que declararlo.
 - [ ] Agregar a `contexto-del-examen.md` los dos datos testimoniales del 2026-09-15.
 - [ ] Sumar el ícono de line-md a la fila de atribuciones pendientes de `acerca-de.html`
   en `registro_log.md`.
+- [ ] Ajustar el tamaño del ícono (decisión 11).
+- [ ] Agregar el rótulo sobre los bloques de código (decisión 12) y registrar el origen de
+  los ejercicios en `contexto-del-examen.md`.
+- [ ] Excluir `alert-loop.svg` del generador de íconos.
+- [ ] Registrar para la épica 50 que el build no verifica los recursos referenciados
+  desde JavaScript.
 - [ ] Corregir `mutedink` en su definición y revisar sus 28 usos (decisión 5).
 - [ ] Rehacer los énfasis que dependían de la diferencia entre `mutedink` y `muted`
   (decisión 5 bis).
@@ -370,8 +407,8 @@ información de Talento Digital, y lo que diga la portada tiene que declararlo.
   carácter distinto.
 - [ ] **Número y lenguaje salen del dato de cada módulo.** Provocado: se cambia el
   lenguaje de un módulo en una copia en memoria y el subtítulo dibujado cambia con él.
-- [ ] **El párrafo explicativo y la nota testimonial conservan su texto**, comparado con
-  el de `ce8f606`.
+- [ ] **La nota testimonial conserva su texto de `ce8f606`, y el párrafo dice exactamente
+  el texto aprobado** de la decisión 9.
 - [ ] **Cada texto de la tarjeta alcanza al menos 4,5:1 sobre `jsyellow`**: tabla con
   elemento, color, fondo y razón.
 - [ ] **`static/resources/alert-loop.svg` no fue modificado por la implementación**:
@@ -379,6 +416,13 @@ información de Talento Digital, y lo que diga la portada tiene que declararlo.
 - [ ] **El ícono es decorativo** (`alt=""`) en las siete tarjetas.
 - [ ] **La separación inferior de la tarjeta aumentó**: se informa en píxeles antes y
   después.
+- [ ] **En pantallas anchas, el alto del ícono coincide con el del bloque del titular y el
+  subtítulo**, con los píxeles de los dos. **En teléfono, el ícono no crece** cuando el
+  titular se parte: se informa su tamaño en los dos anchos.
+- [ ] **El rótulo aparece en las siete tarjetas**, entre el aviso y el primer bloque, con
+  el mismo estilo que «Temas evaluados», y su texto exacto.
+- [ ] **`static/css/icons.css` ya no trae `.i-alert-loop`**, y el generador explica en un
+  comentario por qué excluye ese archivo.
 
 **Movimiento reducido y verificación**
 
@@ -409,6 +453,11 @@ información de Talento Digital, y lo que diga la portada tiene que declararlo.
 - [ ] **El subtítulo de cada módulo corresponde a su lenguaje**, revisado en al menos dos
   tarjetas.
 - [ ] **La nota del origen testimonial sigue visible y legible** sobre el amarillo.
+- [ ] **El ícono se ve del alto del titular y el subtítulo en escritorio**, y en teléfono
+  no aplasta el titular.
+- [ ] **El rótulo deja claro qué son los bloques de código.**
+- [ ] **Con «Abrir todos», la página sigue siendo usable** pese a los siete avisos amarillos
+  y las siete notas testimoniales iguales. Se anota la impresión.
 - [ ] **El texto que usaba `mutedink` se lee bien en las dos páginas** y el sitio conserva
   su identidad visual.
 - [ ] **Las dos filas del índice de módulos se leen**, la inactiva y la activa, que es el

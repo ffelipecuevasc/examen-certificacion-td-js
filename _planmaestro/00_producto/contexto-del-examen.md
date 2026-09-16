@@ -67,12 +67,29 @@ otro sitio. El aviso de programación de la portada arma su subtítulo con ese c
 que corregir una fila de esta tabla es corregir una línea de código y nada más. Si esta tabla y ese archivo llegaran
 a discrepar, manda el testimonio: se corrige el código.
 
+### Agregado el 2026-09-15 · de dónde salieron los ejercicios de ejemplo
+
+Aportado por el autor. Los bloques de «Código de ejercicios que podrían salir en tu examen» que muestra la portada
+—`static/js/data/modules.js`, campo `ejercicios` de cada módulo— **no los inventó el autor ni salen de ningún manual**:
+
+- **Los transcribió una estudiante que rindió el examen**, al terminarlo, de memoria, **para ayudar a quienes venían
+  después**. No fue un encargo: lo hizo por su cuenta.
+- **Otros estudiantes que también lo rindieron los corroboraron**, de modo que no dependen del recuerdo de una sola
+  persona.
+
+**Sin nombres, a propósito.** Quiénes fueron no se registra acá ni en ninguna parte del repositorio, que es público.
+
+**Qué se puede afirmar y qué no.** Que son fieles a lo que cayó en el examen de ese año, hasta donde alcanza un
+recuerdo corroborado. **No** que vayan a repetirse: por eso el rótulo del sitio dice «podrían salir en tu examen» y no
+«salen». Y **no** que sean textualmente los del examen: son una transcripción posterior, no una copia.
+
 ## Qué decisiones del proyecto se apoyan en esto
 
 | Dónde                       | Qué se apoya en este documento                                                                          |
 |-----------------------------|---------------------------------------------------------------------------------------------------------|
 | Iteración 36                | Los bloques de «Código de ejemplo» de la portada se marcan como el formato real de una parte del examen |
 | Iteración 36 · decisión 9   | El aviso de programación de cada módulo: que hay que programar, y en qué lenguaje                       |
+| Iteración 36 · decisión 12  | El rótulo «Código de ejercicios que podrían salir en tu examen», y su verbo en condicional              |
 | Portada, métrica «Formatos» | Los dos formatos de pregunta                                                                            |
 | Épica 40 · Simulacro        | Duración y condiciones del simulacro cronometrado                                                       |
 
