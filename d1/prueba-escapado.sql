@@ -21,13 +21,19 @@
 --   E · el icono del modulo, que es el UNICO dato de la base que se dibuja
 --       dentro de un atributo HTML y no como texto. Es el caso que el escapado
 --       de texto no cubre por si solo, y el que se olvida al revisar.
+--   F · la JUSTIFICACION, desde la iteracion 34. Hasta entonces esta fila la
+--       traia inofensiva —«Fila de prueba del escapado»— porque el sitio no la
+--       dibujaba: era la unica columna del banco que llegaba al navegador sin
+--       pasar nunca por innerHTML. Ahora se dibuja por dos caminos distintos
+--       —al responder, y al pulsar «Ver por qué»— y los dos insertan HTML, asi
+--       que carga el mismo <img onerror> que la alternativa B.
 
 DELETE FROM pregunta WHERE id = 900;
 
 INSERT INTO pregunta (id, modulo, origen, numero_origen, enunciado, justificacion, dificultad, orden_fijo, estado)
 VALUES (900, 2, 'json_2026', 900,
   'Payload A: <script>window.__ejecuto_script = true;</script> y una etiqueta <div> normal',
-  'Fila de prueba del escapado. La carga y la retira scripts/probar-escapado.mjs.',
+  'Payload F: <img src=x onerror="window.__ejecuto_justificacion = true"> en el porque, con comillas "dobles", una ''simple'' y una etiqueta <div> dentro.',
   'media', 0, 'activa');
 
 INSERT INTO alternativa (pregunta_id, letra, orden, texto, es_correcta) VALUES

@@ -41,6 +41,30 @@
  * borrado, y con una clave unica seria leer-modificar-escribir, que es justo donde
  * dos pestanas abiertas se pisan. Y un dato corrupto se lleva por delante un modulo
  * en vez de los siete.
+ *
+ * DOS MEMORIAS, NO UNA (decision 7 de la iteracion 34)
+ *
+ * Ademas de lo guardado en el navegador, este archivo mantiene **lo respondido
+ * durante la visita**, en memoria y nada mas. No es un almacen de respaldo: responde
+ * dos preguntas que el otro no puede responder.
+ *
+ *   1. **Sin almacenamiento, el sitio se queda sin memoria a mitad de la visita.**
+ *      Hasta la iteracion 33 lo respondido vivia solo en el DOM, y cualquier
+ *      repintado —`pintar()` reconstruye desde lo guardado— lo borraba. Con el
+ *      almacen denegado eso significa responder diez preguntas y perderlas al
+ *      volver de otro modulo.
+ *   2. **Lo guardado no sabe de visitas.** «Respondida hace un rato» y «respondida
+ *      la semana pasada» son el mismo dato ahi dentro, y la iteracion 34 las dibuja
+ *      distinto: la primera muestra su justificacion desplegada y la segunda ofrece
+ *      «Ver por que» (decision 6). Sin esta memoria, la distincion se perderia en el
+ *      primer repintado.
+ *
+ * VISITA = desde que se carga la pagina hasta que se recarga o se cierra. Cambiar de
+ * modulo NO la cierra: por eso vive en el modulo y no dentro de ningun componente
+ * que se redibuje.
+ *
+ * **El formato guardado no cambia, y ADR-034 no se enmienda.** Esto no se escribe en
+ * ninguna parte, no sobrevive a una recarga, y no se promete que lo haga.
  */
 
 /**
@@ -66,6 +90,24 @@ const PREFIJO = 'examen-td-js.avance.modulo-';
 const CLAVE_DE_PRUEBA = 'examen-td-js.prueba-de-escritura';
 
 const clave = (modulo) => `${PREFIJO}${modulo}`;
+
+/**
+ * Lo respondido durante esta visita: modulo -> (id de pregunta -> texto elegido).
+ *
+ * Vive en el modulo, asi que dura lo que dure la carga de la pagina y ni un
+ * milisegundo mas. Recargar la borra, y eso es lo correcto: lo que tiene que
+ * sobrevivir a una recarga es lo guardado, que ya tiene su sitio.
+ *
+ * Guarda exactamente lo mismo que el almacen —id y texto— y NO el veredicto, por el
+ * mismo motivo: un veredicto anotado sobrevive a la correccion que lo desmiente.
+ */
+const laVisita = new Map();
+
+/** Lo de la visita para un modulo, creandolo si es la primera respuesta. */
+function visitaDe(modulo) {
+  if (!laVisita.has(modulo)) laVisita.set(modulo, new Map());
+  return laVisita.get(modulo);
+}
 
 /**
  * El almacen, o null si este navegador no lo permite.
@@ -130,11 +172,19 @@ function almacen() {
 export const sePuedeGuardar = () => almacen() !== null;
 
 /**
- * Lo guardado de un modulo: id de pregunta -> texto de la alternativa elegida.
+ * Lo respondido de un modulo: id de pregunta -> texto de la alternativa elegida.
  *
  * Devuelve siempre un Map, vacio si no hay nada que leer. Quien llama no tiene que
  * distinguir «no hay avance» de «no se puede leer»: en los dos casos el modulo
  * arranca en blanco, que es exactamente lo mismo que ve el estudiante.
+ *
+ * JUNTA LAS DOS MEMORIAS, Y LA DE LA VISITA MANDA
+ *
+ * Primero lo guardado en el navegador y encima lo respondido en esta visita. El
+ * orden no es indiferente: si el estudiante volvio a responder una pregunta hoy,
+ * la respuesta de hoy es la que vale. Y sin almacenamiento, la de la visita es la
+ * unica que hay, que es lo que permite que responder siga sirviendo de algo en un
+ * navegador que no deja guardar.
  *
  * UN DATO QUE NO SE ENTIENDE SE IGNORA, Y NO SE AVISA
  *
@@ -145,6 +195,29 @@ export const sePuedeGuardar = () => almacen() !== null;
  * migracion. Esta escrito en ADR-034.
  */
 export function leerAvance(modulo) {
+  const leidas = leerLoGuardado(modulo);
+
+  for (const [id, texto] of visitaDe(modulo)) leidas.set(id, texto);
+
+  return leidas;
+}
+
+/**
+ * Los ids que el estudiante respondio EN ESTA VISITA, en este modulo.
+ *
+ * Es lo que separa «respondida hace un rato» de «respondida otro dia», y esa
+ * diferencia se dibuja: la primera muestra su justificacion desplegada y la segunda
+ * ofrece «Ver por que» (decision 6 de la iteracion 34).
+ *
+ * Se devuelve una copia para que quien la mire no pueda cambiarla: la unica forma de
+ * entrar en esta memoria es respondiendo.
+ */
+export function respondidasEnLaVisita(modulo) {
+  return new Set(visitaDe(modulo).keys());
+}
+
+/** Lo que hay en el almacen del navegador, sin lo de la visita. */
+function leerLoGuardado(modulo) {
   const vacio = new Map();
   const donde = almacen();
   if (!donde) return vacio;
@@ -196,10 +269,20 @@ export function leerAvance(modulo) {
  * pestana a mitad de un modulo no puede perder nada, y la memoria no puede depender
  * de que el estudiante salga por una puerta concreta.
  *
- * Devuelve si se pudo. Quien llama no tiene que hacer nada con el `false` mas que
- * no mentir sobre el: la pagina ya dice que no se esta guardando.
+ * Devuelve si se pudo GUARDAR. Quien llama no tiene que hacer nada con el `false`
+ * mas que no mentir sobre el: la pagina ya dice que no se esta guardando.
+ *
+ * **Lo de la visita se anota siempre, incluso cuando devuelve `false`.** Son dos
+ * memorias con dos promesas distintas: la del navegador promete sobrevivir a la
+ * recarga y puede negarse; la de la visita promete durar lo que dure la pagina y no
+ * se niega nunca. Un navegador que no deja guardar no tiene por que dejar al
+ * estudiante sin lo que acaba de responder mientras sigue ahi.
  */
 export function guardarRespuesta(modulo, preguntaId, texto) {
+  // Primero la visita, y a proposito: es la que no puede fallar, y el `return` de
+  // mas abajo se va sin anotar nada si se deja para el final.
+  visitaDe(modulo).set(preguntaId, texto);
+
   const donde = almacen();
   if (!donde) return false;
 
@@ -223,8 +306,15 @@ export function guardarRespuesta(modulo, preguntaId, texto) {
  * existe (decision 2 de la iteracion 33). Si este borrado no ocurriera, el boton
  * limpiaria la pantalla y el avance volveria a aparecer en la siguiente visita: un
  * boton que miente.
+ *
+ * **Borra las dos memorias** (decision 7 de la iteracion 34). Si dejara viva la de
+ * la visita, reiniciar un modulo sin almacenamiento no borraria nada en absoluto, y
+ * con almacenamiento las respuestas volverian al primer repintado. El mismo boton
+ * que miente, por el otro lado.
  */
 export function borrarAvance(modulo) {
+  laVisita.delete(modulo);
+
   const donde = almacen();
   if (!donde) return;
 

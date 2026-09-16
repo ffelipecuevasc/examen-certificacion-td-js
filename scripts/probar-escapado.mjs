@@ -59,7 +59,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { prepararDomFalso } from './dom-falso.mjs';
+import { almacenDeMentira, prepararDomFalso } from './dom-falso.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
@@ -300,7 +300,25 @@ try {
 // 2 · Cargar el contenido hostil
 // ---------------------------------------------------------------------------
 
-const dom = prepararDomFalso();
+/**
+ * Un almacen de mentira, para que la fila hostil llegue RESTAURADA.
+ *
+ * Hasta la iteracion 34 este guion corria sin `localStorage`, y eso bastaba porque
+ * la justificacion no se dibujaba. Ahora se dibuja por dos caminos y cada uno hay
+ * que provocarlo:
+ *
+ *   - **restaurada** -> «Ver por qué», que inserta el texto al pulsarlo. Para eso
+ *     hace falta que el sitio encuentre una respuesta guardada, y para eso hace
+ *     falta un almacen.
+ *   - **respondida ahora** -> la inserta `responder()`. Se provoca respondiendo.
+ *
+ * Se siembra mas abajo, en cuanto se sabe que texto tiene la alternativa: el objeto
+ * es el mismo, asi que instalarlo vacio aqui y llenarlo despues es legitimo.
+ */
+const almacen = almacenDeMentira();
+const dom = prepararDomFalso({ almacen });
+
+const claveDelModulo = (modulo) => `examen-td-js.avance.modulo-${modulo}`;
 
 let codigo = EN_PIE;
 let cargado = false;
@@ -343,6 +361,18 @@ try {
     pathToFileURL(join(SITIO, 'components', 'cuestionario.js')).href
   );
   const { esc } = await import(pathToFileURL(join(SITIO, 'utils', 'dom.js')).href);
+
+  // La fila hostil llega RESTAURADA: se siembra una respuesta suya en el almacen,
+  // con el texto de su primera alternativa, que es lo que el sitio guarda (ADR-034).
+  // Asi la pregunta 900 se dibuja con «Ver por qué» y su justificacion detras.
+  almacen.datos.set(
+    claveDelModulo(MODULO_HOSTIL),
+    JSON.stringify({
+      v: 1,
+      modulo: MODULO_HOSTIL,
+      respuestas: { [ID_HOSTIL]: hostil.alternativas[0].texto },
+    })
+  );
 
   await mostrarModulo(MODULO_HOSTIL);
   const html = dom.html('#cuestionario');
@@ -391,6 +421,70 @@ try {
       `${textos.length - conCarga} de los ${textos.length} textos de prueba no traen ningun ` +
         'caracter que escapar: d1/prueba-escapado.sql dejo de ser un ataque'
     );
+  }
+
+  // --- 5a · LA JUSTIFICACION, POR SUS DOS CAMINOS (iteracion 34) ----------
+  //
+  // La justificacion no se dibuja con el resto de la tarjeta: aparece al responder,
+  // o detras de «Ver por qué» si la pregunta viene de otra visita. Los dos caminos
+  // insertan HTML y los dos hay que provocarlos, porque un escapado que este en uno
+  // y falte en el otro deja media puerta abierta.
+  //
+  // La fila hostil esta sembrada como restaurada, asi que este es el camino de
+  // «Ver por qué». El de responder se prueba a escala, mas abajo, sobre las 368.
+
+  if (esc(hostil.justificacion) === hostil.justificacion) {
+    problemas.push(
+      'la justificacion de la fila de prueba no trae ningun caracter que escapar: ' +
+        'd1/prueba-escapado.sql dejo de atacar por ese lado'
+    );
+  }
+
+  // Antes de pulsar nada, el recuadro tiene que estar vacio. Si el texto ya
+  // estuviera dibujado, «Ver por qué» no probaria ninguna insercion: solo destaparia
+  // algo que ya paso por el escapado del dibujo.
+  if (html.includes(esc(hostil.justificacion)) || html.includes(hostil.justificacion)) {
+    problemas.push(
+      'la justificacion de una pregunta restaurada ya venia dibujada antes de pulsar ' +
+        '«Ver por qué»: el camino que inserta no se estaria probando'
+    );
+  }
+
+  if (!html.includes('quiz-ver-porque')) {
+    sinVeredicto(
+      `La pregunta ${ID_HOSTIL} se dibujo sin «Ver por qué», asi que no hay como desplegar su ` +
+        'justificacion.',
+      'Se sembro una respuesta suya en el almacen; puede que el sitio no la haya restaurado.'
+    );
+  }
+
+  // El boton se fabrica con lo que el navegador tendria puesto: de que pregunta es
+  // la tarjeta de la que cuelga. `desplegarElPorque()` recorre hacia arriba para
+  // encontrarla, y con un objeto pelado se caeria en la primera linea.
+  const tarjetaHostil = dom.nodo(`#tarjeta-q${ID_HOSTIL}`);
+  tarjetaHostil.dataset.pregunta = `q${ID_HOSTIL}`;
+
+  const botonPorque = dom.nodo(`#ver-porque-${ID_HOSTIL}`);
+  botonPorque.closest = (selector) =>
+    selector === '[data-pregunta]' ? tarjetaHostil : botonPorque;
+
+  dom.disparar('#cuestionario', 'click', {
+    target: { closest: (s) => (s === '.quiz-ver-porque' ? botonPorque : null) },
+  });
+
+  const desplegado = dom.html(`#tarjeta-q${ID_HOSTIL} > .quiz-justificacion`);
+
+  if (desplegado === '') {
+    sinVeredicto(
+      '«Ver por qué» no inserto nada en la pregunta hostil.',
+      'Sin insercion no hay escapado que comprobar por este camino.'
+    );
+  }
+  if (desplegado.includes(hostil.justificacion)) {
+    problemas.push('justificacion tras «Ver por qué»: su forma CRUDA se inserto, sin escapar');
+  }
+  if (!desplegado.includes(esc(hostil.justificacion))) {
+    problemas.push('justificacion tras «Ver por qué»: su forma escapada NO aparece, se perdio texto');
   }
 
   // --- 5b · EL BANCO REAL, A ESCALA (ADR-024) -----------------------------
@@ -443,6 +537,42 @@ try {
   const modulosDelBanco = [...new Set(todo.datos.map((p) => p.modulo))].sort((a, b) => a - b);
   const htmlPorModulo = new Map();
 
+  // Y AQUI SE RESPONDE, que es el segundo camino por el que la justificacion entra
+  // al HTML. Hasta la iteracion 34 esta parte solo dibujaba: las 368 preguntas
+  // salian sin responder, ninguna justificacion se insertaba, y la comprobacion de
+  // mas abajo pasaba sin haber mirado una sola. Eso es H-023 —una prueba que dice
+  // mas de lo que mira— y por eso ahora se responden todas.
+  //
+  // Se vacia el almacen primero: la fila hostil quedo sembrada como respondida, y
+  // una pregunta ya respondida no se puede volver a responder.
+  almacen.datos.clear();
+
+  const justificacionPorPregunta = new Map();
+
+  /** Pulsa una alternativa de una pregunta, como haria el estudiante. */
+  function responderla(pregunta) {
+    const alternativa = pregunta.alternativas?.[0];
+    if (!alternativa) return;
+
+    const tarjeta = dom.nodo(`#tarjeta-q${pregunta.id}`);
+    tarjeta.dataset.pregunta = `q${pregunta.id}`;
+
+    const boton = dom.nodo(`#alternativa-${alternativa.id}`);
+    boton.disabled = false;
+    boton.dataset.correct = String(alternativa.es_correcta === 1);
+    boton.dataset.alternativa = String(alternativa.id);
+    boton.closest = (selector) => (selector === '[data-pregunta]' ? tarjeta : boton);
+
+    dom.disparar('#cuestionario', 'click', {
+      target: { closest: (s) => (s === '.quiz-option' ? boton : null) },
+    });
+
+    justificacionPorPregunta.set(
+      pregunta.id,
+      dom.html(`#tarjeta-q${pregunta.id} > .quiz-justificacion`)
+    );
+  }
+
   for (const numero of modulosDelBanco) {
     await mostrarModulo(numero);
     const dibujado = dom.html('#cuestionario');
@@ -455,6 +585,10 @@ try {
     }
 
     htmlPorModulo.set(numero, dibujado);
+
+    for (const pregunta of todo.datos) {
+      if (pregunta.modulo === numero) responderla(pregunta);
+    }
   }
 
   let textosRevisados = 0;
@@ -478,15 +612,26 @@ try {
       [`pregunta ${p.id} · icono del modulo`, p.modulo_icono],
     ];
 
-    // La justificacion viaja desde la base aunque no se dibuje, asi que lo que
-    // SI se le puede exigir es que no aparezca cruda.
+    // La justificacion se mira en SU recuadro, que es donde la insertan los dos
+    // caminos que la dibujan, y no en el HTML del modulo: el dibujo del modulo la
+    // deja vacia a proposito y buscarla ahi daria «se perdio texto» en las 368.
+    const suRecuadro = justificacionPorPregunta.get(p.id) ?? '';
+
     if (typeof p.justificacion === 'string' && p.justificacion !== '') {
       justificacionesVistas += 1;
       const escapada = esc(p.justificacion);
-      if (escapada !== p.justificacion && html.includes(p.justificacion)) {
+
+      if (escapada !== p.justificacion && suRecuadro.includes(p.justificacion)) {
         problemasDelBanco.push(`pregunta ${p.id} · justificacion: su forma CRUDA aparece en el HTML`);
       }
-      if (html.includes(escapada)) justificacionesDibujadas += 1;
+      // Y tampoco puede colarse cruda en el HTML del modulo, que es el otro sitio
+      // donde podria acabar si algun dia se dibujara con el resto de la tarjeta.
+      if (escapada !== p.justificacion && html.includes(p.justificacion)) {
+        problemasDelBanco.push(
+          `pregunta ${p.id} · justificacion: su forma CRUDA aparece en el HTML del modulo`
+        );
+      }
+      if (suRecuadro.includes(escapada)) justificacionesDibujadas += 1;
     }
 
     for (const [nombre, texto] of suyos) {
@@ -507,17 +652,23 @@ try {
   // Que el banco real traiga de verdad algo que escapar es parte de lo que hay
   // que comprobar. Un banco sin un solo caracter peligroso volveria esta seccion
   // un tramite que siempre pasa, que es el patron de H-023.
-  // O NINGUNA justificacion se dibuja —porque la iteracion 34 todavia no las
-  // muestra— o se dibujan TODAS. Un intermedio significa que algunas se estan
-  // perdiendo por el camino, y ese si seria el fallo.
+  // SE DIBUJAN TODAS. Ni una menos, y el cero ya no vale.
   //
-  // Escrito asi para que no caduque: el dia que la epica 30 las muestre, esta
-  // misma linea pasa a exigir que aparezcan las 368, sin que nadie tenga que
-  // acordarse de venir a quitar una exclusion.
-  if (justificacionesDibujadas !== 0 && justificacionesDibujadas !== justificacionesVistas) {
+  // Hasta la iteracion 34 esta guarda decia «todas o ninguna», porque la pantalla
+  // que muestra las justificaciones no existia y exigir que aparecieran habria sido
+  // exigir que se dibujara algo que nadie implemento. Ya existe, y este guion
+  // responde las 368 para provocarlo: si ahora saliera cero, no significaria «no
+  // toca todavia», significaria que el recuadro dejo de llenarse y que esta seccion
+  // entera esta pasando sin mirar nada. Es la diferencia entre una exclusion con
+  // fecha y una prueba que siempre aprueba.
+  if (justificacionesVistas === 0) {
     problemasDelBanco.push(
-      `de ${justificacionesVistas} justificaciones, ${justificacionesDibujadas} aparecen en el HTML ` +
-        'y el resto no: o se dibujan todas o ninguna, y un intermedio es texto perdido'
+      'ninguna de las preguntas del banco trae justificacion: no hay nada que escapar por ese lado'
+    );
+  } else if (justificacionesDibujadas !== justificacionesVistas) {
+    problemasDelBanco.push(
+      `de ${justificacionesVistas} justificaciones, ${justificacionesDibujadas} aparecen escapadas ` +
+        'en su recuadro y el resto no: o se dibujan todas, o hay texto perdiendose'
     );
   }
 
@@ -573,6 +724,12 @@ try {
       '',
       `Cada pregunta se comparo contra el HTML de SU modulo: se dibujaron los`,
       `modulos ${modulosDelBanco.join(', ')}, uno por uno, como los dibuja la pagina.`,
+      '',
+      `LA JUSTIFICACION, por sus dos caminos (iteracion 34): las ${justificacionesDibujadas}`,
+      `de ${justificacionesVistas} se dibujaron RESPONDIENDO las preguntas, una por una, y`,
+      'ninguna aparecio cruda. Y la de la fila hostil se desplego pulsando «Ver por qué»',
+      'sobre una pregunta restaurada del almacen: tampoco aparecio cruda, y su texto',
+      'llego entero.',
       '',
       `Etiquetas en el HTML: ${presentes.sort().join(', ')}`,
       'Ninguna ajena al componente.',

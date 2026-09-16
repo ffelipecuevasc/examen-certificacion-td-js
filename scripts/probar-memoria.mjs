@@ -105,6 +105,13 @@ async function correrLaVisita(archivoDeEncargo) {
     avisos: [],
     errores: [],
     pasos: [],
+    // Lo que quedo en la tarjeta de una pregunta JUSTO al responderla o al desplegar
+    // su porque. No se puede leer del retrato: responder() y desplegarElPorque()
+    // escriben en los nodos de esa tarjeta, y el retrato mira el HTML que dejo
+    // `pintar()` en el contenedor, que es de antes. Las dos cosas son verdad y hay
+    // que mirarlas por separado.
+    alResponder: [],
+    alDesplegar: [],
   };
 
   /** El lector del DOM falso. Vive aqui fuera para poder retratarlo pase lo que pase. */
@@ -262,6 +269,27 @@ function intervenir(ruta, cuerpo, plan) {
     return { ...cuerpo, datos: cuerpo.datos.map(idsNuevos) };
   }
 
+  // Una pregunta activa SIN justificacion. Hoy no existe ninguna —368 de 368 la
+  // traen— pero puede existir: la columna es nula en el esquema
+  // (d1/migraciones/001-banco-de-preguntas.sql) y quien vigila que ninguna activa se
+  // quede sin ella es d1/verificar-banco.sql, no la validacion por fila del camino de
+  // lectura. Se provocan las tres formas de «no hay texto» a la vez, porque las tres
+  // llegan igual al navegador y una sola comprobacion tiene que cubrirlas.
+  if (plan.tipo === 'sin-justificacion') {
+    const vacias = { nula: null, ausente: undefined, espacios: '   ' };
+
+    return {
+      ...cuerpo,
+      datos: cuerpo.datos.map((p) => {
+        const como = plan.preguntas?.[p.id];
+        if (como === undefined) return p;
+
+        const { justificacion, ...sinElCampo } = p;
+        return como === 'ausente' ? sinElCampo : { ...p, justificacion: vacias[como] };
+      }),
+    };
+  }
+
   if (plan.tipo === 'correcta-movida') {
     return {
       ...cuerpo,
@@ -355,7 +383,42 @@ async function darElPaso(paso, dom, cuestionario, salida) {
       dom.disparar('#cuestionario', 'click', {
         target: { closest: (s) => (s === '.quiz-option' ? boton : null) },
       });
+
+      salida.alResponder.push({
+        pregunta: encargo.pregunta,
+        acertando: Boolean(encargo.acertando),
+        veredicto: dom.html(`#tarjeta-q${encargo.pregunta} > .quiz-feedback`),
+        ...enLaTarjeta(dom, encargo.pregunta),
+      });
     }
+    return;
+  }
+
+  // «Ver por qué» de una pregunta restaurada. El boton se fabrica igual que la
+  // alternativa de mas arriba y por el mismo motivo: `desplegarElPorque()` recorre
+  // hacia arriba buscando la tarjeta, y con un objeto pelado se cae en la primera
+  // linea.
+  if (paso.tipo === 'ver-porque') {
+    const tarjeta = dom.nodo(`#tarjeta-q${paso.pregunta}`);
+    tarjeta.dataset.pregunta = `q${paso.pregunta}`;
+
+    const boton = dom.nodo(`#ver-porque-${paso.pregunta}`);
+    boton.closest = (selector) => (selector === '[data-pregunta]' ? tarjeta : boton);
+
+    const corrieron = dom.disparar('#cuestionario', 'click', {
+      target: { closest: (s) => (s === '.quiz-ver-porque' ? boton : null) },
+    });
+
+    if (corrieron === 0) {
+      salida.errores.push('el contenedor de preguntas no tiene ningun oyente de clic');
+    }
+
+    salida.alDesplegar.push({
+      pregunta: paso.pregunta,
+      botonOculto: boton.classList.contains('hidden'),
+      focoEn: dom.enfocado(),
+      ...enLaTarjeta(dom, paso.pregunta),
+    });
     return;
   }
 
@@ -365,6 +428,18 @@ async function darElPaso(paso, dom, cuestionario, salida) {
   }
 
   salida.errores.push(`no conozco el paso «${paso.tipo}»`);
+}
+
+/**
+ * Que se escribio en el recuadro del porque de una tarjeta.
+ *
+ * Solo el contenido. Si el recuadro quedo visible u oculto NO se puede saber por
+ * aca: el DOM falso arranca cada nodo sin clases, asi que un `classList.remove`
+ * —que es lo que hacen los dos caminos que despliegan— no deja rastro. Lo que se
+ * DIBUJO abierto o cerrado se lee del HTML del contenedor, en el retrato.
+ */
+function enLaTarjeta(dom, pregunta) {
+  return { justificacion: dom.html(`#tarjeta-q${pregunta} > .quiz-justificacion`) };
 }
 
 /** El bloque HTML de una pregunta, o '' si no se dibujo. */
@@ -390,6 +465,29 @@ function alternativasDelBloque(bloque) {
   }));
 }
 
+/**
+ * Como quedo DIBUJADO el porque de una pregunta.
+ *
+ * Tres estados que hay que poder distinguir, y el cuarto es que no haya nada:
+ *
+ *   recuadro   si existe el contenedor del porque
+ *   abierto    si se dibujo desplegado (respondida en esta visita)
+ *   boton      si se dibujo el control «Ver por qué» (restaurada de otra visita)
+ *   texto      lo que dice, ya escapado, o '' si el recuadro vino vacio
+ */
+function porqueDelBloque(bloque) {
+  const recuadro = bloque.match(
+    /<div id="justificacion-q\d+"[^>]*class="quiz-justificacion(?<oculto> hidden)?[^"]*"[^>]*>(?<dentro>[\s\S]*?)<\/div>/
+  );
+
+  return {
+    recuadro: Boolean(recuadro),
+    abierto: Boolean(recuadro) && recuadro.groups.oculto === undefined,
+    boton: /class="quiz-ver-porque/.test(bloque),
+    texto: recuadro?.groups.dentro.match(/<p class="mt-1\.5[^"]*">([\s\S]*?)<\/p>/)?.[1] ?? '',
+  };
+}
+
 /** Foto de lo que la pagina esta diciendo ahora mismo. */
 function retrato(dom, paso) {
   const html = dom.html('#cuestionario');
@@ -400,8 +498,16 @@ function retrato(dom, paso) {
     return { id, elegida: elegida?.texto ?? null, estado: elegida?.estado ?? null };
   });
 
+  const porques = Object.fromEntries(
+    [...html.matchAll(/data-pregunta="q(\d+)"/g)].map((m) => [
+      Number(m[1]),
+      porqueDelBloque(bloqueDePregunta(html, Number(m[1]))),
+    ])
+  );
+
   return {
     paso,
+    porques,
     barras: {
       respondidas: dom.texto('#valor-avance'),
       correctas: dom.texto('#valor-correctas'),
@@ -515,6 +621,29 @@ if (!preguntasDelModulo?.length || !preguntasDelOtro?.length) {
 
 const [P1, P2, P3] = preguntasDelModulo;
 const [Q1, Q2] = preguntasDelOtro;
+
+/**
+ * La justificacion de cada pregunta del modulo de prueba, tal como esta en la base.
+ *
+ * Se lee de la base y no de lo dibujado: lo dibujado esta escapado, y comparar lo
+ * escapado contra si mismo no comprueba nada. El texto original es el unico patron
+ * honesto contra el que mirar el HTML.
+ */
+const justificaciones = new Map(
+  (consultar(`SELECT id, justificacion FROM pregunta_activa WHERE modulo = ${MODULO};`) ?? []).map(
+    (f) => [f.id, f.justificacion]
+  )
+);
+
+// Sin este corte, una consulta que no devuelve nada dejaria comparando el HTML
+// contra `esc(undefined)` —la cadena «undefined»— y la seccion entera pasaria sin
+// haber mirado ninguna justificacion.
+if ([P1, P2, P3].some((id) => typeof justificaciones.get(id) !== 'string')) {
+  noSePudo(
+    'La base local no devolvio las justificaciones del modulo de prueba.',
+    `Modulo ${MODULO}, preguntas ${P1}, ${P2} y ${P3}.`
+  );
+}
 
 // --- Utilidades del orquestador ---------------------------------------------
 
@@ -1275,10 +1404,334 @@ notas.push(
 );
 
 // ===========================================================================
-// 8 · El avance no sale del dispositivo
+// 8 · La justificacion (iteracion 34)
 // ===========================================================================
 
-const todasLasVisitas = [v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v14];
+/**
+ * Una pregunta del modulo cuya justificacion TRAE caracteres que escapar.
+ *
+ * Sin ella, «la forma cruda no aparece» se cumpliria sola: un texto sin `<`, `>`,
+ * `"`, `'` ni `&` sale del escapado identico, y buscarlo seria buscar el mismo
+ * texto dos veces. Es el patron de H-023, y por eso se elige a proposito y se dice
+ * cuando no hay ninguna.
+ */
+const PELIGROSA = preguntasDelModulo.find((id) => {
+  const j = justificaciones.get(id);
+  return typeof j === 'string' && esc(j) !== j;
+});
+
+const discoJustificacion = discoNuevo('justificacion');
+
+const conJustificacion = [
+  { pregunta: P1, acertando: true },
+  { pregunta: P2, acertando: false },
+  ...(PELIGROSA !== undefined && ![P1, P2].includes(PELIGROSA)
+    ? [{ pregunta: PELIGROSA, acertando: true }]
+    : []),
+];
+
+// --- Visita J1: responder bien y mal, y mirar lo que aparecio ---------------
+const vj1 = visitar({
+  disco: discoJustificacion,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: conJustificacion },
+  ],
+});
+
+for (const anotado of vj1.alResponder) {
+  const suya = justificaciones.get(anotado.pregunta);
+  const comoSale = esc(suya);
+
+  if (!anotado.justificacion.includes(comoSale)) {
+    problemas.push(
+      `al responder la pregunta ${anotado.pregunta} ${anotado.acertando ? 'bien' : 'mal'} no ` +
+        'aparecio su justificacion'
+    );
+  }
+
+  // La de OTRA pregunta no. Un recuadro que muestra el porque equivocado ensena una
+  // regla falsa con la cara de quien sabe, que es lo que ADR-034 existe para impedir.
+  for (const [otra, texto] of justificaciones) {
+    if (otra === anotado.pregunta || typeof texto !== 'string' || texto === '') continue;
+    if (anotado.justificacion.includes(esc(texto))) {
+      problemas.push(
+        `el recuadro de la pregunta ${anotado.pregunta} trae la justificacion de la ${otra}`
+      );
+    }
+  }
+
+  // Y el texto de la base NO puede aparecer crudo. Solo se exige donde el escapado
+  // cambia algo: si no cambia nada, el crudo y el escapado son la misma cadena.
+  if (comoSale !== suya && anotado.justificacion.includes(suya)) {
+    problemas.push(
+      `la justificacion de la pregunta ${anotado.pregunta} se inserto CRUDA al responder`
+    );
+  }
+}
+
+if (vj1.alResponder.length !== conJustificacion.length) {
+  problemas.push(
+    `se respondieron ${conJustificacion.length} preguntas y solo ${vj1.alResponder.length} dejaron rastro`
+  );
+}
+
+// Las dos, la acertada y la fallada (decision 2). Explicar solo los errores le
+// quitaria el porque a quien acerto por descarte.
+for (const acertando of [true, false]) {
+  const caso = vj1.alResponder.find((a) => a.acertando === acertando);
+  if (!caso || caso.justificacion === '') {
+    problemas.push(
+      `respondiendo ${acertando ? 'bien' : 'mal'} no aparecio ninguna justificacion`
+    );
+  }
+}
+
+// --- Visita J2: la misma pregunta, restaurada de otra visita ----------------
+//
+// El proceso es nuevo, asi que la memoria de la visita esta vacia y lo unico que
+// queda de J1 es lo guardado en el disco. Es exactamente el estudiante que vuelve
+// al dia siguiente.
+const vj2 = visitar({
+  disco: discoJustificacion,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'ver-porque', pregunta: P1 },
+  ],
+});
+
+const restaurada = vj2.final.porques?.[P1];
+
+if (!restaurada?.boton) {
+  problemas.push(`una pregunta restaurada no ofrece «Ver por qué»: ${JSON.stringify(restaurada)}`);
+}
+if (restaurada?.abierto) {
+  problemas.push(
+    'una pregunta restaurada trae la justificacion desplegada: la pagina se alargaria con ' +
+      'cincuenta justificaciones que nadie pidio leer'
+  );
+}
+if (restaurada?.texto !== '') {
+  problemas.push('el recuadro de una pregunta restaurada viene con texto antes de pedirlo');
+}
+
+const desplegada = vj2.alDesplegar[0];
+const textoDeP1 = justificaciones.get(P1);
+
+if (!desplegada?.justificacion.includes(esc(textoDeP1))) {
+  problemas.push('«Ver por qué» no desplego la justificacion de esa pregunta');
+}
+if (esc(textoDeP1) !== textoDeP1 && desplegada?.justificacion.includes(textoDeP1)) {
+  problemas.push('«Ver por qué» inserto la justificacion CRUDA');
+}
+if (!desplegada?.botonOculto) {
+  problemas.push('tras desplegar, «Ver por qué» sigue ofreciendo hacer lo que ya hizo');
+}
+if (desplegada?.focoEn === 'body') {
+  problemas.push(
+    'tras desplegar el porque el foco cayo al body: quien navega con teclado tiene que ' +
+      'volver a tabular desde el principio de la pagina'
+  );
+}
+
+// --- Visita J3: preguntas que llegan SIN justificacion ----------------------
+//
+// Las tres formas de no traerla, a la vez, porque las tres llegan igual al
+// navegador: nula, ausente del objeto, y solo espacios.
+const vj3 = visitar({
+  disco: discoJustificacion,
+  intercepcion: {
+    tipo: 'sin-justificacion',
+    preguntas: { [P1]: 'nula', [P2]: 'ausente', [P3]: 'espacios' },
+  },
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P3, acertando: true }] },
+  ],
+});
+
+for (const [id, como] of [[P1, 'nula'], [P2, 'ausente'], [P3, 'espacios']]) {
+  const sinPorque = vj3.final.porques?.[id];
+
+  if (sinPorque?.recuadro) {
+    problemas.push(`la pregunta ${id} llego con la justificacion ${como} y dibujo un recuadro vacio`);
+  }
+  if (sinPorque?.boton) {
+    problemas.push(
+      `la pregunta ${id} llego con la justificacion ${como} y ofrece un «Ver por qué» que no ` +
+        'despliega nada'
+    );
+  }
+}
+
+if (vj3.alResponder[0]?.justificacion !== '') {
+  problemas.push(
+    'responder una pregunta sin justificacion escribio algo en el recuadro: ' +
+      JSON.stringify(vj3.alResponder[0]?.justificacion)
+  );
+}
+
+// Y las demas preguntas del modulo, que si la traen, la siguen mostrando. Sin esto
+// «no dibujar nada» se cumpliria tambien no dibujando nunca nada.
+const otraConPorque = preguntasDelModulo.find(
+  (id) => ![P1, P2, P3].includes(id) && typeof justificaciones.get(id) === 'string'
+);
+
+if (otraConPorque !== undefined && vj3.final.porques?.[otraConPorque]?.recuadro !== true) {
+  problemas.push(
+    `con tres preguntas sin justificacion, la ${otraConPorque} perdio la suya: el trato del ` +
+      'caso vacio se llevo por delante el caso normal'
+  );
+}
+
+notas.push(
+  `Justificacion: al responder aparece la de esa pregunta —bien y mal— y no la de otra; una ` +
+    `restaurada ofrece «Ver por qué» y lo despliega sin dejar el foco en el body; y con la ` +
+    `justificacion nula, ausente o en blanco no queda ni recuadro ni boton.` +
+    (PELIGROSA === undefined
+      ? ' NINGUNA justificacion de este modulo trae caracteres que escapar: el escapado lo prueba probar-escapado.'
+      : ` La pregunta ${PELIGROSA} trae caracteres que escapar y no aparecio cruda por ninguno de los dos caminos.`)
+);
+
+// ===========================================================================
+// 9 · La memoria de la visita (decision 7 de la iteracion 34)
+// ===========================================================================
+
+// --- Cambiar de modulo y volver NO cierra la visita -------------------------
+//
+// Se prueba con el almacenamiento DENEGADO a proposito. Con el almacen sano no se
+// distinguiria de lo guardado: la pregunta seguiria respondida igual, y la prueba
+// pasaria sin que existiera ninguna memoria de la visita.
+const vm1 = visitar({
+  disco: discoNuevo('visita-sin-almacen'),
+  almacen: 'lectura-lanza',
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+    { tipo: 'elegir', modulo: OTRO_MODULO },
+    { tipo: 'elegir', modulo: MODULO },
+  ],
+});
+
+if (vm1.final.barras.respondidas !== '1') {
+  problemas.push(
+    'sin almacenamiento, cambiar de modulo y volver perdio lo respondido: el panel dice ' +
+      `«${vm1.final.barras.respondidas}»`
+  );
+}
+if (vm1.final.respondidas.length !== 1) {
+  problemas.push(
+    `sin almacenamiento, al volver al modulo se dibujaron ${vm1.final.respondidas.length} ` +
+      'preguntas respondidas y se habia respondido 1'
+  );
+}
+if (vm1.final.porques?.[P1]?.abierto !== true) {
+  problemas.push(
+    'tras cambiar de modulo y volver, la justificacion de lo respondido en la visita ya no esta ' +
+      `desplegada: ${JSON.stringify(vm1.final.porques?.[P1])}`
+  );
+}
+if (!vm1.final.porques?.[P1]?.texto.includes(esc(justificaciones.get(P1)))) {
+  problemas.push('tras volver al modulo, el recuadro desplegado no trae la justificacion de esa pregunta');
+}
+
+// --- Y CON almacenamiento, la visita manda sobre lo guardado ----------------
+//
+// La otra mitad de la distincion: lo respondido hace un rato se dibuja desplegado
+// aunque tambien este guardado, y lo respondido otro dia se dibuja con su boton.
+// Sin las dos, «desplegada» podria significar simplemente «respondida».
+const discoDosVisitas = discoNuevo('dos-visitas');
+
+const vm2 = visitar({
+  disco: discoDosVisitas,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+    { tipo: 'elegir', modulo: OTRO_MODULO },
+    { tipo: 'elegir', modulo: MODULO },
+  ],
+});
+
+if (vm2.final.porques?.[P1]?.abierto !== true) {
+  problemas.push(
+    'con almacenamiento, lo respondido en esta visita dejo de estar desplegado tras repintar'
+  );
+}
+
+const vm3 = visitar({ disco: discoDosVisitas, pasos: [{ tipo: 'elegir', modulo: MODULO }] });
+
+if (vm3.final.porques?.[P1]?.boton !== true || vm3.final.porques?.[P1]?.abierto !== false) {
+  problemas.push(
+    'en una visita nueva, lo respondido antes no se dibuja como restaurado: la pagina no ' +
+      `distingue «hace un rato» de «otro dia» (${JSON.stringify(vm3.final.porques?.[P1])})`
+  );
+}
+
+// --- Reiniciar borra tambien la memoria de la visita ------------------------
+//
+// Sin almacenamiento, lo guardado no existe, asi que lo unico que reiniciar puede
+// borrar es la memoria de la visita. Si no la borrara, el boton limpiaria la
+// pantalla y las respuestas volverian en el siguiente repintado.
+const vm4 = visitar({
+  disco: discoNuevo('reinicio-sin-almacen'),
+  almacen: 'lectura-lanza',
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }, { pregunta: P2, acertando: false }] },
+    { tipo: 'reiniciar' },
+  ],
+});
+
+if (vm4.final.barras.respondidas !== '0') {
+  problemas.push(
+    `sin almacenamiento, reiniciar dejo el panel en «${vm4.final.barras.respondidas}» respondidas`
+  );
+}
+if (vm4.final.respondidas.length !== 0) {
+  problemas.push(
+    `sin almacenamiento, reiniciar dejo ${vm4.final.respondidas.length} preguntas dibujadas como ` +
+      'respondidas: la memoria de la visita sobrevivio al borrado'
+  );
+}
+if (Object.values(vm4.final.porques ?? {}).some((p) => p.abierto)) {
+  problemas.push('sin almacenamiento, reiniciar dejo justificaciones desplegadas');
+}
+
+// Y reiniciar un modulo no puede llevarse la memoria de la visita del otro.
+const vm5 = visitar({
+  disco: discoNuevo('reinicio-no-toca-el-otro'),
+  almacen: 'lectura-lanza',
+  pasos: [
+    { tipo: 'elegir', modulo: OTRO_MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: Q1, acertando: true }] },
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+    { tipo: 'reiniciar' },
+    { tipo: 'elegir', modulo: OTRO_MODULO },
+  ],
+});
+
+if (vm5.final.barras.respondidas !== '1') {
+  problemas.push(
+    `reiniciar el modulo ${MODULO} se llevo por delante la memoria de la visita del ` +
+      `${OTRO_MODULO}: al volver dice «${vm5.final.barras.respondidas}» respondidas`
+  );
+}
+
+notas.push(
+  'Memoria de la visita: sin almacenamiento, cambiar de modulo y volver conserva lo respondido ' +
+    'con su justificacion desplegada; en una visita nueva esa misma pregunta ofrece «Ver por qué»; ' +
+    'y reiniciar la borra sin tocar la del otro modulo.'
+);
+
+// ===========================================================================
+// 10 · El avance no sale del dispositivo
+// ===========================================================================
+
+const todasLasVisitas = [
+  v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v14,
+  vj1, vj2, vj3, vm1, vm2, vm3, vm4, vm5,
+];
 const rutasVistas = new Set();
 
 for (const visita of todasLasVisitas) {

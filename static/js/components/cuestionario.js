@@ -52,7 +52,13 @@
  */
 import { $, $$, esc, shuffle, icon, prefersReducedMotion } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
-import { borrarAvance, guardarRespuesta, leerAvance, sePuedeGuardar } from '../servicios/memoria.js';
+import {
+  borrarAvance,
+  guardarRespuesta,
+  leerAvance,
+  respondidasEnLaVisita,
+  sePuedeGuardar,
+} from '../servicios/memoria.js';
 import {
   avanceDelResumen,
   cargarConteos,
@@ -181,6 +187,90 @@ const veredictoDibujado = (acerto) =>
     : `${icon('lightbulb', 'text-base text-jsyellow mt-0.5')}<span>La alternativa correcta está marcada en amarillo.</span>`;
 
 /**
+ * Si esta pregunta trae algo que explicar.
+ *
+ * El esquema deja la columna nula (`d1/migraciones/001-banco-de-preguntas.sql`) y
+ * quien vigila que ninguna activa se quede sin justificacion es
+ * `d1/verificar-banco.sql`, no la validacion por fila del camino de lectura: una
+ * pregunta SIN justificacion puede llegar al navegador. Hoy no llega ninguna —368 de
+ * 368 la traen—, y por eso mismo la unica forma de saber que este caso se trata bien
+ * es provocarlo.
+ *
+ * Se mira el dato y no el nodo dibujado. Preguntarle al DOM «¿hay un recuadro?»
+ * responderia que si en el momento justo en que se acaba de dibujar vacio.
+ */
+const tieneJustificacion = (pregunta) =>
+  typeof pregunta?.justificacion === 'string' && pregunta.justificacion.trim() !== '';
+
+/**
+ * El contenido del recuadro del porque. **Texto de la base: se escapa siempre.**
+ *
+ * Sale de aqui y no de dos sitios por el mismo motivo que `veredictoDibujado()`: hay
+ * dos caminos que llegan al mismo recuadro —responder ahora, y pulsar «Ver por qué»
+ * en una pregunta de otra visita— y si cada uno armara su propio HTML, el dia que
+ * uno cambie el estudiante veria una cosa al responder y otra al desplegar.
+ *
+ * NI UN GRIS, Y NO ES CASUALIDAD
+ *
+ * La iteracion 36 dejo `mutedink` y `muted` a 1,19:1 entre si, asi que la jerarquia
+ * ya no se puede expresar con dos grises (decision 5 bis de la 36). Este recuadro no
+ * usa ninguno de los dos: se distingue por el fondo —`panel2` dentro de una tarjeta
+ * `panel`—, por el borde y por el rotulo en amarillo y en negrita. Los dos textos van
+ * en color principal sobre ese fondo: 13,01:1 el rotulo y 16,40:1 el cuerpo.
+ */
+const justificacionDibujada = (pregunta) => `
+              <p class="font-display font-bold text-jsyellow text-[11px] uppercase tracking-widest">Por qué</p>
+              <p class="mt-1.5 text-sm text-paper leading-relaxed">${esc(pregunta.justificacion)}</p>`;
+
+/**
+ * El recuadro del porque, en el estado que corresponda, o nada.
+ *
+ * Tres estados, y el cuarto es no dibujar nada:
+ *
+ *   - **sin responder**: el recuadro va vacio y oculto. Lo llena `responder()`.
+ *   - **respondida en esta visita**: desplegado y lleno (decision 6).
+ *   - **restaurada de otra visita**: «Ver por qué», y el recuadro vacio y oculto.
+ *   - **sin justificacion**: no se dibuja ni el recuadro ni el boton. Ni hueco vacio
+ *     ni un control que no despliegue nada.
+ *
+ * EL RECUADRO SE DIBUJA VACIO, TAMBIEN EN LAS RESTAURADAS
+ *
+ * Podria venir lleno y solo destaparse al pulsar. No viene, y es la misma razon por
+ * la que existe «Ver por qué»: un modulo de 61 preguntas respondidas cargaria 61
+ * justificaciones que nadie pidio leer. Se insertan cuando se piden, por el unico
+ * camino que las inserta, que es el que se comprueba.
+ */
+function porqueDibujado(pregunta, respondida, enLaVisita) {
+  if (!tieneJustificacion(pregunta)) return '';
+
+  const id = `justificacion-q${esc(pregunta.id)}`;
+
+  // `tabindex="-1"` para poder llevar el foco aca al desplegar: el boton que lo
+  // tenia desaparece en ese mismo acto, y sin esto el foco caeria al body.
+  // EL RIEL AMARILLO NO ES ADORNO. El fondo `panel2` dentro de una tarjeta `panel`
+  // los separa a 1,08:1, o sea nada: en escala de grises el recuadro desapareceria y
+  // la justificacion se leeria como un parrafo mas de la pregunta. El riel es lo que
+  // lo delimita sin depender del color, y es el mismo que ya lleva el veredicto
+  // —quedan uno debajo del otro, como una sola franja— porque son la misma cosa: lo
+  // que la pagina responde despues de responder.
+  const recuadro = (abierto) => `
+            <div id="${id}" tabindex="-1" aria-live="polite"
+                 class="quiz-justificacion${abierto ? '' : ' hidden'} mt-3 bg-panel2 border-l-2 border-jsyellow rounded-r-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">${
+                   abierto ? justificacionDibujada(pregunta) : ''
+                 }</div>`;
+
+  if (respondida && !enLaVisita) {
+    return `
+            <button type="button" class="quiz-ver-porque mt-3 inline-flex items-center gap-2 border border-jsyellow/40 text-jsyellow font-display font-bold text-xs px-3 py-2 rounded hover:border-jsyellow transition-colors"
+                    aria-controls="${id}">
+              ${icon('lightbulb', 'text-base')}<span>Ver por qué</span>
+            </button>${recuadro(false)}`;
+  }
+
+  return recuadro(Boolean(respondida));
+}
+
+/**
  * La pregunta a la que pertenece un boton, y la alternativa que se pulso.
  *
  * Se resuelve contra `bancoCargado` y no contra el DOM a proposito: el texto que
@@ -192,23 +282,64 @@ const veredictoDibujado = (acerto) =>
  * guardar: responder tiene que funcionar igual aunque la memoria no pueda anotarlo.
  */
 function deDondeSalio(boton) {
-  if (!bancoCargado) return null;
-
-  const item = boton.closest?.('[data-pregunta]');
-  const preguntaId = Number(String(item?.dataset?.pregunta ?? '').replace(/^q/, ''));
+  const pregunta = preguntaDeLaTarjeta(boton.closest?.('[data-pregunta]'));
   const alternativaId = Number(boton.dataset?.alternativa);
 
-  if (!Number.isInteger(preguntaId) || !Number.isInteger(alternativaId)) return null;
+  if (!pregunta || !Number.isInteger(alternativaId)) return null;
+
+  const alternativa = pregunta.alternativas.find((a) => a.id === alternativaId);
+  return alternativa ? { pregunta, alternativa } : null;
+}
+
+/**
+ * La pregunta del banco cargado a la que pertenece una tarjeta dibujada.
+ *
+ * Se resuelve contra `bancoCargado` y no contra el HTML, por lo mismo que
+ * `deDondeSalio()`: lo dibujado esta escapado, y volver a leerlo de ahi obligaria a
+ * desescaparlo para recuperar el texto original. La tarjeta solo aporta el id.
+ */
+function preguntaDeLaTarjeta(item) {
+  if (!bancoCargado) return null;
+
+  const preguntaId = Number(String(item?.dataset?.pregunta ?? '').replace(/^q/, ''));
+  if (!Number.isInteger(preguntaId)) return null;
 
   for (const grupo of bancoCargado) {
     for (const pregunta of grupo.preguntas) {
-      if (pregunta.id !== preguntaId) continue;
-      const alternativa = pregunta.alternativas.find((a) => a.id === alternativaId);
-      return alternativa ? { pregunta, alternativa } : null;
+      if (pregunta.id === preguntaId) return pregunta;
     }
   }
 
   return null;
+}
+
+/**
+ * Despliega el porque de una pregunta restaurada, a peticion del estudiante.
+ *
+ * DOS COSAS DEL COMO, Y LAS DOS SON PARTE DE LA DECISION
+ *
+ * **El boton se esconde al desplegar.** Su texto es «Ver por qué» y no cambia
+ * (decision 6 de la iteracion 34), asi que dejarlo puesto seria dejar un control que
+ * ya no hace nada ofreciendo hacer lo que acaba de ocurrir.
+ *
+ * **Y por eso el foco tiene que irse a alguna parte.** Quien pulso con teclado tenia
+ * el foco en ese boton; si desaparece sin mas, el foco cae al `body` y hay que
+ * tabular desde el principio de la pagina. Va al recuadro, que es lo que se acaba de
+ * abrir y lo que se queria leer. `preventScroll` por lo mismo que en
+ * `irALaCabecera()`: enfocar desplaza por su cuenta y el recuadro ya esta a la vista.
+ */
+function desplegarElPorque(boton) {
+  const item = boton.closest?.('[data-pregunta]');
+  const pregunta = preguntaDeLaTarjeta(item);
+
+  if (!pregunta || !tieneJustificacion(pregunta)) return;
+
+  const porque = $('.quiz-justificacion', item);
+  porque.innerHTML = justificacionDibujada(pregunta);
+  porque.classList.remove('hidden');
+
+  boton.classList.add('hidden');
+  porque.focus?.({ preventScroll: true });
 }
 
 /** Marca la alternativa elegida, revela la correcta y anota la respuesta. */
@@ -246,13 +377,27 @@ function responder(boton) {
   if (acerto) estado.correctas += 1;
   else estado.incorrectas += 1;
 
+  const origenDelClic = deDondeSalio(boton);
+
+  // La justificacion aparece SIEMPRE al responder, se acierte o no (decision 2 de la
+  // iteracion 34): explicar solo los errores le quitaria el porque a quien acerto
+  // por descarte o por suerte.
+  //
+  // Se pregunta por el dato y no por el nodo: `porqueDibujado()` no dibuja recuadro
+  // cuando la pregunta llega sin justificacion, y buscarlo en el DOM para decidir
+  // haria depender la conducta de lo que se acaba de dibujar en vez del contenido.
+  if (origenDelClic && tieneJustificacion(origenDelClic.pregunta)) {
+    const porque = $('.quiz-justificacion', item);
+    porque.innerHTML = justificacionDibujada(origenDelClic.pregunta);
+    porque.classList.remove('hidden');
+  }
+
   // Se guarda AQUI, al responder, y no al cambiar de modulo ni al salir: cerrar la
   // pestana a mitad de un modulo no puede perder nada, y la memoria no puede
   // depender de que el estudiante salga por una puerta concreta.
   //
   // Se guarda el texto de la alternativa, nunca el veredicto: el veredicto se
   // vuelve a calcular al restaurar, contra el banco que este vigente ese dia.
-  const origenDelClic = deDondeSalio(boton);
   if (origenDelClic) {
     guardarRespuesta(estado.modulo, origenDelClic.pregunta.id, origenDelClic.alternativa.texto);
   }
@@ -340,7 +485,7 @@ function dibujarAlternativa(alternativa, elegida) {
  * posicion, asi que barajar no rompe nada y aca no hace falta ninguna rama
  * especial mas alla de decidir si se baraja o no.
  */
-function dibujarPregunta(pregunta, numero, respondida) {
+function dibujarPregunta(pregunta, numero, respondida, enLaVisita) {
   const orden =
     pregunta.orden_fijo === 1
       ? pregunta.alternativas.slice().sort((a, b) => a.orden - b.orden)
@@ -362,14 +507,22 @@ function dibujarPregunta(pregunta, numero, respondida) {
               <p class="font-display font-bold text-paper leading-snug">${esc(pregunta.enunciado)}</p>
             </div>
             <div class="mt-4 grid gap-2">${alternativas}</div>
-            ${veredicto}
+            ${veredicto}${porqueDibujado(pregunta, respondida, enLaVisita)}
           </li>`;
 }
 
-/** Dibuja la seccion de un modulo, con lo respondido ya puesto. */
-function dibujarGrupo(grupo, vigentes) {
+/**
+ * Dibuja la seccion de un modulo, con lo respondido ya puesto.
+ *
+ * `deLaVisita` son los ids que se respondieron en esta visita, y no es lo mismo que
+ * `vigentes`: las dos dicen «respondida», pero solo la primera dice «hace un rato».
+ * De esa diferencia sale que la justificacion venga desplegada o detras de un boton.
+ */
+function dibujarGrupo(grupo, vigentes, deLaVisita) {
   const preguntas = grupo.preguntas
-    .map((pregunta, i) => dibujarPregunta(pregunta, i + 1, vigentes.get(pregunta.id)))
+    .map((pregunta, i) =>
+      dibujarPregunta(pregunta, i + 1, vigentes.get(pregunta.id), deLaVisita.has(pregunta.id))
+    )
     .join('');
 
   return `
@@ -594,7 +747,15 @@ function pintar() {
 
   const vigentes = restaurarDesdeLaMemoria(bancoCargado, leerAvance(estado.modulo));
 
-  contenedor.innerHTML = bancoCargado.map((grupo) => dibujarGrupo(grupo, vigentes)).join('');
+  // Lo respondido en esta visita se pregunta aca, en cada repintado, y no se lleva
+  // en una variable de este archivo: repintar es exactamente el momento en que la
+  // pantalla se reconstruye desde cero, y una copia local seria una segunda verdad
+  // que se puede quedar atras.
+  const deLaVisita = respondidasEnLaVisita(estado.modulo);
+
+  contenedor.innerHTML = bancoCargado
+    .map((grupo) => dibujarGrupo(grupo, vigentes, deLaVisita))
+    .join('');
 
   estado.total = bancoCargado.reduce((suma, grupo) => suma + grupo.preguntas.length, 0);
   estado.respondidas = vigentes.size;
@@ -772,7 +933,8 @@ function pedirCambioDeModulo(numero) {
 }
 
 /**
- * Conecta la zona de preguntas: responder, y el enlace del estado vacio.
+ * Conecta la zona de preguntas: responder, desplegar el porque, y el enlace del
+ * estado vacio.
  *
  * Se delega en el contenedor y se ata una sola vez, porque su contenido se
  * reescribe entero cada vez que cambia el modulo y los oyentes de los botones se
@@ -788,6 +950,12 @@ function conectarCuestionario(contenedor) {
       // teclado y el lector de pantalla lleguen al mismo sitio que el ojo. Va a
       // la primera fila del indice, que es la primera decision que hay que tomar.
       $('#indice-modulos')?.querySelector?.('[data-modulo]')?.focus?.();
+      return;
+    }
+
+    const verPorQue = evento.target.closest('.quiz-ver-porque');
+    if (verPorQue) {
+      desplegarElPorque(verPorQue);
       return;
     }
 
