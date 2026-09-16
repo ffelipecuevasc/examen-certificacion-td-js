@@ -83,6 +83,28 @@ module.exports = {
           '55%': { transform: 'translateY(0)' },
           '75%': { transform: 'translateY(-2px)' },
         },
+
+        /**
+         * El indicador de que un modulo se esta cargando (iteracion 35).
+         *
+         * ES UN LATIDO Y NO UNA BARRA, Y ESO ES LA DECISION 1. La respuesta de
+         * /api/preguntas llega por partes y sin cabecera de largo, asi que el
+         * navegador no sabe cuanto pesa antes de terminar de recibirla: no hay
+         * porcentaje que calcular. Y aunque lo hubiera, el cuerpo tarda unos 8 ms
+         * en bajar dentro de una espera de ~400 ms, asi que una barra pasaria casi
+         * todo el rato en 0 y saltaria a 100 al final. Este latido no promete
+         * ningun avance: solo dice que la pagina sigue viva.
+         *
+         * EMPIEZA Y TERMINA EN REPOSO, que es la regla de la iteracion 36: en
+         * reposo los puntos estan a opacidad 1, que es su estado en el CSS. Con
+         * `prefers-reduced-motion` la regla de src/input.css recorta la duracion a
+         * 0,01 ms y las iteraciones a 1, asi que recortarlo equivale a no haberlo
+         * corrido y los puntos se quedan visibles, no a medio apagar.
+         */
+        latido: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.25' },
+        },
       },
       animation: {
         floaty: 'floaty 6s ease-in-out infinite',
@@ -92,6 +114,13 @@ module.exports = {
         // que se repite compite con el texto que el estudiante intenta leer.
         tada: 'tada 1s ease-in-out 1',
         asomar: 'asomar 1.1s ease-in-out 1',
+
+        // Este si se repite, y es la excepcion razonada: mientras dura, la carga
+        // sigue ocurriendo, y un indicador que se detiene solo diria que la pagina
+        // se colgo. Dura lo que dura la carga y ni un milisegundo mas, porque lo
+        // que lo retira es el dibujo del modulo. No compite con ningun texto que
+        // el estudiante este leyendo: en esa pantalla no hay nada mas que leer.
+        latido: 'latido 1.2s ease-in-out infinite',
       },
     },
   },

@@ -1042,7 +1042,8 @@ try {
   //
   // Se pide el mismo modulo dos veces seguidas, sin esperar a que llegue la primera.
   // Por la puerta, la segunda no sale a la red. Saltandosela —que es lo que haria un
-  // segundo camino a mostrarModulo()— sale, y son 44 a 65 KB por la misma pregunta
+  // segundo camino a mostrarModulo()— sale, y son 12 a 17 KB comprimidos por la
+  // misma pregunta
   // en una conexion modesta, que es el publico de vision.md.
 
   const contarPeticiones = () => {
@@ -1326,7 +1327,8 @@ try {
   // El reintento tras una carga fallida abrio esta puerta sin querer: «no hay nada
   // cargado» tambien es cierto mientras carga. En una conexion modesta el
   // estudiante pulsa otra vez creyendo que no registro el toque, y cada toque son
-  // 44 a 65 KB por la misma pregunta.
+  // 12 a 17 KB comprimidos —45 a 66 KB sin comprimir— por la misma pregunta,
+  // medido el 2026-09-16 (decision 1 de la iteracion 35).
   //
   // Se provoca de verdad: se retrasa la respuesta del modulo y se pulsa tres veces
   // seguidas, contando cuantas peticiones salen.
@@ -1474,6 +1476,417 @@ try {
   );
 
   // ------------------------------------------------------------------------
+  // 8f · La transicion de carga (iteracion 35)
+  //
+  // Todo lo de aqui abajo se provoca retrasando la respuesta del extremo, nunca
+  // tocando la base. El retraso es POR MODULO y los plazos salen de
+  // PLAZO_DE_CARGA_LENTA_MS, la misma constante que usa el componente: con un
+  // numero copiado a mano, el dia que el plazo cambiara estas pruebas seguirian
+  // midiendo contra el viejo y pasarian en verde sin probar nada.
+  // ------------------------------------------------------------------------
+
+  const { PISO_DE_LA_TRANSICION_MS: PISO, PLAZO_DE_CARGA_LENTA_MS: PLAZO } = await import(
+    pathToFileURL(join(SITIO, 'components', 'cuestionario.js')).href
+  );
+
+  /** Espera. Se usa tanto aqui abajo que escribirla entera cada vez solo hace ruido. */
+  const esperar = (ms) => new Promise((listo) => setTimeout(listo, ms));
+
+  /**
+   * Retrasa la respuesta de cada modulo lo que diga el mapa, y devuelve como
+   * deshacerlo.
+   *
+   * ES POR MODULO Y NO UN PLAZO UNICO, y esa es toda la diferencia con el
+   * mecanismo que ya habia en 8d-bis: con un solo plazo las respuestas llegan en
+   * el mismo orden en que se pidieron, y el caso que hay que cazar —la del primero
+   * llegando despues que la del segundo— no se puede provocar.
+   *
+   * El resumen nunca se retrasa: no es lo que se esta midiendo, y retrasarlo solo
+   * agregaria ruido al reloj.
+   */
+  function retrasarPorModulo(plazos) {
+    const anterior = globalThis.fetch;
+
+    globalThis.fetch = (ruta, opciones) => {
+      const texto = String(ruta);
+      const cual = texto.match(/modulo=(\d+)/);
+      const espera = cual && !texto.includes('resumen') ? plazos[Number(cual[1])] : undefined;
+
+      if (!espera) return anterior(ruta, opciones);
+
+      return new Promise((listo) => {
+        setTimeout(() => listo(anterior(ruta, opciones)), espera);
+      });
+    };
+
+    return () => {
+      globalThis.fetch = anterior;
+    };
+  }
+
+  /** Cuantas veces aparece algo dentro de un texto. */
+  const cuantasVeces = (texto, aguja) => texto.split(aguja).length - 1;
+
+  const fetchLimpio = globalThis.fetch;
+
+  // --- 8f-1 · Que dibuja la transicion, y que NO dibuja --------------------
+
+  const MODULO_TRANSICION = 6;
+  const deshacerTransicion = retrasarPorModulo({ [MODULO_TRANSICION]: 900 });
+
+  const escriturasAntes = dom.escrituras('#cuestionario');
+  elegirEnElIndice(MODULO_TRANSICION);
+
+  await esperar(300);
+
+  const enTransicion = dom.html('#cuestionario');
+
+  if (!enTransicion.includes('js-logo.svg')) {
+    problemas.push('la transicion no muestra el logotipo de JavaScript (decision 3)');
+  }
+  if (!enTransicion.includes('animate-latido')) {
+    problemas.push('la transicion no declara ningun indicador de carga (decision 3)');
+  }
+  if (!enTransicion.includes(`Cargando el Módulo ${MODULO_TRANSICION}…`)) {
+    problemas.push('la transicion no nombra el modulo que viene (decision 3)');
+  }
+  if (!enTransicion.includes('id="carga-lenta"')) {
+    problemas.push('la transicion no deja puesto el hueco del texto de carga lenta');
+  }
+
+  // Ningun numero de avance. Se busca lo que un porcentaje dejaria en el HTML: el
+  // signo, y los dos atributos con que se dibuja una barra de progreso de verdad.
+  // Es la decision 1 escrita como prueba y no como intencion.
+  for (const rastro of ['%', 'progressbar', 'aria-valuenow']) {
+    if (enTransicion.includes(rastro)) {
+      problemas.push(
+        `la transicion trae «${rastro}» en el HTML: la decision 1 dice que no hay porcentaje ` +
+          'ni nada que sugiera cuanto falta'
+      );
+    }
+  }
+
+  const escriturasDeLaTransicion = dom.escrituras('#cuestionario') - escriturasAntes;
+
+  if (escriturasDeLaTransicion !== 1) {
+    problemas.push(
+      `dibujar la transicion reescribio la zona de preguntas ${escriturasDeLaTransicion} ` +
+        'veces, y tiene que ser 1'
+    );
+  }
+  if (dom.enfocado() !== '#mensaje-cuestionario') {
+    problemas.push(
+      `durante la carga el foco esta en «${dom.enfocado()}» y tiene que estar en el mensaje`
+    );
+  }
+  if (dom.nodo('#reiniciar').disabled !== true) {
+    problemas.push('durante la carga «Reiniciar el módulo» sigue disponible (decision 6)');
+  }
+  if (dom.nodo('#repaso').disabled !== true) {
+    problemas.push('durante la carga «Repasar mis errores» sigue disponible (decision 6)');
+  }
+  if (!dom.nodo('#reiniciar').classList.contains('opacity-50')) {
+    problemas.push('«Reiniciar el módulo» no se ve atenuado durante la carga');
+  }
+  if (!dom.nodo('#repaso').classList.contains('opacity-50')) {
+    problemas.push('«Repasar mis errores» no se ve atenuado durante la carga');
+  }
+  if (dom.texto('#mensaje-avance') !== `Cargando el Módulo ${MODULO_TRANSICION}…`) {
+    problemas.push(
+      `durante la carga el panel dice «${dom.texto('#mensaje-avance')}»: no puede invitar a ` +
+        'responder mientras la zona de preguntas dice que esta cargando'
+    );
+  }
+
+  // Y pulsarlos no hace nada. `dom.disparar()` ejecuta los oyentes AUNQUE el nodo
+  // este `disabled`, porque no es un navegador: si la guarda no estuviera tambien
+  // dentro del oyente, esto lo destaparia.
+  const htmlAntesDePulsar = dom.html('#cuestionario');
+  dom.disparar('#reiniciar', 'click', {});
+  dom.disparar('#repaso', 'click', {});
+
+  if (dom.html('#cuestionario') !== htmlAntesDePulsar) {
+    problemas.push('pulsar los controles del panel durante la carga cambio la zona de preguntas');
+  }
+
+  await esperar(900 + PISO + 700);
+  deshacerTransicion();
+
+  if (idsDibujados(dom.html('#cuestionario')).length !== cuantasTiene(MODULO_TRANSICION)) {
+    problemas.push(`la transicion del modulo ${MODULO_TRANSICION} no termino dibujandolo`);
+  }
+  if (dom.nodo('#reiniciar').disabled !== false || dom.nodo('#repaso').disabled !== false) {
+    problemas.push('al terminar la carga los controles del panel siguieron desactivados');
+  }
+  if (dom.html('#carga-lenta') !== '') {
+    problemas.push(
+      'una carga normal mostro el texto de «esta tardando»: el plazo de la decision 7 no ' +
+        'puede alcanzarse en una carga sana'
+    );
+  }
+
+  notas.push(
+    `Transicion: logotipo quieto, indicador sin porcentaje y «Cargando el Módulo ` +
+      `${MODULO_TRANSICION}…», con ${escriturasDeLaTransicion} sola reescritura de la zona, el ` +
+      'foco en el mensaje y los dos controles del panel desactivados. Sin «%», sin progressbar ' +
+      'y sin aria-valuenow.'
+  );
+
+  // --- 8f-2 · Nadie espera de mas -----------------------------------------
+  //
+  // Tres finales, medidos DESDE EL CLIC: instantanea, lenta y fallida inmediata.
+  // La regla de la decision 5 es una sola —el mayor entre lo que tarda la carga y
+  // el piso, y no mas—, asi que se comprueba con la misma formula las tres veces.
+
+  const HOLGURA_MS = 700;
+  const tiempos = [];
+
+  const medir = async (numero, etiqueta, esperado) => {
+    const desde = Date.now();
+    await mostrarModulo(numero);
+    const duro = Date.now() - desde;
+
+    tiempos.push({ etiqueta, duro, esperado });
+
+    if (duro < esperado - 60) {
+      problemas.push(
+        `${etiqueta}: del clic a ver el modulo pasaron ${duro} ms, por debajo del piso de ` +
+          `${esperado} ms: la transicion parpadea`
+      );
+    }
+    if (duro > esperado + HOLGURA_MS) {
+      problemas.push(
+        `${etiqueta}: del clic a ver el modulo pasaron ${duro} ms y lo esperado era ` +
+          `~${esperado} ms: alguien espera de mas`
+      );
+    }
+  };
+
+  await medir(MODULO_DE_MUESTRA, 'Respuesta instantanea', PISO);
+
+  const RETRASO_LENTO = PLAZO - 500;
+  const deshacerLento = retrasarPorModulo({ [MODULO_DEGRADADO]: RETRASO_LENTO });
+  await medir(MODULO_DEGRADADO, 'Respuesta lenta', RETRASO_LENTO);
+  deshacerLento();
+
+  // La fallida inmediata usa el rechazo con `usar_respaldo: false`, que es el unico
+  // que NO cae a la instantanea: resuelve al instante, asi que lo unico que puede
+  // explicar la espera es el piso. Es la decision 5 aplicada al final de error.
+  const MODULO_FALLA_YA = 7;
+  const fetchAntesDeFallar = globalThis.fetch;
+
+  globalThis.fetch = (ruta, opciones) => {
+    if (String(ruta).includes(`modulo=${MODULO_FALLA_YA}`) && !String(ruta).includes('resumen')) {
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            ok: false,
+            error: {
+              codigo: 'PETICION_INVALIDA',
+              mensaje: 'Fallo provocado por la prueba.',
+              usar_respaldo: false,
+            },
+          }),
+          { status: 400, headers: { 'content-type': 'application/json' } }
+        )
+      );
+    }
+    return fetchAntesDeFallar(ruta, opciones);
+  };
+
+  await medir(MODULO_FALLA_YA, 'Fallida inmediata', PISO);
+  globalThis.fetch = fetchAntesDeFallar;
+
+  if (!dom.html('#cuestionario').includes('No se pudo cargar el módulo')) {
+    problemas.push(
+      'la carga fallida no dio paso al mensaje de error: la transicion quedo colgada'
+    );
+  }
+  if (dom.enfocado() !== '#mensaje-cuestionario') {
+    problemas.push(
+      `tras una carga fallida el foco quedo en «${dom.enfocado()}» y tenia que ir al mensaje`
+    );
+  }
+  if (dom.nodo('#reiniciar').disabled !== false || dom.nodo('#repaso').disabled !== false) {
+    problemas.push('tras una carga fallida los controles del panel siguieron desactivados');
+  }
+
+  notas.push(
+    'Nadie espera de mas (desde el clic, ms): ' +
+      tiempos.map((t) => `${t.etiqueta} ${t.duro}, esperado ~${t.esperado}`).join(' · ') +
+      `. Piso ${PISO} ms, holgura ${HOLGURA_MS} ms.`
+  );
+
+  // --- 8f-3 · Una respuesta vieja no apaga ni duplica la transicion --------
+  //
+  // ESTE ES EL MONTAJE DE H-1. Dos cargas, y la del primero llega MIENTRAS la del
+  // segundo sigue viva. Los plazos salen del plazo del texto lento para que el
+  // temporizador abandonado —el que armo la carga del primer modulo— alcance a
+  // dispararse dentro de esa ventana: si no se hubiera cancelado al reemplazar el
+  // registro, escribiria encima de la carga vigente.
+  //
+  //   t = 0        clic en el primero
+  //   t = 0,2·P    clic en el segundo; la carga del primero queda descartada
+  //   t = 0,5·P    llega la respuesta del primero, y se descarta
+  //   t = 1,0·P    aqui se dispararia el temporizador abandonado del primero
+  //   t = 1,1·P    MUESTREO: el segundo sigue cargando y su plazo (1,2·P) no llega
+  //   t = 1,2·P    se cumple el plazo del segundo: su texto lento SI aparece
+  //   t = 1,7·P    llega la respuesta del segundo
+
+  const PRIMERO = 3;
+  const SEGUNDO = 8;
+
+  const deshacerEncimadas = retrasarPorModulo({
+    [PRIMERO]: Math.round(PLAZO * 0.5),
+    [SEGUNDO]: Math.round(PLAZO * 1.5),
+  });
+
+  const escriturasAntesDeEncimar = dom.escrituras('#cuestionario');
+
+  elegirEnElIndice(PRIMERO);
+  await esperar(Math.round(PLAZO * 0.2));
+  elegirEnElIndice(SEGUNDO);
+
+  // Hasta el muestreo, contado desde el clic del segundo.
+  await esperar(Math.round(PLAZO * 0.9));
+
+  const enMuestreo = dom.html('#cuestionario');
+  const transicionesALaVez = cuantasVeces(enMuestreo, 'id="mensaje-cuestionario"');
+
+  if (!enMuestreo.includes(`Cargando el Módulo ${SEGUNDO}…`)) {
+    problemas.push(
+      `con la respuesta del modulo ${PRIMERO} ya descartada, la zona de preguntas dejo de ` +
+        `mostrar la transicion del modulo ${SEGUNDO}: una respuesta vieja apago la vigente`
+    );
+  }
+  if (transicionesALaVez !== 1) {
+    problemas.push(
+      `hay ${transicionesALaVez} transiciones a la vez en la zona de preguntas: quedo duplicada`
+    );
+  }
+  if (dom.nodo('#reiniciar').disabled !== true || dom.nodo('#repaso').disabled !== true) {
+    problemas.push(
+      `la respuesta descartada del modulo ${PRIMERO} reactivo los controles del panel mientras ` +
+        `el modulo ${SEGUNDO} seguia cargando`
+    );
+  }
+  if (dom.html('#carga-lenta') !== '') {
+    problemas.push(
+      'el texto de «esta tardando» aparecio antes de cumplirse el plazo contado desde el clic ' +
+        `del modulo vigente (${SEGUNDO}): lo escribio un temporizador abandonado`
+    );
+  }
+  if (dom.enfocado() !== '#mensaje-cuestionario') {
+    problemas.push(`con una respuesta vieja descartada el foco se fue a «${dom.enfocado()}»`);
+  }
+
+  // Ahora si se cumple el plazo del segundo. El texto lento tiene que aparecer SIN
+  // mover el foco y SIN reescribir la zona de preguntas: si entrara reescribiendo
+  // el contenedor destruiria el nodo que tiene el foco y el lector de pantalla
+  // volveria a anunciar la carga entera.
+  const escriturasAntesDelLento = dom.escrituras('#cuestionario');
+  await esperar(Math.round(PLAZO * 0.3));
+
+  if (!dom.html('#carga-lenta').includes('tardando más de lo normal')) {
+    problemas.push(
+      `pasado el plazo de ${PLAZO} ms la pagina no dijo que la carga estaba tardando (decision 7)`
+    );
+  }
+  if (dom.escrituras('#cuestionario') !== escriturasAntesDelLento) {
+    problemas.push(
+      'el texto de «esta tardando» reescribio la zona de preguntas: eso destruye el nodo con ' +
+        'el foco y hace que la carga se anuncie una segunda vez'
+    );
+  }
+  if (dom.enfocado() !== '#mensaje-cuestionario') {
+    problemas.push(`el texto de «esta tardando» movio el foco a «${dom.enfocado()}»`);
+  }
+  if (dom.html('#carga-lenta').includes('%')) {
+    problemas.push('el texto de «esta tardando» trae un numero: la decision 7 no lo permite');
+  }
+
+  // Y el final: manda el ultimo elegido.
+  await esperar(Math.round(PLAZO * 0.6) + PISO + 900);
+  deshacerEncimadas();
+
+  const trasEncimarlas = idsDibujados(dom.html('#cuestionario'));
+  const escriturasEncimadas = dom.escrituras('#cuestionario') - escriturasAntesDeEncimar;
+
+  if (trasEncimarlas.length !== cuantasTiene(SEGUNDO)) {
+    problemas.push(
+      `con dos cargas encimadas quedaron ${trasEncimarlas.length} preguntas dibujadas, y el ` +
+        `ultimo elegido, el modulo ${SEGUNDO}, tiene ${cuantasTiene(SEGUNDO)}`
+    );
+  }
+  if (marcadoEnElIndice() !== SEGUNDO) {
+    problemas.push(
+      `con dos cargas encimadas el indice quedo marcando el modulo ${marcadoEnElIndice()}, y el ` +
+        `ultimo elegido fue el ${SEGUNDO}`
+    );
+  }
+  if (dom.html('#cuestionario').includes('tardando más de lo normal')) {
+    problemas.push('el texto de «esta tardando» sobrevivio al final de la carga');
+  }
+  if (dom.nodo('#reiniciar').disabled !== false || dom.nodo('#repaso').disabled !== false) {
+    problemas.push('al terminar la carga vigente los controles del panel quedaron colgados');
+  }
+
+  notas.push(
+    `Dos cargas encimadas (modulos ${PRIMERO} y ${SEGUNDO}, retrasos ` +
+      `${Math.round(PLAZO * 0.5)} y ${Math.round(PLAZO * 1.5)} ms, sacados del plazo de ` +
+      `${PLAZO} ms): la respuesta descartada no apago ni duplico la transicion del ` +
+      `${SEGUNDO} —1 transicion a la vez, controles aun desactivados—, el texto lento aparecio ` +
+      'recien a su plazo sin mover el foco ni reescribir la zona, y quedo dibujado el ' +
+      `${SEGUNDO}. Reescrituras de la zona en las dos cargas: ${escriturasEncimadas}.`
+  );
+
+  // --- 8f-4 · La del primero llega DESPUES que la del segundo --------------
+  //
+  // El otro orden, que es el que da nombre al criterio: aqui la respuesta del
+  // primero llega cuando el segundo ya esta dibujado.
+
+  const deshacerDesorden = retrasarPorModulo({
+    [PRIMERO]: Math.round(PLAZO * 1.2),
+    [SEGUNDO]: Math.round(PLAZO * 0.4),
+  });
+
+  elegirEnElIndice(PRIMERO);
+  await esperar(Math.round(PLAZO * 0.2));
+  elegirEnElIndice(SEGUNDO);
+
+  // Hasta despues de que llegue la del primero, que es la que no puede mandar.
+  await esperar(Math.round(PLAZO * 1.2) + PISO + 900);
+  deshacerDesorden();
+
+  const trasLaTardia = idsDibujados(dom.html('#cuestionario'));
+
+  if (trasLaTardia.length !== cuantasTiene(SEGUNDO)) {
+    problemas.push(
+      `con la respuesta del modulo ${PRIMERO} llegando despues que la del ${SEGUNDO}, quedaron ` +
+        `${trasLaTardia.length} preguntas dibujadas y el dibujado tenia que ser el ${SEGUNDO}`
+    );
+  }
+  if (marcadoEnElIndice() !== SEGUNDO) {
+    problemas.push(
+      `con la respuesta tardia del modulo ${PRIMERO} el indice quedo marcando ` +
+        `${marcadoEnElIndice()}`
+    );
+  }
+  if (dom.nodo('#reiniciar').disabled !== false || dom.nodo('#repaso').disabled !== false) {
+    problemas.push(
+      `la respuesta tardia del modulo ${PRIMERO} dejo los controles del panel desactivados`
+    );
+  }
+
+  notas.push(
+    `Desorden: la respuesta del modulo ${PRIMERO} llego despues que la del ${SEGUNDO} y no ` +
+      `mando. Quedo dibujado el ${SEGUNDO}, el indice lo marca, y los controles volvieron a ` +
+      'estar disponibles.'
+  );
+
+  globalThis.fetch = fetchLimpio;
+
+  // ------------------------------------------------------------------------
   // 9 · El modo degradado filtra igual (ADR-008)
   //
   // Se provoca la caida de verdad: se deja el fetch inservible, que es lo que ve
@@ -1576,6 +1989,57 @@ try {
   notas.push(
     `Modo degradado al ABRIR: el aviso de ADR-008 se ve antes de elegir nada, con el ` +
       `estado vacio debajo y los ${enLaCopia.size} conteos del indice contados sobre la copia.`
+  );
+
+  // --- 9c · Movimiento reducido simulado (decision 8) ---------------------
+  //
+  // Va al final porque prepara un DOM falso NUEVO, y a partir de aqui el anterior
+  // queda obsoleto. El fetch sigue caido, asi que la carga sale de la instantanea,
+  // que ya esta importada: termina enseguida y hay que mirar durante el piso.
+  //
+  // LO QUE PRUEBA: que el componente **no declare** movimiento cuando el sistema
+  // pide menos. Lo que no se ve moverse es cosa del navegador y de la regla de
+  // src/input.css, que es la otra mitad del trato y la que de verdad apaga.
+  //
+  // Y ES FALSABLE PORQUE HAY CONTROL POSITIVO: 8f-1 ya exigio que con el DOM
+  // normal la transicion SI traiga `animate-latido`. Sin esa mitad, esta pasaria
+  // en verde tambien el dia que la clase desapareciera para todos.
+
+  const domSinMovimiento = prepararDomFalso({ movimientoReducido: true });
+
+  const cargaSinMovimiento = mostrarModulo(MODULO_DEGRADADO);
+  await esperar(150);
+
+  const htmlSinMovimiento = domSinMovimiento.html('#cuestionario');
+
+  if (htmlSinMovimiento.includes('animate-latido')) {
+    problemas.push(
+      'con `prefers-reduced-motion` simulado la transicion sigue declarando la animacion ' +
+        'del indicador (decision 8)'
+    );
+  }
+  if (!htmlSinMovimiento.includes(`Cargando el Módulo ${MODULO_DEGRADADO}…`)) {
+    problemas.push(
+      'con el movimiento reducido la pagina dejo de decir que esta cargando: quitar el ' +
+        'movimiento no puede quitar la informacion'
+    );
+  }
+  if (!htmlSinMovimiento.includes('js-logo.svg')) {
+    problemas.push('con el movimiento reducido la transicion perdio el logotipo');
+  }
+
+  await cargaSinMovimiento;
+
+  if (idsDibujados(domSinMovimiento.html('#cuestionario')).length === 0) {
+    problemas.push(
+      `con el movimiento reducido el modulo ${MODULO_DEGRADADO} no llego a dibujarse`
+    );
+  }
+
+  notas.push(
+    'Movimiento reducido simulado: la transicion no declara `animate-latido`, conserva el ' +
+      'logotipo y sigue diciendo que esta cargando. Con el DOM normal (8f-1) si lo declara, ' +
+      'asi que la comprobacion puede fallar.'
   );
 
   // ------------------------------------------------------------------------

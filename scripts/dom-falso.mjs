@@ -74,11 +74,23 @@ function crearNodo(selector, registrar, foco) {
     },
     _html: '',
     _texto: '',
+    /**
+     * Cuantas veces se reescribio este elemento.
+     *
+     * Desde la iteracion 35. Sirve para una cosa que no se puede mirar de otra
+     * manera: cuantas veces se reconstruye la zona de preguntas durante una sola
+     * espera. Cada reescritura de `#cuestionario` destruye el nodo que tiene el
+     * foco y obliga a reponerlo, y un lector de pantalla lo vuelve a anunciar. El
+     * numero es la evidencia de que la carga se da a conocer UNA vez y no a cada
+     * paso; sin contarlo, eso solo se puede prometer.
+     */
+    escrituras: 0,
     set innerHTML(valor) {
       // Reescribir el contenido tira lo que colgaba. Si el foco estaba ahi dentro,
       // se cae al body, que es exactamente lo que hace el navegador y lo que la
       // iteracion 32 tuvo que arreglar en tres caminos distintos.
       if (foco.dentroDe(nodo)) foco.soltar();
+      nodo.escrituras += 1;
       this._html = valor;
     },
     get innerHTML() {
@@ -167,8 +179,18 @@ export function almacenDeMentira({ escrituraProhibida = false, lecturaProhibida 
  *   - una funcion: se instala como getter, asi que **leer la propiedad lanza**. Es
  *     Chrome con las cookies bloqueadas, donde el acceso falla antes de llamar a
  *     nada, y es el caso que mas facil se olvida al escribir el codigo.
+ *
+ * `movimientoReducido` decide que contesta `window.matchMedia()`. Es la decision 8
+ * de la iteracion 35, y viene por defecto en `false` para que quien ya llamaba a
+ * esta funcion siga viendo exactamente lo de antes.
+ *
+ * LO QUE PRUEBA Y LO QUE NO. Prueba que el componente **no declare movimiento**
+ * cuando el sistema pide menos: que no ponga la clase de la animacion, y que pida
+ * los desplazamientos con `auto` en vez de `smooth`. **No prueba que no se vea
+ * movimiento**, porque aqui no se pinta nada; eso sigue siendo del navegador y de
+ * la regla de src/input.css, que es la otra mitad y la que de verdad apaga.
  */
-export function prepararDomFalso({ almacen } = {}) {
+export function prepararDomFalso({ almacen, movimientoReducido = false } = {}) {
   const nodos = new Map();
 
   /**
@@ -213,8 +235,16 @@ export function prepararDomFalso({ almacen } = {}) {
   };
 
   globalThis.window = {
-    matchMedia: () => ({ matches: false }),
+    // Se mira la consulta y no se contesta que si a todo: `prefersReducedMotion()`
+    // pregunta por `(prefers-reduced-motion: reduce)`, y si algun dia el sitio
+    // preguntara por otra cosa —el ancho, el modo oscuro— contestarle que si por
+    // arrastre le haria creer al componente algo que nadie pidio simular.
+    matchMedia: (consulta) => ({
+      matches: movimientoReducido && String(consulta).includes('prefers-reduced-motion'),
+    }),
     scrollTo() {},
+    setTimeout: (...argumentos) => setTimeout(...argumentos),
+    clearTimeout: (...argumentos) => clearTimeout(...argumentos),
   };
 
   // El almacen se reinstala en cada arranque, incluso el mismo objeto: lo que se
@@ -252,6 +282,13 @@ export function prepararDomFalso({ almacen } = {}) {
     },
     /** Lo ultimo que el componente escribio con innerHTML. */
     html: (selector) => registrar(selector).innerHTML,
+    /**
+     * Cuantas veces se reescribio un elemento desde que se preparo este DOM.
+     *
+     * Se lee dos veces y se resta, que es la unica forma de preguntar «cuantas
+     * durante ESTA espera» sin depender de cuantas hubo antes.
+     */
+    escrituras: (selector) => registrar(selector).escrituras,
     /** Lo ultimo que el componente escribio con textContent. */
     texto: (selector) => registrar(selector).textContent,
     /** Si un elemento quedo con la clase `hidden` puesta. */
