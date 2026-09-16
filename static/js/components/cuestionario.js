@@ -63,12 +63,15 @@
  * hubiera, el cuerpo baja en unos 8 ms dentro de una espera de ~400 ms. Esta escrito
  * con sus mediciones en la decision 1 de la iteracion 35.
  *
- * Todo lo que la transicion levanta vive en UN registro, `cargaEnCurso`, y lo apaga
- * quien lo creo y nadie mas. El porque esta ahi, y es la parte de este archivo que
- * mas facil se rompe: `mostrarModulo()` tiene cuatro salidas.
+ * Todo lo que la transicion levanta vive en UN registro, y lo apaga quien lo creo y
+ * nadie mas. El porque esta en components/transicion-de-carga.js, que es donde vive
+ * desde la iteracion 41: el simulacro usa la misma transicion, y dos copias de lo
+ * mismo divergen en silencio. Este archivo conserva la parte que es suya —que
+ * modulo se pide, que textos lleva y que controles se desactivan— y nada mas.
  */
 import { $, $$, esc, shuffle, icon, prefersReducedMotion } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
+import { crearTransicionDeCarga } from './transicion-de-carga.js';
 import {
   borrarAvance,
   guardarRespuesta,
@@ -118,21 +121,21 @@ let bancoCargado = null;
 const origen = { resumen: null, modulo: null };
 
 /**
- * Cual es la peticion vigente.
+ * El contador de peticiones ya no vive aqui.
  *
- * El indice esta libre, asi que el estudiante puede cambiar de modulo mientras el
- * anterior todavia viaja. Sin esto, una respuesta lenta del modulo 3 llegaria
- * despues de la del 5 y dibujaria el 3 sobre el 5, con el indice marcando el 5.
- * Cada llamada toma un numero y, al volver del await, se retira si ya no es la
- * ultima.
+ * Se fue con el registro de la transicion en la iteracion 41, decision 9, y no por
+ * orden: el numero de peticion **es la identidad** del registro, y `cerrar()` lo
+ * compara antes de apagar nada. Separarlos dejaria dos sitios obligados a avanzar
+ * al mismo ritmo, y el dia que uno se olvidara el fallo no se veria. Se pide con
+ * `transicion.abrir()`, que toma el numero y levanta el registro en el mismo acto.
  */
-let peticionVigente = 0;
 
 /**
  * Que modulo se esta pidiendo ahora mismo, o null si no se esta pidiendo ninguno.
  *
- * `peticionVigente` sirve para descartar respuestas que llegan tarde; esto sirve
- * para algo distinto: **no salir a pedir dos veces lo mismo**.
+ * El contador de peticiones de la transicion sirve para descartar respuestas que
+ * llegan tarde; esto sirve para algo distinto: **no salir a pedir dos veces lo
+ * mismo**.
  *
  * El reintento de una carga fallida —que es de esta misma iteracion— abrio la
  * puerta sin querer: se permite volver a pedir el modulo que ya esta puesto cuando
@@ -156,136 +159,65 @@ let peticionVigente = 0;
 let moduloCargando = null;
 
 // ---------------------------------------------------------------------------
-// La transicion de carga (iteracion 35)
+// La transicion de carga (iteracion 35; extraida a su modulo en la 41)
 // ---------------------------------------------------------------------------
 
 /**
- * Lo que dura como minimo la transicion, contado desde el clic (decision 5).
+ * Las dos constantes se vuelven a exportar desde aqui, y no es por comodidad.
  *
- * NO ES UNA ESPERA, ES UN PISO. Solo actua cuando la respuesta llego antes, para
- * que la transicion no se vea como un parpadeo, y **nunca alarga una carga que ya
- * tardo mas que esto**. Se aplica igual a los cuatro finales —modulo dibujado,
- * modulo vacio, error y caida a la instantanea—: una sola regla.
+ * `scripts/probar-filtrado.mjs` las importa de ESTE archivo desde la iteracion 35,
+ * y calcula con ellas los retrasos con que provoca el piso y el texto lento. Si
+ * la extraccion las hubiera dejado solo en el modulo nuevo, esa prueba habria
+ * dejado de compilar —o, peor, alguien habria copiado los numeros a mano y las
+ * mediciones habrian seguido en verde midiendo contra un plazo viejo—.
+ *
+ * Quien las quiera de primera mano las tiene en components/transicion-de-carga.js.
  */
-export const PISO_DE_LA_TRANSICION_MS = 400;
+export {
+  PISO_DE_LA_TRANSICION_MS,
+  PLAZO_DE_CARGA_LENTA_MS,
+} from './transicion-de-carga.js';
 
 /**
- * Cuanto se espera antes de decir que la carga esta tardando mas de lo normal
- * (decision 7).
+ * La frase de la carga, escrita UNA vez.
  *
- * DE DONDE SALE ESTE NUMERO, que es lo unico que lo justifica:
+ * Aparece en dos sitios a la vez —el recuadro de la zona de preguntas y el mensaje
+ * del panel izquierdo— y tienen que decir lo mismo, porque se leen al mismo tiempo.
+ * Estuvieron escritos por separado desde la iteracion 35; aqui se juntan, que es lo
+ * unico que garantiza que no se desfasen.
  *
- *   - Una carga sana en produccion tarda **0,345 a 0,411 s** (decision 1, medido
- *     el 2026-09-16). Esto son mas de **seis veces** eso, asi que un modulo que
- *     llega bien no lo alcanza nunca, ni siquiera desde un telefono con datos
- *     moviles, donde lo que sube es el viaje de ida y no el cuerpo, que sigue
- *     pesando 12 a 17 KB.
- *   - La espera maxima antes de caer a la instantanea son **8 s**
- *     (servicios/datos.js). Esto es menos de un tercio, asi que quedan mas de 5 s
- *     de explicacion antes de que el sitio cambie al respaldo en vez de un
- *     silencio entero.
- *   - Y esta muy por encima del piso de 400 ms, asi que los dos nunca se cruzan:
- *     ninguna carga que termine en el piso alcanza a ver este texto.
- *
- * Se exporta para que los guiones calculen sus retrasos a partir de la MISMA
- * constante. Con un numero copiado a mano, el dia que este cambiara las pruebas
- * seguirian midiendo contra el viejo y pasarian en verde sin probar nada.
+ * En el recuadro el numero llega escapado, porque eso va a `innerHTML` y el
+ * escapado lo hace la transicion; en el panel va por `textContent`, que no
+ * interpreta marcado. El texto resultante es el mismo.
  */
-export const PLAZO_DE_CARGA_LENTA_MS = 2500;
+const TITULO_DE_LA_CARGA = (modulo) => `Cargando el Módulo ${modulo}…`;
 
 /**
- * La carga viva, o null si no hay ninguna.
+ * La transicion de esta pagina, con lo que es suyo y no del mecanismo.
  *
- * **ES UN REGISTRO Y NO CUATRO BANDERAS, Y ESA ES TODA LA DEFENSA CONTRA H-1.**
+ * Los cuatro ajustes son exactamente lo que la iteracion 35 tenia escrito dentro
+ * del mecanismo y la 41 saco afuera: donde se dibuja, que dice, que controles se
+ * apagan mientras dura y como se llaman sus dos nodos.
  *
- * `mostrarModulo()` tiene cuatro salidas —el descarte de la respuesta que llega
- * tarde, el error, el modulo vacio y el final que dibuja—. Con cuatro banderas
- * sueltas eso serian dieciseis sitios donde acordarse de apagar, y basta olvidar
- * uno para que la transicion quede colgada o se apague la del modulo equivocado.
- * Con un registro son dos funciones: `abrirLaCarga()` y `cerrarLaCarga()`.
+ * `#mensaje-cuestionario` es el mismo id que usa `dibujarMensaje()`, y eso es
+ * deliberado desde la iteracion 35: `irAlMensaje()` lleva el foco al recuadro sin
+ * enterarse de cual de los dos lo dibujo.
  *
- * Lleva dentro todo lo que hay que deshacer:
- *
- *   peticion    el numero de `peticionVigente` que lo creo. Es la identidad.
- *   modulo      cual se esta pidiendo.
- *   desde       cuando se pulso. De aqui sale el piso.
- *   avisoLento  el temporizador del texto de la decision 7.
- *
- * **Y lo que decide quien puede apagar es el DATO, no el sitio desde donde se
- * llama.** `cerrarLaCarga()` la llaman las cuatro salidas, la del descarte
- * incluida, y esa no hace nada porque su numero de peticion ya no es el del
- * registro: `abrirLaCarga()` lo reemplazo cuando el estudiante eligio el segundo
- * modulo. Se hizo asi, y no «desde la salida del descarte no se llama», porque una
- * regla que depende de acordarse de NO llamar a algo se rompe la primera vez que
- * alguien agregue una quinta salida.
+ * Los dos controles del panel se desactivan por la decision 6 de la 35. El indice
+ * de modulos no esta en la lista a proposito: elegir otro modulo mientras uno carga
+ * se sigue pudiendo, y es lo que el contador de peticiones resuelve bien.
  */
-let cargaEnCurso = null;
-
-/** Si esta carga sigue siendo la que la pantalla esta esperando. */
-const esLaCargaVigente = (miPeticion) => cargaEnCurso?.peticion === miPeticion;
-
-/** Si hay una carga viva ahora mismo. Lo miran el panel y sus dos controles. */
-const hayCargaEnCurso = () => cargaEnCurso !== null;
-
-/**
- * Levanta el registro de una carga, y con el sus cuatro estados.
- *
- * Es el UNICO sitio que crea un registro. Si habia uno anterior lo cancela antes
- * de reemplazarlo —su temporizador incluido—, de modo que nunca hay dos vivos y
- * ningun temporizador huerfano puede escribir encima de la carga siguiente.
- */
-function abrirLaCarga(numero, miPeticion) {
-  if (cargaEnCurso) window.clearTimeout(cargaEnCurso.avisoLento);
-
-  cargaEnCurso = {
-    peticion: miPeticion,
-    modulo: numero,
-    desde: Date.now(),
-    avisoLento: null,
-  };
-
-  cargaEnCurso.avisoLento = window.setTimeout(
-    () => decirQueEstaTardando(miPeticion),
-    PLAZO_DE_CARGA_LENTA_MS
-  );
-
-  fijarControlesDelPanel(false);
-}
-
-/**
- * Apaga el registro, si es el de quien llama. Devuelve si hizo algo.
- *
- * La guarda de la primera linea es H-1 entero. Ver `cargaEnCurso`.
- */
-function cerrarLaCarga(miPeticion) {
-  if (!esLaCargaVigente(miPeticion)) return false;
-
-  window.clearTimeout(cargaEnCurso.avisoLento);
-  cargaEnCurso = null;
-  fijarControlesDelPanel(true);
-
-  return true;
-}
-
-/**
- * Espera lo que le falte al piso, o nada si ya se cumplio.
- *
- * EL RELOJ ES EL DEL ULTIMO CLIC, y con dos modulos seguidos eso importa. Si se
- * conservara el reloj del primero, el segundo se dibujaria a los 400 ms del clic
- * del PRIMERO —o sea antes de cumplir los suyos— y el piso quedaria por debajo de
- * 400 ms justo para el modulo que el estudiante esta mirando, que es el parpadeo
- * que el piso existe para evitar. Cada `abrirLaCarga()` vuelve a poner el reloj en
- * cero, asi que el techo es siempre 400 ms desde el ultimo clic, se pulse una vez
- * o seis.
- */
-async function esperarElPiso() {
-  if (!cargaEnCurso) return;
-
-  const falta = PISO_DE_LA_TRANSICION_MS - (Date.now() - cargaEnCurso.desde);
-  if (falta <= 0) return;
-
-  await new Promise((listo) => window.setTimeout(listo, falta));
-}
+const transicion = crearTransicionDeCarga({
+  contenedor: '#cuestionario',
+  controles: ['#reiniciar', '#repaso'],
+  idDelMensaje: 'mensaje-cuestionario',
+  idDelAvisoLento: 'carga-lenta',
+  textos: {
+    titulo: TITULO_DE_LA_CARGA,
+    detalle: 'Pidiendo sus preguntas al banco.',
+    lento: 'Está tardando más de lo normal. La página sigue esperando la respuesta.',
+  },
+});
 
 /**
  * El repaso abierto, o null si se esta viendo el modulo completo (iteracion 34).
@@ -347,8 +279,10 @@ function actualizarPanel() {
   // hacer algo que no se puede hacer todavia. Es el mismo defecto que ADR-033 y
   // ADR-032 existen para impedir. No sale de una bandera propia: sale del mismo
   // registro del que sale todo lo demas de la transicion.
-  $('#mensaje-avance').textContent = hayCargaEnCurso()
-    ? `Cargando el Módulo ${cargaEnCurso.modulo}…`
+  const carga = transicion.enCurso();
+
+  $('#mensaje-avance').textContent = carga
+    ? TITULO_DE_LA_CARGA(carga.dato)
     : estado.modulo === null
       ? 'Elige un módulo para comenzar.'
       : respondidas === 0
@@ -879,141 +813,6 @@ function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '', enca
         <p class="mt-2 text-sm text-muted">${esc(detalle)}</p>
         ${pie}
       </div>`;
-}
-
-/**
- * La transicion que acompana la carga de un modulo (iteracion 35, decision 3).
- *
- * Tres piezas y ni una mas: **el logotipo de JavaScript quieto**, **un indicador
- * sin porcentaje** y **el texto que nombra el modulo que viene**.
- *
- * NINGUN NUMERO, Y ESO ES LA DECISION 1. No hay porcentaje, ni cuenta regresiva,
- * ni «faltan N preguntas». La respuesta llega por partes y sin cabecera de largo,
- * asi que el navegador no sabe cuanto pesa hasta que termina; dibujar una barra
- * que avanza igual seria inventar un numero, y este proyecto no muestra numeros
- * que no salgan de un dato —«ningun numero es mejor que un numero falso», de la
- * iteracion 24, y «sin numero hasta que sea cierto», de la 31—.
- *
- * SE REUSA EL MISMO CONTRATO QUE `dibujarMensaje()`: el `id` y el `tabindex="-1"`
- * son los mismos, de modo que `irAlMensaje()` sigue funcionando sin enterarse y el
- * foco aparcado de la iteracion 32 no cambia de sitio.
- *
- * EL LOGOTIPO NO SE ANIMA. La tarea original lo pedia encima de una barra; la
- * decision 3 lo deja quieto. Va con `alt` vacio porque es decorativo: lo que hay
- * que leer es el texto de al lado, y un lector de pantalla que anunciara
- * «logotipo de JavaScript» antes de «Cargando el Módulo 3» pondria el adorno
- * delante del dato.
- *
- * EL RECUADRO DEL TEXTO LENTO SE DIBUJA VACIO Y OCULTO, y no se inserta despues.
- * Son dos cosas distintas y las dos importan: una region viva tiene que EXISTIR
- * antes de que su contenido cambie para que el lector de pantalla la anuncie —es
- * lo mismo que hacen `#aviso-respaldo` y `#aviso-almacenamiento` en el HTML—, y
- * tenerlo ya puesto es lo que permite que el texto lento entre **sin reescribir el
- * contenedor**, que es lo que destruiria el nodo con el foco.
- */
-function dibujarTransicion(contenedor, numero) {
-  // Con movimiento reducido no se declara la animacion, en vez de declararla y
-  // confiar en que alguien la apague. La regla de src/input.css la apagaria igual
-  // —recorta la duracion a 0,01 ms—, y se deja puesta: son dos mitades del mismo
-  // trato, y esta es la unica que se puede comprobar sin un navegador (decision 8).
-  const latido = prefersReducedMotion() ? '' : ' animate-latido';
-
-  // Los tres puntos salen desfasados para que se lean como una secuencia y no como
-  // un parpadeo unico. El desfase va en el atributo `style` y no en una clase
-  // porque son tres valores de uso unico: inventar tres utilidades para esto
-  // dejaria tres reglas en el CSS que no vuelve a usar nadie.
-  const punto = (retraso) => `
-            <span class="w-2 h-2 rounded-full bg-jsyellow${latido}" style="animation-delay:${retraso}ms"></span>`;
-
-  contenedor.innerHTML = `
-      <div id="mensaje-cuestionario" tabindex="-1" class="bg-panel border border-panel3 rounded-xl p-8 text-center focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
-        <img src="static/resources/js-logo.svg" alt="" class="w-12 h-12 mx-auto rounded-lg">
-        <p class="mt-4 font-display font-bold text-paper">Cargando el Módulo ${esc(numero)}…</p>
-        <p class="mt-2 text-sm text-muted">Pidiendo sus preguntas al banco.</p>
-        <span class="mt-5 flex items-center justify-center gap-2" aria-hidden="true">${punto(0)}${punto(200)}${punto(400)}
-        </span>
-        <div id="carga-lenta" class="hidden mt-5 text-sm text-paper" role="status" aria-live="polite"></div>
-      </div>`;
-}
-
-/**
- * Dice que la carga esta tardando mas de lo normal (decision 7).
- *
- * SIN NUMEROS, SIN CUENTA REGRESIVA Y SIN PROMETER CUANTO FALTA. Lo unico que se
- * sabe es que ya paso mas tiempo del que tarda una carga sana; cuanto queda no lo
- * sabe nadie, y decirlo seria el mismo numero inventado que la decision 1 descarto.
- *
- * TRES COSAS DEL COMO, Y LAS TRES SON PARTE DE LA DECISION:
- *
- * **1 · Vuelve a comprobar la identidad antes de escribir.** Es la tercera puerta
- * hacia el estado vivo, ademas de las cuatro salidas de `mostrarModulo()`: un
- * temporizador armado para una carga que ya se abandono escribiria encima de la
- * carga siguiente. `abrirLaCarga()` ya lo cancela al reemplazar el registro; esta
- * guarda es el cinturon del tirante, y es la que el rojo secundario rompe.
- *
- * **2 · No reescribe el contenedor.** Escribe dentro de `#carga-lenta`, que ya
- * existe vacio desde `dibujarTransicion()`. Reescribir `#cuestionario` destruiria
- * `#mensaje-cuestionario`, que es el nodo que tiene el foco: quien navega con
- * teclado lo perderia a mitad de la espera, y el lector de pantalla volveria a
- * anunciar la carga entera. Por eso tambien **no se toca el foco aqui**: el
- * estudiante sigue donde estaba.
- *
- * **3 · Es su propia region viva, y no anuncia la carga otra vez.** `role="status"`
- * sobre un nodo que solo contiene esta frase hace que el lector lea la frase nueva
- * —que es informacion que antes no existia— y nada mas. El mensaje «Cargando el
- * Módulo N…» no se repite, porque ese nodo no se toca.
- */
-function decirQueEstaTardando(miPeticion) {
-  if (!esLaCargaVigente(miPeticion)) return;
-
-  const aviso = $('#carga-lenta');
-  if (!aviso) return;
-
-  aviso.innerHTML = `
-          <span class="inline-flex items-start gap-2 text-left">${icon('history-edu', 'text-base text-jsyellow shrink-0 mt-0.5')}<span>Está tardando más de lo normal. La página sigue esperando la respuesta.</span></span>`;
-
-  aviso.classList.remove('hidden');
-}
-
-/**
- * Deja disponibles o no disponibles los dos controles del panel (decision 6).
- *
- * POR QUE SE DESACTIVAN, que son dos defectos reales y no una precaucion:
- *
- *   - «Reiniciar el módulo» durante la carga **no hacia nada**, sin avisar: sale
- *     por `if (!bancoCargado) return`, y durante la carga eso es cierto. Un control
- *     que se pulsa y no produce nada es el mismo «boton que miente» con el que
- *     ADR-034 justifico que reiniciar borre tambien lo guardado.
- *   - «Repasar mis errores (N)» durante la carga **borraba el «Cargando…»** y ponia
- *     «Elige un módulo en el índice…» justo despues de que el estudiante eligiera
- *     uno, y ese mensaje se quedaba encima del modulo al llegar.
- *
- * SE DESACTIVAN POR LOS DOS LADOS, y no es redundante:
- *
- *   - `disabled` es la mitad que ve y oye el estudiante. Es el atributo nativo, asi
- *     que el navegador lo anuncia como no disponible y lo saca del tabulador sin
- *     que haya que programar nada. No se le agrega `aria-disabled`: sobre un boton
- *     realmente deshabilitado es repetir lo que el navegador ya dice.
- *   - La guarda dentro del oyente es la mitad que se puede provocar desde un guion.
- *     `dom.disparar()` del DOM falso ejecuta los oyentes AUNQUE el nodo este
- *     `disabled`, porque no es un navegador: sin la guarda, «pulsarlos no cambia
- *     nada» no se podria comprobar sin creerselo.
- *
- * El indice NO se toca: elegir otro modulo mientras uno carga se sigue pudiendo, y
- * es justamente lo que `peticionVigente` existe para resolver bien.
- */
-function fijarControlesDelPanel(disponibles) {
-  for (const selector of ['#reiniciar', '#repaso']) {
-    const boton = $(selector);
-    if (!boton) continue;
-
-    boton.disabled = !disponibles;
-
-    // El atenuado va por clase y no por color nuevo: la paleta esta cerrada
-    // (iteracion 36) y `opacity` no agrega ningun tono, solo baja el que ya hay.
-    if (disponibles) boton.classList.remove('opacity-50', 'cursor-not-allowed');
-    else boton.classList.add('opacity-50', 'cursor-not-allowed');
-  }
 }
 
 /**
@@ -1636,14 +1435,15 @@ export async function mostrarModulo(numero) {
   const contenedor = $('#cuestionario');
   if (!contenedor) return;
 
-  const miPeticion = (peticionVigente += 1);
-  moduloCargando = numero;
-
   // El registro de la transicion se levanta ANTES de todo lo demas, y con el se
   // estampa el reloj del piso: la decision 5 lo cuenta desde el clic, y esta linea
-  // corre en el mismo turno que el clic del indice. Tambien desactiva los dos
-  // controles del panel y arma el temporizador del texto lento.
-  abrirLaCarga(numero, miPeticion);
+  // corre en el mismo turno que el clic del indice. Tambien toma el numero de esta
+  // peticion, desactiva los dos controles del panel y arma el temporizador del
+  // texto lento. Desde la iteracion 41 el numero y el registro salen del mismo
+  // acto: no hay forma de pedir uno sin el otro.
+  const miPeticion = transicion.abrir(numero);
+
+  moduloCargando = numero;
 
   // Elegir un modulo deja obsoleto el mensaje del repaso: hablaba del modulo anterior.
   olvidarElAvisoDelRepaso();
@@ -1669,7 +1469,7 @@ export async function mostrarModulo(numero) {
   // texto seco. Es UNA sola escritura del contenedor durante toda la espera: el
   // texto lento que pueda venir despues entra en su propio nodo, sin reescribir
   // esto, para no destruir el nodo que en dos lineas mas va a tener el foco.
-  dibujarTransicion(contenedor, numero);
+  transicion.dibujar(numero);
 
   // El indice marca el modulo pedido YA, antes de saber si va a llegar.
   //
@@ -1694,25 +1494,26 @@ export async function mostrarModulo(numero) {
   // pantalla esta esperando y dibujarla la dejaria mintiendo. Se sale SIN bajar la
   // bandera: la carga que sigue viva es la otra, y es suya.
   //
-  // `cerrarLaCarga()` se llama igual, y **no hace nada**, porque el registro ya no
+  // `transicion.cerrar()` se llama igual, y **no hace nada**, porque el registro ya no
   // es de esta peticion. Se llama a proposito: lo que impide que una respuesta
   // vieja apague la transicion del modulo vigente es la guarda por identidad, no
-  // el que alguien se acuerde de no llamar aqui. Ver `cargaEnCurso`.
-  if (miPeticion !== peticionVigente) {
-    cerrarLaCarga(miPeticion);
+  // el que alguien se acuerde de no llamar aqui. Ver `cargaEnCurso` en
+  // components/transicion-de-carga.js.
+  if (!transicion.esLaUltima(miPeticion)) {
+    transicion.cerrar(miPeticion);
     return;
   }
 
   // EL PISO, EN UN SOLO SITIO Y PARA LOS CUATRO FINALES (decision 5). Va aqui
   // arriba, antes de repartirse en modulo dibujado, vacio o error, porque «una
   // sola regla» no se puede cumplir escribiendola tres veces.
-  await esperarElPiso();
+  await transicion.esperarElPiso();
 
   // Y hay que volver a preguntar, porque el piso es un `await`: durante esos
   // 400 ms el estudiante pudo elegir otro modulo. Sin esta segunda comprobacion,
   // una carga ya descartada seguiria adelante y dibujaria encima de la vigente.
-  if (miPeticion !== peticionVigente) {
-    cerrarLaCarga(miPeticion);
+  if (!transicion.esLaUltima(miPeticion)) {
+    transicion.cerrar(miPeticion);
     return;
   }
 
@@ -1725,7 +1526,7 @@ export async function mostrarModulo(numero) {
   // controles del panel vuelven a estar disponibles. El dibujo de la transicion no
   // hace falta borrarlo, porque los tres finales de mas abajo reescriben el
   // contenedor entero: por construccion no puede quedar colgado.
-  cerrarLaCarga(miPeticion);
+  transicion.cerrar(miPeticion);
 
   // Antes de dibujar nada: si esto viene del respaldo, que se vea. Va primero
   // para que el aviso aparezca tambien cuando el modulo venga vacio y la pagina
@@ -1875,8 +1676,9 @@ export function setupReinicio() {
   boton.addEventListener('click', () => {
     // Mientras un modulo carga, este control esta desactivado (decision 6 de la
     // iteracion 35). La guarda va ademas del `disabled`, y no en su lugar: es la
-    // mitad que un guion puede provocar. Ver `fijarControlesDelPanel()`.
-    if (hayCargaEnCurso()) return;
+    // mitad que un guion puede provocar. Ver `fijarControles()` en
+    // components/transicion-de-carga.js.
+    if (transicion.enCurso()) return;
 
     // Sin modulo cargado no hay nada que reiniciar, y volver a dibujar el estado
     // vacio encima de si mismo solo desplazaria la pagina sin motivo.
@@ -1922,7 +1724,7 @@ export function setupRepaso() {
     // pulsado durante la carga borraba el «Cargando…», ponia «Elige un módulo en
     // el índice…» recien elegido uno, y dejaba ese mensaje encima del modulo al
     // llegar. Ahora no llega a correr.
-    if (hayCargaEnCurso()) return;
+    if (transicion.enCurso()) return;
 
     if (repaso) salirDelRepaso();
     else entrarAlRepaso();

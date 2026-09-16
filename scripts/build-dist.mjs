@@ -56,18 +56,19 @@ if (declarado !== null && declarado !== DESTINO) {
  * dentro se queda fuera del sitio.
  *
  * static/resources/ viaja entero aunque los SVG sean material de origen del
- * generador de iconos: index.html y cuestionario.html enlazan js-logo.svg y
+ * generador de iconos: las tres paginas enlazan js-logo.svg y
  * notebooklm-gemini-icon.svg directamente. Filtrarlos por nombre romperia el sitio
  * en silencio el dia que alguien enlace un tercero.
  */
 const LISTA_COPIA = [
   'index.html',
   'cuestionario.html',
+  'simulacro.html',
   'static',
 ];
 
 /** Paginas cuyos enlaces locales se comprueban al terminar. */
-const PAGINAS = ['index.html', 'cuestionario.html'];
+const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html'];
 
 // ---------------------------------------------------------------------------
 // Copia

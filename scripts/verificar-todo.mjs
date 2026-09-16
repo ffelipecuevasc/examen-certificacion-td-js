@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los seis comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los siete comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -31,8 +31,9 @@
  *   2. verificar.mjs              el CSS versionado corresponde a su fuente
  *   3. comprobar-instantanea.mjs  la instantanea dice lo mismo que el respaldo
  *   4. comprobar-cifra.mjs        la portada publica la cifra del banco
- *   5. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
- *   6. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
+ *   5. comprobar-copias.mjs       las tres paginas dicen lo mismo en encabezado y pie
+ *   6. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
+ *   7. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
  * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
@@ -49,8 +50,15 @@
  * portada publicaba «21 preguntas de practica» con 368 en el banco, y sobrevivio
  * al llenado entero porque ninguna comprobacion tenia el deber de mirarla.
  *
+ * La quinta entro con la iteracion 41, y por el mismo motivo: al aparecer la tercera
+ * pagina, el encabezado y el pie pasaron a estar escritos tres veces a mano, y nada
+ * obligaba a que las tres dijeran lo mismo. Corre aqui —y no aparte— porque es una
+ * comprobacion barata, sobre archivos del repositorio, que no necesita ni el
+ * servidor local ni la base D1: exactamente el perfil de las tres que la preceden.
+ * Una comprobacion que hay que acordarse de correr no vigila nada.
+ *
  * Codigos de salida:
- *   0  VERIFICADO             las seis comprobaciones hechas y en verde
+ *   0  VERIFICADO             las siete comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -71,7 +79,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los seis comprobadores, con la traduccion de sus codigos.
+ * Los siete comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -116,6 +124,15 @@ const COMPROBADORES = [
       0: [OK, 'la portada publica la cifra que trae la instantanea'],
       1: [FALLO, 'CIFRA FALSA: index.html anuncia un numero de preguntas que no es el del banco'],
       2: [AVISO, 'no se pudo comparar: la instantanea o la portada no se dejan leer'],
+    },
+  },
+  {
+    nombre: 'copias',
+    guion: 'comprobar-copias.mjs',
+    codigos: {
+      0: [OK, 'las tres paginas dicen lo mismo en su encabezado, su pie y su favicon'],
+      1: [FALLO, 'COPIAS DISTINTAS: una pagina se desfaso del encabezado o del pie de las otras'],
+      2: [AVISO, 'no se pudo comparar: falta una pagina o no trae alguno de los tres bloques'],
     },
   },
   {
