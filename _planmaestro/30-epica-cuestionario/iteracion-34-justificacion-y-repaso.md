@@ -1,7 +1,7 @@
 # Iteración 34 · Justificación y repaso
 
 **Épica:** 30 · Cuestionario
-**Estado:** ⚪ No iniciada
+**Estado:** 🔵 En curso · lectura de alcance hecha, decisiones 1 a 10 resueltas
 **Depende de:** iteraciones 33 y 36 cerradas. El repaso lee el avance guardado de la
 33, y la justificación se dibuja sobre la paleta que dejó la 36.
 
@@ -25,6 +25,13 @@ redacción no lo va a descubrir ninguna comprobación antes que ellos.
   criterios que pedían provocar cambios con `banco:actualizar` y en la base local, algo
   que la 33 prohibió porque sobrescribe la instantánea versionada, y se agregó lo que
   heredan de la 33 y la 36.
+- **2026-09-16 · lectura de alcance y decisiones 7 a 10.** La lectura de alcance de
+  Claude Code confirmó que hoy una pregunta respondida queda bloqueada, y encontró que
+  el código no conserva lo respondido en la visita fuera del almacén ni del DOM. El
+  autor resolvió las decisiones 7 a 10. Se corrigieron: «Repasar la materia» es un
+  enlace y no un botón; la regla sobre la base, que prohibía sin querer la fila de
+  prueba temporal de `probar-escapado.mjs`; la convivencia del repaso con ADR-033; y el
+  criterio del escapado, que podía pasar sin dibujar ninguna justificación.
 
 ## Lo que hereda
 
@@ -34,8 +41,8 @@ redacción no lo va a descubrir ninguna comprobación antes que ellos.
   de la alternativa elegida. **Nunca el veredicto**, que se recalcula contra el banco
   vigente (ADR-034, formato `v: 1`).
 - **Los cambios del banco se provocan interceptando la respuesta del extremo**, nunca
-  con `banco:actualizar` ni escribiendo en la base: ese comando regenera la instantánea
-  versionada.
+  con `banco:actualizar`, `banco:insertar`, `datos:instantanea` ni nada que regenere
+  `static/js/data/instantanea-banco.js`.
 - La puerta única `pedirCambioDeModulo()`, el foco a la cabecera al cargar un módulo, y
   «Reiniciar el módulo» borrando lo guardado de ese módulo.
 
@@ -46,8 +53,10 @@ redacción no lo va a descubrir ninguna comprobación antes que ellos.
   un recuadro, no con un gris distinto.
 - **`cuestionario.js` cambió** en el estado vacío y en el veredicto.
 
-**Del panel actual:** ya existe un botón **«Repasar la materia»**. El modo de esta
-iteración no puede llamarse igual (decisión 5).
+**Del panel actual:** en la fila de «Reiniciar el módulo» ya existe el **enlace**
+«Repasar la materia», que lleva a la guía de estudio (`index.html#modulos`) y se ve casi
+igual que un botón. El modo de esta iteración no puede llamarse igual (decisión 5), y el
+control nuevo no debe confundirse con un enlace que saca de la página.
 
 ## Decisiones tomadas
 
@@ -83,7 +92,7 @@ migración y enmienda de ADR-034.
 - **En el repaso, cada pregunta fallada aparece sin marcar**, para poder intentarla de
   nuevo.
 - **Si vuelve a fallarla**, la respuesta nueva también reemplaza a la anterior, y la
-  pregunta sigue en el repaso.
+  pregunta sigue en el repaso (ver decisión 9).
 - **Una pregunta acertada en el repaso sigue a la vista, con su justificación, hasta que
   el estudiante sale del repaso.** Si desapareciera al instante, el contenido saltaría
   bajo el dedo en el teléfono.
@@ -94,21 +103,29 @@ migración y enmienda de ADR-034.
 Decidido por el autor el 2026-09-16. **Las barras no cambian de significado según el
 modo**: son lo más estable de la página, y la 31 ya corrigió una vez rótulos que decían
 una cosa y medían otra. El repaso muestra **su propio contador**, del tipo «Te quedan N
-preguntas falladas por repasar», que se actualiza al acertar.
+preguntas falladas por repasar», que se actualiza al acertar. Dónde se muestra lo fija
+la decisión 8.
+
+**Convivencia con ADR-033.** «Lo dibujado manda» describe el módulo completo. **Con el
+repaso abierto, el índice y las barras cuentan sobre el módulo completo, no sobre las
+preguntas dibujadas**, y el aviso de descuadre (`avisarSiElResumenNoCuadra()`) compara
+contra el módulo completo: entrar o salir del repaso no debe dispararlo.
 
 ### 5 · Cómo se entra y se sale del repaso
 
 Decidido por el autor el 2026-09-16.
 
 - **Entrar:** un botón junto a «Reiniciar el módulo» que dice **«Repasar mis errores
-  (N)»**, con la cantidad de falladas a la vista. El nombre lo distingue de «Repasar la
-  materia».
+  (N)»**, con la cantidad de falladas a la vista. El nombre lo distingue del enlace
+  «Repasar la materia».
 - **Con N en 0, el botón sigue visible**, y al pulsarlo muestra un mensaje útil: si no hay
   respuestas en el módulo, invita a empezar respondiendo; si todas están acertadas, dice
   que no hay errores que repasar.
-- **Salir:** un botón «Volver al módulo completo».
+- **Salir:** un botón «Volver al módulo completo», en el lugar del botón de entrada
+  (decisión 10).
 - **Elegir otro módulo en el índice a mitad del repaso** sale del repaso y cambia de
-  módulo, sin preguntar. Con la memoria de la 33 no se pierde nada.
+  módulo, sin preguntar. Con la memoria de la 33 y la de la visita (decisión 7) no se
+  pierde nada.
 - **«Reiniciar el módulo» a mitad del repaso** sale del repaso y reinicia.
 
 ### 6 · Las preguntas restauradas ofrecen «Ver por qué»
@@ -119,17 +136,56 @@ control «Ver por qué»** que la despliega solo si el estudiante lo pide. Así 
 se alarga con 50 justificaciones en el teléfono, y ninguna explicación queda fuera de
 alcance.
 
+### 7 · Memoria de la visita
+
+Decidido por el autor el 2026-09-16, a partir de la lectura de alcance: hoy lo
+respondido solo vive en el almacén del navegador y en el DOM, y cualquier repintado
+—entrar o salir del repaso lo es— reconstruye desde el almacén.
+
+- **Además de lo guardado en el navegador, la página mantiene en memoria lo respondido
+  durante la visita.** El formato `v: 1` no cambia y ADR-034 no se enmienda.
+- **Visita** = desde que se carga la página hasta que se recarga o se cierra. Cambiar de
+  módulo no cierra la visita.
+- Esta memoria es la fuente para: **el repaso sin almacenamiento**, **N exacto sin
+  almacenamiento**, y **distinguir «respondida en la visita» de «restaurada»**
+  (decisión 6), también después de cualquier repintado.
+- **«Reiniciar el módulo» borra también la memoria de la visita de ese módulo.**
+
+### 8 · Un solo contador arriba durante el repaso
+
+Decidido por el autor el 2026-09-16. El contador de preguntas de arriba cuenta lo
+dibujado; en el repaso habría dicho «6 preguntas» con las barras en 61. **Mientras dura
+el repaso, el contador del repaso reemplaza al contador del módulo en su mismo lugar.**
+Queda un solo contador visible. Al salir, vuelve el contador del módulo con su cifra
+completa.
+
+### 9 · Fallar otra vez dentro del repaso
+
+Decidido por el autor el 2026-09-16. **La pregunta queda bloqueada, con su
+justificación, y sigue a la vista hasta salir del repaso.** N no baja. Al volver a entrar
+al repaso aparece de nuevo sin marcar. No existe un control «Intentar de nuevo».
+
+### 10 · Durante el repaso, «Volver al módulo completo» ocupa el lugar del botón de entrada
+
+Decidido por el autor el 2026-09-16. **Mientras dura el repaso, «Repasar mis errores
+(N)» no se muestra, y en su lugar aparece «Volver al módulo completo».** La fila nunca
+pasa de tres controles (con «Reiniciar el módulo» y el enlace «Repasar la materia»).
+Reintentar una fallada cuesta salir y volver a entrar.
+
 ## Lo que queda a criterio de quien implemente
 
-El diseño visual de la justificación (con las condiciones heredadas de la 36), dónde
-exactamente se ubica el contador del repaso, cómo se anuncia la justificación a un lector
-de pantalla, y el mecanismo de intercepción en los guiones. El texto de los botones y del
-control «Ver por qué» es el de las decisiones 5 y 6.
+El diseño visual de la justificación (con las condiciones heredadas de la 36), el texto
+del contador del repaso cuando llega a cero con preguntas aún a la vista, cómo se anuncia
+la justificación a un lector de pantalla, y el mecanismo de intercepción en los guiones.
+El texto de los botones y del control «Ver por qué» es el de las decisiones 5, 6 y 10.
 
 ## Tareas
 
 - [x] Resolver con el autor las cuatro decisiones abiertas y anotarlas en este archivo.
   Hecho el 2026-09-16 (decisiones 3 a 6).
+- [x] Lectura de alcance y resolución de sus huecos. Hecho el 2026-09-16 (decisiones 7
+  a 10).
+- [ ] Mantener la memoria de la visita (decisión 7).
 - [ ] Mostrar la justificación al responder, y «Ver por qué» en las preguntas restauradas.
 - [ ] Implementar el modo repaso del módulo con sus botones, su contador y sus mensajes.
 - [ ] Hacer que acertar en el repaso reemplace lo guardado sin cambiar el formato.
@@ -137,12 +193,15 @@ control «Ver por qué» es el de las decisiones 5 y 6.
   «Ver por qué».
 - [ ] Hacer que la justificación se pueda alcanzar y leer con teclado y lector de
   pantalla.
+- [ ] Hacer que `probar:escapado` dibuje justificaciones con contenido hostil.
 
 ## Criterios de aceptación
 
 Cada uno se cierra con evidencia producida **provocando** el comportamiento. **Ningún
-criterio se provoca con `banco:actualizar` ni escribiendo en la base**: los cambios del
-banco se simulan interceptando la respuesta del extremo, como en la 33.
+criterio se provoca con `banco:actualizar`, `banco:insertar`, `datos:instantanea` ni
+nada que regenere `static/js/data/instantanea-banco.js`**: los cambios del banco se
+simulan interceptando la respuesta del extremo, como en la 33. La fila de prueba
+temporal que `probar-escapado.mjs` carga y retira en la base local sí está permitida.
 
 ### Los provoca Claude Code
 
@@ -155,10 +214,22 @@ banco se simulan interceptando la respuesta del extremo, como en la 33.
 - [ ] **Si una pregunta llegara sin justificación, no aparece un hueco vacío** ni un
   «Ver por qué» que no despliega nada. Provocado interceptando la respuesta.
 - [ ] **El escapado cubre la justificación dibujada**, desplegada y tras «Ver por qué»:
-  `npm run probar:escapado` a escala, con contenido hostil en la justificación.
+  `npm run probar:escapado` a escala, con contenido hostil en la justificación de la
+  fila de prueba y la justificación sumada a los textos revisados. **El guion dibuja
+  justificaciones de verdad** (respondiendo o sembrando el almacén), y la guarda «todas
+  o ninguna» no puede pasar con cero justificaciones dibujadas.
 - [ ] **Ningún texto de la justificación usa un gris que dependa de la diferencia entre
   `mutedink` y `muted`**, y todo su texto alcanza al menos 4,5:1 sobre su fondo:
   tabla con elemento, color, fondo y razón.
+
+**Memoria de la visita**
+
+- [ ] **Tras salir del repaso, las preguntas acertadas dentro de él muestran la
+  justificación desplegada**, y tras recargar la página esas mismas muestran «Ver por
+  qué».
+- [ ] **Cambiar de módulo y volver no cierra la visita:** lo respondido antes del cambio
+  sigue mostrando la justificación desplegada.
+- [ ] **«Reiniciar el módulo» deja N en 0 también sin almacenamiento.**
 
 **Repaso**
 
@@ -172,14 +243,21 @@ banco se simulan interceptando la respuesta del extremo, como en la 33.
   alternativa nueva, sin veredicto, con el mismo formato `v: 1`.
 - [ ] **Una acertada sigue a la vista hasta salir del repaso**, y al volver a entrar ya no
   está.
-- [ ] **Volver a fallar deja la pregunta en el repaso** con la respuesta nueva guardada.
-- [ ] **Durante el repaso, las barras miden el módulo completo** y el contador mide el
-  repaso: provocado acertando una fallada y leyendo las dos cifras.
+- [ ] **Volver a fallar deja la pregunta bloqueada en el repaso** con la respuesta nueva
+  guardada, N no baja, y al volver a entrar aparece sin marcar.
+- [ ] **Durante el repaso, las barras miden el módulo completo** y el contador de arriba
+  mide el repaso: provocado acertando una fallada y leyendo las dos cifras.
+- [ ] **Durante el repaso hay un solo contador arriba**, y al salir vuelve el del módulo
+  con su cifra completa.
+- [ ] **Durante el repaso no se muestra «Repasar mis errores (N)»** y en su lugar está
+  «Volver al módulo completo»; la fila tiene como máximo tres controles.
+- [ ] **Entrar y salir del repaso no produce el aviso de descuadre** del resumen.
 - [ ] **Elegir otro módulo en el índice o reiniciar a mitad del repaso sale del repaso**,
   sin aviso y sin perder nada.
 - [ ] **El repaso funciona en modo degradado**, desde la instantánea y con el aviso de
   ADR-008 a la vista.
-- [ ] **El repaso funciona sin almacenamiento**, con lo respondido en la visita.
+- [ ] **El repaso funciona sin almacenamiento**, desde la memoria de la visita, con N
+  exacto.
 
 **Verificación**
 
@@ -192,7 +270,7 @@ banco se simulan interceptando la respuesta del extremo, como en la 33.
 - [ ] **La justificación se lee bien en teléfono** con un módulo grande cargado, y se
   distingue del enunciado y las alternativas.
 - [ ] **«Ver por qué» se entiende** en una pregunta restaurada, sin explicación previa.
-- [ ] **«Repasar mis errores (N)» no se confunde con «Repasar la materia».**
+- [ ] **«Repasar mis errores (N)» no se confunde con el enlace «Repasar la materia».**
 - [ ] **El repaso de principio a fin:** entrar, acertar una, fallar otra, ver que la
   acertada sigue a la vista, salir y volver a entrar.
 - [ ] **Con teclado**, se responde, se llega a la justificación, se abre «Ver por qué», se
@@ -210,6 +288,8 @@ banco se simulan interceptando la respuesta del extremo, como en la 33.
 - **Que se conserve la historia de los intentos.** Acertar en el repaso reemplaza el
   primer intento (decisión 3).
 - Que exista un repaso de todos los módulos a la vez: queda descartado (decisión 1).
+- **Que lo respondido sin almacenamiento sobreviva a una recarga.** La memoria de la
+  visita termina con ella (decisión 7).
 
 ## Notas de la iteración
 
