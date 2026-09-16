@@ -525,8 +525,14 @@ function mostrarEstadoVacio(contenedor) {
     'quiz',
     'Elige un módulo para empezar.',
     'En el panel está el índice con los siete módulos del examen. Cuando elijas uno, sus preguntas aparecen acá.',
+    // El enfasis de «solo en este dispositivo» ya no se apoya en el salto de
+    // `mutedink` a `muted` (decision 5 bis de la iteracion 36). Con `mutedink`
+    // corregido a #8E8C7A los dos grises quedaron a 1,19:1 entre si, y esa
+    // diferencia dejo de verse: era el unico enfasis del sitio que dependia solo
+    // de ella. Pasa a peso de letra y color principal, que ademas funciona sin
+    // color, igual que las barras de la iteracion 32.
     `<p class="mt-4 text-sm text-mutedink max-w-prose mx-auto">
-         Tu avance se guarda <strong class="text-muted">solo en este dispositivo</strong>: no se envía a ningún servidor y no hace falta crear ninguna cuenta. Por lo mismo, no lo vas a encontrar en otro equipo ni si borras los datos del navegador.
+         Tu avance se guarda <strong class="font-semibold text-paper">solo en este dispositivo</strong>: no se envía a ningún servidor y no hace falta crear ninguna cuenta. Por lo mismo, no lo vas a encontrar en otro equipo ni si borras los datos del navegador.
        </p>
        <a href="#indice-modulos" data-ir-al-indice
           class="mt-5 inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">

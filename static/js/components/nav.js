@@ -27,7 +27,7 @@ export function setupMobileMenu() {
 /** Resalta en el menu la seccion que la persona esta leyendo. */
 export function setupScrollSpy() {
   const links = $$('.nav-link');
-  const sections = ['mapa', 'modulos', 'repaso', 'consejos']
+  const sections = ['inicio', 'mapa', 'modulos', 'repaso', 'consejos']
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
@@ -68,6 +68,36 @@ export function animateCounters() {
       if (current >= target) clearInterval(timer);
     }, 45);
   });
+}
+
+/**
+ * El logotipo del hero saluda UNA VEZ, poco despues de cargar.
+ *
+ * Decision 6 de la iteracion 36. El motivo de que sea una sola vez es el mismo por
+ * el que se descarto repetirlo cada cierto tiempo: un movimiento que vuelve compite
+ * con el texto que el estudiante esta tratando de leer. Y el motivo de que no sea
+ * al pasar el raton es que el logotipo no es un enlace ni un boton, asi que casi
+ * nadie lo haria a proposito y el efecto quedaria escondido.
+ *
+ * EL RETRASO NO ES UN NUMERO AL AZAR. Sin el, el efecto ocurre mientras la pagina
+ * todavia se esta pintando y la vista de la persona aun no llega al logotipo: se
+ * gasta el movimiento en un momento en que nadie lo mira. 700 ms alcanzan para que
+ * el hero este quieto y la mirada haya aterrizado.
+ *
+ * LA CLASE SE AGREGA, NO SE QUITA. `animate-tada` declara una sola iteracion, asi
+ * que la animacion corre una vez y se queda inerte. No hace falta limpiarla, y
+ * dejarla puesta ademas documenta en el DOM que esto ya ocurrio.
+ *
+ * Con `prefers-reduced-motion` no se apaga aqui: lo apaga la regla de
+ * src/input.css, que recorta la duracion de cualquier animacion a 0,01 ms. El
+ * efecto empieza y termina en `scale3d(1, 1, 1)`, de modo que recortarlo equivale
+ * a no haberlo corrido: no deja el logotipo torcido ni de otro tamano.
+ */
+export function animarLogotipo() {
+  const logo = $('#logo-hero');
+  if (!logo) return;
+
+  window.setTimeout(() => logo.classList.add('animate-tada'), 700);
 }
 
 /** Escribe el ano actual en el pie de pagina. */

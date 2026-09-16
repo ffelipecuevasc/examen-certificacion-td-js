@@ -68,6 +68,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { abrirRegistro } from './registro-de-salida.mjs';
 
+import { escribirCifraEnPortada } from './cifra-portada.mjs';
+
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WRANGLER = join(RAIZ, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
 const CONFIGURACION = join(RAIZ, 'wrangler.toml');
@@ -538,6 +540,29 @@ try {
   noSePublico(`Fallo al instalar los archivos: ${error.message}`, [
     'Mira el estado de las huellas de abajo: si una cambio y la otra no, quedaron',
     'desparejas y hay que arreglarlo a mano antes de commitear.',
+  ]);
+}
+
+/**
+ * La cifra de la portada viaja con la instantanea (decision 4 bis, iteracion 36).
+ *
+ * Va DESPUES de instalar los dos archivos y no antes: si la instalacion falla, la
+ * portada no puede quedar anunciando un banco que no se publico. Y va aqui dentro,
+ * en el paso unico de ADR-023, por el mismo motivo por el que la instantanea se
+ * regenera aqui y no aparte: lo que hay que acordarse de hacer despues no se hace.
+ *
+ * La portada decia 21 con 368 preguntas en el banco. Duro porque nadie la
+ * reescribia y nadie la miraba; ahora la reescribe esto, y la mira
+ * scripts/comprobar-cifra.mjs dentro de `npm run verificar`.
+ */
+const cifraPortada = escribirCifraEnPortada(activasEnInstantanea);
+
+if (!cifraPortada.ok) {
+  noSePublico(`Los dos archivos quedaron instalados, pero la portada no: ${cifraPortada.motivo}`, [
+    'El banco se publico bien. Lo que falta es la cifra de index.html, que hay que',
+    'reponer antes de commitear:',
+    '',
+    '  npm run datos:cifra',
   ]);
 }
 

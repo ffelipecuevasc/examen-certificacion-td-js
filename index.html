@@ -29,7 +29,13 @@
       <span class="font-display font-bold text-sm sm:text-base tracking-tight">Certificación FullStack JS</span>
     </a>
 
+    <!-- «Inicio» se suma al enlace del logotipo, no lo reemplaza (iteracion 36).
+         No contradice ADR-032, que quito el <select> del cuestionario: alla habia
+         dos controles VISIBLES y equivalentes a tres centimetros; aca el enlace del
+         logotipo no se reconoce como enlace para este publico, asi que habia uno
+         escondido. Esta es la forma visible. -->
     <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
+      <a href="#inicio" class="nav-link hover:text-paper transition-colors">Inicio</a>
       <a href="#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
       <a href="#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
       <a href="cuestionario.html" class="nav-link hover:text-paper transition-colors">Cuestionario</a>
@@ -44,6 +50,7 @@
   </div>
 
   <nav id="mobile-menu" aria-label="Navegación móvil" class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
+    <a href="#inicio" class="mobile-link">Inicio</a>
     <a href="#mapa" class="mobile-link">Mapa</a>
     <a href="#modulos" class="mobile-link">Módulos</a>
     <a href="cuestionario.html" class="mobile-link">Cuestionario</a>
@@ -101,9 +108,41 @@
           </div>
         </div>
 
-        <img src="static/resources/js-logo.svg" alt="Logotipo de JavaScript" class="animate-floaty hidden lg:block w-64 h-64 rounded-2xl">
+        <!-- DOS ANIMACIONES, DOS ELEMENTOS. No es un envoltorio de adorno.
+             `animation` es una propiedad sola: dos clases de Tailwind que la
+             declaren sobre el MISMO elemento no se suman, gana la que venga
+             despues en la hoja. La decision 6 pide que el efecto nuevo CONVIVA con
+             el flotado, no que lo reemplace, asi que el flotado se queda en el
+             envoltorio y el efecto entra en la imagen. Las dos transformaciones se
+             componen y ninguna pisa a la otra.
+
+             `hidden lg:block` viaja al envoltorio y con eso sigue valiendo la
+             decision 3: bajo `lg` no se muestra el logotipo ni, por lo tanto, su
+             efecto. Quien abre la portada desde el telefono no ve ninguno de los
+             dos, y esta iteracion no lo cambia. -->
+        <span class="animate-floaty hidden lg:block">
+          <img id="logo-hero" src="static/resources/js-logo.svg" alt="Logotipo de JavaScript" class="w-64 h-64 rounded-2xl">
+        </span>
       </div>
 
+      <!-- LAS CUATRO METRICAS DEL HERO · DE DONDE SALE CADA UNA (iteracion 36)
+           Se anota aca, y no solo en la planificacion, porque el dia que una se
+           desfase hay que poder saber a que archivo ir sin buscarlo.
+
+           7 modulos    De static/js/data/modules.js, que hoy tiene 7 entradas.
+                        ESCRITO A MANO: si el plan formativo cambia los modulos
+                        evaluados, hay que cambiarlo aqui tambien. PUEDE DESFASARSE.
+           368 preguntas De la instantanea versionada, static/js/data/instantanea-banco.js
+                        (SELLO.preguntas). NO se escribe a mano: la reescribe
+                        scripts/publicar-banco.mjs en el mismo acto que regenera la
+                        instantanea, y `npm run verificar` da rojo si se desfasa
+                        (decision 4 bis). Marcada con data-cifra-banco.
+           2 formatos   De _planmaestro/00_producto/contexto-del-examen.md, «Los dos
+                        formatos de pregunta». ES TESTIMONIO DE ESTUDIANTES, no
+                        informacion oficial de Talento Digital. PUEDE DESFASARSE si
+                        Talento Digital cambia el examen o publica algo oficial.
+           JWT          De static/js/data/modules.js, ultimo tema del modulo 8, que es
+                        el ultimo modulo evaluado. ESCRITO A MANO. PUEDE DESFASARSE. -->
       <dl class="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-px bg-panel3 rounded-xl overflow-hidden">
         <div class="bg-panel p-6">
           <span class="icon i-workspace-premium text-2xl text-jsyellow/70 mb-2" aria-hidden="true"></span>
@@ -112,7 +151,7 @@
         </div>
         <div class="bg-panel p-6">
           <span class="icon i-quiz text-2xl text-jsyellow/70 mb-2" aria-hidden="true"></span>
-          <dd class="font-display font-bold text-4xl text-jsyellow" data-count="21">0</dd>
+          <dd class="font-display font-bold text-4xl text-jsyellow" data-cifra-banco data-count="368">0</dd>
           <dt class="mt-1 text-xs text-muted">Preguntas de práctica</dt>
         </div>
         <div class="bg-panel p-6">
@@ -172,7 +211,7 @@
 
       <div class="bg-jsyellow text-ink rounded-2xl px-6 py-12 sm:px-12 sm:py-16 text-center">
         <span class="inline-flex items-center gap-2 border border-ink/30 rounded-full px-4 py-1.5 font-mono text-[11px]">
-          <span class="icon i-quiz text-base" aria-hidden="true"></span>105 preguntas · 7 módulos
+          <span class="icon i-quiz text-base" aria-hidden="true"></span><span data-cifra-banco>368</span> preguntas · 7 módulos
         </span>
 
         <h2 class="mt-6 font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight">

@@ -84,6 +84,14 @@
     transform: rotate(180deg);
   }
 
+  /* La pildora que dice con palabras que la tarjeta se despliega (iteracion 36).
+     Se esconde cuando ya esta abierta: ahi los temas estan a la vista y el aviso
+     sobra. Es la misma pareja de reglas que gobierna el chevron, y por eso vive
+     al lado: quien cambie una tiene que ver la otra. */
+  .is-open .pista-desplegar {
+    display: none;
+  }
+
   .progress-fill {
     transition: width 380ms ease;
   }

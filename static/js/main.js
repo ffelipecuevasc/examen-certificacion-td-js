@@ -5,7 +5,7 @@
  */
 import { renderRoadmap } from './components/roadmap.js';
 import { renderModules, setupToggleAll } from './components/modules.js';
-import { setupMobileMenu, setupScrollSpy, animateCounters, setCurrentYear } from './components/nav.js';
+import { setupMobileMenu, setupScrollSpy, animateCounters, animarLogotipo, setCurrentYear } from './components/nav.js';
 
 function init() {
   renderRoadmap();
@@ -14,6 +14,7 @@ function init() {
   setupMobileMenu();
   setupScrollSpy();
   animateCounters();
+  animarLogotipo();
   setCurrentYear();
 }
 

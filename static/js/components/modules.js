@@ -23,6 +23,80 @@ function codeBlock(ejercicio, codeId) {
     </div>`;
 }
 
+/**
+ * El aviso que dice que estos bloques SON el formato de una parte del examen.
+ *
+ * Antes decia «Código de ejemplo» y nada mas, y para un principiante eso es
+ * decoracion: un recuadro bonito que se mira y se pasa. Lo que no decia es lo
+ * unico que importa —que en el examen esto se escribe a mano, de memoria, en un
+ * cuadro de texto que no autocompleta, no subraya errores y no ejecuta— y es
+ * justo lo que cambia como hay que estudiarlo.
+ *
+ * EL MENSAJE NO PUEDE DEPENDER DEL COLOR. Lo dicen las palabras; la barra lateral
+ * y el ícono acompañan. En escala de grises se entiende igual, que es la misma
+ * regla que la iteracion 32 aplico al indice de modulos.
+ *
+ * EL ORIGEN VA PEGADO AL DATO, no en una nota al pie. `vision.md` exige declarar
+ * que el material es no oficial, y esto es de lo mas especifico que afirma el
+ * sitio sobre como es el examen: sale del testimonio de estudiantes que lo
+ * rindieron el 2026, recogido en
+ * _planmaestro/00_producto/contexto-del-examen.md, no de Talento Digital.
+ */
+function avisoDelFormato() {
+  return `
+            <div class="mt-7 mb-2 rounded-lg border border-l-4 border-panel3 border-l-jsyellow bg-panel2 p-4">
+              <p class="font-display font-bold text-sm text-paper flex items-center gap-2">${icon('commit', 'text-base text-jsyellow')}Código de ejemplo · así se responde una parte del examen</p>
+              <p class="mt-2 text-xs text-muted leading-relaxed">
+                En el examen, ejercicios como estos se responden escribiendo el código en un cuadro de texto vacío:
+                <strong class="font-semibold text-paper">sin autocompletado, sin marcado de errores y sin poder ejecutarlo</strong>.
+                Practícalos escribiéndolos de memoria, no solo leyéndolos.
+              </p>
+              <p class="mt-2 font-mono text-[11px] text-mutedink leading-relaxed">
+                Esto sale del testimonio de estudiantes que rindieron el examen 2026. No es información oficial de Talento Digital para Chile.
+              </p>
+            </div>`;
+}
+
+/**
+ * Hace que cada tarjeta se mueva UNA VEZ, cuando aparece en pantalla.
+ *
+ * Decision 8 de la iteracion 36, que hereda el motivo de la 6: un movimiento que
+ * se repite compite con el texto que el estudiante intenta leer, y siete tarjetas
+ * latiendo a la vez serian exactamente eso. Se mueve al asomar, se desconecta, y
+ * no vuelve a moverse mientras la pagina siga abierta.
+ *
+ * LO QUE SE LEE SIEMPRE SON LAS PALABRAS. La pildora «Ver temas y código» esta
+ * visible desde el primer momento, sin depender de que esto corra: si no hay
+ * IntersectionObserver, si el JavaScript falla o si la persona pidio menos
+ * movimiento, la tarjeta sigue diciendo con palabras que se despliega. El
+ * movimiento solo atrae la vista hacia lo que ya estaba escrito.
+ *
+ * El movimiento no se apaga aqui cuando hay `prefers-reduced-motion`: lo apaga la
+ * regla de src/input.css, que recorta la duracion de cualquier animacion a
+ * 0,01 ms. Se deja en un solo sitio a proposito, que es donde ya vive para
+ * `animate-floaty`.
+ */
+function avisarQueSeDespliegan() {
+  const pistas = $$('.pista-desplegar');
+  if (pistas.length === 0) return;
+
+  if (typeof IntersectionObserver !== 'function') return;
+
+  const observador = new IntersectionObserver(
+    (entradas) => {
+      entradas.forEach((entrada) => {
+        if (!entrada.isIntersecting) return;
+        entrada.target.classList.add('animate-asomar');
+        // Una sola vez: se deja de mirar apenas se movio.
+        observador.unobserve(entrada.target);
+      });
+    },
+    { threshold: 0.6 }
+  );
+
+  pistas.forEach((pista) => observador.observe(pista));
+}
+
 /** Dibuja el acordeon con los temas y ejemplos de cada modulo. */
 export function renderModules() {
   const container = $('#modules-list');
@@ -59,13 +133,16 @@ export function renderModules() {
               <p class="text-xs text-mutedink font-mono mt-1">${esc(m.parte)} · ${esc(m.resumen)}</p>
             </div>
           </div>
-          ${icon('expand-more', 'chevron text-2xl text-jsyellow')}
+          <span class="flex items-center gap-2 shrink-0">
+            <span class="pista-desplegar inline-flex items-center gap-1.5 rounded-full border border-panel3 bg-panel2 px-3 py-1 font-mono text-[11px] text-muted">Ver temas y código</span>
+            ${icon('expand-more', 'chevron text-2xl text-jsyellow')}
+          </span>
         </button>
         <div id="panel-${i}" class="accordion-panel">
           <div class="px-5 sm:px-6 pb-7 border-t border-panel3 pt-6">
             <p class="font-mono text-[11px] text-mutedink mb-3 flex items-center gap-2">${icon('history-edu', 'text-base')}Temas evaluados</p>
             <ul class="flex flex-col gap-2">${temas}</ul>
-            ${ejercicios ? `<p class="font-mono text-[11px] text-mutedink mt-7 mb-2 flex items-center gap-2">${icon('commit', 'text-base')}Código de ejemplo</p>${ejercicios}` : ''}
+            ${ejercicios ? `${avisoDelFormato()}${ejercicios}` : ''}
           </div>
         </div>
       </article>`;
@@ -77,6 +154,8 @@ export function renderModules() {
       setModuleOpen(button, button.getAttribute('aria-expanded') !== 'true')
     );
   });
+
+  avisarQueSeDespliegan();
 
   container.addEventListener('click', async (event) => {
     const button = event.target.closest('.code-copy-btn');

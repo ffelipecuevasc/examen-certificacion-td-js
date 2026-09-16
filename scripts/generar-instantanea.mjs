@@ -86,6 +86,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { SQL_PREGUNTAS, sqlAlternativas } from '../functions/api/preguntas.js';
 import { validarPreguntas } from '../functions/api/_validacion.js';
+import { escribirCifraEnPortada } from './cifra-portada.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WRANGLER = join(RAIZ, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
@@ -562,6 +563,17 @@ export const PREGUNTAS = ${comoJs(validas)};
 
 writeFileSync(SALIDA, contenido, 'utf8');
 
+/**
+ * Si lo que se acaba de escribir es la instantanea que publica el sitio, la cifra
+ * de la portada va con ella (decision 4 bis, iteracion 36).
+ *
+ * Solo en ese caso. Con `--salida=` el archivo es un temporal de
+ * publicar-banco.mjs, que todavia puede decidir no instalarlo; reescribir la
+ * portada ahi dejaria la cifra de un banco que no llego a publicarse. En ese
+ * camino la reescribe publicar-banco.mjs despues de instalar los dos archivos.
+ */
+const cifraPortada = SALIDA === SALIDA_CANONICA ? escribirCifraEnPortada(validas.length) : null;
+
 // Con `--salida=` el archivo puede caer fuera del repositorio, y ahi el recorte
 // por longitud producia una ruta cortada por la mitad. Se recorta solo si de
 // verdad esta dentro.
@@ -576,6 +588,17 @@ veredicto(
     `Base      ${sello.base} (${sello.entorno})`,
     `Generada  ${sello.generada_en}`,
     `Preguntas ${sello.preguntas}`,
+    ...(cifraPortada
+      ? cifraPortada.ok
+        ? [
+            `Portada   index.html ${
+              cifraPortada.cambio
+                ? `reescrita: ${cifraPortada.cambiadas.map((m) => `linea ${m.linea} ${m.valor} -> ${validas.length}`).join(', ')}`
+                : `ya decia ${validas.length}`
+            }`,
+          ]
+        : [`Portada   NO SE PUDO ESCRIBIR: ${cifraPortada.motivo}`, '          Reponla con: npm run datos:cifra']
+      : []),
     ...(informe.descartadas
       ? [
           `Descartadas por la validacion: ${informe.descartadas}`,

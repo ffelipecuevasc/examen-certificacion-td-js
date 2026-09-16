@@ -11,7 +11,7 @@ web**, que la portada deje de publicar una cifra falsa, y que el texto secundari
 ## Por qué existe esta iteración
 
 Los arreglos que la componen parecen inconexos —un enlace, una animación, un número, un texto junto a un bloque de
-código, un color— pero comparten una raíz, y es lo que justifica agruparlos:
+código, un color— pero comparten una raíz:
 
 **El sitio asume capacidades que su público no tiene.** `vision.md` describe a estudiantes **principiantes**, para
 quienes esta puede ser su primera certificación técnica, que estudian desde el teléfono tanto como desde el computador y
@@ -20,24 +20,23 @@ bloque de código sea algo más que decoración, son convenciones aprendidas: qu
 gris tenue que se lee en un monitor calibrado desaparece en un teléfono al sol con el brillo bajo.
 
 **Y hay un defecto de implementación publicado hoy:** la portada dice que hay **21**
-preguntas de práctica. Son 368. Confirmado en `index.html`: `data-count="21"`, escrito a mano.
+preguntas de práctica. Son 368 (`index.html:115`, `data-count="21"`, escrito a mano).
 
 ## Historial de este archivo
 
 - **2026-09-15 · incorporada al repositorio.** Se redactó en otra sesión como «iteración 34» y el archivo nunca llegó al
-  repositorio: solo existía su fila en el README de la épica, ya renumerada como 36 al partir la antigua 33. Al
-  incorporarla se corrigió lo siguiente:
-    - **El perfil del público** decía «personas adultas en reconversión, que estudiaron otra profesión», atribuido a
-      `vision.md`. `vision.md` no dice eso. Se ajustó a lo que el documento fundacional sí dice.
-    - **El contexto del examen** se movió a `_planmaestro/00_producto/contexto-del-examen.md`.
-    - **Un criterio no comprobable se reformuló:** «un lector que no conoce la convención entiende que las tarjetas se
-      despliegan» no se demuestra mostrando el estado cerrado. Quedó como algo verificable.
-    - **Las referencias** a la transición de carga apuntan a la 35.
-    - **Las decisiones 1 a 4** las tomó el autor el 2026-09-15.
-- **2026-09-15 · ampliada tras el cierre de la 33.** El cierre midió el contraste del color `mutedink`: **2,72:1** sobre
-  `bg-panel` y **3,02:1** sobre `bg-ink`, contra un mínimo de 4,5:1. El autor decidió corregirlo aquí (decisión 5) y
-  resolvió qué dispara el efecto del logotipo (decisión 6), que estaba abierto. **El alcance deja de ser solo la
-  portada.**
+  repositorio. Al incorporarla se ajustó el perfil del público a lo que dice `vision.md`, el contexto del examen se
+  movió a
+  `_planmaestro/00_producto/contexto-del-examen.md`, se reformuló un criterio no comprobable y se corrigieron las
+  referencias a la 35. Decisiones 1 a 4 del autor.
+- **2026-09-15 · ampliada tras el cierre de la 33.** El cierre midió `mutedink` en 2,72:1 y 3,02:1. El autor decidió
+  corregirlo aquí (decisión 5) y resolvió el disparador del efecto del logotipo (decisión 6).
+- **2026-09-15 · revisada tras la lectura de alcance de Claude Code.** Confirmó las ocho afirmaciones de hecho y
+  encontró quince huecos. Los más importantes: `mutedink` tiene **28 usos**, no dos, y el peor contraste real es **2,53:
+  1**; la inyección al construir rompía la propiedad de ADR-010 de que el repositorio sea por sí solo una copia
+  servible, y dependía de un ajuste del panel de Cloudflare que ningún archivo fija; el aviso de licencia no llegaba al
+  sitio publicado. El autor tomó cuatro decisiones: **la decisión 4 se sustituye** por la 4 bis, y se agregan la 5 bis,
+  la 7 y la 8. Los demás huecos se resolvieron en la redacción de los criterios.
 
 ## Alcance
 
@@ -45,12 +44,17 @@ preguntas de práctica. Son 368. Confirmado en `index.html`: `data-count="21"`, 
 
 - la barra de navegación de `index.html` y `cuestionario.html`;
 - la portada;
-- **el color `mutedink` en todo el sitio**, en su definición, y la revisión de cada lugar de las dos páginas donde se
-  usa.
+- **el color `mutedink` en todo el sitio**: su definición y la revisión de sus 28 usos, en las dos páginas y en los
+  componentes que dibujan HTML (`cuestionario.js`,
+  `indice-modulos.js`, `modules.js`, `roadmap.js`);
+- **los énfasis que hoy dependen de la diferencia entre `mutedink` y `muted`** (decisión 5 bis);
+- la comprobación de la cifra de preguntas dentro de `npm run verificar`, y su escritura desde el guion que regenera la
+  instantánea (decisión 4 bis).
 
-**Fuera:** todo lo demás de `cuestionario.html`. La transición al cargar un módulo es la iteración 35. La página
-`acerca-de.html` no es de esta iteración (ver decisión 2). Cualquier otro color que no alcance el contraste se registra,
-no se corrige aquí.
+**Fuera:** todo lo demás de `cuestionario.html`. La transición al cargar un módulo es la
+
+35. `acerca-de.html` no es de esta iteración. **El color `muted` no se toca.** Cualquier otro color que no alcance el
+    contraste se registra, no se corrige.
 
 ## Decisiones tomadas
 
@@ -59,148 +63,203 @@ no se corrige aquí.
 La cifra falsa está publicada y la corrección no depende de la memoria, la justificación ni el repaso. Se prefirió
 ejecutarla antes a renumerar por segunda vez en un día.
 
-### 2 · El efecto del logotipo se copia de animate.css, con su aviso de licencia
+### 2 · El efecto del logotipo se copia de animate.css
 
-El efecto `tada` se escribe en `tailwind.config.cjs`, que ya tiene `keyframes` y
-`animation` en su `extend`. **No se instala ninguna dependencia:** se copian las líneas del efecto, no el paquete
-(decidido el 2026-09-10).
+El efecto `tada` se escribe en `tailwind.config.cjs`, en su `extend`. **No se instala ninguna dependencia:** se copian
+las líneas del efecto, no el paquete. Se toman de la versión 4.1.1 publicada en cdnjs.
 
-**La licencia no es MIT.** animate.css se publica bajo la **Hippocratic License 2.1**, y esa licencia pide atribución.
-El autor decidió reunir las atribuciones de las herramientas con licencia en `acerca-de.html`, que **todavía no existe
-ni tiene iteración asignada** (anotada en `registro_log.md`). Por eso **el aviso viaja con las líneas copiadas desde el
-primer commit:** un comentario junto al efecto en
-`tailwind.config.cjs` con el origen, el copyright y la licencia.
+**El aviso de licencia va junto a las líneas copiadas**, en un comentario de
+`tailwind.config.cjs`, y cita la **Hippocratic License 2.1** del archivo LICENSE vigente del repositorio de animate.css.
+**Deja anotado además** que el encabezado del archivo CSS 4.1.1 declara MIT: las dos fuentes no coinciden, y se cita la
+más exigente.
 
 ### 3 · El efecto del logotipo es solo de escritorio, y se declara
 
-El logotipo del hero lleva `hidden lg:block`: no se muestra bajo `lg`. El autor decidió aceptarlo. **El estudiante que
-abre la portada desde el teléfono no ve ni el logotipo ni su efecto**, y esta iteración no lo cambia.
+El logotipo del hero lleva `hidden lg:block`. **El estudiante que abre la portada desde el teléfono no ve ni el logotipo
+ni su efecto**, y esta iteración no lo cambia.
 
-### 4 · La cifra de preguntas se inyecta al construir, leyendo la instantánea versionada
+### ~~4 · La cifra se inyecta al construir~~ · sustituida por la 4 bis
 
-1. **Hereda una garantía que ya existe.** `npm run verificar` comprueba que la instantánea dice lo mismo que el respaldo
-   versionado, pregunta a pregunta.
-2. **Se actualiza en el flujo que ya existe.** Cada recarga del banco regenera la instantánea (regla 5 de ADR-025), y el
-   siguiente despliegue corrige la cifra.
-3. **No agrega consultas a D1.** Pedirla a `/api/estado` sumaría lecturas a la base en cada visita a la página más
-   visitada, y desde el 2026-09-01 D1 corta las consultas de quien supera el límite diario del plan gratuito.
+Se conserva tachada para que se entienda el cambio. Tenía tres problemas que encontró la lectura de alcance: el archivo
+fuente quedaba con un marcador, rompiendo la propiedad de ADR-010 de que el repositorio sea por sí solo una copia
+servible del sitio; su garantía dependía de que el panel de Cloudflare siguiera ejecutando
+`npm run build`, algo que ningún archivo del repositorio puede fijar
+(`_planmaestro/90-manual/capa-de-datos-y-base-d1.md:54`); y provocar su falla podía dejar `dist/` vacío, porque
+`scripts/build-dist.mjs` lo borra al empezar.
 
-**Descartadas:** escribirla a mano otra vez, con 368 —es exactamente el defecto que se arregla, y la iteración 24 lo
-dejó escrito como error—, y pedirla al abrir la página, por el motivo 3.
+### 4 bis · La cifra real vive escrita en `index.html`, y `npm run verificar` la vigila
 
-**Si la instantánea no se puede leer al construir, el build falla con un mensaje claro.**
-Publicar un número de reserva sería inventarlo.
+Decidido por el autor el 2026-09-15.
+
+- **`index.html` versionado dice la cifra real.** Hoy, 368.
+- **`npm run verificar` falla si esa cifra no coincide con la instantánea versionada.**
+- **El guion que regenera la instantánea después de cada carga del banco también reescribe esa cifra**, en el mismo
+  acto, para que la actualización no dependa de acordarse.
+
+Conserva lo esencial de la decisión anterior —la cifra sale de la instantánea y no de quien la escribe— y resuelve sus
+tres problemas: el repositorio sigue siendo servible, no importa qué comando corra el panel porque la cifra ya viene en
+el archivo, y provocar la falla es seguro. **No repite el defecto del 21:** ese número duró porque nada lo vigilaba.
+Ahora una cifra desfasada deja la verificación en rojo antes de publicar.
 
 ### 5 · `mutedink` se corrige en su definición, hasta 4,5:1 sobre todos sus fondos
 
-Medido en el cierre de la 33 con los colores reales: `mutedink` (`#5C5A4A`) da **2,72:1** sobre `bg-panel` (`#121108`) y
-**3,02:1** sobre `bg-ink` (`#000000`). No alcanza ni el 3:1 de texto grande, y se usa en texto de 14 px. El mismo
-párrafo del estado vacío mezcla un tramo en `text-muted`, que da 6,65:1, con otro ilegible.
+**Se corrige una sola vez, donde se define el color** (`tailwind.config.cjs:18`), hasta alcanzar **al menos 4,5:1 sobre
+cada fondo donde se usa como texto**, incluidos los dos peores medidos: **`bg-panel2`** (hoy 2,53:1) y **la fila activa
+del índice**,
+`bg-jsyellow/10` sobre negro (hoy 2,61:1). La lectura de alcance estimó que hace falta llegar cerca de `#8A8876`.
 
-**Se corrige una sola vez, donde se define el color**, no parchando cada uso, hasta alcanzar **al menos 4,5:1 (WCAG AA,
-texto normal) sobre cada fondo donde se usa**. El motivo del autor: el público estudia desde el teléfono, a menudo con
-luz exterior y brillo bajo, que es justo cuando un contraste bajo se vuelve ilegible.
+**El nombre de la clase no cambia en ningún uso.** Renombrarla o reemplazarla por otra rompería
+`scripts/probar-memoria.mjs:424`, que la busca por su nombre literal.
 
-**Consecuencia declarada:** el cambio alcanza a `cuestionario.html`, así que la pasada del autor revisa también esa
-página.
+**El motivo del autor:** el público estudia desde el teléfono, a menudo con luz exterior y brillo bajo, que es justo
+cuando un contraste bajo se vuelve ilegible.
 
-**Lo que no se hace:** no se redefine la paleta ni se tocan otros colores. Si al medir aparece otro que tampoco alcanza,
-se registra.
+### 5 bis · `muted` no se toca; los énfasis se hacen con peso de letra o con el color principal
+
+Decidido por el autor el 2026-09-15. Con `mutedink` cerca de `#8A8876`, queda a un paso de `muted` (`#9C9A85`, 6,65:1).
+Donde hoy un tramo se destaca **solo** por pasar de
+`mutedink` a `muted` —el caso conocido es «solo en este dispositivo» en el estado vacío del cuestionario—, **el énfasis
+pasa a expresarse con peso de letra o con el color de texto principal**.
+
+Se descartó subir también `muted`: ya cumple con holgura, se usa en todo el sitio, y moverlo cambiaría la identidad
+visual entera para arreglar un énfasis. Expresar el énfasis con peso de letra además funciona sin color, la misma regla
+que se aplicó al índice en la 32.
 
 ### 6 · El efecto del logotipo ocurre una sola vez, al cargar la portada
 
-Con un breve retraso para que la vista alcance a llegar, y **sin repetirse**.
+Con un breve retraso para que la vista alcance a llegar, y **sin repetirse**. Convive con
+`animate-floaty`, que sigue igual.
 
-**Descartadas:** al pasar el ratón —el logotipo no es un enlace ni un botón, así que casi nadie lo haría a propósito y
-el efecto quedaría escondido—; cada cierto tiempo —un movimiento que se repite compite con el texto que el estudiante
-intenta leer—; y las dos a la vez, por la misma razón que la primera. El logotipo ya flota de forma continua
-(`animate-floaty`): el nuevo efecto convive con esa animación sin reemplazarla.
+**Descartadas:** al pasar el ratón —el logotipo no es un enlace y casi nadie lo haría a propósito—; cada cierto tiempo
+—un movimiento que se repite compite con la lectura—; y las dos a la vez.
+
+### 7 · El sitio publicado queda sin atribución visible de animate.css hasta que exista `acerca-de.html`
+
+Decidido por el autor el 2026-09-15. El comentario de la decisión 2 no llega al sitio publicado: `tailwind.config.cjs`
+no se copia a `dist/` y sus comentarios no sobreviven a la compilación. **Se acepta ese período sin atribución visible,
+y se declara.** La fila de `acerca-de.html` en `registro_log.md` tiene que decir que, hasta que la página exista, el
+sitio publicado usa el efecto sin atribución visible.
+
+### 8 · Las tarjetas se mueven una sola vez; lo que se lee siempre son las palabras
+
+Decidido por el autor el 2026-09-15, con la misma regla de la decisión 6. **El texto que dice que la tarjeta se
+despliega está siempre visible** mientras está cerrada, y el movimiento que atrae la vista **ocurre una sola vez**,
+cuando la tarjeta aparece en pantalla. Siete tarjetas latiendo a la vez serían exactamente lo que la decisión 6
+descartó.
+
+### Sobre «Inicio» junto al logotipo, frente a ADR-032
+
+ADR-032 quitó el `<select>` del cuestionario porque dos controles **visibles y equivalentes** a tres centímetros son uno
+de más. Aquí la situación es otra: el enlace del logotipo **no se reconoce como enlace** para este público, así que no
+hay dos controles visibles, hay uno escondido. «Inicio» es la forma visible. En `index.html`
+lleva al comienzo de la propia portada; en `cuestionario.html`, a la portada.
 
 ## Lo que queda a criterio de quien implemente
 
-Los textos exactos, los íconos, el valor concreto del retraso del efecto, el tono nuevo de `mutedink` dentro de la
-identidad del sitio, y el mecanismo con que el build inyecta la cifra. Con las condiciones de las decisiones de arriba.
+Los textos exactos, los íconos, el valor del retraso del efecto, el tono concreto de
+`mutedink`, cómo se detecta que una tarjeta aparece en pantalla, y dónde vive la comprobación de la cifra dentro de
+`npm run verificar`. Con las condiciones de las decisiones de arriba.
 
 ## Contexto que condiciona la tarea de los bloques de código
 
-Está en `_planmaestro/00_producto/contexto-del-examen.md`. Lo esencial para esta iteración: una parte del examen
-consiste en **resolver enunciados programando** en un área de texto sin autocompletado, sin marcado de errores y sin
-ejecutar. Los bloques de «Código de ejemplo» de la portada **tienen ese formato**, y hoy nada lo dice.
-
-Ese contexto viene del **testimonio de estudiantes que rindieron el examen 2026**, no de Talento Digital. `vision.md`
-exige declarar el origen no oficial del material: lo que la portada diga sobre el formato del examen tiene que dejarlo
-claro.
+Está en `_planmaestro/00_producto/contexto-del-examen.md`. Una parte del examen consiste en **resolver enunciados
+programando** en un área de texto sin autocompletado, sin marcado de errores y sin ejecutar. Los bloques de «Código de
+ejemplo» de la portada **tienen ese formato**, y hoy nada lo dice. Ese contexto es **testimonio de estudiantes**, no
+información de Talento Digital, y lo que diga la portada tiene que declararlo.
 
 ## Tareas
 
-- [ ] **Añadir «Inicio» a la barra de navegación** de `index.html` y
-  `cuestionario.html`, apuntando a la portada. El logotipo y el título **conservan**
-  su enlace: se suma una forma visible a la que ya existe, no se reemplaza.
-- [ ] **Hacer más notorio el efecto del logotipo del hero**, copiando las líneas del efecto de animate.css con su aviso
-  de licencia (decisión 2), una vez al cargar (decisión 6).
-- [ ] **Inyectar la cifra de preguntas al construir** desde la instantánea versionada (decisión 4).
-- [ ] **Hacer evidente que las tarjetas de «Qué entra en cada módulo» se despliegan.**
-  Además de la flecha, algo que lo diga con palabras y que se mueva lo suficiente para atraer la vista.
-- [ ] **Marcar los bloques de código como lo que son:** el formato real de una parte del examen, con color, ícono y un
-  texto que lo diga sin rodeos y que declare el origen testimonial de esa información.
-- [ ] **Corregir `mutedink`** en su definición (decisión 5) y revisar cada uso en las dos páginas.
-- [ ] **Revisar las otras tres métricas** —7 módulos, 2 formatos, JWT—, confirmar que siguen siendo ciertas y anotar de
-  dónde sale cada una y si puede desfasarse.
+- [ ] Añadir «Inicio» a la barra de las dos páginas, conservando el enlace del logotipo y del título.
+- [ ] Copiar el efecto `tada` con su aviso de licencia (decisión 2), una vez al cargar (decisión 6).
+- [ ] Escribir la cifra real en `index.html`, agregar su comprobación a
+  `npm run verificar` y hacer que el guion que regenera la instantánea la reescriba (decisión 4 bis).
+- [ ] Hacer evidente que las tarjetas de «Qué entra en cada módulo» se despliegan (decisión 8).
+- [ ] Marcar los bloques de código como formato real de una parte del examen, declarando el origen testimonial.
+- [ ] Corregir `mutedink` en su definición y revisar sus 28 usos (decisión 5).
+- [ ] Rehacer los énfasis que dependían de la diferencia entre `mutedink` y `muted`
+  (decisión 5 bis).
+- [ ] Anotar el origen de las otras tres métricas y si pueden desfasarse.
+- [ ] Actualizar la fila de `acerca-de.html` en `registro_log.md` (decisión 7).
+- [ ] Corregir el comentario de `scripts/verificar-todo.mjs:2`, que dice «cuatro comprobadores» y son cinco.
 
 ## Criterios de aceptación
 
 ### Los provoca Claude Code
 
-- [ ] **«Inicio» está en la barra de las dos páginas y apunta a la portada**, comprobado sobre el HTML que se publica
-  (`dist/`).
-- [ ] **El logotipo y el título siguen apuntando al inicio** en las dos páginas.
-- [ ] **No se instaló ninguna dependencia.** `package.json` y `package-lock.json` no tienen paquetes nuevos: se muestra
-  el diff.
-- [ ] **Las líneas copiadas llevan su aviso de licencia** en el mismo archivo: origen, copyright y Hippocratic License
-  2.1.
-- [ ] **El efecto no se repite:** el CSS generado lo declara con una sola iteración.
-- [ ] **La cifra de preguntas del HTML publicado sale de la instantánea.** Hoy dice 368.
-- [ ] **La cifra acompaña a la instantánea, provocado.** Se construye con una instantánea de prueba con otra cantidad de
-  preguntas y la cifra publicada cambia con ella. **La instantánea versionada no se modifica:** `git diff` sin cambios
-  en
-  `static/js/data/instantanea-banco.js` al terminar.
-- [ ] **Sin instantánea legible, el build falla** con un mensaje que dice por qué, y no publica ninguna cifra.
-  Provocado.
-- [ ] **La cifra se inyecta en el mismo build que publica el sitio.** Se muestra, con archivo y línea, qué comando
-  construye lo que Cloudflare Pages publica y que ese comando es el que inyecta.
-- [ ] **`mutedink` alcanza al menos 4,5:1 sobre cada fondo donde se usa.** Se entrega una tabla con cada uso en las dos
-  páginas —archivo, elemento, fondo real— y su razón de contraste antes y después, calculada con los colores del CSS.
-- [ ] **Las animaciones nuevas quedan bajo la regla de `prefers-reduced-motion`** que ya tiene `src/input.css`,
-  comprobado en el CSS generado.
-- [ ] **Las otras tres métricas tienen origen anotado**, y la iteración dice cuáles pueden desfasarse.
-- [ ] **`npm run verificar` termina en 0**, con sus cinco comprobaciones en OK.
-- [ ] **Los guiones del cuestionario siguen en verde:** `probar:filtrado`,
-  `probar:memoria` y `probar:escapado`.
+**Navegación y efecto**
+
+- [ ] **«Inicio» está en la barra de las dos páginas**, sobre `dist/`: en `index.html`
+  lleva al comienzo de la portada, en `cuestionario.html` lleva a la portada.
+- [ ] **El logotipo y el título conservan su enlace** en las dos páginas.
+- [ ] **No se instaló ninguna dependencia.** Diff de `package.json` y
+  `package-lock.json` sin paquetes nuevos.
+- [ ] **Las líneas copiadas llevan su aviso**: origen (animate.css 4.1.1), copyright, Hippocratic License 2.1, y la nota
+  de que el encabezado del CSS 4.1.1 declara MIT.
+- [ ] **El efecto del logotipo declara una sola iteración** en la utilidad nueva del CSS generado. La evidencia sale de
+  la declaración de esa utilidad, no de la regla general de `prefers-reduced-motion`, que ya fuerza una iteración para
+  todo.
+- [ ] **El movimiento de las tarjetas también declara una sola iteración**, con la misma evidencia.
+
+**La cifra**
+
+- [ ] **`index.html` versionado dice 368**, y `dist/index.html` también.
+- [ ] **`npm run verificar` da rojo si la cifra no coincide con la instantánea.**
+  Provocado de forma segura —sin dejar modificado ningún archivo versionado al terminar—, con el mensaje exacto del
+  rojo.
+- [ ] **El guion que regenera la instantánea reescribe la cifra.** Demostrado **sin ejecutarlo contra los archivos
+  versionados** —sobre copias temporales o con su propia opción de ensayo—, porque regenerar la instantánea desde aquí
+  está vedado.
+- [ ] **Al terminar, `static/js/data/instantanea-banco.js` no tiene cambios**, y el diff de `index.html` contiene solo
+  lo que esta iteración pretende.
+
+**Contraste**
+
+- [ ] **Tabla de los 28 usos de `mutedink`**: archivo y línea, elemento, fondo, razón antes y después. **Todo uso como
+  texto alcanza al menos 4,5:1.**
+- [ ] **El punto de 8 × 8 px de `index.html:146`**, que no es texto, se mide contra 3:1 (componente no textual) y lo
+  alcanza.
+- [ ] **La cabecera pegajosa** (`cuestionario.js:381`), cuyo fondo es semitransparente con desenfoque, se mide sobre su
+  fondo liso, y la tabla declara esa limitación.
+- [ ] **La clase `text-mutedink` sigue con el mismo nombre** en todos sus usos.
+- [ ] **Ningún énfasis depende ya solo de la diferencia entre `mutedink` y `muted`.** Se listan los casos encontrados y
+  cómo quedó cada uno.
+- [ ] **`muted` no cambió.** Diff de `tailwind.config.cjs` limitado a `mutedink` y al efecto nuevo.
+
+**Movimiento reducido y verificación**
+
+- [ ] **Las animaciones nuevas quedan cubiertas por la regla de `prefers-reduced-motion`**
+  de `src/input.css`, comprobado en el CSS generado.
+- [ ] **Las otras tres métricas tienen origen anotado** en las notas: «7 módulos» y «JWT» salen de
+  `static/js/data/modules.js`, escritos a mano; «2 formatos» sale del contexto del examen, testimonial. Se dice cuáles
+  pueden desfasarse.
+- [ ] **`npm run verificar` termina en 0** con sus cinco comprobaciones y la nueva.
+- [ ] **`probar:filtrado`, `probar:memoria` y `probar:escapado` siguen en verde.**
 
 ### Los comprueba el autor en el navegador
 
 - [ ] **Desde `cuestionario.html`, «Inicio» lleva a la portada**, en escritorio y en teléfono.
-- [ ] **El efecto del logotipo se nota en escritorio**, ocurre una vez al cargar y no se repite mientras la página sigue
-  abierta.
-- [ ] **Una tarjeta cerrada dice con palabras que se despliega**, legible sin tocarla, también en teléfono.
-- [ ] **Los bloques de código se leen como formato del examen**: el texto lo dice, y el mensaje no depende solo del
-  color (comprobado en escala de grises).
-- [ ] **El texto sobre el formato del examen declara que viene del testimonio de estudiantes**, no de Talento Digital.
-- [ ] **El texto que usaba `mutedink` se lee bien en las dos páginas**, incluido el párrafo del avance local en el
-  estado vacío del cuestionario, y el sitio conserva su identidad visual.
+- [ ] **El efecto del logotipo se nota en escritorio**, ocurre una vez al cargar y no se repite.
+- [ ] **Una tarjeta cerrada dice con palabras que se despliega**, se mueve una sola vez al aparecer, y se entiende
+  también en teléfono.
+- [ ] **Los bloques de código se leen como formato del examen**, sin depender del color (escala de grises), y declaran
+  el origen testimonial.
+- [ ] **El texto que usaba `mutedink` se lee bien en las dos páginas** y el sitio conserva su identidad visual.
+- [ ] **Las dos filas del índice de módulos se leen**, la inactiva y la activa, que es el peor fondo del sitio.
+- [ ] **«Solo en este dispositivo» sigue destacado** en el estado vacío del cuestionario.
 - [ ] **La portada se ve bien en teléfono** con todo lo añadido.
-- [ ] **Con `prefers-reduced-motion` emulado**, las animaciones nuevas no se mueven.
+- [ ] **Con `prefers-reduced-motion` emulado, no se percibe movimiento** en las animaciones nuevas.
 - [ ] **Sin errores de consola** en las dos páginas.
 - [ ] **Tras el push, la portada publicada dice 368.**
 
 ## Lo que esta iteración no puede afirmar
 
-- **Que el estudiante entienda mejor el examen.** Se puede comprobar que la información está y se ve; que cumpla su
-  función pedagógica lo dirá el uso.
-- **Que el efecto del logotipo llegue al teléfono.** No llega, por decisión (decisión 3).
+- **Que el estudiante entienda mejor el examen.** Lo dirá el uso.
+- **Que el efecto del logotipo llegue al teléfono.** No llega (decisión 3).
 - **Que la cifra coincida con D1 en todo momento.** Dice lo que dice la instantánea, que entre una recarga del banco y
-  el siguiente despliegue puede ir detrás.
-- **Que el formato del examen descrito sea el oficial.** Es testimonio de estudiantes, y así se declara.
+  su commit puede ir detrás.
+- **Que el formato del examen descrito sea el oficial.** Es testimonio de estudiantes.
+- **Que el sitio publicado atribuya animate.css.** No lo hace hasta que exista
+  `acerca-de.html` (decisión 7).
 - **Que el sitio entero cumpla WCAG AA.** Se corrige un color medido; los demás no se auditan aquí.
 
 ## Notas de la iteración

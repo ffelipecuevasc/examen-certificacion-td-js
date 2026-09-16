@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los cuatro comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los seis comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -29,8 +29,10 @@
  *
  *   1. verificar-barrera.mjs      ADR-015 sigue en pie (H-014)
  *   2. verificar.mjs              el CSS versionado corresponde a su fuente
- *   3. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
- *   4. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
+ *   3. comprobar-instantanea.mjs  la instantanea dice lo mismo que el respaldo
+ *   4. comprobar-cifra.mjs        la portada publica la cifra del banco
+ *   5. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
+ *   6. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
  * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
@@ -43,8 +45,12 @@
  * las dos van a avisar, y el resultado sera VERIFICACION INCOMPLETA: es correcto,
  * y es la diferencia entre una casilla en blanco y una marcada sin mirar.
  *
+ * La cuarta entro con la iteracion 36, y por un motivo que conviene no olvidar: la
+ * portada publicaba «21 preguntas de practica» con 368 en el banco, y sobrevivio
+ * al llenado entero porque ninguna comprobacion tenia el deber de mirarla.
+ *
  * Codigos de salida:
- *   0  VERIFICADO             las cuatro comprobaciones hechas y en verde
+ *   0  VERIFICADO             las seis comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -65,7 +71,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los cuatro comprobadores, con la traduccion de sus codigos.
+ * Los seis comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -101,6 +107,15 @@ const COMPROBADORES = [
       0: [OK, 'la instantanea versionada dice lo mismo que el respaldo versionado'],
       1: [FALLO, 'DIVERGEN: la instantanea y el respaldo no cuentan el mismo banco'],
       2: [AVISO, 'no se pudo comparar: falta el respaldo o la instantanea no se deja leer'],
+    },
+  },
+  {
+    nombre: 'cifra',
+    guion: 'comprobar-cifra.mjs',
+    codigos: {
+      0: [OK, 'la portada publica la cifra que trae la instantanea'],
+      1: [FALLO, 'CIFRA FALSA: index.html anuncia un numero de preguntas que no es el del banco'],
+      2: [AVISO, 'no se pudo comparar: la instantanea o la portada no se dejan leer'],
     },
   },
   {
