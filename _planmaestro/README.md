@@ -12,7 +12,7 @@ decisiones vale tanto como el código que las implementa.
 | **Iteración** | Ninguna en curso                                                                                                                                   |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
 | **Estado**    | ⚪ No iniciada                                                                                                                                      |
-| **Siguiente** | **Iteración 41 · Presentación y motor.** La épica 30 cerró el 2026-09-16 con la iteración 35, y con ella el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15. La 40 es la siguiente por el orden escrito más abajo: «las épicas se ejecutan en orden». |
+| **Siguiente** | **Iteración 41 · Presentación, selección y protección del intento.** La épica 30 cerró el 2026-09-16 con la iteración 35, y con ella el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15. La 40 es la siguiente por el orden escrito más abajo: «las épicas se ejecutan en orden». **Orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16: 41 → 45 → 42 → 43 → 44**, con la 45 adelantada para fijar la dirección visual antes de construir el cronómetro. Los números de las iteraciones no cambian. |
 
 > **Antes de abrir la iteración 41.** Los archivos de la épica 40 **fueron reescritos el
 > 2026-09-16** y tienen decisiones pendientes: su propio README pide verificar, antes de
@@ -49,7 +49,7 @@ decisiones vale tanto como el código que las implementa.
 | 10 | Plataforma Cloudflare           | 🟢 Completada  | Sitio en Pages, capa de datos y dos bases D1 operativas                     |
 | 20 | Persistencia de preguntas       | 🟢 Completada  | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
 | 30 | Cuestionario                    | 🟢 Completada  | `cuestionario.html` por módulo, con memoria del avance, justificación, repaso y transición de carga |
-| 40 | Simulacro de examen             | 🔵 Activa      | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
+| 40 | Simulacro de examen             | 🔵 En curso    | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
 | 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos               |
 
 Las épicas se ejecutan en orden: cada una depende de la anterior. La 10 va primera porque el banco de preguntas vive en

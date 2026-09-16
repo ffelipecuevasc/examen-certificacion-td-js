@@ -107,3 +107,49 @@ textual del examen: son apuntes de una estudiante, no una copia oficial.
   examen al que se refiere. No se borra lo anterior: se marca como corregido y se dice por qué.
 - **Si Talento Digital publica información oficial** que confirme o contradiga algo de aquí, esa fuente manda, y se
   cita.
+
+---
+
+## Agregado el 2026-09-16 · duración total y formato mezclado
+
+> **Origen.** Aportado por el autor **a partir de información oficial y pública de
+> Talento Digital para Chile**: el **email explicativo que les llegó a los
+> participantes**, estudiantes e instructores. Es la primera sección de este documento
+> que **no** se apoya en testimonio de estudiantes, y por eso se declara aparte: la
+> cabecera de arriba describe el origen del resto. **Amplía lo escrito; no lo corrige.**
+
+1. **El examen dura 120 minutos en total.**
+2. **En ese tiempo, las preguntas de alternativas y las de programación vienen
+   mezcladas, en orden aleatorio.** No hay un bloque de alternativas seguido de un
+   bloque de programación: se alternan sin patrón.
+
+**Relación con «Dos horas» de `:21`.** Dice lo mismo con otras palabras, y se deja tal
+cual: lo que agrega esta sección es **la fuente** —esa línea viene del testimonio y
+ésta del email oficial— y **el formato mezclado**, que no estaba escrito en ninguna
+parte.
+
+### Lo que el simulacro toma de acá, y lo que no
+
+**Ninguna cifra del simulacro sale de este documento.** El simulacro de la épica 40
+—**120 preguntas, 30 segundos por pregunta, 60 minutos como duración máxima del
+intento y 60 % para aprobar**— y sus reglas de omisión —se omite con un segundo toque,
+una omitida no se puede responder después y **cuenta como incorrecta**— son
+**decisiones de diseño del autor, tomadas el 2026-09-16** y documentadas en
+`_planmaestro/40-epica-simulacro-examen/README.md`. **No vienen del examen real.**
+
+Los 60 minutos son un **máximo y no un plazo**: por la misma decisión del 2026-09-16,
+el tiempo total del simulacro **no limita** el intento —con el sobrante de cada
+pregunta perdido nunca puede agotarse antes que las preguntas— y se muestra como
+**tiempo transcurrido**.
+
+Las diferencias, dichas de frente, para que nadie las confunda:
+
+| | Examen real (este documento) | Simulacro (decisión de diseño) |
+|---|---|---|
+| Duración | 120 minutos en total | 30 segundos por pregunta; el tiempo total no limita |
+| Formatos | Alternativas y programación, mezcladas al azar | Solo alternativas |
+| Orden | Aleatorio entre formatos | Una pregunta a la vez, sin vuelta atrás |
+| Aprobación | No consta acá | 72 de 120 (60 %), decidido por el autor |
+
+Por eso la épica 40 exige que **ninguna pantalla del simulacro afirme que el examen
+real funciona igual**, y que las reglas se expliquen **como reglas del simulacro**.

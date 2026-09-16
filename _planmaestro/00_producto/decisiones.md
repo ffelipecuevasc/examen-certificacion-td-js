@@ -1031,6 +1031,57 @@ funcionar cuando cae la capa de datos. Contradice ADR-008 justo en la página m�
 larga y menos interrumpible del sitio: una caída a mitad de un intento de 60 minutos
 lo perdería entero.
 
+**Actualización del 2026-09-16 · vocabulario del resultado del simulacro.**
+*Decisión del autor, tomada al cerrar las decisiones de diseño de la épica 40.* El
+resumen del simulacro **sí dice si se aprobó**, con el umbral del propio simulacro:
+**72 de 120 correctas (60 %)**, y **las omitidas cuentan como incorrectas**. Para
+poder decirlo, la lista de palabras de más arriba se enmienda así, y sólo así:
+
+**Permitidas, y únicamente con esta forma exacta:**
+
+- «Aprobaste el simulacro»
+- «Reprobaste el simulacro»
+
+**Siguen prohibidas:** «aprobado» y «reprobado» sin «el simulacro», «nota», «puntaje
+oficial», «calificación», «certificación», y cualquier fórmula que sugiera validez de
+certificación.
+
+**Por qué esto no contradice lo que dice esta misma ADR en `decisiones.md:977-978`**
+—«Su puntaje no puede sustentar una nota, una certificación ni una decisión sobre
+nadie»—. Lo que la frase permitida afirma es el resultado **del simulacro**, y las
+reglas del simulacro —120 preguntas, 30 segundos cada una, el sobrante se pierde, una
+omitida cuenta como incorrecta, 60 % para aprobar— son **decisiones de diseño del
+autor**, escritas en el README de la épica 40. **No son las del examen real**, que
+dura 120 minutos y mezcla alternativas con programación
+(`00_producto/contexto-del-examen.md`). Y la frase lleva esa distinción **en su propia
+forma**: lo que se aprueba o se reprueba es «el simulacro», nombrado dentro de la
+frase, no algo que valga fuera de la pantalla donde aparece. Quien lee «Reprobaste el
+simulacro» sabe exactamente qué reprobó.
+
+**Por qué no es el caso de `:978-980`** —«Si algún día hiciera falta eso, esta decisión
+se cae entera y hay que sustituirla por una ADR nueva»—. Ese párrafo se activa si al
+simulacro le hiciera falta **validez**: que su resultado valiera ante alguien. Mostrar
+que se aprobó **el simulacro** no le da validez de evaluación ni la reclama: sigue sin
+sustentar una nota, una certificación ni una decisión sobre nadie, y sigue sin poder
+garantizar que nadie haya visto las respuestas, que es lo que esta ADR dejó escrito
+con todas sus letras. Por eso ADR-022 no se cae ni se sustituye: se enmienda su lista
+de palabras, y todo lo demás queda en pie.
+
+**Por qué la autorización también se escribe como lista mecánica.** Por el mismo motivo
+de `:994-997`: **la persona que redacte esa pantalla puede no haber leído esta ADR.** Un
+principio general no la detiene, y tampoco la guía. Por eso lo permitido son **dos
+frases exactas** y no una regla del tipo «se puede hablar de aprobación si queda claro
+que es del simulacro», que es precisamente la formulación que no detiene a nadie:
+cualquiera cree que su redacción deja claro eso. Si hace falta una tercera frase, se
+añade acá antes de escribirla en la pantalla.
+
+**La «Consecuencia» de `:999-1002` pasa a apuntar a esta lista.** Para la **épica 40** y
+para la **iteración 44** —la que redacta la pantalla de resultados—, el criterio de
+aceptación es el vocabulario de esta actualización, no la lista de `:987-991` leída
+sola. La fila que repite esa lista en `00_producto/registro_log.md:194` —la `:193` antes
+de que se registrara ahí mismo la tanda de decisiones de la épica 40— queda marcada como
+actualizada por este bloque, para que no queden dos listas vigentes que discrepen.
+
 ---
 
 ## ADR-023 · La instantánea se genera desde la base de la nube, en el mismo acto que el respaldo de ADR-014
