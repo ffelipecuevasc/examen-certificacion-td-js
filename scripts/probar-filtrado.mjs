@@ -504,7 +504,7 @@ try {
   const dom = prepararDomFalso();
   globalThis.fetch = (ruta, opciones) => fetchReal(DIRECCION + ruta, opciones);
 
-  const { mostrarModulo, renderCuestionario } = await import(
+  const { mostrarModulo, renderCuestionario, setupReinicio, setupRepaso } = await import(
     pathToFileURL(join(SITIO, 'components', 'cuestionario.js')).href
   );
   const { pintarIndice } = await import(
@@ -521,6 +521,12 @@ try {
   // siete conteos antes de terminar. Sin el await, las comprobaciones del indice
   // mirarian un indice todavia sin cifras y dirian que faltan.
   await renderCuestionario();
+
+  // Lo mismo que hace static/js/cuestionario-main.js al abrir la pagina. Hasta la
+  // iteracion 34 este guion no ataba estos dos, asi que corria sobre una pagina a
+  // medio conectar: los botones del panel no respondian a nada.
+  setupReinicio();
+  setupRepaso();
 
   const vacio = dom.html('#cuestionario');
   const idsEnVacio = idsDibujados(vacio);
@@ -576,10 +582,15 @@ try {
 
   // Las siete cifras, contra la base consultada aparte.
   //
-  // Desde la iteracion 33 la fila dice «respondidas/total». Aqui no hay nada
-  // respondido —este guion corre sin almacenamiento, que es lo que instala
-  // prepararDomFalso() por defecto—, asi que las siete tienen que decir «0/N». Que
-  // el cero se mueva con lo guardado se prueba en scripts/probar-memoria.mjs.
+  // Desde la iteracion 33 la fila dice «respondidas/total». Aqui todavia no se ha
+  // respondido nada —esta comprobacion va primero a proposito—, asi que las siete
+  // tienen que decir «0/N». Que el cero se mueva se prueba en
+  // scripts/probar-memoria.mjs.
+  //
+  // El motivo escrito hasta la iteracion 34 era otro y era falso: «este guion corre
+  // sin almacenamiento». Sin almacenamiento tambien se recuerda, porque la memoria
+  // de la visita existe justo para eso (decision 7 de la 34). Lo que sostiene el
+  // cero es el orden, no la falta de almacen.
   for (const fila of porModulo) {
     const enElIndice = new RegExp(
       `data-modulo="${fila.modulo}"[\\s\\S]*?>\\s*0/${fila.cuantas}\\s*<`
@@ -872,9 +883,30 @@ try {
   // eso hay que abrir la pagina varias veces, y eso no se puede fingir dentro de un
   // solo proceso.
   // ------------------------------------------------------------------------
+  /**
+   * Las preguntas que este guion respondio desde el ultimo dibujo.
+   *
+   * Hace falta desde la iteracion 34: `responder()` no vuelve a dibujar, asi que el
+   * HTML del contenedor sigue mostrando como sin responder una pregunta que ya se
+   * respondio. Sin esta lista, `responderUna()` pulsaria tres veces la misma.
+   */
+  let yaRespondidas = new Set();
+
+  /**
+   * Cuantas preguntas respondio este guion en cada modulo, en toda la corrida.
+   *
+   * Tambien es de la iteracion 34, y por el mismo motivo. Antes responder no dejaba
+   * rastro y el indice podia darse por sentado en «0/N» de principio a fin. Ahora la
+   * memoria de la visita conserva lo respondido **aunque no haya almacenamiento**
+   * —para eso existe—, asi que lo que el indice tiene que decir depende de lo que
+   * este guion haya ido respondiendo. Se lleva la cuenta en vez de suponerla.
+   */
+  const respondidasPorModulo = new Map();
+
   /** Deja el componente en un modulo, esperando a que termine de dibujarlo. */
   const asentar = async (numero) => {
     await mostrarModulo(numero);
+    yaRespondidas = new Set();
   };
 
   /** Que modulo esta marcando el indice ahora mismo, o null. */
@@ -883,11 +915,61 @@ try {
     return m ? Number(m[1]) : null;
   };
 
-  /** Simula que el estudiante respondio una pregunta del modulo dibujado. */
+  /**
+   * Responde una pregunta del modulo dibujado, eligiendo su alternativa correcta.
+   *
+   * SE FABRICA EL BOTON QUE EL NAVEGADOR TENDRIA, Y ESO CAMBIO EN LA ITERACION 34
+   *
+   * Antes este ayudante creaba un boton pelado, sin `data-alternativa` y sin una
+   * tarjeta de la que colgar. `responder()` no lograba identificar la pregunta y las
+   * barras se sumaban a mano por una rama que existia solo para este caso. La rama
+   * se quito —ningun navegador puede llegar ahi: toda alternativa dibujada lleva su
+   * id y su tarjeta su `data-pregunta`—, asi que lo que se pulsa aca tiene que ser
+   * lo que se pulsa alla. Los dos ids salen del HTML que el componente acaba de
+   * dibujar, no de un numero inventado.
+   *
+   * **Sigue eligiendo la correcta**, que es lo que sostiene la asimetria 3/3/0 de
+   * las barras: si las tres esperaran el mismo numero, una que copiara el valor de
+   * otra pasaria sin que nadie lo notara.
+   */
   const responderUna = () => {
-    const boton = dom.nodo('#un-boton-de-alternativa');
+    const html = dom.html('#cuestionario');
+
+    const preguntaId = idsDibujados(html).find(
+      (id) => !yaRespondidas.has(id) && !bloqueDePregunta(html, id).includes('data-answered="true"')
+    );
+
+    if (preguntaId === undefined) {
+      problemas.push('no quedaba ninguna pregunta sin responder en el modulo dibujado');
+      return 0;
+    }
+
+    const alternativaId = Number(
+      bloqueDePregunta(html, preguntaId).match(/data-correct="true" data-alternativa="(\d+)"/)?.[1]
+    );
+
+    if (!Number.isInteger(alternativaId)) {
+      problemas.push(
+        `la pregunta ${preguntaId} se dibujo sin una alternativa correcta que se pueda pulsar`
+      );
+      return 0;
+    }
+
+    yaRespondidas.add(preguntaId);
+
+    const moduloDibujado = Number(html.match(/id="grupo-modulo-(\d+)"/)?.[1]);
+    if (Number.isInteger(moduloDibujado)) {
+      respondidasPorModulo.set(moduloDibujado, (respondidasPorModulo.get(moduloDibujado) ?? 0) + 1);
+    }
+
+    const tarjeta = dom.nodo(`#tarjeta-q${preguntaId}`);
+    tarjeta.dataset.pregunta = `q${preguntaId}`;
+
+    const boton = dom.nodo(`#alternativa-${alternativaId}`);
     boton.disabled = false;
     boton.dataset.correct = 'true';
+    boton.dataset.alternativa = String(alternativaId);
+    boton.closest = (selector) => (selector === '[data-pregunta]' ? tarjeta : boton);
 
     return dom.disparar('#cuestionario', 'click', {
       target: { closest: (s) => (s === '.quiz-option' ? boton : null) },
@@ -897,6 +979,7 @@ try {
   /** Simula que el estudiante pulsa una fila del indice. */
   const elegirEnElIndice = (numero) => {
     const fila = { dataset: { modulo: String(numero) } };
+    yaRespondidas = new Set();
 
     return dom.disparar('#indice-modulos', 'click', {
       target: { closest: (s) => (s === '[data-modulo]' ? fila : null) },
@@ -1079,6 +1162,23 @@ try {
   // ------------------------------------------------------------------------
 
   await asentar(MODULO_DE_MUESTRA);
+
+  // Se reinicia antes de contar, y es nuevo desde la iteracion 34. Antes de ella
+  // responder no dejaba rastro, asi que este bloque siempre empezaba de cero sin
+  // pedirlo. Ahora la memoria de la visita conserva lo que se respondio mas arriba
+  // en este mismo guion, y contar 3 sobre lo que ya habia daria 4. Se limpia por el
+  // camino del estudiante —el boton de reiniciar— y no tocando la memoria por
+  // dentro, que es lo que este guion existe para no hacer.
+  dom.disparar("#reiniciar", "click", {});
+  yaRespondidas = new Set();
+  respondidasPorModulo.set(MODULO_DE_MUESTRA, 0);
+
+  if (dom.texto('#valor-avance') !== '0') {
+    problemas.push(
+      `reiniciar no dejo el modulo en cero antes de contar las barras: dice ` +
+        `«${dom.texto('#valor-avance')}»`
+    );
+  }
 
   const delModulo = porModulo.find((f) => f.modulo === MODULO_DE_MUESTRA)?.cuantas ?? 0;
   const CUANTAS_RESPONDER = 3;
@@ -1456,11 +1556,19 @@ try {
     enLaCopia.set(pregunta.modulo, (enLaCopia.get(pregunta.modulo) ?? 0) + 1);
   }
 
+  // La cifra esperada NO es «0» desde la iteracion 34: la memoria de la visita
+  // conserva lo que este guion fue respondiendo, y sigue viva aunque `renderCuestionario()`
+  // se vuelva a llamar —eso simula abrir la pagina, no recargarla, y una visita solo
+  // termina al recargar—. Que el avance sobreviva a una recarga de verdad se prueba
+  // en scripts/probar-memoria.mjs, que abre un proceso nuevo por visita.
   for (const [numero, cuantas] of enLaCopia) {
-    const enElIndice = new RegExp(`data-modulo="${numero}"[\\s\\S]*?>\\s*0/${cuantas}\\s*<`);
+    const respondidas = respondidasPorModulo.get(numero) ?? 0;
+    const enElIndice = new RegExp(
+      `data-modulo="${numero}"[\\s\\S]*?>\\s*${respondidas}/${cuantas}\\s*<`
+    );
     if (!enElIndice.test(indiceCaido)) {
       problemas.push(
-        `con la capa caida, el indice no muestra «0/${cuantas}» en el modulo ${numero}`
+        `con la capa caida, el indice no muestra «${respondidas}/${cuantas}» en el modulo ${numero}`
       );
     }
   }

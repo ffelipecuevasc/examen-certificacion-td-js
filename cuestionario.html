@@ -171,12 +171,12 @@
           </a>
         </div>
 
-        <!-- Lo que responde el boton del repaso cuando no hay nada que repasar
-             (decision 5). Vive aca, pegado al boton que lo produce, y no en el
-             mensaje de avance de mas arriba: ese lo reescribe actualizarPanel() en
-             cada respuesta y el aviso se borraria solo. Nace oculto, asi que el
-             panel no crece mientras no haga falta. -->
-        <p id="aviso-repaso" class="hidden mt-3 text-sm text-paper font-semibold" role="status"></p>
+        <!-- Lo que responde el boton del repaso cuando no hay nada que repasar NO
+             vive aca (decision 11 de la iteracion 34). Estuvo un rato, pegado al
+             boton que lo produce, y hacia crecer el panel: ADR-032 contabilizo su
+             coste vertical al milimetro y dice que no crece ni una fila. El mensaje
+             se dibuja en la zona de preguntas, bajo la cabecera del modulo, por el
+             mismo motivo por el que viven alla los dos avisos de arriba. -->
 
         <div class="mt-auto pt-8">
           <p class="font-mono text-[11px] text-mutedink">¿Quieres practicar todavía más?</p>

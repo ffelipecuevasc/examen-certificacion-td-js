@@ -540,11 +540,27 @@ function retrato(dom, paso) {
     // dibujada porque nadie volvio a dibujar»: sin esto, el criterio de que una
     // acertada siga a la vista se cumpliria solo, por omision.
     largoDelHtml: html.length,
+    /** Si el estado vacio sigue ofreciendo su enlace al indice de modulos. */
+    traeEnlaceAlIndice: html.includes('data-ir-al-indice'),
+    /** Lo que dice el panel en palabras. Sirve para comprobar que NO dice otra cosa. */
+    mensajeDelPanel: dom.texto('#mensaje-avance'),
     repaso: {
       boton: dom.texto('#repaso-rotulo'),
       contador: dom.html('#contador-banco'),
-      aviso: dom.texto('#aviso-repaso'),
+      // El mensaje se lee del HTML de la ZONA DE PREGUNTAS, que es donde la
+      // decision 11 lo manda. Leerlo de un nodo suelto no distinguiria «esta en la
+      // zona de preguntas» de «esta en el panel», que es justo lo que hay que
+      // distinguir.
+      aviso: html.match(/<p id="aviso-repaso"[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? '',
+      // Y donde quedo respecto de la cabecera del modulo.
+      avisoTrasLaCabecera:
+        html.includes('id="aviso-repaso"') &&
+        html.indexOf('</header>') < html.indexOf('id="aviso-repaso"') &&
+        html.indexOf('id="aviso-repaso"') < html.indexOf('<ul class="mt-3'),
+      // `responder()` no repinta, asi que retira el mensaje escondiendo su nodo.
+      // Es lo unico que se puede mirar en ese camino.
       avisoOculto: dom.oculto('#aviso-repaso'),
+      focoEnElAviso: dom.enfocado() === '#aviso-repaso',
     },
     barras: {
       respondidas: dom.texto('#valor-avance'),
@@ -2165,6 +2181,140 @@ if (vr5.final.repaso.avisoOculto) {
   problemas.push('el mensaje del repaso se escribio pero quedo oculto');
 }
 
+// Y donde va: bajo la cabecera del modulo, con la vista y el foco ahi (decision 11).
+if (!vr5.final.repaso.avisoTrasLaCabecera) {
+  problemas.push(
+    'el mensaje con N en 0 no quedo entre la cabecera del modulo y las preguntas'
+  );
+}
+if (!vr5.final.repaso.focoEnElAviso) {
+  problemas.push(
+    `tras pulsar «Repasar mis errores (0)» el foco quedo en «${vr5.final.paso.tipo}»/` +
+      `«${vr5.final.repaso.focoEnElAviso}»: el mensaje esta en la otra columna y en telefono ` +
+      'queda pantalla y media por debajo del boton que se acaba de pulsar'
+  );
+}
+
+// --- El panel NO crece (decision 11, ADR-032) ------------------------------
+//
+// No es una conducta que se pueda provocar: es una propiedad del archivo. Si el
+// mensaje tuviera su elemento dentro del panel, el panel crece al mostrarlo, y la
+// ventana de 700 px de alto deja de alcanzar hasta «Reiniciar el módulo». Se
+// comprueba donde vive, igual que la fila de tres controles.
+const htmlDeLaPagina = readFileSync(join(RAIZ, 'cuestionario.html'), 'utf8');
+
+const panelFijo = htmlDeLaPagina.slice(
+  htmlDeLaPagina.indexOf('============ PANEL FIJO ============'),
+  htmlDeLaPagina.indexOf('============ CUESTIONARIO ============')
+);
+
+if (panelFijo === '' || !panelFijo.includes('id="reiniciar"')) {
+  noSePudo('No pude recortar el panel fijo de cuestionario.html para comprobarlo.');
+}
+
+const avisosEnElPanel = panelFijo.match(/id="aviso-[a-z-]+"/g) ?? [];
+
+if (avisosEnElPanel.length > 0) {
+  problemas.push(
+    `el panel fijo trae ${avisosEnElPanel.join(', ')}: los avisos viven en la zona de ` +
+      'preguntas, porque ADR-032 contabilizo el alto del panel al milimetro y mostrar uno ' +
+      'aca lo hace crecer'
+  );
+}
+
+// Y el mensaje tampoco se coló en el texto del panel por otro camino.
+if (vr5.final.mensajeDelPanel.includes('Todavía no respondes')) {
+  problemas.push('el mensaje con N en 0 se escribio en el panel en vez de la zona de preguntas');
+}
+
+// --- Visita R5x: el mensaje no queda a la vista cuando ya no describe nada --
+//
+// Los cuatro caminos de la decision 11. Tres repintan y se lo llevan por delante;
+// responder NO repinta, y es el unico que podria dejarlo colgado encima de una
+// pregunta recien respondida.
+const vr5x = visitar({
+  disco: discoNuevo('repaso-aviso-obsoleto'),
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'repaso' },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }] },
+    { tipo: 'repaso' },
+  ],
+});
+
+if (vr5x.pasos[1].repaso.aviso === '') {
+  problemas.push('el mensaje con N en 0 no llego a dibujarse');
+}
+if (!vr5x.pasos[2].repaso.avisoOculto) {
+  problemas.push(
+    'responder dejo a la vista el mensaje que decia que no habias respondido nada: responder ' +
+      'no repinta, asi que el mensaje hay que retirarlo a mano'
+  );
+}
+if (vr5x.pasos[3].repaso.aviso !== '') {
+  problemas.push('entrar al repaso dejo puesto el mensaje que decia que no habia nada que repasar');
+}
+
+const vr5y = visitar({
+  disco: discoNuevo('repaso-aviso-cambio'),
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'repaso' },
+    { tipo: 'elegir', modulo: OTRO_MODULO },
+  ],
+});
+
+if (vr5y.final.repaso.aviso !== '') {
+  problemas.push(
+    `cambiar de modulo dejo puesto un mensaje del modulo anterior: «${vr5y.final.repaso.aviso}»`
+  );
+}
+
+const vr5z = visitar({
+  disco: discoNuevo('repaso-aviso-reinicio'),
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+    { tipo: 'repaso' },
+    { tipo: 'reiniciar' },
+  ],
+});
+
+if (vr5z.pasos[2].repaso.aviso === '') {
+  problemas.push('con todo acertado el mensaje no llego a dibujarse');
+}
+if (vr5z.final.repaso.aviso !== '') {
+  problemas.push(
+    `reiniciar dejo puesto el mensaje que decia que habias acertado todo: ` +
+      `«${vr5z.final.repaso.aviso}»`
+  );
+}
+
+// --- Visita R5w: sin ningun modulo cargado ---------------------------------
+//
+// El tercer caso, que la decision 5 no preveia y la 11 si: pulsar el boton nada mas
+// abrir la pagina. Tambien en la zona de preguntas, y sin llevarse por delante el
+// estado vacio, que es donde vive el enlace al indice que justamente hace falta.
+const vr5w = visitar({
+  disco: discoNuevo('repaso-sin-modulo'),
+  pasos: [{ tipo: 'repaso' }],
+});
+
+if (!/Elige un módulo/.test(vr5w.final.repaso.aviso)) {
+  problemas.push(
+    `sin ningun modulo cargado, el boton del repaso respondio «${vr5w.final.repaso.aviso}»`
+  );
+}
+if (!vr5w.final.repaso.focoEnElAviso) {
+  problemas.push('sin modulo cargado, el mensaje del repaso no se llevo el foco');
+}
+if (!vr5w.final.traeEnlaceAlIndice) {
+  problemas.push(
+    'el mensaje sin modulo cargado se llevo por delante el estado vacio: el enlace al indice ' +
+      'es justo lo que el estudiante necesita en ese momento'
+  );
+}
+
 // --- Visita R5b: con N en 0 y todo acertado --------------------------------
 //
 // El otro mensaje, que no puede ser el mismo: «no has respondido nada» manda a
@@ -2364,7 +2514,7 @@ notas.push(
 const todasLasVisitas = [
   v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v14,
   vj1, vj2, vj3, vm1, vm2, vm3, vm4, vm5,
-  vr0, vr1, vr2, vr3, vr3b, vr4, vr5, vr5b, vr6, vr7, vr8, vr9, vr10,
+  vr0, vr1, vr2, vr3, vr3b, vr4, vr5, vr5b, vr5w, vr5x, vr5y, vr5z, vr6, vr7, vr8, vr9, vr10,
 ];
 const rutasVistas = new Set();
 

@@ -204,11 +204,6 @@ function actualizarPanel() {
   const vigentes = vigentesDelModulo();
   actualizarContadorDeArriba(vigentes);
   actualizarBotonDelRepaso(vigentes);
-
-  // Y el aviso del boton del repaso se retira en cuanto pasa cualquier otra cosa.
-  // Decia «responde algunas preguntas y vuelve»; si sigue puesto despues de que el
-  // estudiante responda, esta describiendo un estado que ya no existe.
-  limpiarAvisoDelRepaso();
 }
 
 /**
@@ -442,26 +437,29 @@ function responder(boton) {
     // una pregunta que desaparece bajo el dedo se lleva el texto que se estaba
     // leyendo.
     if (repaso) repaso.respondidas.add(origenDelClic.pregunta.id);
-
-    // LAS TRES BARRAS SE RECUENTAN, NO SE SUMAN.
-    //
-    // Sumar de a uno estaba bien mientras responder fuera irrepetible. En el repaso
-    // no lo es: la misma pregunta se responde por segunda vez, y `respondidas += 1`
-    // la contaria dos veces —62 de 61— y dejaria su primer veredicto sumado para
-    // siempre en la barra equivocada. Recontar contra la memoria y el banco da el
-    // mismo resultado que repintar, que es de donde salen las barras al volver al
-    // modulo: dos formas de llegar al mismo numero no pueden divergir si es el
-    // mismo calculo.
-    recontarElModulo(vigentesDelModulo());
-  } else {
-    // Sin poder identificar la pregunta no hay nada que recontar —la respuesta no
-    // quedo anotada en ninguna parte—, pero en la pantalla si esta. Se suma a mano
-    // para que las barras no digan menos de lo que se ve. Ningun navegador llega
-    // aca: toda alternativa dibujada lleva su `data-alternativa`.
-    estado.respondidas += 1;
-    if (acerto) estado.correctas += 1;
-    else estado.incorrectas += 1;
   }
+
+  // LAS TRES BARRAS SE RECUENTAN, NO SE SUMAN.
+  //
+  // Sumar de a uno estaba bien mientras responder fuera irrepetible. En el repaso no
+  // lo es: la misma pregunta se responde por segunda vez, y `respondidas += 1` la
+  // contaria dos veces —62 de 61— y dejaria su primer veredicto sumado para siempre
+  // en la barra equivocada. Recontar contra la memoria y el banco da el mismo
+  // resultado que repintar, que es de donde salen las barras al volver al modulo:
+  // dos formas de llegar al mismo numero no pueden divergir si es el mismo calculo.
+  //
+  // Se recuenta SIEMPRE, tambien si `deDondeSalio()` no encontro nada. Hubo un rato
+  // una rama que en ese caso sumaba a mano, y era un camino muerto: toda alternativa
+  // dibujada lleva su `data-alternativa`, y su pregunta su `data-pregunta`, asi que
+  // desde un navegador no se puede llegar ahi. Lo unico que sostenia esa rama era un
+  // guion que fabricaba un boton sin esos atributos, o sea una prueba comprobando
+  // una pantalla que no existe.
+  recontarElModulo(vigentesDelModulo());
+
+  // Responder es el unico de los cuatro caminos que dejan obsoleto el mensaje del
+  // repaso que NO vuelve a dibujar. Si no se retirara aca, un «todavía no respondes
+  // ninguna pregunta» se quedaria encima de una pregunta recien respondida.
+  olvidarElAvisoDelRepaso();
 
   actualizarPanel();
 }
@@ -597,7 +595,7 @@ function dibujarGrupo(grupo, aDibujar, respondida, enLaVisita) {
           <span class="font-display font-bold text-jsyellow text-sm shrink-0">Módulo ${esc(grupo.numero)}</span>
           <span class="font-display font-semibold text-paper text-sm truncate">${esc(grupo.titulo)}</span>
           <span class="ml-auto font-mono text-[11px] text-mutedink shrink-0">${grupo.preguntas.length}</span>
-        </header>
+        </header>${grupo.numero === estado.modulo ? avisoDelRepasoDibujado() : ''}
         <ul class="mt-3 grid gap-4">${preguntas}</ul>
       </section>`;
 }
@@ -707,8 +705,8 @@ function mostrarAvisoAlmacenamiento() {
  * escapa, y por eso lleva ese nombre y no «detalle2». Quien lo use con algo que
  * venga de la capa de datos rompe la regla del archivo.
  */
-function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '') {
-  contenedor.innerHTML = `
+function dibujarMensaje(contenedor, nombreIcono, titulo, detalle, pie = '', encabezado = '') {
+  contenedor.innerHTML = `${encabezado}
       <div id="mensaje-cuestionario" tabindex="-1" class="bg-panel border border-panel3 rounded-xl p-8 text-center focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
         <span class="grid place-items-center w-12 h-12 mx-auto rounded-lg bg-panel2 text-jsyellow">${icon(nombreIcono, 'text-2xl')}</span>
         <p class="mt-4 font-display font-bold text-paper">${esc(titulo)}</p>
@@ -755,7 +753,12 @@ function mostrarEstadoVacio(contenedor) {
        <a href="#indice-modulos" data-ir-al-indice
           class="mt-5 inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
          ${icon('layers', 'text-base text-jsyellow')}Ir al índice de módulos
-       </a>`
+       </a>`,
+    // Sin modulo cargado no hay cabecera bajo la cual poner nada, y el estado vacio
+    // es todo lo que hay en esta zona. El mensaje va ENCIMA de el y no en su lugar:
+    // lo que el estudiante necesita justo entonces es el enlace al indice que el
+    // estado vacio ya trae, y reemplazarlo se lo quitaria.
+    avisoDelRepasoDibujado()
   );
 }
 
@@ -931,21 +934,87 @@ function actualizarBotonDelRepaso(vigentes = vigentesDelModulo()) {
   icono.innerHTML = icon('cancel', 'text-base');
 }
 
-/** Lo que responde el boton del repaso cuando no hay nada que repasar. */
-function avisarDelRepaso(texto) {
+/**
+ * Lo que responde el boton del repaso cuando no hay nada que repasar, o null.
+ *
+ * NO VIVE EN EL PANEL, Y ESE ES EL PUNTO (decision 11 de la iteracion 34)
+ *
+ * Estuvo un rato pegado al boton que lo produce, que es donde uno lo pondria sin
+ * pensarlo. Hacia crecer el panel fijo, y ADR-032 contabilizo su coste vertical al
+ * milimetro: la ventana de 700 px de alto tiene que seguir alcanzando hasta
+ * «Reiniciar el módulo». Es el mismo motivo por el que los dos avisos de la
+ * iteracion 33 —el respaldo y el almacenamiento— viven en la zona de preguntas.
+ *
+ * Se guarda como texto y no como nodo porque la zona de preguntas se reescribe
+ * entera en cada dibujo: el nodo no sobrevive, el texto si, y `pintar()` lo vuelve
+ * a poner donde corresponde.
+ */
+let avisoDelRepaso = null;
+
+/**
+ * El mensaje, listo para insertar, o nada si no hay ninguno.
+ *
+ * Lleva el mismo recuadro con riel amarillo que la justificacion, por lo mismo: el
+ * fondo `panel2` dentro de esta columna no se distingue por si solo, y el riel lo
+ * delimita sin depender del color. `tabindex="-1"` para poder llevarle el foco.
+ */
+const avisoDelRepasoDibujado = () =>
+  avisoDelRepaso === null
+    ? ''
+    : `
+        <p id="aviso-repaso" tabindex="-1" role="status"
+           class="mt-3 bg-panel2 border-l-2 border-jsyellow rounded-r-lg px-4 py-3 text-sm text-paper font-semibold focus:outline-none focus:ring-2 focus:ring-jsyellow/40">${esc(avisoDelRepaso)}</p>`;
+
+/**
+ * Deja el mensaje puesto en la zona de preguntas y lleva la vista y el foco ahi.
+ *
+ * Con modulo cargado va **bajo la cabecera del modulo**; sin modulo cargado, en el
+ * estado vacio, que es lo unico que hay en esa zona. En los dos casos se dibuja
+ * volviendo a dibujar, y no tocando un nodo suelto: asi el mensaje no puede quedar
+ * en un sitio que el siguiente dibujo no conozca.
+ *
+ * El viaje es el mismo que al entrar al repaso, y por el mismo motivo: el mensaje
+ * esta en la otra columna, y en telefono queda pantalla y media por debajo del
+ * boton que lo produjo. Pulsar y que no pase nada visible es peor que no responder.
+ */
+function mostrarAvisoDelRepaso(texto) {
+  avisoDelRepaso = texto;
+
+  const contenedor = $('#cuestionario');
+  if (!contenedor) return;
+
+  if (bancoCargado) pintar();
+  else mostrarEstadoVacio(contenedor);
+
   const aviso = $('#aviso-repaso');
   if (!aviso) return;
 
-  aviso.textContent = texto;
+  // El nodo se acaba de dibujar visible. Quitarle `hidden` es inofensivo en el
+  // navegador y necesario para que un mensaje anterior, escondido por
+  // `olvidarElAvisoDelRepaso()`, no se quede escondido al volver a mostrarse.
   aviso.classList.remove('hidden');
+
+  aviso.scrollIntoView?.({
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    block: 'center',
+  });
+  aviso.focus?.({ preventScroll: true });
 }
 
-function limpiarAvisoDelRepaso() {
-  const aviso = $('#aviso-repaso');
-  if (!aviso) return;
+/**
+ * Retira el mensaje en cuanto deja de describir la situacion (decision 11).
+ *
+ * Lo llaman los cuatro caminos que la cambian: responder, cambiar de modulo,
+ * reiniciar y entrar al repaso. Tres de ellos vuelven a dibujar y se lo llevarian
+ * por delante igual; **responder no**, y es justo el que dejaria en pantalla un
+ * «todavía no respondes ninguna pregunta» encima de una pregunta recien
+ * respondida. Por eso se esconde el nodo ademas de olvidar el texto.
+ */
+function olvidarElAvisoDelRepaso() {
+  if (avisoDelRepaso === null) return;
 
-  aviso.textContent = '';
-  aviso.classList.add('hidden');
+  avisoDelRepaso = null;
+  $('#aviso-repaso')?.classList.add('hidden');
 }
 
 /**
@@ -961,7 +1030,7 @@ function limpiarAvisoDelRepaso() {
  */
 function entrarAlRepaso() {
   if (!bancoCargado) {
-    avisarDelRepaso('Elige un módulo en el índice y responde algunas preguntas para poder repasar.');
+    mostrarAvisoDelRepaso('Elige un módulo en el índice y responde algunas preguntas para poder repasar.');
     return;
   }
 
@@ -969,13 +1038,17 @@ function entrarAlRepaso() {
   const falladas = falladasDelModulo(vigentes);
 
   if (falladas.length === 0) {
-    avisarDelRepaso(
+    mostrarAvisoDelRepaso(
       vigentes.size === 0
         ? 'Todavía no respondes ninguna pregunta de este módulo. Responde algunas y vuelve acá.'
         : 'No tienes errores que repasar: acertaste todas las que llevas respondidas.'
     );
     return;
   }
+
+  // Entrar es una de las cuatro cosas que dejan obsoleto el mensaje: si estaba
+  // puesto, decia que no habia nada que repasar.
+  olvidarElAvisoDelRepaso();
 
   repaso = { ids: new Set(falladas), respondidas: new Set() };
   pintar();
@@ -1264,6 +1337,9 @@ export async function mostrarModulo(numero) {
   const miPeticion = (peticionVigente += 1);
   moduloCargando = numero;
 
+  // Elegir un modulo deja obsoleto el mensaje del repaso: hablaba del modulo anterior.
+  olvidarElAvisoDelRepaso();
+
   // Elegir un modulo a mitad del repaso sale del repaso, sin preguntar (decision 5).
   // Va aca arriba y no en el indice: `mostrarModulo()` es el unico sitio por el que
   // se cambia de modulo, asi que el repaso no puede sobrevivir a un cambio por
@@ -1466,6 +1542,8 @@ export function setupReinicio() {
     // Sin modulo cargado no hay nada que reiniciar, y volver a dibujar el estado
     // vacio encima de si mismo solo desplazaria la pagina sin motivo.
     if (!bancoCargado) return;
+
+    olvidarElAvisoDelRepaso();
 
     // Reiniciar a mitad del repaso sale del repaso y reinicia (decision 5). Primero
     // se sale: `pintar()` dibujaria el subconjunto congelado de un repaso cuyas

@@ -1,7 +1,7 @@
 # Iteración 34 · Justificación y repaso
 
 **Épica:** 30 · Cuestionario
-**Estado:** 🔵 En curso · lectura de alcance hecha, decisiones 1 a 10 resueltas
+**Estado:** 🔵 En curso · lectura de alcance hecha, etapas 1 y 2 implementadas, decisiones 1 a 11 resueltas
 **Depende de:** iteraciones 33 y 36 cerradas. El repaso lee el avance guardado de la
 33, y la justificación se dibuja sobre la paleta que dejó la 36.
 
@@ -32,6 +32,8 @@ redacción no lo va a descubrir ninguna comprobación antes que ellos.
   enlace y no un botón; la regla sobre la base, que prohibía sin querer la fila de
   prueba temporal de `probar-escapado.mjs`; la convivencia del repaso con ADR-033; y el
   criterio del escapado, que podía pasar sin dibujar ninguna justificación.
+- **2026-09-16 · decisión 11, tras la etapa 2.** El mensaje con N en 0 hacía crecer el
+  panel fijo en contra de ADR-032; el autor lo llevó a la zona de preguntas.
 
 ## Lo que hereda
 
@@ -172,6 +174,20 @@ Decidido por el autor el 2026-09-16. **Mientras dura el repaso, «Repasar mis er
 pasa de tres controles (con «Reiniciar el módulo» y el enlace «Repasar la materia»).
 Reintentar una fallada cuesta salir y volver a entrar.
 
+### 11 · El mensaje con N en 0 aparece en la zona de preguntas
+
+Decidido por el autor el 2026-09-16, tras la etapa 2: el mensaje junto al botón hacía
+crecer el panel fijo, y ADR-032 dice que el panel no crece ni una fila.
+
+- **Al pulsar «Repasar mis errores (0)», el mensaje aparece en la zona de preguntas,
+  bajo la cabecera del módulo**, y la vista y el foco van hasta ahí, igual que al entrar
+  al repaso. **El panel no crece en ningún caso.**
+- **Sin módulo cargado**, el mensaje invita a elegir un módulo y aparece también en la
+  zona de preguntas.
+- **El mensaje no queda a la vista cuando ya no describe la situación**: al responder,
+  cambiar de módulo, reiniciar o entrar al repaso.
+- ADR-032 no se enmienda.
+
 ## Lo que queda a criterio de quien implemente
 
 El diseño visual de la justificación (con las condiciones heredadas de la 36), el texto
@@ -238,7 +254,10 @@ temporal que `probar-escapado.mjs` carga y retira en la base local sí está per
   correcta cambió: el repaso sigue al banco nuevo.
 - [ ] **El botón dice «Repasar mis errores (N)» con N exacto**, y N cambia al acertar.
 - [ ] **Con N en 0 aparecen los dos mensajes útiles**, el de módulo sin respuestas y el de
-  todo acertado, cada uno en su caso.
+  todo acertado, cada uno en su caso, en la zona de preguntas y no en el panel.
+- [ ] **Mostrar el mensaje con N en 0 no hace crecer el panel** (ADR-032), también sin
+  módulo cargado, y el mensaje desaparece al responder, cambiar de módulo, reiniciar o
+  entrar al repaso.
 - [ ] **Acertar en el repaso reemplaza lo guardado:** la clave del módulo trae la
   alternativa nueva, sin veredicto, con el mismo formato `v: 1`.
 - [ ] **Una acertada sigue a la vista hasta salir del repaso**, y al volver a entrar ya no
