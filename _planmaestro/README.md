@@ -9,10 +9,10 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | iteracion-36-orientacion-en-la-portada.md                                                                                                          |
+| **Iteración** | iteracion-34-justificacion-y-repaso.md                                                                                                             |
 | **Épica**     | 30 - Cuestionario                                                                                                                                  |
 | **Estado**    | ⚪ No iniciada                                                                                                                                      |
-| **Siguiente** | La siguiente es `iteracion-34-justificacion-y-repaso.md` (épica 30). El orden de trabajo de la épica 30 es **33 → 36 → 34 → 35**, decidido por el autor el 2026-09-15: la portada publica una cifra falsa y la 36 no depende de las otras tres. |
+| **Siguiente** | La siguiente es `iteracion-35-transicion-de-carga.md` (épica 30), con la que se cierra el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15. La 36 se adelantó porque la portada publicaba una cifra falsa; ya cerró. |
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -32,6 +32,7 @@ decisiones vale tanto como el código que las implementa.
 | 31 - Selector de módulo                | 30 - Cuestionario           | 2026-09-11 | 🟢 Completada |
 | 32 - Rediseño del panel fijo           | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | 33 - Memoria del avance                | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
+| 36 - Orientación en la portada         | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

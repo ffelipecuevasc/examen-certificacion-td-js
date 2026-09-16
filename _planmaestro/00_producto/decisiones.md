@@ -1139,6 +1139,36 @@ esta ADR: **un procedimiento que pide acordarse de dos cosas produce una.** Escr
 advertencia se siente como haber resuelto el problema; lo que lo resuelve es que el
 segundo paso no pueda no ocurrir.
 
+**Actualización · 2026-09-15.** La protección del sello **se extiende a la cifra que la
+portada publica** (iteración 36, decisión 4 bis). Hasta hoy el sello defendía la
+instantánea y el respaldo; no defendía lo que el estudiante lee en la primera pantalla.
+
+Desde ahora, **`scripts/cifra-portada.mjs` se niega a escribir la cifra si el sello de la
+instantánea no dice `nube`**, y **`scripts/comprobar-cifra.mjs` da rojo si la instantánea
+versionada no lo trae, aunque el número coincida** — ese «aunque» es el punto entero, y se
+explica abajo.
+
+**El hueco que cierra.** Alguien corre el generador contra la base local para probar el
+modo degradado, que es un camino legítimo y documentado (`PERMITIR_INSTANTANEA_LOCAL=1`).
+La instantánea queda con las diez filas de juguete y la cifra de la portada se reescribía
+con ese número. Portada e instantánea quedaban **de acuerdo en un número falso**, así que
+la comparación entre las dos no tenía nada que objetar.
+
+**Lo que no era.** No era un fallo silencioso: `comprobar-instantanea.mjs` ya denunciaba
+ese estado por el sello y por la comparación contra `d1/respaldo-banco.sql`, y
+`npm run verificar` ya daba rojo por el paso `instantanea`. Lo que fallaba es que **la
+línea que hablaba de la portada decía OK**, y quien leyera solo esa línea se quedaba
+tranquilo mientras la portada anunciaba diez preguntas. La comprobación se puso donde el
+problema se ve publicado, no donde ya se veía.
+
+**Cómo responde cada punto de llamada a la negativa**, que es donde está el criterio:
+`publicar-banco.mjs` **falla entero**, porque llegar ahí con otro sello es una
+contradicción y seguir dejaría la instantánea nueva versionada con la portada anunciando
+el banco anterior —el «a medias» que esta ADR existe para impedir—;
+`generar-instantanea.mjs` **sigue y avisa**, porque es el único sitio donde un sello que
+no dice `nube` es un resultado buscado, y ahí la portada conserva la cifra del banco
+publicado, que sigue siendo la verdadera.
+
 ---
 
 ## ADR-024 · La iteración 22 se verifica con las diez filas de juguete, y el escapado no queda probado a escala hasta la 24

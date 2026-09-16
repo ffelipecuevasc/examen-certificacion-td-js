@@ -69,19 +69,27 @@ a discrepar, manda el testimonio: se corrige el código.
 
 ### Agregado el 2026-09-15 · de dónde salieron los ejercicios de ejemplo
 
+> **Corregido el 2026-09-15**, el mismo día en que se escribió. La primera redacción decía que los ejercicios se
+> transcribieron **«al terminarlo, de memoria»**. **El autor no había dicho eso**: fue una forma de transcripción que
+> quien escribió la sección dio por supuesta y atribuyó al testimonio. Lo que de verdad ocurrió está abajo, y cambia
+> el peso de la fuente: no son un recuerdo posterior, son apuntes tomados **durante** el examen y con autorización
+> explícita. Se corrige en vez de matizarse porque una fuente mal descrita se usa mal.
+
 Aportado por el autor. Los bloques de «Código de ejercicios que podrían salir en tu examen» que muestra la portada
 —`static/js/data/modules.js`, campo `ejercicios` de cada módulo— **no los inventó el autor ni salen de ningún manual**:
 
-- **Los transcribió una estudiante que rindió el examen**, al terminarlo, de memoria, **para ayudar a quienes venían
-  después**. No fue un encargo: lo hizo por su cuenta.
-- **Otros estudiantes que también lo rindieron los corroboraron**, de modo que no dependen del recuerdo de una sola
-  persona.
+- **La mañana del examen oficial de 2026**, en una reunión por Zoom con el equipo de Talento Digital para Chile, **una
+  encargada informó en vivo** que los estudiantes podían usar **cuaderno, teléfono o tablet** para tomar apuntes o
+  desarrollar ejercicios. **En versiones anteriores estaba prohibido**, así que fue un cambio anunciado ese mismo día.
+- **Con esa autorización, una estudiante anotó los ejercicios de código durante el examen**, para estudiar con ellos.
+- **Otros estudiantes que también lo rindieron los corroboraron**, de modo que no dependen de una sola persona.
 
 **Sin nombres, a propósito.** Quiénes fueron no se registra acá ni en ninguna parte del repositorio, que es público.
 
-**Qué se puede afirmar y qué no.** Que son fieles a lo que cayó en el examen de ese año, hasta donde alcanza un
-recuerdo corroborado. **No** que vayan a repetirse: por eso el rótulo del sitio dice «podrían salir en tu examen» y no
-«salen». Y **no** que sean textualmente los del examen: son una transcripción posterior, no una copia.
+**Qué se puede afirmar y qué no.** Que son fieles a los ejercicios que cayeron en el examen de ese año: se anotaron
+**durante** la prueba y con permiso, no se reconstruyeron después, y además están corroborados. **No** que vayan a
+repetirse: por eso el rótulo del sitio dice «podrían salir en tu examen» y no «salen». Y **no** que sean el enunciado
+textual del examen: son apuntes de una estudiante, no una copia oficial.
 
 ## Qué decisiones del proyecto se apoyan en esto
 

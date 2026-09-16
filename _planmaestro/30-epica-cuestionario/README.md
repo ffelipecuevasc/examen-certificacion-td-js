@@ -42,9 +42,10 @@ explica cada respuesta y permite repasar solo los errores.
 | 33 | Memoria del avance                       | 🟢 Completada · 2026-09-15 |
 | 34 | Orientación del estudiante en la portada | ⚪ No iniciada |
 | 35 | Transición de carga                      | ⚪ No iniciada             |
-| 36 | [Orientación del estudiante en la portada](iteracion-36-orientacion-en-la-portada.md) | ⚪ No iniciada |
+| 36 | [Orientación del estudiante en la portada](iteracion-36-orientacion-en-la-portada.md) | 🟢 Completada · 2026-09-15 |
 
 **Orden de trabajo: 33 → 36 → 34 → 35.** Decidido por el autor el **2026-09-15**, al cerrar la 33.
+**La 36 cerró el 2026-09-15. La siguiente es la 34.**
 La 36 se adelanta a la 34 y la 35 porque **la portada publica hoy una cifra falsa**, que es un
 defecto a la vista de cualquiera que entre, y porque **la 36 no depende de la 33, la 34 ni la 35**:
 toca `index.html`, no el cuestionario. Las otras dos siguen después, en su orden, y ninguna se
