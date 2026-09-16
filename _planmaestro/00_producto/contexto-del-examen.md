@@ -38,11 +38,41 @@ Se habilita un editor incrustado que, en la práctica, es **un área de texto va
 El estudiante escribe de memoria y sin poder comprobar nada. **Lo corrige una persona de Talento Digital, días
 después.**
 
+### Agregado el 2026-09-15 · programar entra en los siete módulos, y no siempre es escribir
+
+Aportado por el autor a partir del testimonio de sus estudiantes. **Amplía lo de arriba; no lo corrige.**
+
+1. **Los siete módulos evaluados piden programar.** No es una parte suelta del examen ni algo que aparezca solo en
+   algunos módulos: del 2 al 8, todos.
+2. **Programar toma dos formas**, y la segunda no estaba escrita acá: **escribir el código** en el área de texto
+   vacía, tal como se describe arriba, **o revisar un código dado y señalar el error**. La segunda forma se responde
+   igual de a ciegas —sin ejecutar, sin subrayado— pero lo que se pide no es producir, es diagnosticar.
+
+### Agregado el 2026-09-15 · el lenguaje de cada módulo
+
+Misma fuente y misma fecha. Qué se programa en cada módulo:
+
+| Módulo | Lenguaje             |
+|--------|----------------------|
+| 2      | HTML5 y CSS3         |
+| 3      | JavaScript           |
+| 4      | JavaScript           |
+| 5      | SQL                  |
+| 6      | Node.js con Express  |
+| 7      | Node.js con SQL      |
+| 8      | Node.js con Express  |
+
+**Dónde vive este dato en el código:** en `static/js/data/modules.js`, campo `lenguaje` de cada módulo, y en ningún
+otro sitio. El aviso de programación de la portada arma su subtítulo con ese campo y el número del módulo, de modo
+que corregir una fila de esta tabla es corregir una línea de código y nada más. Si esta tabla y ese archivo llegaran
+a discrepar, manda el testimonio: se corrige el código.
+
 ## Qué decisiones del proyecto se apoyan en esto
 
 | Dónde                       | Qué se apoya en este documento                                                                          |
 |-----------------------------|---------------------------------------------------------------------------------------------------------|
 | Iteración 36                | Los bloques de «Código de ejemplo» de la portada se marcan como el formato real de una parte del examen |
+| Iteración 36 · decisión 9   | El aviso de programación de cada módulo: que hay que programar, y en qué lenguaje                       |
 | Portada, métrica «Formatos» | Los dos formatos de pregunta                                                                            |
 | Épica 40 · Simulacro        | Duración y condiciones del simulacro cronometrado                                                       |
 

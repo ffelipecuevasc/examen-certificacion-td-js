@@ -24,34 +24,65 @@ function codeBlock(ejercicio, codeId) {
 }
 
 /**
- * El aviso que dice que estos bloques SON el formato de una parte del examen.
+ * El aviso que dice que en el examen hay que PROGRAMAR, no solo reconocer.
  *
- * Antes decia «Código de ejemplo» y nada mas, y para un principiante eso es
- * decoracion: un recuadro bonito que se mira y se pasa. Lo que no decia es lo
- * unico que importa —que en el examen esto se escribe a mano, de memoria, en un
- * cuadro de texto que no autocompleta, no subraya errores y no ejecuta— y es
- * justo lo que cambia como hay que estudiarlo.
+ * POR QUE ES AMARILLO (decision 9 de la iteracion 36)
  *
- * EL MENSAJE NO PUEDE DEPENDER DEL COLOR. Lo dicen las palabras; la barra lateral
- * y el ícono acompañan. En escala de grises se entiende igual, que es la misma
- * regla que la iteracion 32 aplico al indice de modulos.
+ * La version anterior era una tarjeta oscura con barra amarilla y el titular
+ * «Código de ejemplo · así se responde una parte del examen». Sobre una pagina
+ * oscura no destacaba: quedaba como un parrafo mas dentro del acordeon, y un
+ * aviso que el estudiante no ve no cumple ninguna funcion. El autor lo rediseno
+ * con fondo `jsyellow` para que sea lo primero que se ve al abrir un modulo.
+ *
+ * EL FONDO AMARILLO OBLIGA A DAR VUELTA TODOS LOS COLORES. Ninguno de los grises
+ * del sitio sirve encima: `paper` da 1,26:1, `muted` 2,11:1 y `mutedink` 2,51:1.
+ * Todo el texto pasa a tonos oscuros —`ink`, `panel2`, `panel3`—, que sobre el
+ * amarillo dan entre 11,81:1 y 15,53:1. El enfasis se sigue expresando con peso
+ * de letra, no con color, que es la regla de la decision 5 bis.
+ *
+ * EL SUBTITULO NO ESTA ESCRITO AQUI. Sale de `numero` y `lenguaje` de cada modulo
+ * (static/js/data/modules.js). Siete frases escritas a mano serian siete
+ * oportunidades de que una quede diciendo el lenguaje de otro modulo.
+ *
+ * SE DIBUJA EN LOS SIETE MODULOS, TENGAN O NO EJERCICIOS DE EJEMPLO. Antes vivia
+ * dentro del `if` de los ejercicios, y hoy eso no se nota porque los siete tienen.
+ * Pero lo que el aviso afirma —que en ese modulo hay que programar— es cierto por
+ * el testimonio, no por que nosotros tengamos un ejemplo a mano: si manana un
+ * modulo se queda sin bloque de codigo, el aviso tiene que seguir ahi.
  *
  * EL ORIGEN VA PEGADO AL DATO, no en una nota al pie. `vision.md` exige declarar
  * que el material es no oficial, y esto es de lo mas especifico que afirma el
  * sitio sobre como es el examen: sale del testimonio de estudiantes que lo
  * rindieron el 2026, recogido en
  * _planmaestro/00_producto/contexto-del-examen.md, no de Talento Digital.
+ *
+ * EL ICONO ES UNA IMAGEN, NO UNA CLASE `i-*` (decision 10). Sus animaciones viven
+ * dentro del SVG y hay que conservarlas, y el sistema de iconos del sitio las
+ * perderia: convierte cada SVG en una mascara CSS, que solo guarda la forma. Por
+ * eso este va con `<img>` y por eso su trazo queda negro —`currentColor` sin CSS
+ * que lo herede—, que sobre amarillo es justo lo que conviene. NO se le pone
+ * color desde el CSS: no lo tomaria.
+ *
+ * Y ES DECORATIVO: `alt=""`. El titular que va al lado ya dice lo que significa,
+ * asi que describirlo otra vez solo obligaria a un lector de pantalla a oir dos
+ * veces lo mismo.
  */
-function avisoDelFormato() {
+function avisoDeProgramacion(m) {
   return `
-            <div class="mt-7 mb-2 rounded-lg border border-l-4 border-panel3 border-l-jsyellow bg-panel2 p-4">
-              <p class="font-display font-bold text-sm text-paper flex items-center gap-2">${icon('commit', 'text-base text-jsyellow')}Código de ejemplo · así se responde una parte del examen</p>
-              <p class="mt-2 text-xs text-muted leading-relaxed">
-                En el examen, ejercicios como estos se responden escribiendo el código en un cuadro de texto vacío:
-                <strong class="font-semibold text-paper">sin autocompletado, sin marcado de errores y sin poder ejecutarlo</strong>.
+            <div class="mt-7 mb-10 rounded-xl bg-jsyellow p-5 sm:p-6">
+              <div class="flex items-start gap-3">
+                <img src="static/resources/alert-loop.svg" alt="" class="w-8 h-8 shrink-0">
+                <div class="min-w-0">
+                  <p class="font-display font-bold text-xl sm:text-2xl text-ink leading-snug">En el examen real deberás programar</p>
+                  <p class="mt-1 font-display font-semibold text-sm sm:text-base text-ink">En el Módulo ${esc(m.numero)} te tocará programar en ${esc(m.lenguaje)}</p>
+                </div>
+              </div>
+              <p class="mt-4 text-sm text-panel2 leading-relaxed">
+                En el examen, ejercicios como estos se responden escribiendo el código en un cuadro de texto vacío, o revisando código y señalando el error:
+                <strong class="font-semibold text-ink">sin autocompletado, sin marcado de errores y sin poder ejecutarlo</strong>.
                 Practícalos escribiéndolos de memoria, no solo leyéndolos.
               </p>
-              <p class="mt-2 font-mono text-[11px] text-mutedink leading-relaxed">
+              <p class="mt-3 font-mono text-[11px] text-panel3 leading-relaxed">
                 Esto sale del testimonio de estudiantes que rindieron el examen 2026. No es información oficial de Talento Digital para Chile.
               </p>
             </div>`;
@@ -142,7 +173,8 @@ export function renderModules() {
           <div class="px-5 sm:px-6 pb-7 border-t border-panel3 pt-6">
             <p class="font-mono text-[11px] text-mutedink mb-3 flex items-center gap-2">${icon('history-edu', 'text-base')}Temas evaluados</p>
             <ul class="flex flex-col gap-2">${temas}</ul>
-            ${ejercicios ? `${avisoDelFormato()}${ejercicios}` : ''}
+            ${avisoDeProgramacion(m)}
+            ${ejercicios}
           </div>
         </div>
       </article>`;

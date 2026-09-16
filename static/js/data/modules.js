@@ -6,6 +6,18 @@
  * anadio en la iteracion 31: el selector del cuestionario necesita el numero para
  * pedirle el modulo a la capa de datos, y sacarlo de la cadena 'Modulo 3' con una
  * expresion regular seria inventar un dato que aqui se puede escribir.
+ *
+ * `lenguaje` es en que se programa ese modulo el dia del examen, y lo usa el aviso
+ * de programacion de components/modules.js para armar su subtitulo (iteracion 36,
+ * decision 9). VIVE AQUI Y EN NINGUN OTRO SITIO: la alternativa era escribir las
+ * siete frases a mano en el componente, y siete frases a mano son siete
+ * oportunidades de que una quede diciendo el lenguaje de otro modulo el dia que
+ * el temario cambie. El subtitulo se arma con `numero` y `lenguaje`; si manana el
+ * modulo 7 pasa a evaluarse en otra cosa, se cambia esta linea y nada mas.
+ *
+ * ES TESTIMONIO DE ESTUDIANTES, no informacion oficial de Talento Digital. La
+ * tabla completa y su origen estan en
+ * _planmaestro/00_producto/contexto-del-examen.md.
  */
 export const modulesData = [
   {
@@ -14,6 +26,7 @@ export const modulesData = [
     modulo: 'Módulo 2',
     icono: 'devices',
     titulo: 'Fundamentos de Desarrollo Front-End',
+    lenguaje: 'HTML5 y CSS3',
     resumen: '6 preguntas de selección múltiple + 2 ejercicios de código',
     temas: [
       'Uso y configuración de media queries para diseño responsivo',
@@ -42,6 +55,7 @@ export const modulesData = [
     modulo: 'Módulo 3',
     icono: 'data-object',
     titulo: 'Fundamentos de Programación en JavaScript',
+    lenguaje: 'JavaScript',
     resumen: 'Evaluación práctica de lógica pura en JavaScript',
     temas: [
       'Control de flujo con switch / case',
@@ -69,6 +83,7 @@ export const modulesData = [
     modulo: 'Módulo 4',
     icono: 'bolt',
     titulo: 'Programación Avanzada en JavaScript',
+    lenguaje: 'JavaScript',
     resumen: 'Paradigmas y manejo de asincronía',
     temas: [
       'Conceptos de programación orientada a objetos (OOP)',
@@ -90,6 +105,7 @@ export const modulesData = [
     modulo: 'Módulo 5',
     icono: 'database',
     titulo: 'Fundamentos de Bases de Datos Relacionales',
+    lenguaje: 'SQL',
     resumen: 'Preguntas conceptuales y escritura de consultas SQL',
     temas: [
       'Modificación de datos con UPDATE',
@@ -125,6 +141,7 @@ export const modulesData = [
     modulo: 'Módulo 6',
     icono: 'dns',
     titulo: 'Desarrollo de Aplicaciones Web Node Express',
+    lenguaje: 'Node.js con Express',
     resumen: 'Arquitectura del servidor, enrutamiento y módulos',
     temas: [
       'Ejecución de un archivo Node desde la consola de comandos',
@@ -150,6 +167,7 @@ export const modulesData = [
     modulo: 'Módulo 7',
     icono: 'layers',
     titulo: 'Acceso a Datos en Aplicaciones Node',
+    lenguaje: 'Node.js con SQL',
     resumen: 'Persistencia avanzada, transacciones y ORM',
     temas: [
       'Pool de conexiones frente a conexiones individuales',
@@ -180,6 +198,7 @@ export const modulesData = [
     modulo: 'Módulo 8',
     icono: 'shield-lock',
     titulo: 'Implementación de API Backend Node Express',
+    lenguaje: 'Node.js con Express',
     resumen: 'Buenas prácticas REST y autenticación con JWT',
     temas: [
       'JSON como formato de intercambio en servicios REST',
