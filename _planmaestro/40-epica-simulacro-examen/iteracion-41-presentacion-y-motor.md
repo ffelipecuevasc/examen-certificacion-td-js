@@ -1,108 +1,118 @@
-# Iteración 41 · Presentación, extremo y motor del intento
+# Iteración 41 · Presentación, selección y protección del intento
 
 **Épica:** 40 · Simulacro de examen
 **Estado:** ⚪ No iniciada
-**Depende de:** épica 30 cerrada. Decisiones E2 y E3 de la épica resueltas.
+**Depende de:** épica 30 cerrada, y la actualización de ADR-022 escrita en `decisiones.md`.
+**Siguiente en el orden de trabajo:** iteración 45.
 
 ## Objetivo
 
-Crear `simulacro.html` con su pantalla de presentación, un extremo que entrega las 120
-preguntas de un intento ya elegidas, y la maquinaria que sostiene el intento en el
-navegador, todavía sin cronómetros.
+Crear `simulacro.html` con su pantalla de presentación, elegir en el navegador las 120 preguntas de un intento, traerlas
+con un extremo de solo lectura, y guardar el intento para que sobreviva a una recarga, todavía sin cronómetros ni
+recorrido.
 
 ## Contexto
 
-El simulacro comparte con `cuestionario.html` el encabezado, el pie y el favicon. Lo que
-cambia es que aquí hay un antes y un después: la página no arranca respondiendo, arranca
-explicando.
-
-**Por qué un extremo nuevo.** Decidido por el autor el 2026-09-16. El cuestionario pide un
-módulo a la vez (iteración 31) para no bajar el banco entero. El simulacro necesita
-preguntas de todos los módulos. Pedir cada módulo por separado multiplicaría las esperas,
-y usar la instantánea de 499 557 B bajaría el banco completo. Un extremo que devuelve solo
-las 120 preguntas elegidas es el camino más liviano para el navegador.
+La página no arranca respondiendo, arranca explicando. Esta iteración deja lista la maquinaria sobre la que la 42, la 43
+y la 44 construyen: un intento elegido, cargado, guardado y protegido.
 
 ## Historial de este archivo
 
 - **2026-09-04 · anotadas** las preguntas hermanas.
-- **2026-09-16 · reescrita.** El autor eligió el extremo nuevo. Se agregó lo que hereda de
-  la épica 30, se marcaron como pendientes el reanclaje de las preguntas hermanas a los ids
-  de D1 y la transición de carga, y se movió a la iteración 43 el texto definitivo de las
-  reglas, que depende de decisiones de la 42 y la 43.
+- **2026-09-16 · reescrita dos veces**, la segunda tras la lectura de alcance de la épica. El autor cambió la
+  arquitectura: el navegador elige y el extremo solo sirve. Las preguntas hermanas quedaron ancladas a ids de D1.
 
 ## Lo que hereda
 
-- **ADR-008 · modo degradado:** si la capa de datos no responde, el sitio usa la
-  instantánea versionada y lo avisa. El simulacro también tiene que funcionar así
-  (decisión E3 de la épica).
-- **ADR-022:** las respuestas correctas viajan al navegador. El extremo puede enviarlas.
-- **Iteración 34:** la justificación se dibuja escapada y está probada con contenido
-  hostil. El simulacro no la muestra hasta el resumen (44).
-- **Iteración 35:** la transición de carga acompaña la carga real con un piso, sin
-  porcentaje, con el latido `animate-latido` definido en `tailwind.config.cjs`, y declara
-  que un indicador «dura lo que dura la carga y ni un milisegundo más».
-- **Épica 50, pendiente registrado:** `?resumen=1` lee 1111 filas. Un extremo que elige al
-  azar puede leer la tabla entera en cada intento.
+- **ADR-008 · modo degradado:** si la capa de datos no responde, se usa la instantánea y se avisa.
+- **ADR-009:** el Worker público solo expone lectura. El extremo nuevo es de lectura y no la amplía.
+- **ADR-022 con su actualización del 2026-09-16:** las respuestas correctas viajan al navegador; el vocabulario del
+  resultado es el del README de la épica.
+- **ADR-033:** `?resumen=1` entrega los ids activos de cada módulo. Hoy lee 1111 filas por petición (pendiente de la
+  épica 50).
+- **ADR-034 y su actualización del 2026-09-15:** el espacio `examen-td-js.simulacro.` está reservado; la versión va dentro
+  del dato; un dato que no se entiende se ignora; se guarda al ocurrir, no al salir.
+- **Iteración 35:** la transición de carga (`dibujarTransicion()`, `cargaEnCurso`, `abrirLaCarga()`, `cerrarLaCarga()`,
+  `esperarElPiso()`, `decirQueEstaTardando()`) con su piso de 400 ms y su aviso de carga lenta. **Hoy está dentro de
+  `cuestionario.js`, sin exportar, y `fijarControlesDelPanel()` está cableada a `#reiniciar` y `#repaso`.**
+- **`utils/dom.js`:** `esc()`, `shuffle()` y `prefersReducedMotion()` se reutilizan tal cual.
+- **Lo que no se hereda:** el sitio no usa hoy `beforeunload`, `pagehide`, `visibilitychange` ni `sessionStorage`. Todo
+  lo del ciclo de vida de la página es nuevo.
 
 ## Decisiones tomadas
 
-### 1 · Un extremo nuevo entrega el intento ya armado
+Todas del autor, 2026-09-16.
 
-Decidido por el autor el 2026-09-16. El servidor elige las preguntas, aplica el reparto
-por módulo y excluye los pares hermanos. El navegador recibe el intento listo.
+### 1 · El navegador elige; el extremo solo sirve
+
+- El navegador parte de los ids por módulo de `?resumen=1`, elige y pide las elegidas a un extremo **de solo lectura que
+  devuelve preguntas por id**, sin elegir ni repartir.
+- En modo degradado, **el mismo código** elige desde la instantánea. No hay una segunda copia del algoritmo.
+- **Las justificaciones no viajan con el intento** (se piden en la 44).
+- Motivos: `vision.md:68-70` deja fuera de alcance un servidor que haga más que servir el banco; y el proyecto ya
+  decidió no duplicar lógica entre el extremo y el respaldo (`generar-instantanea.mjs` importa las consultas de
+  `preguntas.js` por eso).
+- Se documenta en una **ADR nueva**, que incluye por qué este extremo **no puede cachearse nunca** (`cache-control:
+  no-store`), para cuando la iteración 53 revise esa cabecera.
+
+### 2 · Reparto parejo
+
+**17 preguntas por módulo, y la número 120 en un módulo elegido al azar.** Cada módulo pesa lo mismo y el resumen compara
+sin trampa. Conteos al 2026-09-16 (instantánea sellada el 2026-09-10): módulo 2: 52 · 3: 61 · 4: 61 · 5: 49 · 6: 52 ·
+7: 48 · 8: 45. Todos alcanzan con holgura.
+
+### 3 · Exclusión de preguntas hermanas en todo el intento
+
+La exclusión es **global al intento**, no por módulo: un par cruza del módulo 2 al 3. La lista vive en un **archivo de
+datos versionado dentro de `static/js/`**, que usan igual el camino normal y el degradado.
+
+### 4 · Reservas hasta 120
+
+Si la validación descarta alguna pregunta elegida, **se completa con reservas** respetando reparto y exclusión. Si aun
+así no se reúnen 120, **el intento no empieza** y se explica por qué. Un intento siempre tiene 120 preguntas.
+
+### 5 · El intento se guarda al ocurrir y se retoma
+
+- Se guarda en el navegador, bajo `examen-td-js.simulacro.`, **al empezar y en cada cambio**, nunca al salir.
+- Se guardan **las preguntas tal como llegaron**, no solo sus ids: una corrección del banco no cambia un intento empezado.
+  Esto se aparta a propósito de la regla central de ADR-034 (recalcular contra el banco vigente), y la ADR nueva lo
+  dice.
+- Al volver a la página con un intento en curso, se retoma. (Cómo cuenta el tiempo al volver es de la 42.)
+- Si no hay almacenamiento, el intento funciona durante la visita y se avisa que no sobrevive a una recarga, con el
+  patrón del aviso del cuestionario.
+
+### 6 · Una sola pestaña escribe el intento
+
+La pestaña que abre último **toma el intento**, y la otra **se bloquea con un aviso** («Este intento continúa en otra
+pestaña» o similar). Nunca hay dos pestañas escribiendo el mismo intento.
+
+### 7 · La transición de carga es la de la iteración 35
+
+Mientras llegan las preguntas se muestra la transición de la 35 con su piso y su aviso de carga lenta. Sin espera
+adicional. Para usarla fuera del cuestionario hay que **extraerla** a un módulo propio, con los controles a desactivar
+como parámetro.
 
 ## Decisiones sin resolver
 
-### 2 · El segundo extra en la transición de carga (la decide el autor)
+### 8 · Encabezado y pie (la decide el autor tras la lectura de alcance)
 
-El autor propuso el 2026-09-16 una animación que dure lo que tarde el extremo **o un
-segundo extra**, para dar tiempo a que todo cargue.
-
-**Choca con la iteración 35**, que dejó escrito que una espera fija miente y que el
-indicador dura lo que dura la carga y nada más. Además, un segundo extra no da tiempo a
-nada: el navegador dibuja cuando los datos llegaron, no antes ni después.
-
-- **Reutilizar la transición de la 35** (recomendada): el latido acompaña la carga real con
-  su piso, y al llegar el intento se muestra. Si la carga tarda más de lo normal, se dice.
-- **Agregar el segundo extra**: exige enmendar el criterio «nadie espera de más» de la 35
-  para esta página, con su motivo escrito.
-
-**Pendiente.**
-
-### 3 · Reparto por módulo y banco insuficiente (se propone con evidencia)
-
-El reparto se define con los conteos reales por módulo del banco vigente, y se justifica
-por escrito. Hay que decidir qué pasa si un módulo no alcanza su cuota: completar con otros
-módulos, o entregar un intento más corto. **Pendiente**, con los conteos medidos a la vista.
-
-### 4 · Dónde viven las preguntas hermanas (se propone tras la lectura de alcance)
-
-La tabla de abajo cita archivos que ya no existen (`modulo-0X.json`,
-`static/js/data/cuestionario.js`). Hay que reanclarla a los ids de D1 y decidir dónde vive
-la lista: en la base, en el código del extremo o en un archivo versionado. El modo
-degradado (E3) también tiene que respetarla. **Pendiente.**
-
-### 5 · Cómo se protege un intento en curso (decisión E2 de la épica)
-
-El aviso nativo del navegador al abandonar la página es poco confiable en teléfonos. Hay
-que decidir si el intento sobrevive a una recarga o a que el teléfono cierre la pestaña, y
-cómo, sabiendo que en el examen real no se puede volver atrás. **Pendiente.**
+Hoy el encabezado y el pie son **HTML copiado a mano** en `index.html` y `cuestionario.html`, y las dos copias ya
+difieren en 14 de 32 líneas. El simulacro puede ser una tercera copia o motivar extraerlos a una pieza única, lo que toca
+las otras dos páginas. **Pendiente**, con el costo de cada camino medido en la lectura.
 
 ## Tareas
 
-- [ ] Reanclar las preguntas hermanas a los ids de D1 (decisión 4).
-- [ ] Crear `simulacro.html` con el encabezado, el pie y el favicon del resto del sitio,
-  sobre fondo negro.
-- [ ] Pantalla de presentación con un botón de inicio, que es lo único que arranca el
-  intento. El texto definitivo de las reglas se cierra en la 43.
-- [ ] Extremo que devuelve un intento de 120 preguntas con el reparto por módulo y sin
-  pares hermanos.
-- [ ] Motor del intento en el navegador: recibe el intento y sostiene su estado.
-- [ ] Transición de carga según la decisión 2.
-- [ ] Comportamiento en modo degradado según E3.
-- [ ] Protección del intento en curso según E2.
-- [ ] Enlazar el simulacro desde el menú, el pie y `index.html`.
-- [ ] Documentar el extremo en una ADR nueva.
+- [ ] Escribir la ADR nueva de la decisión 1, con las decisiones 4 y 5 como consecuencias.
+- [ ] Extraer la transición de carga de la 35 a un módulo reutilizable, sin cambiar lo que ve el cuestionario.
+- [ ] Crear el archivo de datos de preguntas hermanas con los ids de la tabla de abajo.
+- [ ] Crear el extremo de solo lectura que devuelve preguntas por id, con la validación existente.
+- [ ] Crear el algoritmo de selección con reparto, exclusión y reservas, usado por los dos caminos.
+- [ ] Crear `simulacro.html` sobre fondo `ink`, con encabezado, pie y favicon según la decisión 8.
+- [ ] Pantalla de presentación con un botón de inicio, que es lo único que arranca el intento. El texto de las reglas es
+  provisional: se cierra en la 43.
+- [ ] Guardar y retomar el intento (decisión 5) y bloquear la segunda pestaña (decisión 6).
+- [ ] Registrar `simulacro.html` en `scripts/build-dist.mjs` (listas de `:64-70`), para que llegue a `dist/`.
+- [ ] Enlazar el simulacro desde el menú de escritorio y móvil y el pie de las dos páginas, y desde `index.html`.
 
 ## Criterios de aceptación
 
@@ -110,88 +120,103 @@ Cada uno se cierra con evidencia producida **provocando** el comportamiento.
 
 ### Los provoca Claude Code
 
-- [ ] **`simulacro.html` usa el mismo encabezado, pie y favicon** que el resto, y el fondo
-  de la página es `ink`.
-- [ ] **Nada del intento ocurre hasta pulsar el botón de inicio**: antes de pulsarlo no se
-  pide el extremo.
-- [ ] **Un intento trae exactamente 120 preguntas, sin repetidas**, comprobado sobre una
-  muestra de intentos generados.
-- [ ] **El reparto por módulo se cumple en cada intento de la muestra** y está documentado
-  con los conteos del banco vigente.
-- [ ] **Ningún intento de la muestra contiene dos preguntas del mismo par hermano**, ni dos
-  del trío, con la lista ya anclada a ids.
-- [ ] **Dos intentos no son idénticos**, y se informa cuántas preguntas comparten en
-  promedio sobre la muestra.
-- [ ] **Con un banco insuficiente para el reparto**, simulado interceptando la respuesta,
-  el comportamiento es el decidido.
-- [ ] **La respuesta del extremo no incluye preguntas inactivas ni descartadas.**
-- [ ] **El extremo informa cuántas filas lee por intento**, para la épica 50.
-- [ ] **En modo degradado, el intento se arma desde la instantánea** con las mismas reglas
-  de reparto y hermanas, y el aviso de ADR-008 queda visible.
-- [ ] **La transición de carga cumple la decisión 2**, medida desde el clic.
-- [ ] **Una carga fallida del intento no deja la transición colgada** y muestra un mensaje
-  útil.
-- [ ] **Todo texto que venga del banco se dibuja escapado**: `probar:escapado` lo cubre en
-  el simulacro.
-- [ ] **El intento en curso se comporta según E2** al recargar, provocado en el guion.
-- [ ] **El simulacro es alcanzable desde el menú, el pie y la portada.**
+**Selección**
+
+- [ ] **Sobre una muestra de al menos 200 intentos generados**, cada intento trae exactamente 120 preguntas, sin
+  repetidas, y todas activas.
+- [ ] **Cada intento de la muestra cumple el reparto**: 17 por módulo y un módulo con 18. Se informa cuántas veces le tocó
+  el extra a cada módulo.
+- [ ] **Ningún intento de la muestra contiene dos preguntas de un mismo par hermano**, incluido el par que cruza de módulo
+  (25 ↔ 107) y el trío (205, 210, 222).
+- [ ] **Se informa cuántas preguntas comparten en promedio dos intentos** de la muestra, junto al valor esperado por azar
+  (unas 39). Un promedio muy por encima del esperado es rojo.
+- [ ] **Con el modo degradado provocado**, el intento se elige desde la instantánea con el mismo código, y el aviso de
+  ADR-008 queda visible.
+- [ ] **El algoritmo existe una sola vez**: el camino normal y el degradado importan la misma función.
+- [ ] **Con una pregunta elegida descartada por la validación**, simulado interceptando la respuesta, el intento se
+  completa con reservas y sigue teniendo 120.
+- [ ] **Con descartes que impiden reunir 120**, simulado interceptando, el intento no empieza y la pantalla lo explica.
+
+**Extremo**
+
+- [ ] **El extremo devuelve exactamente las preguntas pedidas por id**, sin justificaciones, con el mismo contrato y
+  validación que `?modulo=N`.
+- [ ] **El extremo rechaza lo que no es lectura** y una lista de ids mal formada, con los errores de `_comun.js`.
+- [ ] **Se informan las filas leídas por intento** (resumen + extremo), para la épica 50.
+- [ ] **La respuesta lleva `cache-control: no-store`.**
+
+**Carga y guardado**
+
+- [ ] **Nada del intento ocurre hasta pulsar el botón de inicio**: antes no se pide el extremo ni se escribe nada.
+- [ ] **La transición de carga es la de la 35**, medida desde el clic: `max(carga, 400 ms)`, con el aviso de carga lenta a
+  su plazo.
+- [ ] **El cuestionario sigue igual** tras extraer la transición: `probar:filtrado` en verde, con sus mediciones.
+- [ ] **El intento queda guardado bajo `examen-td-js.simulacro.`** apenas empieza, con versión dentro del dato y las
+  preguntas completas.
+- [ ] **Simulando una recarga**, el intento se retoma con las mismas 120 preguntas en el mismo orden.
+- [ ] **Con el banco cambiado entre la carga y la recarga**, simulado interceptando, el intento retomado conserva las
+  preguntas como llegaron.
+- [ ] **Un dato guardado corrupto o de otra versión se ignora** sin romper la página.
+- [ ] **Con dos pestañas simuladas**, la última toma el intento y la otra queda bloqueada con aviso; ninguna escritura de
+  la bloqueada llega al almacén.
+- [ ] **Sin almacenamiento**, el intento empieza y se muestra el aviso de que no sobrevive a una recarga.
+
+**Página**
+
+- [ ] **Todo texto que venga del banco se dibuja escapado**: se agrega a `probar:escapado` un bloque para el simulacro.
+- [ ] **`simulacro.html` llega a `dist/`**: `npm run build` lo lista y no informa recursos rotos.
+- [ ] **El simulacro es alcanzable** desde el menú de escritorio, el menú móvil y el pie de las dos páginas, y desde la
+  portada: se comprueba sobre el HTML.
+- [ ] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
 
 ### Los comprueba el autor en el navegador
 
 - [ ] **La presentación se entiende sin tecnicismos**, leída en el teléfono.
-- [ ] **La transición de carga no se siente como una espera de más** con buena conexión, y
-  acompaña con la red limitada.
-- [ ] **Recargar o salir con un intento en curso** se comporta según E2, en escritorio y
-  en teléfono.
+- [ ] **La transición de carga se siente igual que en el cuestionario**, con buena conexión y con la red limitada.
+- [ ] **Recargar a mitad del intento lo retoma**, en escritorio y en teléfono.
+- [ ] **Abrir el simulacro en una segunda pestaña** bloquea la primera con un aviso claro.
+- [ ] **Los enlaces al simulacro** funcionan desde el menú, el pie y la portada, en escritorio y en teléfono.
 - [ ] **Sin errores de consola.**
-- [ ] **`npm run verificar` termina en 0.**
+- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
 
 ## Preguntas hermanas
 
-*Anotado el 2026-09-04, al revisar el solapamiento entre los dos bancos. Actualizado el
-mismo día, tras aplicar los retiros de la iteración 24.*
+*Anotadas el 2026-09-04. Ancladas a ids de D1 el 2026-09-16 en la lectura de alcance de la épica, con
+`origen`/`modulo`/`numero_origen` contra `d1/respaldo-banco.sql`; los veinte enunciados coinciden con su descripción.*
 
-> **⚠️ 2026-09-16 · esta tabla está desanclada.** Cita `modulo-0X.json` y posiciones de
-> `static/js/data/cuestionario.js`, que ya no son la fuente del banco. La columna
-> «Se rozan en» es la única forma fiable de encontrar cada pregunta en D1. Reanclarla es la
-> primera tarea de esta iteración (decisión 4).
+Diez relaciones que **no son duplicados**: cada pregunta evalúa algo distinto. Pero se rozan tanto que sacarlas juntas
+en el mismo intento convierte una en la respuesta de la otra.
 
-Diez pares que **no son duplicados**: cada pregunta evalúa algo distinto y por eso ninguna
-se retiró. Pero se rozan tanto —dos caras del mismo tema, dos propiedades del mismo objeto,
-una la pista de la otra— que sacarlas juntas en el mismo intento convierte una en la
-respuesta de la otra.
+| Par (cita original) | Se rozan en | id A | id B | Módulos |
+|---|---|---|---|---|
+| m08#3 ↔ M8·2 | cómo nombrar un endpoint / cómo estructurar el de un recurso | 326 | 360 | 8 / 8 |
+| m05#38 ↔ M5·13 | objetivo de normalizar / objetivo de la 3FN | 210 | 222 | 5 / 5 |
+| m05#33 ↔ M5·13 | dependencia transitiva / objetivo de la 3FN | 205 | 222 | 5 / 5 |
+| m05#30 ↔ M5·12 | entidad fuerte / entidad débil | 202 | 221 | 5 / 5 |
+| m02#26 ↔ M2·8 | evento `change` / evento `blur` | 26 | 45 | 2 / 2 |
+| m07#12 ↔ M7·7 | `rows` / `rowCount` | 287 | 318 | 7 / 7 |
+| m05#26 ↔ M5·11 | `DROP` / `TRUNCATE`, contrastados con `DELETE` | 198 | 220 | 5 / 5 |
+| m05#16 ↔ M5·10 | violar una llave foránea / qué restricción la impone | 189 | 219 | 5 / 5 |
+| m02#25 ↔ M3·7 | `let` sobre `var` al iterar / iteradoras globales anidadas | 25 | 107 | **2 / 3** |
+| m03#33 ↔ M3·13 | notación de corchetes / notación de punto | 85 | 112 | 3 / 3 |
 
-| Par (cita original) | Posición vieja al 2026-09-04 | Se rozan en |
-|---|---|---|
-| m08#3 ↔ M8·2 | M8·1 | cómo nombrar un endpoint / cómo estructurar el de un recurso concreto |
-| m05#38 ↔ M5·13 | M5·10 | objetivo de normalizar / objetivo de la 3FN, que es un caso del anterior |
-| m05#33 ↔ M5·13 | M5·10 | dependencia transitiva / objetivo de la 3FN |
-| m05#30 ↔ M5·12 | M5·9 | entidad fuerte / entidad débil: cada definición insinúa la otra |
-| m02#26 ↔ M2·8 | M2·6 | evento `change` / evento `blur` |
-| m07#12 ↔ M7·7 | M7·5 | `rows` / `rowCount`, dos propiedades del mismo objeto |
-| m05#26 ↔ M5·11 | M5·8 | `DROP` / `TRUNCATE`, que a su vez se contrasta con `DELETE` |
-| m05#16 ↔ M5·10 | M5·7 | qué ocurre al violar una llave foránea / qué restricción la impone |
-| m02#25 ↔ M3·7 | M3·5 | `let` sobre `var` al iterar / iteradoras globales en ciclos anidados |
-| m03#33 ↔ M3·13 | M3·10 | notación de corchetes / notación de punto |
+**Lo que el motor tiene que saber:**
 
-**M5·13 aparece dos veces**, con `m05#38` y con `m05#33`: ahí no hay un par sino un trío,
-y el motor no puede tratarlo como dos restricciones sueltas.
+1. **Son 19 preguntas, no 20.** El id 222 está en dos filas: **205, 210 y 222 forman un trío**, del que un intento puede
+   traer como máximo una.
+2. **El par 25 ↔ 107 cruza módulos**: una exclusión aplicada dentro de cada módulo no lo ve.
+3. **El módulo 5 aporta 9 de sus 49 preguntas** a la lista. Aun así alcanza para su cuota.
+4. La lista sale de `npm run informe-banco`, que compara **redacción**, no significado. Cumplir el criterio garantiza que
+   no salgan **estas** juntas, no que no salgan dos parecidas.
+5. Si una de estas preguntas se retira del banco, su fila deja de aplicar; el archivo de datos debe tolerarlo.
 
-**Avisos sobre esta lista:**
-
-1. Eran once. `m08#23 ↔ M8·11` desapareció al retirarse `M8·11` en la iteración 24.
-2. Hay que comprobar que los veinte ids sigan activos en el banco vigente; si alguno se
-   retiró, el par desaparece.
-3. La lista sale de `npm run informe-banco`, que compara **redacción**, no significado.
-   Cumplir el criterio garantiza que no salgan **estas** preguntas juntas, no que no salgan
-   dos preguntas parecidas.
+Las citas `m0X#N` remiten a `_planmaestro/00_producto/cuestionarios/modulo-0X.json`, conservados por ADR-031.
 
 ## Lo que esta iteración no puede afirmar
 
-- **Que un intento no se pueda inspeccionar**: las respuestas viajan al navegador
-  (ADR-022).
-- **Que dos intentos seguidos no repitan preguntas**: sin historial de intentos, cada uno
-  se elige sin saber del anterior.
+- **Que un intento no se pueda inspeccionar**: las respuestas viajan al navegador (ADR-022).
+- **Que dos intentos seguidos no repitan preguntas**: sin historial, cada uno se elige sin saber del anterior.
+- **Que un intento sobreviva a borrar los datos del navegador** o a cambiar de dispositivo.
 
 ## Notas de la iteración
 

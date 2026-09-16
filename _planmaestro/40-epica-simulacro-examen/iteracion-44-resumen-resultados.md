@@ -2,113 +2,124 @@
 
 **Épica:** 40 · Simulacro de examen
 **Estado:** ⚪ No iniciada
-**Depende de:** iteración 43, y la enmienda de ADR-022 (decisión E1 de la épica).
+**Depende de:** iteración 43.
 
 ## Objetivo
 
-Cerrar el intento con un resumen que diga si se aprobó el simulacro con el criterio del
-examen real, y sobre todo qué estudiar.
+Cerrar el intento con un resumen que diga si se aprobó el simulacro, qué módulos estudiar, y por qué era correcta cada
+respuesta.
 
 ## Contexto
 
-Es la pantalla que justifica todo el simulacro. Un porcentaje aislado no sirve de nada; lo
-útil es «fallaste 7 de 17 preguntas del módulo 7, vuelve a transacciones y Sequelize».
+Es la pantalla que justifica todo el simulacro. Un porcentaje aislado no sirve de nada; lo útil es «fallaste 9 de 17
+preguntas del módulo 5, vuelve a normalización».
 
 ## Historial de este archivo
 
-- **2026-09-16 · reescrita.** El autor decidió mostrar si se aprobó o reprobó el simulacro
-  con el 60 % del examen real, y que las omitidas cuenten como incorrectas. Eso choca con
-  la restricción de vocabulario de ADR-022, que queda como condición previa (E1). Se agregó
-  la reutilización de la justificación de la iteración 34.
+- **2026-09-16 · reescrita dos veces.** El autor fijó el vocabulario del resultado, la forma de la revisión en el teléfono,
+  que las justificaciones se piden en el resumen y que se conserva el último resultado. La lectura de alcance mostró que la
+  justificación de la 34 no está exportada y que los anclajes de la guía no llevan el número del módulo.
 
-## ⚠️ Condición previa: enmienda de ADR-022
+## Lo que hereda
 
-ADR-022 prohíbe hoy «aprobado» y «reprobado» en toda la épica. **Esta iteración no se
-construye hasta que ADR-022 tenga una actualización fechada** que diga qué palabras quedan
-permitidas, con qué forma, y cuáles siguen prohibidas. Ver el README de la épica. Los
-criterios de vocabulario de abajo se ajustan a esa enmienda al abrir la iteración.
+- **Reglas del simulacro** (README de la épica): omitida cuenta como incorrecta; se aprueba con 72 de 120.
+- **Actualización de ADR-022:** solo «Aprobaste el simulacro» y «Reprobaste el simulacro».
+- **Iteración 41:** el intento guardado con sus preguntas; siempre 120.
+- **Iteración 45:** el marcado estático del resumen y el significado de cada color.
+- **Iteración 34:** `justificacionDibujada()`, `porqueDibujado()` y `tieneJustificacion()` en `cuestionario.js`,
+  **sin exportar y acopladas** a `bancoCargado` y a los estados «respondida en la visita / restaurada».
+- **La guía:** `components/modules.js:203` crea `<article id="modulo-${i}">` con `i` = posición, no número de módulo
+  (`#modulo-0` es el módulo 2); los crea JavaScript, no están en `index.html`, y el acordeón llega cerrado.
+  `index.html#modulos` sí está en el HTML.
 
 ## Decisiones tomadas
 
-### 1 · El resumen dice si se aprobó el simulacro
+Todas del autor, 2026-09-16.
 
-Decidido por el autor el 2026-09-16, sujeto a E1:
+### 1 · El resultado
 
-- **Se aprueba con al menos el 60 % de respuestas correctas sobre el total del intento.**
-  Con 120 preguntas, 72 correctas. Si un intento trae menos preguntas (decisión 3 de la
-  41), el umbral es el 60 % de ese total, redondeado hacia arriba.
-- **Las omitidas y las agotadas por tiempo cuentan como incorrectas** (decisión 1 de la 43).
+- **«Aprobaste el simulacro»** con 72 correctas o más; **«Reprobaste el simulacro»** con 71 o menos.
+- **Las omitidas y las agotadas sin alternativa cuentan como incorrectas.**
 
-### 2 · La justificación reutiliza la pieza de la iteración 34
+### 2 · La revisión en el teléfono
 
-La revisión dibuja la justificación con el mismo componente de la 34, que ya está escapado
-y probado con contenido hostil a escala. No se escribe una segunda forma de dibujarla.
+**Agrupada por módulo, de peor a mejor desempeño.** En cada módulo, **las incorrectas y las omitidas llegan abiertas** y
+**las correctas plegadas**, con un control para abrirlas. Cada pregunta muestra la alternativa dada (o que se omitió), la
+correcta y la justificación.
+
+### 3 · Las justificaciones se piden al llegar al resumen
+
+Se piden por los ids del intento al extremo de la 41, con la instantánea como respaldo si falla. La justificación se dibuja
+con **una sola pieza extraída de la iteración 34**, que recibe la pregunta y nada más; el cuestionario pasa a usar esa misma
+pieza.
+
+### 4 · Se conserva el último resultado
+
+El resumen queda en el navegador hasta que se empieza otro intento, que lo reemplaza. No hay historial.
 
 ## Decisiones sin resolver
 
-### 3 · Conservar o compartir el resumen (la decide el autor)
+### 5 · Los enlaces a la guía (la decide el autor tras la lectura de alcance)
 
-¿El resumen se pierde al salir, se guarda en el navegador o se puede compartir? Guardarlo
-roza el historial de intentos, que está fuera de alcance. **Pendiente.**
+Enlazar a `#modulo-N` no funciona tal como está la portada. Caminos posibles: enlazar a `index.html#modulos`, que siempre
+existe; o cambiar la portada para que cada módulo tenga un ancla con su número y se abra al llegar, lo que toca
+`modules.js`. **Pendiente.**
 
-### 4 · La revisión de 120 preguntas en el teléfono (la decide el autor)
+### 6 · El desempate del desglose (propuesta a confirmar)
 
-120 preguntas con su justificación es una página muy larga. La iteración 34 resolvió algo
-parecido con «Ver por qué». ¿Se muestra todo, solo las incorrectas por defecto, o se agrupa
-por módulo? **Pendiente.**
+Propuesta: de peor a mejor por porcentaje de correctas; a igual porcentaje, primero el módulo con más omitidas; si sigue el
+empate, por número de módulo. **Pendiente de confirmar** en la lectura de alcance.
 
 ## Tareas
 
-- [ ] Resultado global: correctas, incorrectas (separando respondidas mal y omitidas),
-  porcentaje y si se aprobó el simulacro.
-- [ ] Desglose por módulo, ordenado de peor a mejor desempeño.
-- [ ] Tiempo empleado, total y promedio por pregunta.
-- [ ] Revisión pregunta a pregunta con la respuesta dada, la correcta y la justificación.
-- [ ] Enlaces desde cada módulo débil hacia su sección en `index.html`.
-- [ ] Botón para rendir otro intento.
-- [ ] Resolver las decisiones 3 y 4.
+- [ ] Extraer la pieza de la justificación de la 34 y hacer que el cuestionario la use, sin cambiar lo que muestra.
+- [ ] Resultado global: correctas, respondidas mal, omitidas, porcentaje y resultado del simulacro.
+- [ ] Desglose por módulo, ordenado de peor a mejor (decisión 6).
+- [ ] Tiempo transcurrido total y promedio por pregunta.
+- [ ] Revisión agrupada por módulo (decisión 2).
+- [ ] Pedir las justificaciones con respaldo (decisión 3).
+- [ ] Enlaces a la guía (decisión 5).
+- [ ] Conservar el último resultado (decisión 4) y botón para rendir otro intento.
 
 ## Criterios de aceptación
 
-Cada uno se cierra con evidencia producida **provocando** el comportamiento, con intentos
-simulados de resultado conocido.
+Cada uno se cierra con evidencia producida **provocando** el comportamiento, con intentos simulados de resultado conocido y
+el reloj controlable de la 42.
 
 ### Los provoca Claude Code
 
-- [ ] **Las cifras cuadran**: correctas + respondidas mal + omitidas = total del intento.
-- [ ] **El porcentaje se calcula con las omitidas como incorrectas.**
-- [ ] **El umbral de aprobación es exacto en el borde**: con 120 preguntas, 72 correctas
-  aprueba y 71 no. Provocado con intentos simulados de esas cifras, y con un intento de
-  total menor.
-- [ ] **El desglose por módulo suma el total del intento** y está ordenado por desempeño,
-  con un criterio de desempate documentado.
-- [ ] **La revisión muestra, para cada pregunta, qué respondió el estudiante, cuál era la
-  correcta y la justificación**, dibujada con la pieza de la 34.
-- [ ] **Las omitidas y las agotadas se distinguen de las respondidas mal** en la revisión,
-  aunque cuenten igual.
-- [ ] **Cada módulo del desglose enlaza a una sección que existe** en `index.html`.
-- [ ] **Rendir otro intento pide un intento nuevo al extremo** y no reutiliza el anterior.
-- [ ] **Un intento que termina por tiempo llega a un resumen coherente** con las mismas
-  reglas.
-- [ ] **El vocabulario de la pantalla cumple ADR-022 enmendada**: se comprueba sobre el
-  texto dibujado, buscando la lista de palabras prohibidas de la enmienda.
-- [ ] **`probar:escapado` cubre la revisión.**
+- [ ] **Las cifras cuadran**: correctas + respondidas mal + omitidas = 120.
+- [ ] **El umbral es exacto en el borde**: 72 correctas dicen «Aprobaste el simulacro» y 71 «Reprobaste el simulacro».
+- [ ] **Una agotada con alternativa marcada** cuenta según esa alternativa; **una agotada sin alternativa**, como omitida.
+- [ ] **El desglose por módulo suma 120** y respeta el orden y el desempate de la decisión 6.
+- [ ] **La revisión agrupa por módulo, en el orden del desglose**, con incorrectas y omitidas abiertas y correctas plegadas.
+- [ ] **Cada pregunta de la revisión muestra la alternativa dada o que se omitió, la correcta y la justificación correcta.**
+- [ ] **Con el extremo caído al pedir las justificaciones**, simulado interceptando, salen de la instantánea.
+- [ ] **La justificación se dibuja con la pieza extraída** en el resumen y en el cuestionario: `probar:memoria` y
+  `probar:filtrado` siguen en verde sin cambios de comportamiento.
+- [ ] **El texto dibujado del resumen no contiene ninguna palabra prohibida** por la actualización de ADR-022, y el resultado
+  usa exactamente una de las dos frases permitidas.
+- [ ] **Los enlaces a la guía llevan a un destino que existe una vez dibujada la portada**, según la decisión 5.
+- [ ] **Tras simular una recarga en el resumen**, se muestra el mismo resultado; **al empezar otro intento**, el anterior
+  deja de estar guardado.
+- [ ] **Rendir otro intento pide una selección nueva** y no reutiliza la anterior.
+- [ ] **`probar:escapado` cubre la revisión**, con un bloque nuevo para el simulacro.
 - [ ] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
 
 ### Los comprueba el autor en el navegador
 
-- [ ] **El resultado se entiende a la primera**, incluido por qué se aprobó o no.
+- [ ] **El resultado se entiende a la primera.**
 - [ ] **El desglose dice qué estudiar** sin tener que interpretar números.
-- [ ] **La revisión se puede recorrer cómodamente en el teléfono.**
-- [ ] **Ninguna frase sugiere una certificación**, leída en pantalla.
+- [ ] **La revisión se recorre cómodamente en el teléfono**, abriendo y plegando correctas.
+- [ ] **Los enlaces a la guía llevan donde prometen.**
+- [ ] **Ninguna frase sugiere una certificación ni equipara el simulacro con el examen real**, leída en pantalla.
 - [ ] **Sin errores de consola.**
-- [ ] **`npm run verificar` termina en 0.**
+- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
 
 ## Lo que esta iteración no puede afirmar
 
-- **Que aprobar el simulacro signifique aprobar el examen real.** Imita su criterio en la
-  parte de alternativas, pero no incluye la programación ni puede garantizar que el
-  estudiante no haya visto las respuestas (ADR-022).
+- **Que aprobar el simulacro signifique aprobar el examen real.** El examen real mezcla programación, dura 120 minutos y no
+  tiene las reglas del simulacro; y el simulacro no puede garantizar que no se hayan visto las respuestas (ADR-022).
 
 ## Notas de la iteración
 

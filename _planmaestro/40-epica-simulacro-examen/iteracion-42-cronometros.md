@@ -2,110 +2,105 @@
 
 **Épica:** 40 · Simulacro de examen
 **Estado:** ⚪ No iniciada
-**Depende de:** iteración 41. Decisiones E4 y E5 de la épica resueltas.
+**Depende de:** iteraciones 41 y 45.
 
 ## Objetivo
 
-Implementar los dos cronómetros —el total de 60 minutos y el de 30 segundos por
-pregunta— con avance automático al agotarse este último, sin que el tiempo mostrado
-dependa de la precisión del temporizador del navegador.
+Conectar los dos cronómetros al marcado de la 45: 30 segundos por pregunta con avance automático, y el tiempo transcurrido
+del intento, calculados desde instantes guardados y no contando pulsos, y dejar un reloj controlable para probar un
+intento completo sin esperarlo.
 
 ## Historial de este archivo
 
-- **2026-09-16 · reescrita.** Se precisó la relación entre los dos cronómetros según qué
-  pase con el tiempo sobrante, se agregó el bloqueo del teléfono como caso principal de
-  segundo plano, se aclaró qué ocurre con una pregunta sin responder al agotarse su tiempo
-  (reglas del examen real), y se agregaron las condiciones de color que impone la paleta.
+- **2026-09-16 · reescrita dos veces.** El autor resolvió el tiempo sobrante, el segundo plano y qué cuenta al agotarse el
+  tiempo. La lectura de alcance mostró que los guiones no pueden controlar el reloj hoy.
 
 ## Lo que hereda
 
-- **Reglas del examen real** (README de la épica): una pregunta omitida no se puede volver
-  a responder y cuenta como incorrecta.
-- **Iteración 35:** el movimiento se apaga con `prefers-reduced-motion` desde
-  `src/input.css`; toda animación empieza y termina en reposo. El DOM falso de los guiones
-  puede simular el movimiento reducido (decisión 8 de la 35).
-- **Paleta** (`tailwind.config.cjs`): existen `ruby` (#E0115F) y `rubydim`, `esmeralda` y
-  `esmeraldadim`. **`ruby` sobre `ink` da 4,41:1 y sobre `panel` 3,98:1**: no alcanza 4,5:1
-  para texto normal. Solo sirve para texto grande (3:1), bordes, íconos o como fondo
-  `rubydim` con texto `paper` (9,95:1).
+- **Reglas del simulacro** (README de la épica).
+- **Iteración 41:** el intento guardado al ocurrir, con su instante de inicio; la retoma tras una recarga.
+- **Iteración 45:** la forma del cronómetro, el color de la urgencia y la guía visual.
+- **Iteración 35:** `prepararDomFalso({ movimientoReducido: true })`; toda animación empieza y termina en reposo.
+- **Lo que no existe:** `dom-falso.mjs` no controla `Date.now()`, no tiene `setInterval`, `requestAnimationFrame`,
+  `performance.now()`, `document.hidden` ni `visibilitychange`. Y `Date.now()` real sostiene las mediciones de la 35 en
+  `probar-filtrado.mjs`: reemplazarlo en todo el proceso las rompería.
+
+## Decisiones tomadas
+
+Todas del autor, 2026-09-16.
+
+### 1 · El tiempo sobrante se pierde
+
+Cada pregunta tiene 30 segundos. Avanzar antes solo acorta el intento. **El tiempo total nunca se agota antes que las
+preguntas**, así que no es un límite: se muestra como **tiempo transcurrido**, y no existe «terminar por tiempo total».
+
+### 2 · Al agotarse los 30 segundos
+
+- **Con una alternativa marcada**, cuenta como respondida con esa alternativa.
+- **Sin alternativa marcada**, queda omitida.
+- En los dos casos se avanza sola a la siguiente, sin vuelta atrás.
+
+### 3 · El reloj sigue corriendo fuera de la página
+
+Si el estudiante sale de la página o bloquea el teléfono, **el tiempo sigue**. Al volver, el tiempo mostrado es el real, y
+cada pregunta cuyo plazo se cumplió mientras tanto se resuelve con la regla 2 (cuenta la marcada o queda omitida). Lo mismo
+al retomar tras una recarga.
+
+### 4 · El tiempo se calcula desde instantes guardados
+
+La cifra mostrada sale siempre de «ahora menos el instante guardado», nunca de contar pulsos de un temporizador, que se
+atrasa en pestañas ocultas.
 
 ## Decisiones sin resolver
 
-### 1 · El tiempo sobrante y la relación entre los cronómetros (decisión E5 de la épica)
+### 5 · Cómo se construye el reloj controlable (se propone tras la lectura de alcance)
 
-Si el estudiante responde en 10 segundos, ¿qué pasa con los 20 restantes? La elección
-cambia qué significa cada cronómetro:
-
-- **Si el sobrante se pierde**, cada pregunta tiene sus 30 segundos y avanzar antes solo
-  acorta el intento. El total nunca puede agotarse antes de terminar las preguntas: **el
-  cronómetro de 60 minutos pasa a ser informativo, no un límite**, y el criterio «al
-  agotarse los 60 minutos el intento termina» no puede ocurrir.
-- **Si el sobrante se acumula**, hay que decidir en qué se usa: el tope de 30 segundos por
-  pregunta impide gastarlo. O el tope por pregunta se alarga con lo acumulado, o el total
-  es el único límite real y los 30 segundos son una referencia.
-
-**Lo que decide es cómo funciona el examen real.** Hay que contrastarlo con
-`_planmaestro/00_producto/contexto-del-examen.md` antes de elegir. **Pendiente.**
-
-### 2 · El cronómetro en segundo plano (la decide el autor)
-
-Si el estudiante cambia de pestaña **o bloquea el teléfono**, que es el caso real del
-público, ¿el tiempo sigue corriendo? Lo más parecido al examen real es que sí. El tiempo se
-calcula siempre desde un instante de inicio guardado, no contando pulsos del temporizador,
-que se ralentiza en pestañas ocultas. **Pendiente.**
-
-### 3 · El color de la urgencia (la decide el autor, antes o con la 45)
-
-`ruby` significa «error» en el resumen (44). Usarlo también para «se acaba el tiempo»
-puede confundir. Además no alcanza 4,5:1 como texto normal. **Pendiente**, con E4.
+Hace falta que el código del simulacro obtenga la hora de una fuente **inyectable**, y que el DOM falso ofrezca avance
+manual del tiempo, temporizadores sobre ese reloj y `visibilitychange` disparable, **sin tocar el `Date.now()` real** que usan
+otros guiones. Es infraestructura que usan también la 43 y la 44. **Pendiente**, con la propuesta de la lectura.
 
 ## Tareas
 
-- [ ] Cronómetro total, visible durante todo el intento.
-- [ ] Cronómetro de 30 segundos por pregunta, llamativo.
-- [ ] Avance automático a la siguiente pregunta al agotarse su tiempo.
-- [ ] Señal clara cuando el tiempo de la pregunta se acaba, que no dependa solo del color.
-- [ ] Resolver y documentar en una ADR el tiempo sobrante (decisión 1).
-- [ ] Resolver y documentar en una ADR el segundo plano (decisión 2).
-- [ ] Fin del intento según la decisión 1.
+- [ ] Construir el reloj controlable (decisión 5) y documentarlo para la 43 y la 44.
+- [ ] Cronómetro de 30 segundos por pregunta, con la forma de la 45.
+- [ ] Avance automático al agotarse, con la regla de la decisión 2.
+- [ ] Tiempo transcurrido del intento, visible todo el intento.
+- [ ] Resolución de preguntas agotadas en segundo plano y al retomar (decisión 3).
+- [ ] Señal de urgencia según la 45, que no dependa solo del color.
 - [ ] Respetar `prefers-reduced-motion`.
-- [ ] Un reloj controlable en los guiones, para probar un intento completo sin esperar el
-  tiempo real.
+- [ ] Documentar las decisiones 1 a 4 en una ADR.
 
 ## Criterios de aceptación
 
-Cada uno se cierra con evidencia producida **provocando** el comportamiento, con el reloj
-controlado de los guiones.
+Cada uno se cierra con evidencia producida **provocando** el comportamiento, con el reloj controlable.
 
 ### Los provoca Claude Code
 
-- [ ] **Los dos cronómetros avanzan de forma coherente** con la regla de la decisión 1,
-  comprobado en varios puntos de un intento simulado.
-- [ ] **Al agotarse el tiempo de una pregunta, se pasa sola a la siguiente** y la anterior
-  queda registrada como sin responder, con las consecuencias de una omisión: no se puede
-  volver a ella y cuenta como incorrecta.
-- [ ] **El final del intento ocurre según la decisión 1** y lleva al resumen.
-- [ ] **El tiempo mostrado se calcula desde el instante de inicio**: simulando un
-  temporizador que se atrasa, la cifra mostrada sigue siendo la correcta.
-- [ ] **Tras simular un minuto en segundo plano**, el tiempo al volver es el que dice la
-  decisión 2, y si una o varias preguntas se agotaron en ese lapso, quedan registradas como
-  sin responder.
-- [ ] **La cuenta regresiva se entiende sin color**: hay texto o forma que la comunica.
-- [ ] **Con el movimiento reducido simulado, el cronómetro no declara movimiento** y sigue
-  mostrando el tiempo.
-- [ ] **Todo texto y borde del cronómetro alcanza su umbral de contraste**, con tabla de
-  elemento, color, fondo real y razón.
+- [ ] **El cronómetro de la pregunta muestra el tiempo correcto** en varios puntos simulados de una misma pregunta.
+- [ ] **Al agotarse con una alternativa marcada**, queda registrada esa alternativa y se pasa a la siguiente.
+- [ ] **Al agotarse sin alternativa marcada**, queda omitida y se pasa a la siguiente.
+- [ ] **Avanzar antes de tiempo no traspasa el sobrante**: la siguiente pregunta empieza con 30 segundos.
+- [ ] **El tiempo transcurrido coincide con el reloj simulado** en todo el intento, y ningún camino termina el intento por
+  tiempo total.
+- [ ] **Con un temporizador que se atrasa simulado**, las cifras mostradas siguen siendo las correctas.
+- [ ] **Tras simular 2 minutos en segundo plano a mitad de una pregunta**, al volver el tiempo es el real y las preguntas
+  cuyo plazo se cumplió quedaron resueltas con la regla 2, en orden.
+- [ ] **Tras simular una recarga después de 2 minutos**, el mismo resultado.
+- [ ] **El reloj controlable no altera las mediciones de la 35**: `probar:filtrado` en verde con sus tiempos.
+- [ ] **La urgencia se comunica sin color**: hay texto o forma que la expresa.
+- [ ] **Con el movimiento reducido simulado, el cronómetro no declara movimiento** y sigue mostrando el tiempo.
+- [ ] **Contraste de todo texto y borde nuevo** según la guía de la 45, con tabla.
 - [ ] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
 
 ### Los comprueba el autor en el navegador
 
 - [ ] **Los dos cronómetros se entienden a la primera**, en teléfono.
-- [ ] **Bloquear el teléfono un minuto a mitad de una pregunta** deja el tiempo correcto
-  según la decisión 2.
-- [ ] **Cambiar de pestaña un minuto** da el mismo resultado.
+- [ ] **Bloquear el teléfono un par de minutos a mitad de una pregunta** deja el tiempo real al volver, con las preguntas
+  agotadas resueltas.
+- [ ] **Cambiar de pestaña un par de minutos** da el mismo resultado.
 - [ ] **Con movimiento reducido activado**, el cronómetro sigue siendo comprensible.
 - [ ] **Sin errores de consola.**
-- [ ] **`npm run verificar` termina en 0.**
+- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
 
 ## Lo que esta iteración no puede afirmar
 
