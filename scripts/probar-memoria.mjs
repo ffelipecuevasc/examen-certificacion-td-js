@@ -184,8 +184,12 @@ async function correrLaVisita(archivoDeEncargo) {
       pathToFileURL(join(raizDelSitio, 'components', 'cuestionario.js')).href
     );
 
+    // Lo mismo que hace static/js/cuestionario-main.js al abrir la pagina, y en el
+    // mismo orden. Si algun dia esa lista creciera y esta no, la visita estaria
+    // probando una pagina a medio conectar.
     await cuestionario.renderCuestionario();
     cuestionario.setupReinicio();
+    cuestionario.setupRepaso();
 
     // --- Los pasos ------------------------------------------------------------
     for (const paso of encargo.pasos) {
@@ -388,6 +392,9 @@ async function darElPaso(paso, dom, cuestionario, salida) {
         pregunta: encargo.pregunta,
         acertando: Boolean(encargo.acertando),
         veredicto: dom.html(`#tarjeta-q${encargo.pregunta} > .quiz-feedback`),
+        // Las alternativas que `responder()` deshabilito. Es el nodo real que toca
+        // —el que sale de `$$('.quiz-option', item)`—, no el boton fabricado.
+        bloqueada: dom.nodo(`#tarjeta-q${encargo.pregunta} >> .quiz-option`).disabled,
         ...enLaTarjeta(dom, encargo.pregunta),
       });
     }
@@ -419,6 +426,15 @@ async function darElPaso(paso, dom, cuestionario, salida) {
       focoEn: dom.enfocado(),
       ...enLaTarjeta(dom, paso.pregunta),
     });
+    return;
+  }
+
+  // El boton del repaso, en cualquiera de sus dos papeles. Se dispara el MISMO
+  // elemento en los dos casos, porque el sitio tiene un solo boton: si algun dia
+  // fueran dos, este paso dejaria de poder salir del repaso y se veria enseguida.
+  if (paso.tipo === 'repaso') {
+    const corrieron = dom.disparar('#repaso', 'click', {});
+    if (corrieron === 0) salida.errores.push('el boton del repaso no tiene ningun oyente');
     return;
   }
 
@@ -505,9 +521,31 @@ function retrato(dom, paso) {
     ])
   );
 
+  // La cifra que la cabecera del modulo lleva a la derecha. En el repaso tiene que
+  // seguir siendo la del MODULO: es la cabecera del modulo, y un numero mas chico
+  // ahi seria un tercer contador contradiciendo a los otros dos.
+  // Se ancla a las clases COMPLETAS de ese span: el numero de cada pregunta usa
+  // tambien `text-mutedink shrink-0`, y un patron mas corto leeria «01» creyendo que
+  // lee la cuenta del modulo.
+  const cabecera = Number(
+    html.match(/ml-auto font-mono text-\[11px\] text-mutedink shrink-0">(\d+)</)?.[1] ?? NaN
+  );
+
   return {
     paso,
     porques,
+    cabecera,
+    // El tamano del HTML del contenedor, para poder afirmar que NO se reescribio.
+    // Es lo unico que distingue «la pregunta sigue dibujada» de «la pregunta sigue
+    // dibujada porque nadie volvio a dibujar»: sin esto, el criterio de que una
+    // acertada siga a la vista se cumpliria solo, por omision.
+    largoDelHtml: html.length,
+    repaso: {
+      boton: dom.texto('#repaso-rotulo'),
+      contador: dom.html('#contador-banco'),
+      aviso: dom.texto('#aviso-repaso'),
+      avisoOculto: dom.oculto('#aviso-repaso'),
+    },
     barras: {
       respondidas: dom.texto('#valor-avance'),
       correctas: dom.texto('#valor-correctas'),
@@ -1725,12 +1763,608 @@ notas.push(
 );
 
 // ===========================================================================
-// 10 · El avance no sale del dispositivo
+// 10 · El repaso (iteracion 34)
+// ===========================================================================
+
+/** La alternativa correcta de una pregunta, y una incorrecta, segun la base local. */
+function alternativasDe(pregunta) {
+  const filas = consultar(
+    `SELECT texto, es_correcta FROM alternativa WHERE pregunta_id = ${pregunta} ORDER BY orden;`
+  );
+
+  return {
+    correcta: filas?.find((f) => f.es_correcta === 1)?.texto,
+    incorrectas: (filas ?? []).filter((f) => f.es_correcta !== 1).map((f) => f.texto),
+  };
+}
+
+const altP1 = alternativasDe(P1);
+const altP2 = alternativasDe(P2);
+
+if (!altP1.correcta || altP1.incorrectas.length < 2 || !altP2.correcta) {
+  noSePudo('La base local no devolvio las alternativas de las preguntas de prueba.');
+}
+
+const N_DEL_BOTON = (retratoVisto) => {
+  const m = retratoVisto.repaso.boton.match(/\((\d+)\)/);
+  return m ? Number(m[1]) : null;
+};
+
+const N_DEL_CONTADOR = (retratoVisto) => {
+  const html = retratoVisto.repaso.contador;
+  if (/No te queda ninguna fallada por repasar/.test(html)) return 0;
+  return Number(html.match(/Te quedan? (\d+) pregunta/)?.[1] ?? NaN);
+};
+
+// --- La fila de controles, en el HTML versionado ---------------------------
+//
+// «La fila nunca pasa de tres controles» (decision 10) no es una conducta que se
+// pueda provocar: es una propiedad del archivo. Se comprueba donde vive.
+const filaDeBotones = readFileSync(join(RAIZ, 'cuestionario.html'), 'utf8')
+  .match(/<div class="mt-6 flex flex-wrap gap-3">([\s\S]*?)<\/div>/)?.[1] ?? '';
+
+const controlesDeLaFila = (filaDeBotones.match(/<(button|a)\b/g) ?? []).length;
+
+if (controlesDeLaFila !== 3) {
+  problemas.push(
+    `la fila del panel tiene ${controlesDeLaFila} controles y la decision 10 fija tres: ` +
+      'reiniciar, el del repaso, y el enlace a la materia'
+  );
+}
+if ((filaDeBotones.match(/id="repaso"/g) ?? []).length !== 1) {
+  problemas.push(
+    'la fila no tiene exactamente un boton de repaso: si hubiera dos, el de entrar podria ' +
+      'quedar visible durante el repaso'
+  );
+}
+
+// --- Visita R1: el repaso sigue al banco nuevo -----------------------------
+//
+// P1 se responde BIEN y P2 MAL. Despues se intercepta moviendo la correcta de P1,
+// que es lo que hace `banco:actualizar` al corregir una pregunta. Sin el banco
+// nuevo el repaso traeria una sola pregunta; con el, dos.
+const discoRepaso = discoNuevo('repaso');
+
+const vr0 = visitar({
+  disco: discoRepaso,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }, { pregunta: P2, acertando: false }] },
+  ],
+});
+
+if (N_DEL_BOTON(vr0.final) !== 1) {
+  problemas.push(
+    `con una fallada el boton dice «${vr0.final.repaso.boton}» y tendria que decir «(1)»`
+  );
+}
+
+const vr1 = visitar({
+  disco: discoRepaso,
+  intercepcion: { tipo: 'correcta-movida', pregunta: P1 },
+  pasos: [{ tipo: 'elegir', modulo: MODULO }, { tipo: 'repaso' }],
+});
+
+if (N_DEL_BOTON(vr1.pasos[0]) !== 2) {
+  problemas.push(
+    `con la correcta de ${P1} movida, el boton dice «${vr1.pasos[0].repaso.boton}» y esa ` +
+      'pregunta paso a estar fallada: tendria que decir «(2)»'
+  );
+}
+
+const enElRepaso = vr1.final.dibujadas;
+
+if (enElRepaso.length !== 2 || !enElRepaso.includes(P1) || !enElRepaso.includes(P2)) {
+  problemas.push(
+    `el repaso dibujo ${JSON.stringify(enElRepaso)} y las falladas segun el banco de hoy son ` +
+      `${P1} y ${P2}: ni mas ni menos`
+  );
+}
+
+// Y sin marcar, las dos, para poder intentarlas de nuevo (decision 3).
+if (vr1.final.respondidas.length !== 0) {
+  problemas.push(
+    `el repaso dibujo ${vr1.final.respondidas.length} preguntas ya marcadas: no se podrian reintentar`
+  );
+}
+if (Object.values(vr1.final.porques).some((p) => p.abierto || p.boton)) {
+  problemas.push('el repaso dibujo el porque de una pregunta que presenta sin marcar');
+}
+
+// --- Las barras miden el modulo, el contador mide el repaso (decision 4) ----
+if (vr1.final.total !== String(cuantasTiene(MODULO))) {
+  problemas.push(
+    `en el repaso las barras dicen que el modulo tiene ${vr1.final.total} preguntas y tiene ` +
+      `${cuantasTiene(MODULO)}: las barras no cambian de significado segun el modo`
+  );
+}
+if (vr1.final.barras.respondidas !== '2') {
+  problemas.push(
+    `en el repaso las barras dicen «${vr1.final.barras.respondidas}» respondidas y el modulo ` +
+      'lleva 2: miden el modulo completo, no lo dibujado'
+  );
+}
+if (vr1.final.cabecera !== cuantasTiene(MODULO)) {
+  problemas.push(
+    `en el repaso la cabecera del modulo dice ${vr1.final.cabecera} y el modulo tiene ` +
+      `${cuantasTiene(MODULO)}: seria un tercer contador contradiciendo a los otros dos`
+  );
+}
+if (N_DEL_CONTADOR(vr1.final) !== 2) {
+  problemas.push(
+    `el contador de arriba dice «${vr1.final.repaso.contador}» y quedan 2 falladas por repasar`
+  );
+}
+
+// Un solo contador arriba (decision 8): el del modulo desaparece de su sitio.
+if (/módulo/.test(vr1.final.repaso.contador)) {
+  problemas.push(
+    'durante el repaso el contador de arriba sigue siendo el del modulo: habria dos cifras ' +
+      `distintas del mismo sitio (${vr1.final.repaso.contador})`
+  );
+}
+
+// Y el boton cambio de papel (decision 10).
+if (vr1.final.repaso.boton !== 'Volver al módulo completo') {
+  problemas.push(
+    `durante el repaso el boton dice «${vr1.final.repaso.boton}»: «Repasar mis errores» no ` +
+      'puede seguir ofreciendo entrar a donde ya se entro'
+  );
+}
+
+// Entrar no dispara el aviso de descuadre (decision 4).
+const descuadres = (v) => v.avisos.filter((a) => /El indice (dice|contaba)/.test(a));
+
+if (descuadres(vr1).length > 0) {
+  problemas.push(
+    `entrar al repaso disparo el aviso de descuadre: ${JSON.stringify(descuadres(vr1))}`
+  );
+}
+
+// --- Visita R2: acertar reemplaza lo guardado, y la acertada sigue a la vista
+const discoAcertar = discoNuevo('repaso-acertar');
+
+const vr2 = visitar({
+  disco: discoAcertar,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }, { pregunta: P2, acertando: true }] },
+    { tipo: 'repaso' },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+  ],
+});
+
+const antesDeAcertar = vr2.pasos[2];
+const despuesDeAcertar = vr2.pasos[3];
+
+if (N_DEL_CONTADOR(antesDeAcertar) !== 1 || N_DEL_CONTADOR(despuesDeAcertar) !== 0) {
+  problemas.push(
+    `acertar en el repaso no movio el contador: antes «${antesDeAcertar.repaso.contador}», ` +
+      `despues «${despuesDeAcertar.repaso.contador}»`
+  );
+}
+
+// Las barras SI se mueven, y siguen midiendo el modulo entero.
+if (despuesDeAcertar.barras.respondidas !== '2' || despuesDeAcertar.total !== String(cuantasTiene(MODULO))) {
+  problemas.push(
+    `tras acertar en el repaso las barras dicen ${despuesDeAcertar.barras.respondidas} de ` +
+      `${despuesDeAcertar.total}: la respuesta se conto dos veces o el total cambio`
+  );
+}
+if (despuesDeAcertar.barras.correctas !== '2' || despuesDeAcertar.barras.incorrectas !== '0') {
+  problemas.push(
+    `tras acertar una fallada las barras dicen ${despuesDeAcertar.barras.correctas} correctas y ` +
+      `${despuesDeAcertar.barras.incorrectas} incorrectas, y tendrian que decir 2 y 0`
+  );
+}
+
+// La acertada SIGUE A LA VISTA (decision 3).
+if (!despuesDeAcertar.dibujadas.includes(P1)) {
+  problemas.push(
+    'la pregunta acertada desaparecio del repaso al acertarla: en el telefono el contenido ' +
+      'saltaria bajo el dedo'
+  );
+}
+
+// Y sigue a la vista POR DISENO, no por casualidad: responder dentro del repaso no
+// vuelve a dibujar la lista. Sin esta linea, la comprobacion de arriba se cumpliria
+// sola —nadie repinto, asi que nada pudo desaparecer— y una version que recalculara
+// el conjunto en cada dibujo pasaria en verde hasta que alguien repintara.
+if (despuesDeAcertar.largoDelHtml !== antesDeAcertar.largoDelHtml) {
+  problemas.push(
+    'responder dentro del repaso volvio a dibujar la lista: la pregunta que se esta leyendo ' +
+      'salta bajo el dedo, y el conjunto congelado deja de ser lo unico que la sostiene'
+  );
+}
+
+// Lo guardado se REEMPLAZO, sin cambiar el formato (decision 3).
+const anotadoTrasAcertar = JSON.parse(leerDisco(discoAcertar)[claveDe(MODULO)] ?? '{}');
+
+if (anotadoTrasAcertar.v !== 1) {
+  problemas.push(`acertar en el repaso cambio la version del formato: ${JSON.stringify(anotadoTrasAcertar.v)}`);
+}
+if (anotadoTrasAcertar.respuestas?.[P1] !== altP1.correcta) {
+  problemas.push(
+    `acertar en el repaso no reemplazo lo guardado: la clave del modulo trae ` +
+      `${JSON.stringify(anotadoTrasAcertar.respuestas?.[P1])}`
+  );
+}
+if (Object.keys(anotadoTrasAcertar.respuestas ?? {}).length !== 2) {
+  problemas.push(
+    `tras acertar en el repaso hay ${Object.keys(anotadoTrasAcertar.respuestas ?? {}).length} ` +
+      'respuestas guardadas y se respondieron 2 preguntas: la nueva se sumo en vez de reemplazar'
+  );
+}
+for (const palabra of ['acerto', 'veredicto', 'es_correcta']) {
+  if (JSON.stringify(anotadoTrasAcertar).includes(`"${palabra}"`)) {
+    problemas.push(`acertar en el repaso guardo «${palabra}»: el veredicto no se guarda`);
+  }
+}
+
+// --- Visita R3: salir, y las acertadas quedan desplegadas -------------------
+const discoSalir = discoNuevo('repaso-salir');
+
+// Se entra con DOS falladas y se arregla una. Con una sola, al volver a entrar no
+// quedaria ninguna y el repaso ni siquiera se abriria: la prueba pasaria sin haber
+// mirado si la acertada desaparecio de la lista. Ese es el patron de H-023.
+const vr3 = visitar({
+  disco: discoSalir,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }, { pregunta: P2, acertando: false }] },
+    { tipo: 'repaso' },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+    { tipo: 'repaso' },
+    { tipo: 'repaso' },
+  ],
+});
+
+const trasSalir = vr3.pasos[4];
+const trasVolverAEntrar = vr3.pasos[5];
+
+if (trasSalir.dibujadas.length !== cuantasTiene(MODULO)) {
+  problemas.push(
+    `al salir del repaso se dibujaron ${trasSalir.dibujadas.length} preguntas y el modulo tiene ` +
+      `${cuantasTiene(MODULO)}`
+  );
+}
+if (trasSalir.repaso.boton !== 'Repasar mis errores (1)') {
+  problemas.push(
+    `al salir del repaso el boton dice «${trasSalir.repaso.boton}»: se entro con 2 falladas y se ` +
+      'acerto 1'
+  );
+}
+if (!/preguntas · módulo/.test(trasSalir.repaso.contador)) {
+  problemas.push(
+    `al salir del repaso el contador de arriba no volvio al del modulo: «${trasSalir.repaso.contador}»`
+  );
+}
+if (!trasSalir.repaso.contador.includes(String(cuantasTiene(MODULO)))) {
+  problemas.push(
+    `al salir del repaso el contador no trae la cifra completa del modulo: ` +
+      `«${trasSalir.repaso.contador}»`
+  );
+}
+
+// La acertada DENTRO del repaso queda con su justificacion desplegada al salir.
+if (trasSalir.porques[P1]?.abierto !== true) {
+  problemas.push(
+    'tras salir del repaso, la pregunta acertada dentro de el no muestra su justificacion ' +
+      `desplegada: ${JSON.stringify(trasSalir.porques[P1])}`
+  );
+}
+
+// Y al volver a entrar ya no esta: dejo de estar fallada. La otra si.
+if (trasVolverAEntrar.dibujadas.includes(P1)) {
+  problemas.push('al volver a entrar al repaso, la pregunta ya acertada sigue apareciendo');
+}
+if (trasVolverAEntrar.dibujadas.length !== 1 || !trasVolverAEntrar.dibujadas.includes(P2)) {
+  problemas.push(
+    `al volver a entrar, el repaso dibujo ${JSON.stringify(trasVolverAEntrar.dibujadas)} y la ` +
+      `unica que sigue fallada es la ${P2}`
+  );
+}
+
+// Y TRAS RECARGAR, esa misma pregunta ofrece «Ver por qué».
+//
+// Es la otra mitad del criterio, y la que prueba que lo de la visita es de la
+// visita: el proceso es nuevo, lo unico que queda es el disco, y ahi no hay ninguna
+// marca de cuando se respondio.
+const vr3b = visitar({ disco: discoSalir, pasos: [{ tipo: 'elegir', modulo: MODULO }] });
+
+if (vr3b.final.porques[P1]?.boton !== true || vr3b.final.porques[P1]?.abierto !== false) {
+  problemas.push(
+    'tras recargar, la pregunta acertada dentro del repaso sigue con la justificacion ' +
+      `desplegada en vez de ofrecer «Ver por qué»: ${JSON.stringify(vr3b.final.porques[P1])}`
+  );
+}
+
+// --- Visita R4: volver a fallar (decision 9) -------------------------------
+const discoFallar = discoNuevo('repaso-fallar');
+
+const vr4 = visitar({
+  disco: discoFallar,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }] },
+    { tipo: 'repaso' },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }] },
+    { tipo: 'repaso' },
+    { tipo: 'repaso' },
+  ],
+});
+
+const trasVolverAFallar = vr4.pasos[3];
+
+if (N_DEL_CONTADOR(vr4.pasos[2]) !== 1 || N_DEL_CONTADOR(trasVolverAFallar) !== 1) {
+  problemas.push(
+    `volver a fallar movio el contador: antes «${vr4.pasos[2].repaso.contador}», despues ` +
+      `«${trasVolverAFallar.repaso.contador}»`
+  );
+}
+if (!trasVolverAFallar.dibujadas.includes(P1)) {
+  problemas.push('la pregunta vuelta a fallar desaparecio del repaso');
+}
+
+// Queda BLOQUEADA: no hay «intentar de nuevo» dentro del mismo repaso.
+const alVolverAFallar = vr4.alResponder.at(-1);
+
+if (alVolverAFallar?.bloqueada !== true) {
+  problemas.push(
+    'tras volver a fallar dentro del repaso la pregunta quedo contestable otra vez: reintentar ' +
+      'cuesta salir y volver a entrar (decision 9)'
+  );
+}
+if (alVolverAFallar?.justificacion === '') {
+  problemas.push('volver a fallar dentro del repaso no mostro la justificacion');
+}
+
+// Y la respuesta NUEVA quedo guardada.
+const anotadoTrasFallar = JSON.parse(leerDisco(discoFallar)[claveDe(MODULO)] ?? '{}');
+
+if (!altP1.incorrectas.includes(anotadoTrasFallar.respuestas?.[P1])) {
+  problemas.push(
+    `volver a fallar no guardo la respuesta nueva: la clave trae ` +
+      `${JSON.stringify(anotadoTrasFallar.respuestas?.[P1])}`
+  );
+}
+
+// Al volver a entrar, aparece de nuevo SIN MARCAR.
+const reentrada = vr4.pasos[5];
+
+if (!reentrada.dibujadas.includes(P1)) {
+  problemas.push('al volver a entrar al repaso, la pregunta vuelta a fallar no aparece');
+}
+if (reentrada.respondidas.some((r) => r.id === P1)) {
+  problemas.push(
+    'al volver a entrar al repaso, la pregunta vuelta a fallar aparece marcada: no se podria ' +
+      'intentar de nuevo'
+  );
+}
+
+// --- Visita R5: con N en 0 y el modulo sin responder -----------------------
+const vr5 = visitar({
+  disco: discoNuevo('repaso-sin-respuestas'),
+  pasos: [{ tipo: 'elegir', modulo: MODULO }, { tipo: 'repaso' }],
+});
+
+if (!/Todavía no respondes/.test(vr5.final.repaso.aviso)) {
+  problemas.push(
+    `con el modulo sin responder, el boton del repaso respondio «${vr5.final.repaso.aviso}»`
+  );
+}
+if (vr5.final.dibujadas.length !== cuantasTiene(MODULO)) {
+  problemas.push('con N en 0 el repaso se abrio igual y dejo la pantalla sin preguntas que repasar');
+}
+if (vr5.final.repaso.boton !== 'Repasar mis errores (0)') {
+  problemas.push(
+    `con N en 0 el boton dice «${vr5.final.repaso.boton}»: tiene que seguir visible y decir (0)`
+  );
+}
+if (vr5.final.repaso.avisoOculto) {
+  problemas.push('el mensaje del repaso se escribio pero quedo oculto');
+}
+
+// --- Visita R5b: con N en 0 y todo acertado --------------------------------
+//
+// El otro mensaje, que no puede ser el mismo: «no has respondido nada» manda a
+// responder y «no fallaste ninguna» no pide nada. Un solo texto para los dos seria
+// verdadero en ambos e inutil en ambos.
+const vr5b = visitar({
+  disco: discoNuevo('repaso-todo-acertado'),
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }, { pregunta: P2, acertando: true }] },
+    { tipo: 'repaso' },
+  ],
+});
+
+if (!/No tienes errores que repasar/.test(vr5b.final.repaso.aviso)) {
+  problemas.push(
+    `con todo acertado, el boton del repaso respondio «${vr5b.final.repaso.aviso}»`
+  );
+}
+if (vr5b.final.repaso.aviso === vr5.final.repaso.aviso) {
+  problemas.push(
+    'los dos casos de N en 0 dan el mismo mensaje: «no has respondido nada» y «no fallaste ' +
+      'ninguna» llevan a cosas distintas'
+  );
+}
+if (vr5b.final.dibujadas.length !== cuantasTiene(MODULO)) {
+  problemas.push('con todo acertado el repaso se abrio igual');
+}
+
+// --- Visita R6: salir por el indice y por reiniciar ------------------------
+const vr6 = visitar({
+  disco: discoNuevo('repaso-salidas'),
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }] },
+    { tipo: 'repaso' },
+    { tipo: 'elegir', modulo: OTRO_MODULO },
+    { tipo: 'elegir', modulo: MODULO },
+  ],
+});
+
+const trasCambiarDeModulo = vr6.pasos[3];
+
+if (trasCambiarDeModulo.dibujadas.length !== cuantasTiene(OTRO_MODULO)) {
+  problemas.push(
+    `elegir otro modulo a mitad del repaso dibujo ${trasCambiarDeModulo.dibujadas.length} ` +
+      `preguntas y el modulo ${OTRO_MODULO} tiene ${cuantasTiene(OTRO_MODULO)}: no salio del repaso`
+  );
+}
+if (trasCambiarDeModulo.repaso.boton === 'Volver al módulo completo') {
+  problemas.push('elegir otro modulo a mitad del repaso dejo el boton diciendo que se sigue dentro');
+}
+if (vr6.final.barras.respondidas !== '1') {
+  problemas.push(
+    `salir del repaso cambiando de modulo perdio lo respondido: al volver dice ` +
+      `«${vr6.final.barras.respondidas}»`
+  );
+}
+
+const vr7 = visitar({
+  disco: discoNuevo('repaso-reinicio'),
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }] },
+    { tipo: 'repaso' },
+    { tipo: 'reiniciar' },
+  ],
+});
+
+if (vr7.final.dibujadas.length !== cuantasTiene(MODULO)) {
+  problemas.push(
+    `reiniciar a mitad del repaso dibujo ${vr7.final.dibujadas.length} preguntas: no salio del repaso`
+  );
+}
+if (vr7.final.repaso.boton !== 'Repasar mis errores (0)') {
+  problemas.push(
+    `reiniciar a mitad del repaso dejo el boton en «${vr7.final.repaso.boton}»`
+  );
+}
+if (vr7.final.barras.respondidas !== '0') {
+  problemas.push('reiniciar a mitad del repaso no reinicio');
+}
+
+// Ninguna de las dos salidas avisa ni pregunta, y ninguna descuadra el indice.
+for (const [nombre, visita] of [['cambiar de modulo', vr6], ['reiniciar', vr7]]) {
+  if (descuadres(visita).length > 0) {
+    problemas.push(`salir del repaso por ${nombre} disparo el aviso de descuadre`);
+  }
+}
+
+// --- Visita R8: sin almacenamiento -----------------------------------------
+//
+// Todo lo del repaso tiene que salir de la memoria de la visita: no hay otra cosa.
+const vr8 = visitar({
+  disco: discoNuevo('repaso-sin-almacen'),
+  almacen: 'lectura-lanza',
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }, { pregunta: P2, acertando: true }] },
+    { tipo: 'repaso' },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+  ],
+});
+
+if (N_DEL_BOTON(vr8.pasos[1]) !== 1) {
+  problemas.push(
+    `sin almacenamiento el boton dice «${vr8.pasos[1].repaso.boton}» y hay 1 fallada`
+  );
+}
+if (vr8.pasos[2].dibujadas.length !== 1 || !vr8.pasos[2].dibujadas.includes(P1)) {
+  problemas.push(
+    `sin almacenamiento el repaso dibujo ${JSON.stringify(vr8.pasos[2].dibujadas)} y la unica ` +
+      `fallada es la ${P1}`
+  );
+}
+if (N_DEL_CONTADOR(vr8.pasos[2]) !== 1 || N_DEL_CONTADOR(vr8.pasos[3]) !== 0) {
+  problemas.push(
+    `sin almacenamiento el contador del repaso no siguio: «${vr8.pasos[2].repaso.contador}» -> ` +
+      `«${vr8.pasos[3].repaso.contador}»`
+  );
+}
+if (vr8.final.avisoAlmacenamiento.oculto) {
+  problemas.push('con el repaso abierto y sin almacenamiento, la pagina dejo de decir que no guarda');
+}
+
+// --- Visita R9: reiniciar deja N en 0, tambien sin almacenamiento ----------
+const vr9 = visitar({
+  disco: discoNuevo('repaso-reinicio-sin-almacen'),
+  almacen: 'lectura-lanza',
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }, { pregunta: P2, acertando: false }] },
+    { tipo: 'reiniciar' },
+  ],
+});
+
+if (N_DEL_BOTON(vr9.pasos[1]) !== 2) {
+  problemas.push(
+    `sin almacenamiento, dos falladas dejaron el boton en «${vr9.pasos[1].repaso.boton}»`
+  );
+}
+if (N_DEL_BOTON(vr9.final) !== 0) {
+  problemas.push(
+    `sin almacenamiento, reiniciar dejo el boton en «${vr9.final.repaso.boton}» y tendria que ` +
+      'decir «(0)»: la memoria de la visita sobrevivio al borrado'
+  );
+}
+
+// --- Visita R10: modo degradado --------------------------------------------
+//
+// Con el fetch caido todo sale de la instantanea, y el repaso tiene que funcionar
+// igual, con el aviso de ADR-008 a la vista.
+const vr10 = visitar({
+  disco: discoNuevo('repaso-degradado'),
+  caerLaRed: true,
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: false }] },
+    { tipo: 'repaso' },
+  ],
+});
+
+if (vr10.final.avisoRespaldo.oculto) {
+  problemas.push('en modo degradado el repaso funciona pero el aviso de ADR-008 no esta a la vista');
+}
+if (vr10.final.dibujadas.length !== 1 || !vr10.final.dibujadas.includes(P1)) {
+  problemas.push(
+    `en modo degradado el repaso dibujo ${JSON.stringify(vr10.final.dibujadas)} y la unica ` +
+      `fallada es la ${P1}`
+  );
+}
+if (N_DEL_CONTADOR(vr10.final) !== 1) {
+  problemas.push(
+    `en modo degradado el contador del repaso dice «${vr10.final.repaso.contador}»`
+  );
+}
+
+notas.push(
+  `Repaso: con la correcta de ${P1} movida por la interceptacion, el repaso trajo las 2 falladas ` +
+    'segun el banco de hoy, sin marcar; acertar una reemplazo lo guardado —misma clave, formato ' +
+    'v: 1, sin veredicto—, bajo el contador y no las barras, y la acertada siguio a la vista hasta ' +
+    'salir; volver a fallar la dejo bloqueada con su justificacion, sin bajar el contador, y ' +
+    'reaparecio sin marcar al reentrar.'
+);
+
+notas.push(
+  'Repaso, los bordes: con N en 0 salen los dos mensajes —modulo sin responder y todo acertado— y ' +
+    'el repaso no se abre; elegir otro modulo o reiniciar salen sin preguntar y sin perder nada; ' +
+    'funciona sin almacenamiento y en modo degradado con el aviso de ADR-008; la fila se queda en ' +
+    '3 controles; y ninguna entrada ni salida disparo el aviso de descuadre del resumen.'
+);
+
+// ===========================================================================
+// 11 · El avance no sale del dispositivo
 // ===========================================================================
 
 const todasLasVisitas = [
   v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v14,
   vj1, vj2, vj3, vm1, vm2, vm3, vm4, vm5,
+  vr0, vr1, vr2, vr3, vr3b, vr4, vr5, vr5b, vr6, vr7, vr8, vr9, vr10,
 ];
 const rutasVistas = new Set();
 

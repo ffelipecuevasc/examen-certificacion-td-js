@@ -153,14 +153,30 @@
           <p class="mt-1 font-mono text-[11px] text-mutedink">Preguntas del módulo: <span id="total-preguntas">0</span></p>
         </div>
 
+        <!-- Tres controles, y nunca mas de tres (decision 10 de la iteracion 34).
+             El del medio es uno solo que cambia de papel: fuera del repaso dice
+             «Repasar mis errores (N)» y dentro dice «Volver al módulo completo».
+             Que sea el MISMO boton no es un atajo: es lo que garantiza que el de
+             entrar no pueda quedar visible durante el repaso. Su rotulo lo escribe
+             components/cuestionario.js, que es quien sabe cuantas falladas hay. -->
         <div class="mt-6 flex flex-wrap gap-3">
           <button id="reiniciar" type="button" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
             <span class="icon i-restart-alt text-base" aria-hidden="true"></span>Reiniciar el módulo
+          </button>
+          <button id="repaso" type="button" class="inline-flex items-center gap-2 border border-jsyellow/50 text-jsyellow font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow transition-colors">
+            <span id="repaso-icono" class="shrink-0"></span><span id="repaso-rotulo">Repasar mis errores</span>
           </button>
           <a href="index.html#modulos" class="inline-flex items-center gap-2 border border-panel3 text-muted font-display font-bold text-xs px-4 py-2.5 rounded hover:border-jsyellow hover:text-paper transition-colors">
             <span class="icon i-menu-book text-base" aria-hidden="true"></span>Repasar la materia
           </a>
         </div>
+
+        <!-- Lo que responde el boton del repaso cuando no hay nada que repasar
+             (decision 5). Vive aca, pegado al boton que lo produce, y no en el
+             mensaje de avance de mas arriba: ese lo reescribe actualizarPanel() en
+             cada respuesta y el aviso se borraria solo. Nace oculto, asi que el
+             panel no crece mientras no haga falta. -->
+        <p id="aviso-repaso" class="hidden mt-3 text-sm text-paper font-semibold" role="status"></p>
 
         <div class="mt-auto pt-8">
           <p class="font-mono text-[11px] text-mutedink">¿Quieres practicar todavía más?</p>

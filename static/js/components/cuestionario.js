@@ -130,6 +130,31 @@ let peticionVigente = 0;
  */
 let moduloCargando = null;
 
+/**
+ * El repaso abierto, o null si se esta viendo el modulo completo (iteracion 34).
+ *
+ *   ids          las preguntas que estaban falladas AL ENTRAR. Se congela ahi.
+ *   respondidas  las que se volvieron a responder DENTRO de este repaso.
+ *
+ * POR QUE EL CONJUNTO SE CONGELA AL ENTRAR
+ *
+ * Porque si se recalculara solo, acertar una pregunta la haria desaparecer bajo el
+ * dedo: el estudiante lee su justificacion en el telefono y el contenido salta. Las
+ * decisiones 3 y 9 dicen las dos lo mismo desde los dos lados —la que se acierta y
+ * la que se vuelve a fallar siguen a la vista hasta salir—, y congelar la lista es
+ * la unica forma de cumplirlas sin excepciones.
+ *
+ * POR QUE `respondidas` ES UN CONJUNTO APARTE, Y NO BASTA LA MEMORIA DE LA VISITA
+ *
+ * Una pregunta fallada hace diez minutos ya esta en la memoria de la visita, y aun
+ * asi el repaso tiene que dibujarla SIN MARCAR para poder reintentarla. Lo que
+ * distingue «respondida antes» de «respondida aca dentro» es esto y nada mas.
+ *
+ * N, el numero del contador, NO sale de aca: se cuenta cada vez contra el banco y la
+ * memoria (`falladasDe()`). Por eso volver a fallar no lo baja y acertar si.
+ */
+let repaso = null;
+
 /** Actualiza las tres barras verticales y los contadores del panel izquierdo. */
 function actualizarPanel() {
   const { respondidas, correctas, incorrectas, total } = estado;
@@ -171,6 +196,19 @@ function actualizarPanel() {
   // iteracion 33). Con nada cargado se olvida: las siete filas vuelven a contar
   // sobre el resumen. El indice solo se repinta si la cifra cambio de verdad.
   fijarAvanceDibujado(bancoCargado ? estado.modulo : null, respondidas, total);
+
+  // Los dos numeros del repaso salen de aca porque de aca salen todos: N cambia
+  // exactamente cuando cambian las barras, y son la misma cuenta mirada de dos
+  // maneras. Llevarlos por separado seria abrir la puerta a que digan cosas
+  // distintas sobre el mismo modulo.
+  const vigentes = vigentesDelModulo();
+  actualizarContadorDeArriba(vigentes);
+  actualizarBotonDelRepaso(vigentes);
+
+  // Y el aviso del boton del repaso se retira en cuanto pasa cualquier otra cosa.
+  // Decia «responde algunas preguntas y vuelve»; si sigue puesto despues de que el
+  // estudiante responda, esta describiendo un estado que ya no existe.
+  limpiarAvisoDelRepaso();
 }
 
 /**
@@ -373,9 +411,6 @@ function responder(boton) {
   aviso.innerHTML = veredictoDibujado(acerto);
 
   item.dataset.answered = 'true';
-  estado.respondidas += 1;
-  if (acerto) estado.correctas += 1;
-  else estado.incorrectas += 1;
 
   const origenDelClic = deDondeSalio(boton);
 
@@ -400,6 +435,32 @@ function responder(boton) {
   // vuelve a calcular al restaurar, contra el banco que este vigente ese dia.
   if (origenDelClic) {
     guardarRespuesta(estado.modulo, origenDelClic.pregunta.id, origenDelClic.alternativa.texto);
+
+    // Dentro del repaso, esta pregunta deja de dibujarse sin marcar. Sigue a la
+    // vista con su veredicto y su justificacion hasta que el estudiante salga, se
+    // haya acertado (decision 3) o vuelto a fallar (decision 9): en el telefono,
+    // una pregunta que desaparece bajo el dedo se lleva el texto que se estaba
+    // leyendo.
+    if (repaso) repaso.respondidas.add(origenDelClic.pregunta.id);
+
+    // LAS TRES BARRAS SE RECUENTAN, NO SE SUMAN.
+    //
+    // Sumar de a uno estaba bien mientras responder fuera irrepetible. En el repaso
+    // no lo es: la misma pregunta se responde por segunda vez, y `respondidas += 1`
+    // la contaria dos veces —62 de 61— y dejaria su primer veredicto sumado para
+    // siempre en la barra equivocada. Recontar contra la memoria y el banco da el
+    // mismo resultado que repintar, que es de donde salen las barras al volver al
+    // modulo: dos formas de llegar al mismo numero no pueden divergir si es el
+    // mismo calculo.
+    recontarElModulo(vigentesDelModulo());
+  } else {
+    // Sin poder identificar la pregunta no hay nada que recontar —la respuesta no
+    // quedo anotada en ninguna parte—, pero en la pantalla si esta. Se suma a mano
+    // para que las barras no digan menos de lo que se ve. Ningun navegador llega
+    // aca: toda alternativa dibujada lleva su `data-alternativa`.
+    estado.respondidas += 1;
+    if (acerto) estado.correctas += 1;
+    else estado.incorrectas += 1;
   }
 
   actualizarPanel();
@@ -514,15 +575,19 @@ function dibujarPregunta(pregunta, numero, respondida, enLaVisita) {
 /**
  * Dibuja la seccion de un modulo, con lo respondido ya puesto.
  *
- * `deLaVisita` son los ids que se respondieron en esta visita, y no es lo mismo que
- * `vigentes`: las dos dicen «respondida», pero solo la primera dice «hace un rato».
- * De esa diferencia sale que la justificacion venga desplegada o detras de un boton.
+ * `respondida` y `enLaVisita` llegan como funciones y no como Map y Set, porque en el
+ * repaso la respuesta a las dos preguntas cambia: una pregunta respondida hace diez
+ * minutos se dibuja SIN MARCAR ahi dentro, para poder reintentarla. Quien decide eso
+ * es `pintar()`; aca solo se dibuja lo que diga.
+ *
+ * `aDibujar` puede ser menos que `grupo.preguntas` —en el repaso lo es—, pero la
+ * cabecera sigue contando el MODULO: es la cabecera del modulo, no la de la lista, y
+ * un «6» bajo el titulo del Modulo 3 se leeria como el tamano del modulo. El numero
+ * del repaso vive arriba, en su contador (decision 8).
  */
-function dibujarGrupo(grupo, vigentes, deLaVisita) {
-  const preguntas = grupo.preguntas
-    .map((pregunta, i) =>
-      dibujarPregunta(pregunta, i + 1, vigentes.get(pregunta.id), deLaVisita.has(pregunta.id))
-    )
+function dibujarGrupo(grupo, aDibujar, respondida, enLaVisita) {
+  const preguntas = aDibujar
+    .map((pregunta, i) => dibujarPregunta(pregunta, i + 1, respondida(pregunta), enLaVisita(pregunta)))
     .join('');
 
   return `
@@ -734,6 +799,63 @@ function restaurarDesdeLaMemoria(grupos, guardadas) {
   return vigentes;
 }
 
+/** Lo respondido del modulo cargado, ya cruzado con el banco que se dibujo hoy. */
+function vigentesDelModulo() {
+  return restaurarDesdeLaMemoria(bancoCargado ?? [], leerAvance(estado.modulo));
+}
+
+/**
+ * Cuantas de esas preguntas estan FALLADAS hoy.
+ *
+ * `acerto === false` y no `!acerto`: una pregunta sin responder no esta en el Map, y
+ * `!undefined` la contaria como fallada. Serian 61 errores en un modulo en blanco.
+ *
+ * Se cuenta cada vez, contra el banco y la memoria, y no se lleva un contador aparte.
+ * De ahi salen solas las decisiones 3 y 9: acertar baja N porque la pregunta deja de
+ * estar fallada, y volver a fallar no lo baja porque sigue estandolo.
+ */
+const falladasDe = (ids, vigentes) => [...ids].filter((id) => vigentes.get(id)?.acerto === false);
+
+/**
+ * Las falladas del modulo cargado, en el orden en que se dibujan.
+ *
+ * El orden importa: es el que va a tener el repaso, y recorrer `bancoCargado` es lo
+ * que lo mantiene igual al del modulo completo. Sacarlas del Map las devolveria en
+ * orden de respuesta, que es el orden en que el estudiante se equivoco.
+ */
+function falladasDelModulo(vigentes) {
+  const todas = [];
+
+  for (const grupo of bancoCargado ?? []) {
+    for (const pregunta of grupo.preguntas) todas.push(pregunta.id);
+  }
+
+  // Pasa por `falladasDe()` y no repite la condicion. Estuvo escrita dos veces
+  // durante un rato y se vio enseguida por que no sirve: romper una de las dos
+  // dejaba la otra tapando el fallo, y la prueba que tenia que cazarlo pasaba en
+  // verde. Una regla, un sitio.
+  return falladasDe(todas, vigentes);
+}
+
+/**
+ * Las tres barras, contadas sobre EL MODULO COMPLETO.
+ *
+ * Tambien durante el repaso, y es la decision 4: las barras no cambian de
+ * significado segun el modo. Por eso se cuenta contra `bancoCargado` —el modulo
+ * entero, este dibujado o no— y nunca contra lo que hay en pantalla. La 31 ya
+ * corrigio una vez rotulos que decian una cosa y median otra.
+ *
+ * Y es tambien lo que hace que entrar o salir del repaso no dispare
+ * `avisarSiElResumenNoCuadra()`: `estado.total` sigue siendo el del modulo, que es
+ * contra lo que el resumen se compara.
+ */
+function recontarElModulo(vigentes) {
+  estado.total = (bancoCargado ?? []).reduce((suma, grupo) => suma + grupo.preguntas.length, 0);
+  estado.respondidas = vigentes.size;
+  estado.correctas = [...vigentes.values()].filter((r) => r.acerto).length;
+  estado.incorrectas = estado.respondidas - estado.correctas;
+}
+
 /**
  * Dibuja el modulo que ya esta cargado en memoria, con lo respondido restaurado.
  *
@@ -745,7 +867,7 @@ function pintar() {
   const contenedor = $('#cuestionario');
   if (!contenedor || !bancoCargado) return;
 
-  const vigentes = restaurarDesdeLaMemoria(bancoCargado, leerAvance(estado.modulo));
+  const vigentes = vigentesDelModulo();
 
   // Lo respondido en esta visita se pregunta aca, en cada repintado, y no se lleva
   // en una variable de este archivo: repintar es exactamente el momento en que la
@@ -753,16 +875,169 @@ function pintar() {
   // que se puede quedar atras.
   const deLaVisita = respondidasEnLaVisita(estado.modulo);
 
+  // En el repaso se dibujan SOLO las preguntas con las que se entro, y las que
+  // todavia no se han reintentado salen sin marcar: esa es toda la diferencia entre
+  // los dos modos, y cabe en estas dos funciones.
+  const respondida = (p) =>
+    repaso && !repaso.respondidas.has(p.id) ? undefined : vigentes.get(p.id);
+
+  const enLaVisita = (p) => (repaso ? repaso.respondidas.has(p.id) : deLaVisita.has(p.id));
+
   contenedor.innerHTML = bancoCargado
-    .map((grupo) => dibujarGrupo(grupo, vigentes, deLaVisita))
+    .map((grupo) => {
+      const aDibujar = repaso
+        ? grupo.preguntas.filter((p) => repaso.ids.has(p.id))
+        : grupo.preguntas;
+
+      return aDibujar.length === 0 ? '' : dibujarGrupo(grupo, aDibujar, respondida, enLaVisita);
+    })
     .join('');
 
-  estado.total = bancoCargado.reduce((suma, grupo) => suma + grupo.preguntas.length, 0);
-  estado.respondidas = vigentes.size;
-  estado.correctas = [...vigentes.values()].filter((r) => r.acerto).length;
-  estado.incorrectas = estado.respondidas - estado.correctas;
+  recontarElModulo(vigentes);
 
+  // El contador de arriba y el rotulo del boton los pone `actualizarPanel()`, que
+  // es quien tiene las cifras al dia. No se repiten aca.
   actualizarPanel();
+}
+
+/**
+ * El unico control del repaso, en sus dos papeles (decisiones 5 y 10).
+ *
+ * Fuera del repaso dice «Repasar mis errores (N)», con N a la vista; dentro dice
+ * «Volver al módulo completo». **Es el mismo boton**, y eso no es una economia de
+ * codigo: es lo que hace imposible que el de entrar se quede visible durante el
+ * repaso, y lo que mantiene la fila en tres controles pase lo que pase.
+ *
+ * El rotulo y el icono se escriben en dos nodos distintos y no con un innerHTML del
+ * boton entero, porque el foco puede estar puesto ahi: reescribir el boton lo
+ * destruiria, y quien lo acaba de pulsar con teclado se quedaria sin foco.
+ *
+ * **Con N en cero el boton NO se esconde ni se deshabilita** (decision 5). Esconderlo
+ * dejaria al estudiante sin saber que el repaso existe justo en el momento en que
+ * todavia no ha respondido nada, que es cuando mas falta hace saberlo.
+ */
+function actualizarBotonDelRepaso(vigentes = vigentesDelModulo()) {
+  const rotulo = $('#repaso-rotulo');
+  const icono = $('#repaso-icono');
+  if (!rotulo || !icono) return;
+
+  if (repaso) {
+    rotulo.textContent = 'Volver al módulo completo';
+    icono.innerHTML = icon('swap-horiz', 'text-base');
+    return;
+  }
+
+  rotulo.textContent = `Repasar mis errores (${falladasDelModulo(vigentes).length})`;
+  icono.innerHTML = icon('cancel', 'text-base');
+}
+
+/** Lo que responde el boton del repaso cuando no hay nada que repasar. */
+function avisarDelRepaso(texto) {
+  const aviso = $('#aviso-repaso');
+  if (!aviso) return;
+
+  aviso.textContent = texto;
+  aviso.classList.remove('hidden');
+}
+
+function limpiarAvisoDelRepaso() {
+  const aviso = $('#aviso-repaso');
+  if (!aviso) return;
+
+  aviso.textContent = '';
+  aviso.classList.add('hidden');
+}
+
+/**
+ * Entra al repaso, o explica por que no hay a que entrar.
+ *
+ * LOS DOS MENSAJES SON DISTINTOS A PROPOSITO (decision 5)
+ *
+ * «No has respondido nada» y «no fallaste ninguna» llevan a cosas distintas: el
+ * primero manda a responder, el segundo felicita y no pide nada. Un solo mensaje
+ * para los dos —«no hay errores que repasar»— seria verdadero en los dos casos y
+ * util en ninguno, porque el estudiante que no ha respondido nada creeria que ya
+ * termino.
+ */
+function entrarAlRepaso() {
+  if (!bancoCargado) {
+    avisarDelRepaso('Elige un módulo en el índice y responde algunas preguntas para poder repasar.');
+    return;
+  }
+
+  const vigentes = vigentesDelModulo();
+  const falladas = falladasDelModulo(vigentes);
+
+  if (falladas.length === 0) {
+    avisarDelRepaso(
+      vigentes.size === 0
+        ? 'Todavía no respondes ninguna pregunta de este módulo. Responde algunas y vuelve acá.'
+        : 'No tienes errores que repasar: acertaste todas las que llevas respondidas.'
+    );
+    return;
+  }
+
+  repaso = { ids: new Set(falladas), respondidas: new Set() };
+  pintar();
+
+  // El foco y el desplazamiento van a la cabecera del modulo, igual que al elegirlo
+  // en el indice: la zona de preguntas se acaba de reescribir entera, y quien pulso
+  // con teclado se quedaria mirando el panel sin saber que la lista cambio.
+  irALaCabecera(estado.modulo);
+}
+
+/** Vuelve al modulo completo. Nada de lo respondido se pierde: solo cambia que se dibuja. */
+function salirDelRepaso() {
+  repaso = null;
+  pintar();
+  irALaCabecera(estado.modulo);
+}
+
+/**
+ * Deja el repaso, si estaba abierto, sin dibujar nada.
+ *
+ * Lo llaman los dos caminos que sacan del repaso sin que el estudiante lo pida
+ * —elegir otro modulo en el indice, y reiniciar— porque los dos van a repintar por
+ * su cuenta enseguida. **Sin aviso y sin preguntar** (decision 5): con la memoria de
+ * la 33 y la de la visita no se pierde nada, y un aviso que no protege de nada
+ * entrena a ignorar los avisos, que es lo que ya hizo retirar el de la 31.
+ */
+function cerrarElRepaso() {
+  repaso = null;
+}
+
+/**
+ * El contador de arriba: el del modulo, o el del repaso mientras dure.
+ *
+ * **Uno solo, en el mismo sitio** (decision 8). El contador del modulo cuenta lo
+ * dibujado, asi que en el repaso habria dicho «6 preguntas» con las barras en 61.
+ * Dejar los dos habria puesto en pantalla dos numeros verdaderos que se contradicen
+ * a simple vista, que es peor que uno falso: el falso se corrige.
+ */
+function actualizarContadorDeArriba(vigentes = vigentesDelModulo()) {
+  const contenedor = $('#contador-banco');
+  if (!contenedor) return;
+
+  if (!repaso) {
+    mostrarContador(bancoCargado);
+    return;
+  }
+
+  const cuantas = falladasDe(repaso.ids, vigentes).length;
+
+  // El texto con N en cero, con preguntas todavia a la vista, queda a criterio de
+  // quien implementa. Dice que no queda ninguna y no que el repaso termino, porque
+  // lo que hay en pantalla sigue ahi hasta que el estudiante decida salir.
+  const dice =
+    cuantas === 0
+      ? 'No te queda ninguna fallada por repasar'
+      : cuantas === 1
+        ? 'Te queda 1 pregunta fallada por repasar'
+        : `Te quedan ${cuantas} preguntas falladas por repasar`;
+
+  contenedor.innerHTML = `${icon('cancel', 'text-base')}<span>${esc(dice)}</span>`;
+  contenedor.classList.remove('hidden');
+  contenedor.classList.add('inline-flex');
 }
 
 /**
@@ -989,6 +1264,12 @@ export async function mostrarModulo(numero) {
   const miPeticion = (peticionVigente += 1);
   moduloCargando = numero;
 
+  // Elegir un modulo a mitad del repaso sale del repaso, sin preguntar (decision 5).
+  // Va aca arriba y no en el indice: `mostrarModulo()` es el unico sitio por el que
+  // se cambia de modulo, asi que el repaso no puede sobrevivir a un cambio por
+  // ninguna ruta, ni siquiera por una que se escriba manana.
+  cerrarElRepaso();
+
   estado.modulo = numero;
   estado.respondidas = 0;
   estado.correctas = 0;
@@ -1186,6 +1467,11 @@ export function setupReinicio() {
     // vacio encima de si mismo solo desplazaria la pagina sin motivo.
     if (!bancoCargado) return;
 
+    // Reiniciar a mitad del repaso sale del repaso y reinicia (decision 5). Primero
+    // se sale: `pintar()` dibujaria el subconjunto congelado de un repaso cuyas
+    // preguntas acaban de dejar de estar respondidas.
+    cerrarElRepaso();
+
     borrarAvance(estado.modulo);
     pintar();
 
@@ -1197,4 +1483,27 @@ export function setupReinicio() {
       window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
     }
   });
+}
+
+/**
+ * Conecta el boton del repaso (iteracion 34).
+ *
+ * Un solo oyente para los dos papeles del boton, porque es un solo boton: cual de
+ * los dos corre lo decide `repaso`, que es el mismo estado que decide el rotulo. Si
+ * fueran dos oyentes sobre dos elementos, habria que acordarse de esconder uno.
+ *
+ * Se llama una vez al arrancar la pagina, y deja el rotulo puesto con la cifra que
+ * corresponda —«Repasar mis errores (0)» con la pagina recien abierta—, para que el
+ * boton no aparezca a medio escribir mientras no se elige modulo.
+ */
+export function setupRepaso() {
+  const boton = $('#repaso');
+  if (!boton) return;
+
+  boton.addEventListener('click', () => {
+    if (repaso) salirDelRepaso();
+    else entrarAlRepaso();
+  });
+
+  actualizarBotonDelRepaso();
 }
