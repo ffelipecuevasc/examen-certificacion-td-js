@@ -9,10 +9,10 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | iteracion-34-justificacion-y-repaso.md                                                                                                             |
+| **Iteración** | iteracion-35-transicion-de-carga.md                                                                                                                |
 | **Épica**     | 30 - Cuestionario                                                                                                                                  |
 | **Estado**    | ⚪ No iniciada                                                                                                                                      |
-| **Siguiente** | La siguiente es `iteracion-35-transicion-de-carga.md` (épica 30), con la que se cierra el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15. La 36 se adelantó porque la portada publicaba una cifra falsa; ya cerró. |
+| **Siguiente** | Con la 35 se cierra el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15, y con ella la épica 30. La 34 cerró el 2026-09-16. |
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -33,6 +33,7 @@ decisiones vale tanto como el código que las implementa.
 | 32 - Rediseño del panel fijo           | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | 33 - Memoria del avance                | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | 36 - Orientación en la portada         | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
+| 34 - Justificación y repaso            | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

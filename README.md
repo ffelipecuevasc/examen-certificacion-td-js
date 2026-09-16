@@ -10,8 +10,11 @@ Este repositorio no reemplaza las clases ni el material oficial del programa: su
 
 1. **Revisa el mapa del examen** y el orden de los módulos evaluados.
 2. **Abre cada módulo** para ver sus temas y el código de ejemplo.
-3. **Responde el miniexamen**: 21 preguntas con alternativas y explicación inmediata.
-4. **Sigue practicando** en los cuadernos de NotebookLM enlazados en la página.
+3. **Practica en el cuestionario** (`cuestionario.html`): eliges un módulo en el índice y respondes sus preguntas a tu ritmo. Cada respuesta se corrige al instante y **muestra su justificación**, se acierte o no, para que la practiques entendiendo el porqué y no memorizando posiciones —las alternativas se barajan en cada carga—.
+4. **Vuelve sobre lo que fallaste** con «Repasar mis errores», que deja en pantalla solo las preguntas falladas **de ese módulo** para intentarlas de nuevo.
+5. **Sigue practicando** en los cuadernos de NotebookLM enlazados en la página.
+
+Tu avance se guarda **en tu propio navegador**, sin cuentas ni registro: no se comparte entre dispositivos y se pierde si borras los datos del sitio. Si el navegador no permite guardar, el cuestionario funciona igual y te lo dice.
 
 ## Estructura del proyecto
 
@@ -31,7 +34,9 @@ Este repositorio no reemplaza las clases ni el material oficial del programa: su
     └── resources/          Imágenes y otros recursos
 ```
 
-Para agregar o editar preguntas del miniexamen basta con modificar `static/js/data/quiz.js`.
+Las preguntas del cuestionario **ya no viven en este repositorio**: están en una base D1 y se sirven desde `functions/api/`, con una instantánea versionada en `static/js/data/instantanea-banco.js` que el sitio usa si la capa de datos no responde. Se editan con la herramienta de línea de comandos descrita en `_planmaestro/90-manual/administrar-el-banco.md`, no tocando código.
+
+> **El resto de este README quedó desfasado** en la épica 20 y está pendiente de rehacerse: el árbol de `static/` de aquí arriba y la sección de publicación describen el sitio anterior a la base D1. Anotado en `_planmaestro/00_producto/registro_log.md`, sin asignar.
 
 ## Desarrollo local
 

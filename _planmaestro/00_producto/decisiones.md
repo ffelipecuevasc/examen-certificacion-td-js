@@ -2273,3 +2273,59 @@ falso** —el veredicto no se guarda, se recalcula contra el banco vigente—. E
 avance momentáneamente optimista, no una regla equivocada enseñada con cara de quien sabe, que
 es lo que esta ADR existe para impedir. Sigue valiendo «lo dibujado manda» de ADR-033: en
 cuanto el módulo se abre, mandan sus preguntas.
+
+### Actualización · 2026-09-16 · memoria de la visita
+
+La iteración 34 añade una segunda memoria al cuestionario. Esta actualización se escribe porque
+esta ADR describía **una sola**, y a partir de hoy hay dos con promesas distintas. **La decisión
+original no cambia y el formato `v: 1` tampoco**: lo que se guarda en el navegador se guarda
+exactamente igual, con las mismas claves y los mismos campos.
+
+**Qué se agrega: la memoria de la visita.** Además del almacén del navegador, la página mantiene
+en memoria lo que el estudiante respondió **durante esta visita**. Vive desde que se carga la
+página hasta que se recarga o se cierra, y **cambiar de módulo no la cierra**. No se escribe en
+ninguna parte, no sobrevive a una recarga, y no se promete que lo haga.
+
+**Para qué existe, que son tres cosas y ninguna es «por si acaso»:**
+
+1. **El repaso funciona sin almacenamiento.** Con las cookies bloqueadas no hay nada guardado
+   contra lo que cruzar, y el repaso —que es todo el punto de la iteración 34— se quedaría sin
+   preguntas que ofrecer.
+2. **N es exacto sin almacenamiento.** El botón «Repasar mis errores (N)» cuenta las falladas del
+   módulo; sin esta memoria diría siempre cero en un navegador que no guarda.
+3. **Distinguir «respondida en la visita» de «restaurada».** Lo guardado no sabe de visitas:
+   «respondida hace un rato» y «respondida la semana pasada» son el mismo dato ahí dentro. La
+   iteración 34 las dibuja distinto —la primera muestra su justificación desplegada y la segunda
+   ofrece «Ver por qué»— y sin esta memoria la distinción se perdería en el primer repintado,
+   porque `pintar()` reconstruye desde cero.
+
+**Cómo se combinan las dos**, y está escrito en un solo archivo a propósito
+(`static/js/servicios/memoria.js`):
+
+- **`leerAvance()`** (`memoria.js:197-201`) lee primero lo guardado y **encima** lo de la visita.
+  El orden no es indiferente: si el estudiante volvió a responder una pregunta hoy, la respuesta
+  de hoy es la que vale. Sin almacenamiento, la de la visita es la única que hay.
+- **`guardarRespuesta()`** (`memoria.js:281-286`) anota **primero** en la visita y después intenta
+  el almacén. Devuelve si se pudo guardar, pero la visita queda anotada aunque devuelva `false`:
+  son dos promesas distintas, y la del almacén puede negarse.
+- **`borrarAvance()`** (`memoria.js:315-317`) borra **las dos**. Si dejara viva la de la visita,
+  «Reiniciar el módulo» no borraría nada en un navegador sin almacenamiento, y con almacenamiento
+  las respuestas volverían al primer repintado: el mismo botón que miente, por el otro lado.
+- **`respondidasEnLaVisita()`** (`memoria.js:215-217`) devuelve solo los ids de esta visita, que es
+  lo que el componente usa para elegir cómo dibujar cada pregunta.
+
+**Lo que esto cambia para el estudiante sin almacenamiento.** Antes, con las cookies bloqueadas, lo
+respondido vivía únicamente en la pantalla y cualquier repintado se lo llevaba: volver de otro
+módulo bastaba para perderlo. **Ahora el sitio recuerda durante toda la visita**, se puede cambiar
+de módulo y volver, y el repaso funciona. Lo que se pierde al recargar sigue perdiéndose, **y eso
+es lo esperado, no un defecto**: es exactamente lo que el aviso de la página anuncia —«al recargar
+la página el módulo va a empezar de cero»— y lo que la consecuencia de más arriba llamaba «el
+recuerdo entre visitas».
+
+**De dónde sale.** Es la decisión 7 de
+[`_planmaestro/30-epica-cuestionario/iteracion-34-justificacion-y-repaso.md`](../30-epica-cuestionario/iteracion-34-justificacion-y-repaso.md),
+tomada por el autor el 2026-09-16 tras la lectura de alcance: el código no conservaba lo respondido
+fuera del almacén ni del DOM, y tres criterios de esa iteración dependían de que lo conservara.
+
+**Lo que esta actualización no resuelve, y ya estaba asumido.** Dos pestañas abiertas se siguen
+pisando, y ahora además de forma asimétrica: ver la limitación declarada en la iteración 34.
