@@ -112,6 +112,11 @@ async function correrLaVisita(archivoDeEncargo) {
     // que mirarlas por separado.
     alResponder: [],
     alDesplegar: [],
+    // Lo que paso al pulsar una alternativa del modulo ANTERIOR (iteracion 35).
+    // No se puede leer del retrato: el retrato mira el HTML del contenedor, y lo
+    // que hay que vigilar aqui es lo que NO se movio —el panel, el almacen y la
+    // memoria de la visita— alrededor de un clic concreto.
+    alPulsarLoViejo: [],
   };
 
   /** El lector del DOM falso. Vive aqui fuera para poder retratarlo pase lo que pase. */
@@ -152,6 +157,16 @@ async function correrLaVisita(archivoDeEncargo) {
 
       if (encargo.caerLaRed) throw new Error('caida provocada');
 
+      // Retraso POR MODULO (iteracion 35). Es lo que permite pulsar algo mientras
+      // otro modulo todavia viaja: sin esto, la carga local termina en unos 30 ms
+      // y no hay ventana en la que provocar nada. El resumen no se retrasa nunca,
+      // porque no es lo que se esta midiendo.
+      const cual = String(ruta).match(/modulo=(\d+)/);
+      const espera =
+        cual && !String(ruta).includes('resumen') ? encargo.retrasos?.[cual[1]] : undefined;
+
+      if (espera) await new Promise((listo) => setTimeout(listo, espera));
+
       const respuesta = await fetchReal(DIRECCION + ruta, opciones);
 
       if (!encargo.intercepcion) return respuesta;
@@ -184,6 +199,14 @@ async function correrLaVisita(archivoDeEncargo) {
       pathToFileURL(join(raizDelSitio, 'components', 'cuestionario.js')).href
     );
 
+    // La MISMA instancia de memoria.js que usa el componente: misma URL, mismo
+    // modulo, no una copia. Sirve para mirar desde fuera la memoria de la visita,
+    // que es lo unico de las dos memorias que no deja rastro ni en el HTML ni en
+    // el archivo que hace de disco.
+    const memoria = await import(
+      pathToFileURL(join(raizDelSitio, 'servicios', 'memoria.js')).href
+    );
+
     // Lo mismo que hace static/js/cuestionario-main.js al abrir la pagina, y en el
     // mismo orden. Si algun dia esa lista creciera y esta no, la visita estaria
     // probando una pagina a medio conectar.
@@ -193,7 +216,7 @@ async function correrLaVisita(archivoDeEncargo) {
 
     // --- Los pasos ------------------------------------------------------------
     for (const paso of encargo.pasos) {
-      await darElPaso(paso, dom, cuestionario, salida);
+      await darElPaso(paso, dom, cuestionario, salida, { almacen, memoria });
       salida.pasos.push(retrato(dom, paso));
     }
 
@@ -339,8 +362,115 @@ function intervenir(ruta, cuerpo, plan) {
   return cuerpo;
 }
 
+/**
+ * Fabrica el boton de una alternativa dibujada y su tarjeta, como haria el HTML.
+ *
+ * Sale de aqui y no esta escrito dos veces porque lo usan dos pasos: `responder`,
+ * que pulsa lo que esta a la vista, y `pulsar-lo-viejo`, que guarda la referencia
+ * para pulsarla cuando ya NO lo esta. Si cada uno fabricara el suyo, el dia que
+ * cambiara lo que `responder()` necesita leer del boton, uno de los dos se
+ * quedaria atras y su prueba pasaria en verde sin tocar el codigo de verdad.
+ *
+ * `sufijo` separa los nodos del DOM falso: los del clic viejo no pueden ser los
+ * mismos que los del modulo dibujado, o compartirian identidad y el clic «viejo»
+ * estaria pulsando la tarjeta nueva.
+ */
+function fabricarAlternativa(dom, pregunta, elegida, sufijo = '') {
+  const tarjeta = dom.nodo(`#tarjeta${sufijo}-q${pregunta}`);
+  tarjeta.dataset.pregunta = `q${pregunta}`;
+
+  const boton = dom.nodo(`#alternativa${sufijo}-${elegida.id}`);
+  boton.disabled = false;
+  boton.dataset.correct = String(elegida.correcta);
+  boton.dataset.alternativa = String(elegida.id);
+  boton.closest = (selector) => (selector === '[data-pregunta]' ? tarjeta : boton);
+
+  return { tarjeta, boton };
+}
+
 /** Ejecuta un paso del encargo sobre el componente real. */
-async function darElPaso(paso, dom, cuestionario, salida) {
+async function darElPaso(paso, dom, cuestionario, salida, { almacen, memoria } = {}) {
+  // ------------------------------------------------------------------------
+  // Pulsar una alternativa del modulo ANTERIOR (iteracion 35)
+  //
+  // Es la premisa de la iteracion 34 puesta a prueba en vez de razonada: al
+  // cambiar de modulo, `mostrarModulo()` pone `bancoCargado` en null y reescribe
+  // el contenedor, asi que no queda ninguna alternativa anterior que pulsar. Aqui
+  // se guarda una referencia ANTES de cambiar y se pulsa despues, en los dos
+  // momentos en que el estudiante podria llegar a hacerlo:
+  //
+  //   1 · MIENTRAS el modulo nuevo viaja. En el navegador ese boton ya esta
+  //       desprendido del arbol y el clic ni siquiera llegaria al oyente del
+  //       contenedor; aqui se fuerza a que llegue, que es MAS exigente.
+  //   2 · Con el modulo nuevo YA dibujado. Ahi el boton sigue siendo de una
+  //       pregunta que no es de este modulo, y es la otra mitad del criterio:
+  //       ninguna respuesta se guarda en un modulo que no es el que la muestra.
+  //
+  // UN SOLO CAMINO, Y SE DICE: `conectarCuestionario()` delega en `#cuestionario`
+  // y las alternativas se dibujan como `<button>` pelados, sin oyente propio (ver
+  // `dibujarAlternativa()`). Asi que «pulsar la referencia vieja» y «pasar por el
+  // oyente delegado» son lo mismo, y se dispara una vez por momento.
+  // ------------------------------------------------------------------------
+  if (paso.tipo === 'pulsar-lo-viejo') {
+    const bloque = bloqueDePregunta(dom.html('#cuestionario'), paso.pregunta);
+    const alternativas = alternativasDelBloque(bloque);
+    const elegida = alternativas.find((a) => (paso.acertando ? a.correcta : !a.correcta));
+
+    if (!elegida) {
+      salida.errores.push(
+        `no encontre una alternativa dibujada en la pregunta ${paso.pregunta} para guardarla ` +
+          'como referencia vieja'
+      );
+      return;
+    }
+
+    // La referencia se toma AHORA, con el modulo viejo todavia a la vista.
+    const { boton } = fabricarAlternativa(dom, paso.pregunta, elegida, '-vieja');
+
+    const pulsar = () =>
+      dom.disparar('#cuestionario', 'click', {
+        target: { closest: (s) => (s === '.quiz-option' ? boton : null) },
+      });
+
+    const foto = (cuando, oyentes = null) => ({
+      cuando,
+      oyentes,
+      panel: {
+        respondidas: dom.texto('#valor-avance'),
+        correctas: dom.texto('#valor-correctas'),
+        incorrectas: dom.texto('#valor-incorrectas'),
+        total: dom.texto('#total-preguntas'),
+      },
+      // El almacen entero, no solo la clave del modulo: el criterio dice «ninguna
+      // clave», y mirar solo una no veria la respuesta que se cuela en la de al lado.
+      almacen: almacen?.datos ? Object.fromEntries(almacen.datos) : null,
+      enLaVisitaVieja: [...memoria.respondidasEnLaVisita(paso.moduloViejo)].sort(),
+      enLaVisitaNueva: [...memoria.respondidasEnLaVisita(paso.modulo)].sort(),
+    });
+
+    // 1 · Se pide el otro modulo y NO se espera: lo que hay que provocar ocurre
+    //     mientras viaja.
+    dom.disparar('#indice-modulos', 'click', {
+      target: {
+        closest: (s) => (s === '[data-modulo]' ? { dataset: { modulo: String(paso.modulo) } } : null),
+      },
+    });
+
+    await new Promise((listo) => setTimeout(listo, paso.durante ?? 600));
+
+    salida.alPulsarLoViejo.push(foto('antes, con el modulo nuevo todavia cargando'));
+    salida.alPulsarLoViejo.push(
+      foto('despues, con el modulo nuevo todavia cargando', pulsar())
+    );
+
+    // 2 · Y otra vez con el modulo nuevo ya dibujado.
+    await new Promise((listo) => setTimeout(listo, paso.espera ?? 3500));
+
+    salida.alPulsarLoViejo.push(foto('antes, con el modulo nuevo ya dibujado'));
+    salida.alPulsarLoViejo.push(foto('despues, con el modulo nuevo ya dibujado', pulsar()));
+    return;
+  }
+
   if (paso.tipo === 'elegir') {
     dom.disparar('#indice-modulos', 'click', {
       target: { closest: (s) => (s === '[data-modulo]' ? { dataset: { modulo: String(paso.modulo) } } : null) },
@@ -375,14 +505,7 @@ async function darElPaso(paso, dom, cuestionario, salida) {
       // la marca, el parrafo del veredicto— y con objetos pelados se cae en la
       // primera linea. Lo unico que se fabrica es lo que el navegador tendria puesto
       // en el HTML: de que pregunta es la tarjeta y que alternativa se pulso.
-      const tarjeta = dom.nodo(`#tarjeta-q${encargo.pregunta}`);
-      tarjeta.dataset.pregunta = `q${encargo.pregunta}`;
-
-      const boton = dom.nodo(`#alternativa-${elegida.id}`);
-      boton.disabled = false;
-      boton.dataset.correct = String(elegida.correcta);
-      boton.dataset.alternativa = String(elegida.id);
-      boton.closest = (selector) => (selector === '[data-pregunta]' ? tarjeta : boton);
+      const { boton } = fabricarAlternativa(dom, encargo.pregunta, elegida);
 
       dom.disparar('#cuestionario', 'click', {
         target: { closest: (s) => (s === '.quiz-option' ? boton : null) },
@@ -718,7 +841,17 @@ const notas = [];
  * Volver de aqui es lo mas parecido a cerrar el navegador: del proceso hijo no queda
  * nada mas que el archivo del disco y lo que conto de lo que vio.
  */
-function visitar({ disco, almacen = 'normal', pasos = [], intercepcion = null, sitio = null, caerLaRed = false }) {
+function visitar({
+  disco,
+  almacen = 'normal',
+  pasos = [],
+  intercepcion = null,
+  sitio = null,
+  caerLaRed = false,
+  // Cuanto tarda la respuesta de cada modulo, en ms (iteracion 35). Sin retraso,
+  // la carga local dura unos 30 ms y no hay ventana en la que pulsar nada.
+  retrasos = null,
+}) {
   visitas += 1;
 
   const encargo = join(taller, `encargo-${visitas}.json`);
@@ -726,7 +859,7 @@ function visitar({ disco, almacen = 'normal', pasos = [], intercepcion = null, s
 
   writeFileSync(
     encargo,
-    JSON.stringify({ disco, almacen, pasos, intercepcion, sitio, salida, caerLaRed })
+    JSON.stringify({ disco, almacen, pasos, intercepcion, sitio, salida, caerLaRed, retrasos })
   );
 
   const corrida = spawnSync(process.execPath, [join(AQUI, 'probar-memoria.mjs'), `--visita=${encargo}`], {
@@ -2508,6 +2641,160 @@ notas.push(
 );
 
 // ===========================================================================
+// 10c · Durante la carga no se puede responder el modulo anterior (iteracion 35)
+//
+// Es la premisa de la iteracion 34, provocada en vez de razonada. La 34 quito de
+// `responder()` la rama que sumaba respuestas sin identificar apoyandose en que al
+// cambiar de modulo no queda ninguna alternativa anterior que pulsar; la 35 puso
+// una transicion justo en ese hueco, asi que hay que comprobar que la premisa
+// sigue en pie y no solo suponerlo.
+//
+// Se pulsa una alternativa del modulo viejo en los DOS momentos en que alguien
+// podria llegar a hacerlo —con el nuevo cargando y con el nuevo ya dibujado— y las
+// tres memorias tienen que quedar donde estaban: el panel, el almacen entero y la
+// memoria de la visita.
+// ===========================================================================
+
+const discoLoViejo = discoNuevo('pulsar-lo-viejo');
+
+const vv1 = visitar({
+  disco: discoLoViejo,
+  // El modulo nuevo tarda, que es lo que abre la ventana. El viejo no se retrasa:
+  // tiene que estar dibujado antes de que empiece lo que se quiere provocar.
+  retrasos: { [OTRO_MODULO]: 2500 },
+  pasos: [
+    { tipo: 'elegir', modulo: MODULO },
+    { tipo: 'responder', cuales: [{ pregunta: P1, acertando: true }] },
+    {
+      tipo: 'pulsar-lo-viejo',
+      pregunta: P2,
+      acertando: false,
+      moduloViejo: MODULO,
+      modulo: OTRO_MODULO,
+      durante: 800,
+      espera: 3500,
+    },
+  ],
+});
+
+const [antesCargando, despuesCargando, antesDibujado, despuesDibujado] = vv1.alPulsarLoViejo;
+
+if (vv1.alPulsarLoViejo.length !== 4) {
+  problemas.push(
+    `el paso de pulsar lo viejo dejo ${vv1.alPulsarLoViejo.length} fotos y tenian que ser 4: ` +
+      'la comprobacion no llego a provocar nada'
+  );
+  veredictoRoto();
+}
+
+// LO PRIMERO: que el clic haya llegado de verdad al oyente. Sin esto, todo lo de
+// abajo pasaria en verde por no haber ocurrido nada, que es la peor forma de que
+// una prueba este en verde.
+for (const foto of [despuesCargando, despuesDibujado]) {
+  if (foto.oyentes !== 1) {
+    problemas.push(
+      `el clic sobre la alternativa vieja (${foto.cuando}) corrio ${foto.oyentes} oyentes: ` +
+        'la comprobacion no esta pulsando nada'
+    );
+  }
+}
+
+const mismoPanel = (a, b) => JSON.stringify(a.panel) === JSON.stringify(b.panel);
+const mismoAlmacen = (a, b) => JSON.stringify(a.almacen) === JSON.stringify(b.almacen);
+const mismaVisita = (a, b) =>
+  JSON.stringify([a.enLaVisitaVieja, a.enLaVisitaNueva]) ===
+  JSON.stringify([b.enLaVisitaVieja, b.enLaVisitaNueva]);
+
+for (const [antes, despues] of [
+  [antesCargando, despuesCargando],
+  [antesDibujado, despuesDibujado],
+]) {
+  if (!mismoPanel(antes, despues)) {
+    problemas.push(
+      `pulsar una alternativa del modulo ${MODULO} (${despues.cuando}) movio el panel: ` +
+        `${JSON.stringify(antes.panel)} paso a ${JSON.stringify(despues.panel)}`
+    );
+  }
+  if (!mismoAlmacen(antes, despues)) {
+    problemas.push(
+      `pulsar una alternativa del modulo ${MODULO} (${despues.cuando}) escribio en el almacen: ` +
+        `${JSON.stringify(antes.almacen)} paso a ${JSON.stringify(despues.almacen)}`
+    );
+  }
+  if (!mismaVisita(antes, despues)) {
+    problemas.push(
+      `pulsar una alternativa del modulo ${MODULO} (${despues.cuando}) escribio en la memoria ` +
+        `de la visita: ${JSON.stringify([antes.enLaVisitaVieja, antes.enLaVisitaNueva])} paso a ` +
+        `${JSON.stringify([despues.enLaVisitaVieja, despues.enLaVisitaNueva])}`
+    );
+  }
+}
+
+// Y la pregunta que se pulso nunca entro en ninguna de las dos memorias, ni en la
+// del modulo que la muestra ni en la del que no.
+for (const foto of vv1.alPulsarLoViejo) {
+  if (foto.enLaVisitaVieja.includes(P2)) {
+    problemas.push(
+      `la pregunta ${P2} quedo anotada en la memoria de la visita del modulo ${MODULO} sin ` +
+        `haberse respondido (${foto.cuando})`
+    );
+  }
+  if (foto.enLaVisitaNueva.length !== 0) {
+    problemas.push(
+      `la memoria de la visita del modulo ${OTRO_MODULO} trae ${foto.enLaVisitaNueva.length} ` +
+        `respuestas sin que se haya respondido ninguna suya (${foto.cuando})`
+    );
+  }
+}
+
+// El almacen, visto desde el disco: la unica respuesta guardada es la que SI se
+// respondio, la P1 del modulo viejo, y el modulo nuevo no estreno clave.
+const discoTrasLoViejo = leerDisco(discoLoViejo);
+const guardadoViejo = discoTrasLoViejo[claveDe(MODULO)]
+  ? JSON.parse(discoTrasLoViejo[claveDe(MODULO)])
+  : null;
+
+if (Object.keys(guardadoViejo?.respuestas ?? {}).length !== 1) {
+  problemas.push(
+    `el modulo ${MODULO} quedo con ${Object.keys(guardadoViejo?.respuestas ?? {}).length} ` +
+      'respuestas guardadas y solo se respondio 1'
+  );
+}
+if (guardadoViejo?.respuestas?.[P2] !== undefined) {
+  problemas.push(
+    `la pregunta ${P2}, pulsada cuando su modulo ya no estaba a la vista, quedo guardada`
+  );
+}
+if (discoTrasLoViejo[claveDe(OTRO_MODULO)] !== undefined) {
+  problemas.push(
+    `el modulo ${OTRO_MODULO} estreno clave en el almacen sin que se respondiera ninguna ` +
+      'pregunta suya: una respuesta se guardo en un modulo que no es el que la muestra'
+  );
+}
+
+// Y el modulo nuevo termino dibujado, con el avance que le toca: ninguno.
+if (vv1.final.dibujadas.length !== cuantasTiene(OTRO_MODULO)) {
+  problemas.push(
+    `tras pulsar lo viejo, el modulo ${OTRO_MODULO} dibujo ${vv1.final.dibujadas.length} ` +
+      `preguntas y tiene ${cuantasTiene(OTRO_MODULO)}`
+  );
+}
+if (vv1.final.respondidas.length !== 0) {
+  problemas.push(
+    `el modulo ${OTRO_MODULO} aparecio con ${vv1.final.respondidas.length} preguntas ` +
+      'respondidas, y no se respondio ninguna suya'
+  );
+}
+
+notas.push(
+  `Modulo anterior durante la carga: con el modulo ${OTRO_MODULO} viajando y despues ya ` +
+    `dibujado, se pulso una alternativa del ${MODULO} guardada antes de cambiar. El clic llego ` +
+    'al oyente las dos veces y no movio nada: ni el panel, ni una sola clave del almacen, ni la ' +
+    `memoria de la visita. El ${OTRO_MODULO} quedo dibujado entero y sin avance, y el ${MODULO} ` +
+    'conserva su unica respuesta de verdad.'
+);
+
+// ===========================================================================
 // 11 · El avance no sale del dispositivo
 // ===========================================================================
 
@@ -2515,6 +2802,7 @@ const todasLasVisitas = [
   v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v14,
   vj1, vj2, vj3, vm1, vm2, vm3, vm4, vm5,
   vr0, vr1, vr2, vr3, vr3b, vr4, vr5, vr5b, vr5w, vr5x, vr5y, vr5z, vr6, vr7, vr8, vr9, vr10,
+  vv1,
 ];
 const rutasVistas = new Set();
 
