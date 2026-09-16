@@ -101,6 +101,19 @@ textual del examen: son apuntes de una estudiante, no una copia oficial.
 | Portada, métrica «Formatos» | Los dos formatos de pregunta                                                                            |
 | Épica 40 · Simulacro        | Duración y condiciones del simulacro cronometrado                                                       |
 
+> **Nota del 2026-09-16 · la fila de la épica 40 quedó atrás, y se deja escrita como
+> estaba.** Decía «Duración y condiciones del simulacro cronometrado», y eso fue cierto
+> mientras el simulacro no tenía reglas propias. **Desde el 2026-09-16 el simulacro no
+> toma de este documento ninguna cifra ni ninguna regla:** sus 120 preguntas, sus 30
+> segundos por pregunta, el sobrante perdido, la omisión que cuenta como incorrecta y el
+> 72 de 120 para aprobar son **decisiones de diseño del autor**, escritas en
+> `_planmaestro/40-epica-simulacro-examen/README.md`. Lo que este documento le aporta a
+> la épica 40 es **solo contexto**: qué es de verdad el examen que el estudiante va a
+> rendir —120 minutos, alternativas y programación mezcladas en orden aleatorio— para
+> que ninguna pantalla del simulacro afirme que el examen real funciona igual. Está
+> detallado en «Agregado el 2026-09-16 · duración total y formato mezclado», al final de
+> este archivo.
+
 ## Cómo se mantiene
 
 - **Cuando un estudiante aporte un dato nuevo o contradiga uno de estos**, se anota aquí con la fecha y el año del
