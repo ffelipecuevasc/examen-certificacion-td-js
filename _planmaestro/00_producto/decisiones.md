@@ -1082,6 +1082,37 @@ sola. La fila que repite esa lista en `00_producto/registro_log.md:194` —la `:
 de que se registrara ahí mismo la tanda de decisiones de la épica 40— queda marcada como
 actualizada por este bloque, para que no queden dos listas vigentes que discrepen.
 
+**Tercera frase autorizada · 2026-09-16 · la frase de la presentación.** *Decisión del
+autor, tomada al abrir la etapa B de la iteración 41.* El párrafo anterior dice que si
+hace falta una tercera frase se añade acá antes de escribirla en la pantalla. Hace
+falta, y **no se hizo en ese orden**: la regla 08 de la presentación de `simulacro.html`
+ya la escribió en la etapa A de la iteración 41, antes de que estuviera autorizada. Se
+regulariza aquí, y se deja dicho el desorden en vez de taparlo, porque el valor de esta
+lista está entero en que se consulte antes de redactar.
+
+**Permitida, y únicamente con esta forma exacta:**
+
+- «Se aprueba el simulacro con al menos el 60 %»
+
+**Alcance de esta tercera frase, y de ninguna otra cosa:** vale **solo** para la pantalla
+de presentación del simulacro y para el texto de reglas que la iteración 43 redacta
+sobre ella. **No** vale para la pantalla de resultados de la iteración 44, que sigue
+teniendo exactamente las dos frases de más arriba y ninguna más.
+
+**Por qué esta forma y no otra.** Es impersonal —«se aprueba», no «apruebas»—, porque la
+presentación explica una regla antes del intento y todavía no hay resultado de nadie; y
+nombra «el simulacro» dentro de la frase, que es la misma condición que cumplen las dos
+anteriores. El «60 %» es el umbral del propio simulacro, el mismo de esta actualización.
+Lo que la acompaña en la regla 08 —«Son 72 correctas de 120. Es una exigencia elegida
+para practicar, igual que todo lo demás de esta lista.»— no usa ninguna palabra de la
+lista y no necesita autorización: se cita aquí para que quien compare la pantalla con
+esta ADR no tenga que adivinar dónde termina lo autorizado.
+
+**Siguen prohibidas** las mismas de siempre: «aprobado» y «reprobado» sin «el
+simulacro», «nota», «puntaje oficial», «calificación», «certificación», y cualquier
+fórmula que sugiera validez de certificación. Y sigue en pie la regla del párrafo
+anterior: una cuarta frase se añade **acá antes** de escribirla en la pantalla.
+
 ---
 
 ## ADR-023 · La instantánea se genera desde la base de la nube, en el mismo acto que el respaldo de ADR-014
