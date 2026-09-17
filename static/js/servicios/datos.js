@@ -135,6 +135,41 @@ export async function leerPreguntas(modulo) {
 }
 
 /**
+ * Las preguntas de una lista de ids (iteracion 41, decision 1).
+ *
+ * Es `/api/preguntas?ids=…`. Lo usa el simulacro despues de elegir en el navegador:
+ * la eleccion sale de `servicios/eleccion-del-intento.js` y aqui solo se viene a
+ * buscar lo elegido. **No vuelven las justificaciones**: durante un intento no se
+ * corrige, y son el campo mas pesado del banco. Se piden en la iteracion 44.
+ *
+ * NO SE PIDE SI LA LISTA VIENE VACIA, y eso no es una optimizacion: el extremo
+ * rechaza `?ids=` vacio con `PETICION_INVALIDA`, y salir a buscar un error conocido
+ * gasta un viaje para volver con la respuesta que ya se sabia. Se devuelve la forma
+ * de siempre, con `usar_respaldo` en false, porque esto es un error del sitio y no
+ * de la capa: taparlo con el respaldo es exactamente lo que advierte la cabecera de
+ * `functions/api/_comun.js`.
+ *
+ * Cae a la instantanea con las mismas reglas que las otras dos lecturas: solo el
+ * fallo del SERVICIO cambia al respaldo, y cuando lo hace se dice.
+ */
+export async function leerPreguntasPorIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return {
+      ok: false,
+      codigo: 'PETICION_INVALIDA',
+      mensaje: 'No se pidio ninguna pregunta.',
+      usar_respaldo: false,
+    };
+  }
+
+  const respuesta = await consultar(`/api/preguntas?ids=${ids.join(',')}`);
+
+  if (respuesta.ok || !respuesta.usar_respaldo) return respuesta;
+
+  return (await leerIdsDeLaInstantanea(ids)) ?? respuesta;
+}
+
+/**
  * Cuantas preguntas tiene cada modulo, sin traerse ninguna.
  *
  * Es `/api/preguntas?resumen=1`, autorizado por ADR-033 y enmendado por la
@@ -211,6 +246,48 @@ async function leerDesdeInstantanea(modulo) {
     ok: true,
     datos,
     meta: { origen: 'instantanea', respaldo: copia.sello, vacio: datos.length === 0 },
+    vacio: datos.length === 0,
+  };
+}
+
+/**
+ * Las preguntas de una lista de ids, desde la instantanea.
+ *
+ * SE COMPORTA COMO EL EXTREMO, y eso es lo unico que importa aqui: los ids que no
+ * estan en la copia **no vuelven**, igual que los que no estan en la base. Quien
+ * pidio repone con sus reservas sin tener que saber de donde salieron las que si
+ * volvieron. Es lo que permite que el simulacro tenga un solo camino.
+ *
+ * Y se quitan las justificaciones, como las quita el extremo. La instantanea las
+ * trae —ADR-008 las necesita para corregir en el cuestionario—, asi que dejarlas
+ * pasar aqui haria que el intento pesara distinto segun el camino, y que la
+ * iteracion 44 pudiera creer que ya las tiene cuando por el camino normal no las
+ * tendria. Dos caminos que devuelven cosas distintas es justo lo que el modo
+ * degradado no se puede permitir.
+ *
+ * El orden es por id, como el del extremo, y por el mismo motivo: que la respuesta
+ * no dependa de en que orden estaba escrito el archivo.
+ */
+async function leerIdsDeLaInstantanea(ids) {
+  const copia = await cargarInstantanea();
+  if (!copia) return null;
+
+  const pedidos = new Set(ids);
+
+  const datos = copia.todas
+    .filter((pregunta) => pedidos.has(pregunta.id))
+    .sort((a, b) => a.id - b.id)
+    .map(({ justificacion, ...resto }) => resto);
+
+  return {
+    ok: true,
+    datos,
+    meta: {
+      origen: 'instantanea',
+      respaldo: copia.sello,
+      ids_pedidos: ids.length,
+      vacio: datos.length === 0,
+    },
     vacio: datos.length === 0,
   };
 }

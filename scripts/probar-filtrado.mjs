@@ -1125,6 +1125,13 @@ try {
     join(SITIO, 'main.js'),
     join(SITIO, 'servicios', 'datos.js'),
     join(SITIO, 'servicios', 'memoria.js'),
+    join(RAIZ, 'simulacro.html'),
+    join(SITIO, 'components', 'simulacro.js'),
+    join(SITIO, 'components', 'transicion-de-carga.js'),
+    join(SITIO, 'components', 'aviso-de-respaldo.js'),
+    join(SITIO, 'servicios', 'eleccion-del-intento.js'),
+    join(SITIO, 'data', 'hermanas.js'),
+    join(SITIO, 'simulacro-main.js'),
     join(AQUI, 'probar-escapado.mjs'),
     join(AQUI, 'probar-memoria.mjs'),
     join(AQUI, 'dom-falso.mjs'),
@@ -2043,7 +2050,912 @@ try {
   );
 
   // ------------------------------------------------------------------------
-  // 10 · Veredicto
+  // 10 · El simulacro elige y trae (iteracion 41, etapa B)
+  //
+  // Va al final y con su propio DOM falso, porque a partir de aqui lo que se
+  // prueba es otra pagina. El fetch se devuelve al servidor local: la seccion 9
+  // lo dejo caido a proposito y aqui hace falta vivo.
+  //
+  // QUE SE PRUEBA AQUI Y QUE NO
+  //
+  // El simulacro todavia no dibuja preguntas —eso es de las iteraciones 42 y 43—,
+  // asi que no hay nada que filtrar. Lo que hay es una maquina de elegir, y de una
+  // maquina de elegir lo que importa es si reparte bien, si excluye lo que dice
+  // excluir y si se niega a empezar cuando no puede cumplir lo que promete.
+  // ------------------------------------------------------------------------
+
+  globalThis.fetch = fetchLimpio;
+
+  const {
+    MODULOS_DEL_EXAMEN,
+    PREGUNTAS_DEL_INTENTO,
+    PREGUNTAS_POR_MODULO,
+    elegirIntento,
+  } = await import(pathToFileURL(join(SITIO, 'servicios', 'eleccion-del-intento.js')).href);
+
+  const { GRUPOS_DE_HERMANAS } = await import(
+    pathToFileURL(join(SITIO, 'data', 'hermanas.js')).href
+  );
+
+  /**
+   * Una fuente de azar con semilla, para que la muestra sea repetible.
+   *
+   * Es `mulberry32`, treinta y dos bits, escrito aqui y no en el sitio: el sitio no
+   * necesita un azar repetible, esta prueba si. Si el algoritmo llamara a
+   * `Math.random` por dentro —como llamaba `shuffle()` antes de la iteracion 41—,
+   * una muestra que diera rojo no se podria volver a correr igual, y un rojo
+   * irrepetible no se arregla: se discute.
+   */
+  const azarConSemilla = (semilla) => {
+    let estado = semilla >>> 0;
+    return () => {
+      estado = (estado + 0x6d2b79f5) >>> 0;
+      let t = estado;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+
+  /** Cuantos intentos trae la muestra. Lo fija el criterio de la iteracion 41. */
+  const INTENTOS_DE_LA_MUESTRA = 200;
+
+  /** La semilla. Cualquiera sirve; lo que importa es que sea SIEMPRE la misma. */
+  const SEMILLA = 20260916;
+
+  /** El solapamiento promedio que el criterio deja pasar. Mas es rojo. */
+  const SOLAPAMIENTO_MAXIMO = 42;
+
+  // --- 10a · El extremo por ids ------------------------------------------
+  //
+  // Se le habla directo, sin pasar por el navegador: lo que se prueba es el
+  // contrato del extremo, y meterlo detras del componente solo escondería cual de
+  // los dos fallo.
+
+  const pedirCrudo = async (ruta, opciones) => {
+    const respuesta = await fetchReal(`${DIRECCION}${ruta}`, {
+      headers: { accept: 'application/json' },
+      signal: AbortSignal.timeout(ESPERA_SONDEO),
+      ...opciones,
+    });
+    return { estado: respuesta.status, cuerpo: await respuesta.json() };
+  };
+
+  const resumenParaIds = await pedirCrudo('/api/preguntas?resumen=1');
+
+  if (!resumenParaIds.cuerpo?.ok) {
+    noSePudo(
+      'El resumen no contesto, asi que no hay ids con los que armar un intento.',
+      JSON.stringify(resumenParaIds.cuerpo, null, 2)
+    );
+  }
+
+  const idsPorModulo = Object.fromEntries(
+    resumenParaIds.cuerpo.datos.map((fila) => [fila.modulo, fila.preguntas_ids])
+  );
+
+  const filasDelResumen = resumenParaIds.cuerpo.meta?.filas_leidas ?? 0;
+
+  // El intento de muestra con el que se interroga al extremo. Se elige con la misma
+  // funcion del sitio, no con una lista escrita a mano: pedir 120 ids inventados
+  // probaria el extremo contra algo que el simulacro nunca le va a pedir.
+  const intentoDeMuestra = elegirIntento({
+    idsPorModulo,
+    azar: azarConSemilla(SEMILLA),
+  });
+
+  if (!intentoDeMuestra.ok) {
+    noSePudo(
+      'Con la base local no se pudo elegir ni un intento, asi que no hay nada que pedirle al extremo.',
+      JSON.stringify(intentoDeMuestra)
+    );
+  }
+
+  const porIds = await pedirCrudo(
+    `/api/preguntas?ids=${intentoDeMuestra.ids.join(',')}`
+  );
+
+  if (!porIds.cuerpo?.ok) {
+    problemas.push(
+      `el extremo rechazo una lista de ${intentoDeMuestra.ids.length} ids validos: ` +
+        `${porIds.cuerpo?.error?.codigo ?? '(sin codigo)'}`
+    );
+  } else {
+    const devueltos = porIds.cuerpo.datos.map((p) => p.id).sort((a, b) => a - b);
+    const pedidos = [...intentoDeMuestra.ids].sort((a, b) => a - b);
+
+    if (JSON.stringify(devueltos) !== JSON.stringify(pedidos)) {
+      problemas.push(
+        `el extremo no devolvio exactamente las ${pedidos.length} preguntas pedidas: ` +
+          `volvieron ${devueltos.length}`
+      );
+    }
+
+    const conJustificacion = porIds.cuerpo.datos.filter((p) => 'justificacion' in p);
+    if (conJustificacion.length > 0) {
+      problemas.push(
+        `el extremo por ids devolvio ${conJustificacion.length} justificacion(es), y el ` +
+          'intento no las lleva (decision 1)'
+      );
+    }
+
+    const malArmadas = porIds.cuerpo.datos.filter(
+      (p) =>
+        p.alternativas?.length !== 4 ||
+        p.alternativas.filter((a) => a.es_correcta === 1).length !== 1
+    );
+    if (malArmadas.length > 0) {
+      problemas.push(
+        `${malArmadas.length} pregunta(s) del extremo por ids no traen 4 alternativas con 1 correcta`
+      );
+    }
+
+    if (porIds.cuerpo.meta?.origen !== 'd1') {
+      problemas.push('el extremo por ids no viene con el contrato de _comun.js');
+    }
+  }
+
+  const filasDelExtremo = porIds.cuerpo?.meta?.filas_leidas ?? 0;
+  const consultasDelExtremo = porIds.cuerpo?.meta?.consultas ?? 0;
+
+  // Las filas leidas se COMPRUEBAN, no solo se imprimen.
+  //
+  // El numero se informa para la epica 50, y un numero que solo se imprime es un
+  // numero que nadie mira. El piso sale de lo que la respuesta ya trae en la mano:
+  // 120 preguntas mas sus 480 alternativas son 600 filas que hubo que leer si o si,
+  // asi que cualquier cifra por debajo esta contando de menos.
+  //
+  // Se descubrio provocandolo: sumando el `rows_read` de UN trozo en vez de los
+  // cuatro, el extremo informaba 468 y lo demas seguia en verde. Una medicion que se
+  // equivoca a la baja es peor que no medir, porque la epica 50 decidiria sobre ella.
+  const filasQueHuboQueLeer =
+    (porIds.cuerpo?.datos?.length ?? 0) +
+    (porIds.cuerpo?.datos ?? []).reduce((suma, p) => suma + (p.alternativas?.length ?? 0), 0);
+
+  if (filasDelExtremo < filasQueHuboQueLeer) {
+    problemas.push(
+      `el extremo por ids informa ${filasDelExtremo} filas leidas y devolvio ` +
+        `${filasQueHuboQueLeer} filas: esta contando de menos (¿un solo trozo?)`
+    );
+  }
+
+  // Un id que no existe no vuelve, y no rompe la peticion.
+  const conFantasma = await pedirCrudo(
+    `/api/preguntas?ids=${intentoDeMuestra.ids[0]},999999,${intentoDeMuestra.ids[1]}`
+  );
+
+  if (!conFantasma.cuerpo?.ok || conFantasma.cuerpo.datos.length !== 2) {
+    problemas.push(
+      'un id inexistente no se ignoro: se pidieron 3 ids, uno inventado, y no volvieron 2 preguntas'
+    );
+  }
+
+  // Los rechazos. Cada uno es una forma distinta de escribir mal la lista, y las
+  // seis tienen que doler igual: `PETICION_INVALIDA`, no una respuesta a medias.
+  const rechazosEsperados = [
+    ['?ids=', 'lista vacia'],
+    ['?ids=25,abc', 'un id que no es numero'],
+    ['?ids=25,,26', 'una coma de mas'],
+    ['?ids=2.5', 'un id con decimales'],
+    ['?ids=-3', 'un id negativo'],
+    ['?ids=0', 'el id cero'],
+    ['?ids=25,107,25', 'un id repetido'],
+    [`?ids=${Array.from({ length: 121 }, (_, i) => i + 1).join(',')}`, '121 ids'],
+    ['?ids=25&modulo=2', 'ids junto a modulo'],
+    ['?ids=25&resumen=1', 'ids junto a resumen'],
+  ];
+
+  for (const [consulta, queEs] of rechazosEsperados) {
+    const { cuerpo } = await pedirCrudo(`/api/preguntas${consulta}`);
+    if (cuerpo?.error?.codigo !== 'PETICION_INVALIDA') {
+      problemas.push(
+        `el extremo acepto ${queEs} en vez de rechazarlo con PETICION_INVALIDA ` +
+          `(dijo ${cuerpo?.error?.codigo ?? 'que si'})`
+      );
+    }
+  }
+
+  // Y lo que no es lectura lo para `soloLectura()`, antes de mirar el parametro.
+  const noEsLectura = await pedirCrudo('/api/preguntas?ids=25', { method: 'POST' });
+  if (noEsLectura.cuerpo?.error?.codigo !== 'METODO_NO_PERMITIDO') {
+    problemas.push('un POST al extremo por ids no lo paro soloLectura() (ADR-009)');
+  }
+
+  notas.push(
+    `Extremo por ids: ${intentoDeMuestra.ids.length} ids en UNA peticion, resueltos en ` +
+      `${consultasDelExtremo} consultas de un solo batch —D1 admite 100 parametros ligados y ` +
+      `120 no cabe—, devolviendo exactamente las pedidas, sin justificaciones. ` +
+      `${rechazosEsperados.length} formas de pedir mal rechazadas con PETICION_INVALIDA y el ` +
+      'POST parado por soloLectura().'
+  );
+
+  notas.push(
+    `Filas leidas en un intento: ${filasDelResumen} el resumen + ${filasDelExtremo} el extremo ` +
+      `= ${filasDelResumen + filasDelExtremo}. Medido en local, que SI las reporta. Queda para ` +
+      'la epica 50: la vista entra por el indice de estado y no por la clave primaria.'
+  );
+
+  // --- 10b · La muestra de 200 intentos -----------------------------------
+
+  const azarDeLaMuestra = azarConSemilla(SEMILLA);
+  const muestra = [];
+
+  for (let i = 0; i < INTENTOS_DE_LA_MUESTRA; i += 1) {
+    muestra.push(elegirIntento({ idsPorModulo, azar: azarDeLaMuestra }));
+  }
+
+  const fallidos = muestra.filter((intento) => !intento.ok).length;
+  if (fallidos > 0) {
+    problemas.push(
+      `${fallidos} de los ${INTENTOS_DE_LA_MUESTRA} intentos de la muestra no se pudieron elegir`
+    );
+  }
+
+  const activos = new Set(Object.values(idsPorModulo).flat());
+  const extraPorModulo = new Map(MODULOS_DEL_EXAMEN.map((m) => [m, 0]));
+  const vecesQueSalio = new Map();
+  const ordenesDistintos = new Set();
+  let dosDelMismoGrupo = 0;
+  let repartoMalo = 0;
+  let repetidasODeBaja = 0;
+  let dosAntesQueTres = 0;
+
+  for (const intento of muestra) {
+    if (!intento.ok) continue;
+
+    // 120 preguntas distintas y todas activas.
+    if (
+      intento.ids.length !== PREGUNTAS_DEL_INTENTO ||
+      new Set(intento.ids).size !== PREGUNTAS_DEL_INTENTO ||
+      intento.ids.some((id) => !activos.has(id))
+    ) {
+      repetidasODeBaja += 1;
+    }
+
+    // 17 en seis modulos y 18 en uno.
+    const cuotas = MODULOS_DEL_EXAMEN.map((m) => intento.porModulo[m].length);
+    const conDieciocho = cuotas.filter((c) => c === PREGUNTAS_POR_MODULO + 1);
+    const conDiecisiete = cuotas.filter((c) => c === PREGUNTAS_POR_MODULO);
+
+    if (conDieciocho.length !== 1 || conDiecisiete.length !== 6) {
+      repartoMalo += 1;
+    }
+
+    extraPorModulo.set(intento.moduloDelExtra, extraPorModulo.get(intento.moduloDelExtra) + 1);
+
+    // Ni dos de un mismo grupo, en todo el intento.
+    const elegidos = new Set(intento.ids);
+    for (const grupo of GRUPOS_DE_HERMANAS) {
+      if (grupo.filter((id) => elegidos.has(id)).length > 1) dosDelMismoGrupo += 1;
+    }
+
+    for (const id of intento.ids) {
+      vecesQueSalio.set(id, (vecesQueSalio.get(id) ?? 0) + 1);
+    }
+
+    ordenesDistintos.add(intento.orden.join(','));
+    if (intento.orden.indexOf(2) < intento.orden.indexOf(3)) dosAntesQueTres += 1;
+  }
+
+  if (repetidasODeBaja > 0) {
+    problemas.push(
+      `${repetidasODeBaja} intento(s) de la muestra no traen ${PREGUNTAS_DEL_INTENTO} preguntas ` +
+        'distintas y activas'
+    );
+  }
+
+  if (repartoMalo > 0) {
+    problemas.push(
+      `${repartoMalo} intento(s) de la muestra no reparten ${PREGUNTAS_POR_MODULO} por modulo ` +
+        'con uno en 18'
+    );
+  }
+
+  if (dosDelMismoGrupo > 0) {
+    problemas.push(
+      `${dosDelMismoGrupo} vez(ces) un intento trajo dos preguntas del mismo grupo de hermanas`
+    );
+  }
+
+  // Los dos grupos que el criterio nombra, anclados aqui.
+  //
+  // SIN ESTO LA COMPROBACION DE ARRIBA SE ENGANA SOLA, y se descubrio provocandolo:
+  // el bucle recorre `GRUPOS_DE_HERMANAS`, o sea el MISMO archivo que se quiere
+  // vigilar. Escrito el trio {205, 210, 222} como el par {205, 210}, un intento con
+  // la 210 y la 222 juntas pasa en verde, porque para el archivo roto no son
+  // hermanas. Una prueba que saca su verdad del archivo que prueba no prueba nada:
+  // es H-023 otra vez.
+  //
+  // La verdad de estos dos grupos vive en la tabla de la iteracion 41 y se copia
+  // aqui a mano, a proposito. El resto de la lista puede crecer —el informe compara
+  // redaccion y no significado, asi que va a crecer— y por eso no se ancla entera:
+  // lo que se ancla es lo que el criterio nombra con nombre y apellido.
+  const GRUPOS_QUE_EL_CRITERIO_NOMBRA = [
+    [25, 107], // el unico que cruza modulos: por el la exclusion es global
+    [205, 210, 222], // el unico trio: por el la lista son grupos y no pares
+  ];
+
+  for (const esperado of GRUPOS_QUE_EL_CRITERIO_NOMBRA) {
+    const estaEntero = GRUPOS_DE_HERMANAS.some(
+      (grupo) =>
+        grupo.length === esperado.length && esperado.every((id) => grupo.includes(id))
+    );
+
+    if (!estaEntero) {
+      problemas.push(
+        `el grupo de hermanas {${esperado.join(', ')}} no esta entero en data/hermanas.js`
+      );
+    }
+  }
+
+  const sinExtraNunca = [...extraPorModulo].filter(([, veces]) => veces === 0);
+  if (sinExtraNunca.length > 0) {
+    problemas.push(
+      `a ${sinExtraNunca.length} modulo(s) no les toco nunca la pregunta 120 en ` +
+        `${INTENTOS_DE_LA_MUESTRA} intentos: el sorteo del extra no esta repartiendo`
+    );
+  }
+
+  // El solapamiento promedio entre pares de intentos.
+  //
+  // Se comparan TODOS los pares y no una muestra de pares: son 19 900 comparaciones
+  // de conjuntos de 120, que es trabajo de milisegundos, y un promedio sobre un
+  // subconjunto elegido al azar seria un numero mas dificil de defender que de
+  // calcular.
+  const conjuntos = muestra.filter((i) => i.ok).map((i) => new Set(i.ids));
+  let sumaDeSolapamientos = 0;
+  let pares = 0;
+
+  for (let i = 0; i < conjuntos.length; i += 1) {
+    for (let j = i + 1; j < conjuntos.length; j += 1) {
+      let comunes = 0;
+      for (const id of conjuntos[i]) if (conjuntos[j].has(id)) comunes += 1;
+      sumaDeSolapamientos += comunes;
+      pares += 1;
+    }
+  }
+
+  const solapamientoPromedio = pares > 0 ? sumaDeSolapamientos / pares : 0;
+
+  if (solapamientoPromedio > SOLAPAMIENTO_MAXIMO) {
+    problemas.push(
+      `el solapamiento promedio entre intentos es ${solapamientoPromedio.toFixed(1)} preguntas, ` +
+        `por encima del maximo de ${SOLAPAMIENTO_MAXIMO}`
+    );
+  }
+
+  // El orden de los modulos se sortea (decision 3).
+  //
+  // ESTA ES LA COMPROBACION CRUDA DEL SESGO, y es la que un orden fijo rompe de
+  // inmediato: con el recorrido del 2 al 8, el modulo 2 va antes que el 3 en el
+  // 100 % de los intentos y aqui tiene que ir en la mitad. La frecuencia con que
+  // salen la 25 y la 107 —las dos caras del unico grupo que cruza modulos— se
+  // informa al lado, porque es la consecuencia que el sorteo existe para evitar.
+  const mitad = INTENTOS_DE_LA_MUESTRA / 2;
+  const desvio = Math.abs(dosAntesQueTres - mitad) / mitad;
+
+  if (desvio > 0.3) {
+    problemas.push(
+      `el modulo 2 se recorrio antes que el 3 en ${dosAntesQueTres} de ${INTENTOS_DE_LA_MUESTRA} ` +
+        'intentos: el orden de los modulos no se esta sorteando'
+    );
+  }
+
+  if (ordenesDistintos.size < 20) {
+    problemas.push(
+      `la muestra solo produjo ${ordenesDistintos.size} orden(es) distinto(s) de modulos`
+    );
+  }
+
+  const veces25 = vecesQueSalio.get(25) ?? 0;
+  const veces107 = vecesQueSalio.get(107) ?? 0;
+
+  notas.push(
+    `Muestra de ${INTENTOS_DE_LA_MUESTRA} intentos con semilla ${SEMILLA}: todos con ` +
+      `${PREGUNTAS_DEL_INTENTO} preguntas distintas y activas, ${PREGUNTAS_POR_MODULO} por modulo ` +
+      'y uno en 18. Extra por modulo: ' +
+      [...extraPorModulo].map(([m, v]) => `${m}:${v}`).join(' · ') +
+      '.'
+  );
+
+  notas.push(
+    `Hermanas: ninguna pareja de los ${GRUPOS_DE_HERMANAS.length} grupos aparecio junta en ` +
+      `ninguno de los ${INTENTOS_DE_LA_MUESTRA} intentos, el trio {205, 210, 222} y el par ` +
+      '{25, 107} incluidos.'
+  );
+
+  notas.push(
+    `Solapamiento promedio entre los ${pares} pares de intentos: ` +
+      `${solapamientoPromedio.toFixed(1)} preguntas (esperado 38,9; maximo ${SOLAPAMIENTO_MAXIMO}).`
+  );
+
+  notas.push(
+    `Orden de modulos sorteado: ${ordenesDistintos.size} ordenes distintos, y el modulo 2 fue ` +
+      `antes que el 3 en ${dosAntesQueTres} de ${INTENTOS_DE_LA_MUESTRA}. La 25 salio ` +
+      `${veces25} veces y la 107, ${veces107}.`
+  );
+
+  // --- 10c · Con una hermana retirada del resumen -------------------------
+  //
+  // Un id retirado deja de aparecer en `preguntas_ids` y su grupo tendria que
+  // volverse inerte solo, sin codigo que lo contemple. Se provoca quitando la 107
+  // de la lista que se le pasa al algoritmo, que es exactamente lo que veria el
+  // navegador el dia que esa pregunta se retire.
+
+  const sinLa107 = {
+    ...idsPorModulo,
+    3: idsPorModulo[3].filter((id) => id !== 107),
+  };
+
+  const azarSinHermana = azarConSemilla(SEMILLA);
+  let intentosSinLa107 = 0;
+  let conLa25 = 0;
+
+  for (let i = 0; i < 50; i += 1) {
+    const intento = elegirIntento({ idsPorModulo: sinLa107, azar: azarSinHermana });
+    if (!intento.ok) continue;
+
+    intentosSinLa107 += 1;
+    if (intento.ids.includes(107)) {
+      problemas.push('con la 107 retirada del resumen, el algoritmo la eligio igual');
+    }
+    if (intento.ids.includes(25)) conLa25 += 1;
+  }
+
+  if (intentosSinLa107 !== 50) {
+    problemas.push(
+      `con la 107 retirada, solo ${intentosSinLa107} de 50 intentos se pudieron elegir`
+    );
+  }
+
+  notas.push(
+    `Hermana retirada: con la 107 fuera del resumen, los 50 intentos se eligieron igual y la 25 ` +
+      `salio en ${conLa25} de ellos, ya sin nadie que la prohiba.`
+  );
+
+  // --- 10d · Reservas: preguntas que no vuelven ---------------------------
+  //
+  // Se interceptan las respuestas del extremo y se les quitan preguntas, que es lo
+  // que pasa de verdad cuando una se retira entre el resumen y la peticion o la
+  // validacion la descarta. El sitio tiene que reponer del MISMO modulo hasta 120.
+
+  const domSimulacro = prepararDomFalso();
+
+  const { conectarComienzo, comenzarElIntento } = await import(
+    pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href
+  );
+
+  conectarComienzo();
+
+  /**
+   * Deja pasar las peticiones al servidor, quitandole preguntas a la respuesta.
+   *
+   * `cuantasQuitar` se descuenta: solo la PRIMERA tanda pierde preguntas, para que
+   * la reposicion tenga de donde sacarlas. Un recorte que se repitiera en cada
+   * ronda seria el caso 10e, que es otro.
+   */
+  const interceptarQuitando = (cuantasQuitar) => {
+    let porQuitar = cuantasQuitar;
+
+    return async (ruta, opciones) => {
+      const respuesta = await fetchLimpio(ruta, opciones);
+      if (!ruta.includes('ids=') || porQuitar === 0) return respuesta;
+
+      const cuerpo = await respuesta.json();
+      const quitadas = Math.min(porQuitar, cuerpo.datos.length);
+      porQuitar -= quitadas;
+      cuerpo.datos = cuerpo.datos.slice(quitadas);
+
+      return new Response(JSON.stringify(cuerpo), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    };
+  };
+
+  const PREGUNTAS_QUE_NO_VUELVEN = 9;
+
+  globalThis.fetch = interceptarQuitando(PREGUNTAS_QUE_NO_VUELVEN);
+  await comenzarElIntento();
+
+  const conReservas = domSimulacro.html('#zona-del-intento');
+
+  if (!conReservas.includes('Intento listo')) {
+    problemas.push(
+      `con ${PREGUNTAS_QUE_NO_VUELVEN} preguntas que no vuelven, el intento no se completo con reservas`
+    );
+  }
+
+  const cuentasConReservas = [...conReservas.matchAll(/text-jsyellow">(\d+)</g)].map((m) =>
+    Number(m[1])
+  );
+
+  if (cuentasConReservas.length !== MODULOS_DEL_EXAMEN.length) {
+    problemas.push('el aviso «Intento listo» no dijo la cuenta de los siete modulos');
+  } else if (cuentasConReservas.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
+    problemas.push(
+      `tras reponer, el intento quedo con ${cuentasConReservas.reduce((a, b) => a + b, 0)} ` +
+        `preguntas y no con ${PREGUNTAS_DEL_INTENTO}`
+    );
+  } else if (cuentasConReservas.filter((c) => c === PREGUNTAS_POR_MODULO + 1).length !== 1) {
+    problemas.push('tras reponer, el reparto por modulo dejo de ser 17 con uno en 18');
+  }
+
+  notas.push(
+    `Reservas: con ${PREGUNTAS_QUE_NO_VUELVEN} preguntas descartadas por intercepcion, el intento ` +
+      `se completo igual hasta ${PREGUNTAS_DEL_INTENTO}, reponiendo del mismo modulo y ` +
+      'conservando el reparto.'
+  );
+
+  // --- 10e · Cuando no se pueden reunir 120 -------------------------------
+  //
+  // Ahora el recorte NO se agota: cada tanda pierde preguntas, asi que las reservas
+  // no alcanzan. El intento no puede empezar, y la pantalla tiene que decirlo. Un
+  // intento de 113 preguntas seria peor que ninguno.
+
+  globalThis.fetch = async (ruta, opciones) => {
+    const respuesta = await fetchLimpio(ruta, opciones);
+    if (!ruta.includes('ids=')) return respuesta;
+
+    const cuerpo = await respuesta.json();
+    cuerpo.datos = cuerpo.datos.slice(30);
+
+    return new Response(JSON.stringify(cuerpo), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  };
+
+  await comenzarElIntento();
+
+  const noSePudoHtml = domSimulacro.html('#zona-del-intento');
+
+  if (noSePudoHtml.includes('Intento listo')) {
+    problemas.push(
+      'con descartes que impiden reunir 120, el simulacro dijo «Intento listo» igual'
+    );
+  }
+  if (!noSePudoHtml.includes('No se pudo armar el simulacro')) {
+    problemas.push('con descartes que impiden reunir 120, la pantalla no lo explico');
+  }
+  if (!noSePudoHtml.includes('id="comenzar-simulacro"')) {
+    problemas.push('tras no poder empezar, no quedo forma de volver a intentarlo');
+  }
+
+  // Y el reintento funciona: el oyente esta sobre la zona, no sobre el boton, asi
+  // que sobrevive a que la zona se reescriba. Con el fetch ya sano, esta vez sale.
+  globalThis.fetch = fetchLimpio;
+
+  const corrieron = domSimulacro.disparar('#zona-del-intento', 'click', {
+    target: { closest: (s) => (s === '#comenzar-simulacro' ? {} : null) },
+  });
+
+  if (corrieron === 0) {
+    problemas.push('el boton de reintentar no tiene quien lo escuche');
+  }
+
+  await esperar(PISO + 900);
+
+  if (!domSimulacro.html('#zona-del-intento').includes('Intento listo')) {
+    problemas.push('el reintento tras un fracaso no llego a armar el intento');
+  }
+
+  notas.push(
+    'Intento imposible: con cada tanda recortada, el simulacro NO empieza, explica por que y deja ' +
+      'un boton para reintentar que de verdad reintenta (el oyente vive en la zona, no en el boton).'
+  );
+
+  // --- 10f · Una sola transicion, medida desde el clic --------------------
+  //
+  // Antes de pulsar no sale ni una peticion: la presentacion es HTML. Al pulsar
+  // salen dos —el resumen y el extremo— y las dos van debajo de la MISMA
+  // transicion, asi que lo que se mide desde el clic es `max(carga, 400 ms)` una
+  // vez y no dos veces 400 ms encadenados.
+
+  const domMedido = prepararDomFalso();
+  const rutasPedidas = [];
+
+  globalThis.fetch = (ruta, opciones) => {
+    rutasPedidas.push(ruta);
+    return fetchLimpio(ruta, opciones);
+  };
+
+  const { conectarComienzo: conectarMedido, comenzarElIntento: comenzarMedido } =
+    await import(
+      `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?medicion=1`
+    );
+
+  conectarMedido();
+
+  if (rutasPedidas.length !== 0) {
+    problemas.push(
+      `la presentacion del simulacro pidio ${rutasPedidas.length} cosa(s) antes de pulsar «Comenzar»`
+    );
+  }
+
+  const desdeElClic = Date.now();
+  const cargaDelIntento = comenzarMedido();
+
+  // Durante la carga, la transicion. Es la misma del cuestionario, con sus mismas
+  // tres piezas, y por eso se comprueban las tres: si alguna faltara, la
+  // extraccion de la decision 9 habria dejado el simulacro con media transicion.
+  await esperar(120);
+  const duranteLaCarga = domMedido.html('#zona-del-intento');
+
+  if (!duranteLaCarga.includes('Preparando tu simulacro…')) {
+    problemas.push('al pulsar «Comenzar» no aparecio la transicion de carga');
+  }
+  if (!duranteLaCarga.includes('js-logo.svg')) {
+    problemas.push('la transicion del simulacro no trae el logotipo');
+  }
+  if (!duranteLaCarga.includes('id="carga-lenta-simulacro"')) {
+    problemas.push('la transicion del simulacro no dejo puesto el hueco del texto lento');
+  }
+
+  await cargaDelIntento;
+  const duroElIntento = Date.now() - desdeElClic;
+
+  if (rutasPedidas.length !== 2) {
+    problemas.push(
+      `al pulsar «Comenzar» salieron ${rutasPedidas.length} peticiones y tenian que ser 2`
+    );
+  }
+  if (!rutasPedidas.some((r) => r.includes('resumen=1'))) {
+    problemas.push('al pulsar «Comenzar» no salio la peticion del resumen');
+  }
+  if (!rutasPedidas.some((r) => r.includes('ids='))) {
+    problemas.push('al pulsar «Comenzar» no salio la peticion del extremo por ids');
+  }
+  if (duroElIntento < PISO) {
+    problemas.push(
+      `la transicion del simulacro duro ${duroElIntento} ms desde el clic, por debajo del piso de ${PISO} ms`
+    );
+  }
+
+  // Y la zona se reescribio dos veces y no tres: transicion y resultado. Una
+  // tercera escritura seria una segunda transicion encadenada.
+  const escriturasDeLaZona = domMedido.escrituras('#zona-del-intento');
+  if (escriturasDeLaZona !== 2) {
+    problemas.push(
+      `la zona del intento se reescribio ${escriturasDeLaZona} veces: con una sola transicion ` +
+        'tienen que ser 2 (la transicion y el resultado)'
+    );
+  }
+
+  notas.push(
+    `Transicion del simulacro: 0 peticiones antes del clic, ${rutasPedidas.length} despues ` +
+      `(resumen + ids), bajo UNA sola transicion —${escriturasDeLaZona} escrituras de la zona— y ` +
+      `${duroElIntento} ms desde el clic, con el piso en ${PISO} ms.`
+  );
+
+  // --- 10g · «Intento listo» no dibuja texto del banco --------------------
+  //
+  // Es la decision 11, y es lo que hace que `probar:escapado` no tenga nada que
+  // vigilar todavia en esta pagina: no hay texto de la base en el HTML. Se
+  // comprueba contra las preguntas de verdad, no razonando sobre el codigo.
+
+  const listoHtml = domMedido.html('#zona-del-intento');
+
+  if (!listoHtml.includes('Intento listo')) {
+    problemas.push('la carga del simulacro no termino en el aviso «Intento listo»');
+  }
+
+  const cuentasDelAviso = [...listoHtml.matchAll(/text-jsyellow">(\d+)</g)].map((m) =>
+    Number(m[1])
+  );
+
+  if (cuentasDelAviso.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
+    problemas.push(
+      '«Intento listo» no dice la cantidad por modulo, o las cantidades no suman ' +
+        PREGUNTAS_DEL_INTENTO
+    );
+  }
+
+  // Los textos contra los que se compara salen del extremo, no de una lista escrita
+  // aqui. Si el extremo no contesto —que ya es un problema anotado mas arriba—, esto
+  // no puede dar verde callado: se dice que no se pudo mirar. Es la mitad de H-023
+  // que se olvida, la de la comprobacion que deja de comprobar sin avisar.
+  const textosDelBanco = (porIds.cuerpo?.datos ?? []).flatMap((p) => [
+    p.enunciado,
+    ...(p.alternativas ?? []).map((a) => a.texto),
+  ]);
+
+  if (textosDelBanco.length === 0) {
+    problemas.push(
+      'no se pudo comprobar que «Intento listo» no dibuje texto del banco: el extremo no ' +
+        'entrego preguntas contra las que comparar'
+    );
+  }
+
+  const coladas = textosDelBanco.filter(
+    (texto) => typeof texto === 'string' && texto.length > 12 && listoHtml.includes(texto)
+  );
+
+  if (coladas.length > 0) {
+    problemas.push(
+      `«Intento listo» dibujo ${coladas.length} texto(s) del banco, y no tiene que dibujar ninguno ` +
+        '(decision 11)'
+    );
+  }
+
+  notas.push(
+    `«Intento listo»: dice la cuenta de los siete modulos, suma ${PREGUNTAS_DEL_INTENTO}, y ` +
+      `ninguno de los ${textosDelBanco.length} textos del banco del intento aparece en su HTML.`
+  );
+
+  // --- 10h · Modo degradado: se elige desde la instantanea -----------------
+  //
+  // Se provoca la caida de verdad, como en la seccion 9: el fetch inservible. El
+  // resumen y el extremo caen los dos a la copia, el algoritmo elige igual —no sabe
+  // de donde vienen los ids— y el aviso de ADR-008 tiene que quedar VISIBLE. Un
+  // respaldo servido en silencio es lo unico que esa ADR prohibe sin matices.
+
+  const domDegradado = prepararDomFalso();
+
+  const { conectarComienzo: conectarDegradado, comenzarElIntento: comenzarDegradado } =
+    await import(
+      `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?degradado=1`
+    );
+
+  conectarDegradado();
+
+  globalThis.fetch = () => Promise.reject(new Error('caida provocada'));
+
+  await comenzarDegradado();
+
+  const degradadoHtml = domDegradado.html('#zona-del-intento');
+
+  if (!degradadoHtml.includes('Intento listo')) {
+    problemas.push('con la capa de datos caida, el simulacro no pudo armar el intento');
+  }
+
+  const cuentasDegradadas = [...degradadoHtml.matchAll(/text-jsyellow">(\d+)</g)].map((m) =>
+    Number(m[1])
+  );
+
+  if (cuentasDegradadas.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
+    problemas.push(
+      `en modo degradado el intento quedo con ${cuentasDegradadas.reduce((a, b) => a + b, 0)} ` +
+        `preguntas y no con ${PREGUNTAS_DEL_INTENTO}`
+    );
+  }
+
+  const avisoDelSimulacro = domDegradado.html('#aviso-respaldo');
+
+  // SE MIRA LO ESCRITO, NO LA CLASE, y se descubrio provocandolo: el DOM falso no
+  // arranca con las clases que trae el HTML, asi que un nodo que nadie toco no esta
+  // `hidden` para el. Preguntar solo por `oculto()` daba verde con el aviso
+  // apagado del todo, que es exactamente el caso que hay que cazar. `oculto()` sigue
+  // sirviendo para el caso contrario —cuando el componente apaga un aviso que
+  // sobraba— y por eso se pregunta ademas, no en vez de.
+  if (avisoDelSimulacro === '') {
+    problemas.push(
+      'en modo degradado el simulacro no escribio el aviso de ADR-008: estaria sirviendo la copia ' +
+        'en silencio'
+    );
+  }
+
+  if (domDegradado.oculto('#aviso-respaldo')) {
+    problemas.push('en modo degradado el simulacro dejo el aviso de ADR-008 escondido');
+  }
+
+  if (!avisoDelSimulacro.includes('copia guardada del banco de preguntas')) {
+    problemas.push('el aviso de respaldo del simulacro no dice que se esta viendo una copia');
+  }
+
+  if (!avisoDelSimulacro.includes('el simulacro se cargó desde la copia')) {
+    problemas.push('el aviso de respaldo del simulacro no nombra al simulacro');
+  }
+
+  notas.push(
+    `Modo degradado del simulacro: con el fetch caido, las ${PREGUNTAS_DEL_INTENTO} preguntas se ` +
+      'eligieron y se armaron desde la instantanea, y el aviso de ADR-008 quedo visible nombrando ' +
+      'al simulacro.'
+  );
+
+  // --- 10i · El algoritmo existe una sola vez -----------------------------
+  //
+  // Es el unico criterio de la etapa que no se provoca, porque lo que afirma es una
+  // ausencia: que NO haya una segunda copia del algoritmo para el camino degradado.
+  // Se comprueba leyendo quien importa que.
+
+  const fuenteDelSimulacro = readFileSync(
+    join(SITIO, 'components', 'simulacro.js'),
+    'utf8'
+  );
+
+  const importaElAlgoritmo = /from '\.\.\/servicios\/eleccion-del-intento\.js'/.test(
+    fuenteDelSimulacro
+  );
+
+  if (!importaElAlgoritmo) {
+    problemas.push('el simulacro no importa el algoritmo de servicios/eleccion-del-intento.js');
+  }
+
+  const vecesQueSeElige = (fuenteDelSimulacro.match(/elegirIntento\(/g) ?? []).length;
+
+  if (vecesQueSeElige !== 1) {
+    problemas.push(
+      `el simulacro llama a elegirIntento() ${vecesQueSeElige} veces: el camino normal y el ` +
+        'degradado tienen que pasar por la misma'
+    );
+  }
+
+  // Y la capa de datos NO sabe elegir. Es donde se bifurcan los dos caminos —vivo y
+  // degradado—, asi que es el sitio donde una segunda copia del algoritmo se
+  // colaria sin que nadie la viera. Se comprueba por sus imports y no por sus
+  // palabras: los comentarios del archivo hablan de la eleccion, y tienen que poder
+  // seguir hablando de ella.
+  const fuenteDeDatos = readFileSync(join(SITIO, 'servicios', 'datos.js'), 'utf8');
+
+  if (/from\s+'[^']*(eleccion-del-intento|hermanas)/.test(fuenteDeDatos)) {
+    problemas.push(
+      'servicios/datos.js importa el algoritmo o la lista de hermanas: el camino degradado no ' +
+        'puede elegir por su cuenta'
+    );
+  }
+
+  // Y quien importa el algoritmo es uno solo en todo el sitio.
+  const importadores = [
+    join(SITIO, 'main.js'),
+    join(SITIO, 'cuestionario-main.js'),
+    join(SITIO, 'simulacro-main.js'),
+    join(SITIO, 'components', 'simulacro.js'),
+    join(SITIO, 'components', 'cuestionario.js'),
+    join(SITIO, 'servicios', 'datos.js'),
+  ].filter(
+    (archivo) =>
+      existsSync(archivo) && /from\s+'[^']*eleccion-del-intento/.test(readFileSync(archivo, 'utf8'))
+  );
+
+  if (importadores.length !== 1) {
+    problemas.push(
+      `el algoritmo lo importan ${importadores.length} archivos del sitio, y tiene que importarlo uno`
+    );
+  }
+
+  notas.push(
+    'Un solo algoritmo: components/simulacro.js es el unico archivo del sitio que importa ' +
+      'elegirIntento(), y la llama una vez; el camino degradado cambia de donde salen los ids, no ' +
+      'quien elige. servicios/datos.js no importa ni el algoritmo ni las hermanas.'
+  );
+
+  // --- 10j · El aviso extraido dibuja lo mismo, byte a byte ---------------
+  //
+  // El aviso salio de components/cuestionario.js en esta etapa. La extraccion no
+  // puede haber cambiado ni un caracter de lo que ve el estudiante, asi que se
+  // compara contra el HTML exacto que se dibujaba antes, escrito aqui entero.
+  //
+  // Se compara contra lo que dibujo el CUESTIONARIO en la seccion 9b, con la caida
+  // provocada de verdad, y no contra una llamada preparada para esta comprobacion:
+  // lo que hay que proteger es lo que ve quien abre la pagina.
+
+  const AVISO_ANTES_DE_LA_EXTRACCION =
+    '\n      <div class="flex items-start gap-3 border border-jsyellow/40 bg-jsyellow/5 rounded-xl px-5 py-4">\n' +
+    '        <span class="icon i-database text-xl text-jsyellow shrink-0 mt-0.5" aria-hidden="true"></span>\n' +
+    '        <div>\n' +
+    '          <p class="font-display font-bold text-paper text-sm">Estás viendo una copia guardada del banco de preguntas.</p>\n' +
+    '          <p class="mt-1 text-sm text-muted">No se pudo conectar con el servidor, así que el cuestionario se cargó desde la copia incluida en el sitio. Puedes practicar con normalidad, pero puede que falten preguntas nuevas o correcciones recientes. Es la copia del 10 de septiembre de 2026.</p>\n' +
+    '        </div>\n' +
+    '      </div>';
+
+  const avisoDelCuestionario = dom.html('#aviso-respaldo');
+
+  if (avisoDelCuestionario !== AVISO_ANTES_DE_LA_EXTRACCION) {
+    problemas.push(
+      'el aviso de respaldo del cuestionario cambio al extraerse a su componente: el HTML ya no ' +
+        'es el mismo byte a byte'
+    );
+  }
+
+  notas.push(
+    `Aviso de respaldo extraido: el cuestionario dibuja los ${AVISO_ANTES_DE_LA_EXTRACCION.length} ` +
+      'caracteres exactos que dibujaba antes de la extraccion, y el simulacro usa el mismo ' +
+      'componente cambiando solo como se nombra la pagina.'
+  );
+
+  // ------------------------------------------------------------------------
+  // 11 · Veredicto
   // ------------------------------------------------------------------------
 
   if (problemas.length > 0) {

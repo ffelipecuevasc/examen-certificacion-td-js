@@ -87,6 +87,23 @@
   <section id="simulacro" class="px-5 sm:px-8 py-14 sm:py-20">
     <div class="max-w-3xl mx-auto">
 
+      <!-- EL AVISO DE ADR-008 VA AQUI, FUERA DE #zona-del-intento, Y ESO IMPORTA.
+           La transicion de carga reescribe la zona entera; si el aviso viviera
+           dentro, el propio acto de cargar lo borraria justo en el caso en que
+           hace falta, que es cuando lo que se cargo salio de la copia.
+
+           Se dibuja vacio y oculto, no se inserta despues: una region viva tiene
+           que EXISTIR antes de que su contenido cambie para que el lector de
+           pantalla la anuncie. Es lo mismo que hace #aviso-respaldo del
+           cuestionario, y lo llena el mismo componente. -->
+      <div id="aviso-respaldo" class="hidden mb-8" role="status" aria-live="polite"></div>
+
+      <!-- LO QUE LA CARGA REESCRIBE.
+           La presentacion entera vive aca dentro, y al pulsar «Comenzar» se
+           sustituye por la transicion y despues por «Intento listo» o por la
+           explicacion de por que no se pudo. -->
+      <div id="zona-del-intento">
+
       <span class="inline-flex items-center gap-2 border border-panel3 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow">
         <span class="icon i-bolt text-base" aria-hidden="true"></span>120 preguntas · 30 segundos cada una
       </span>
@@ -192,15 +209,22 @@
 
       </ol>
 
-      <!-- EL BOTON EXISTE Y TODAVIA NO HACE NADA (etapa A de la iteracion 41).
-           Lo conecta la etapa B: al pulsarlo saldran, bajo una sola transicion, la
-           lista de ids del resumen y las 120 preguntas elegidas (decision 5).
+      <!-- EL BOTON YA ESTA CONECTADO (etapa B de la iteracion 41).
+           Al pulsarlo salen, bajo una sola transicion, la lista de ids del resumen
+           y las 120 preguntas elegidas (decision 5), y la carga termina en el aviso
+           «Intento listo» (decision 11). Todavia no se responde: el recorrido con
+           el reloj es de las iteraciones 42 y 43.
 
-           Que un boton se pulse y no produzca nada es justo lo que este proyecto
-           llama «un boton que miente», y por eso esta pagina NO se enlaza todavia
-           desde el menu, el pie ni la portada: nadie llega hasta aca sin escribir
-           la direccion a mano. Los enlaces entran en la etapa C, con el simulacro
-           entero funcionando. -->
+           EL OYENTE NO ESTA AQUI, sino sobre #zona-del-intento, en
+           static/js/components/simulacro.js. El motivo: si el intento no se puede
+           armar, la pagina dibuja un boton NUEVO con este mismo id para reintentar,
+           y un oyente atado a este boton se habria ido con el.
+
+           Y ESTA PAGINA SIGUE SIN ENLAZARSE desde el menu, el pie ni la portada.
+           Mientras no se pueda responder, quien llegara desde el menu se quedaria
+           mirando «Intento listo» sin nada que hacer. Los enlaces entran en la
+           iteracion 44 (decision 13); hasta entonces se llega escribiendo la
+           direccion a mano. -->
       <div class="mt-10 flex flex-wrap items-center gap-4">
         <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-base px-8 py-4 rounded hover:bg-jsyellowdim transition-colors">
           <span class="icon i-rocket-launch text-xl" aria-hidden="true"></span>Comenzar el simulacro
@@ -210,6 +234,12 @@
         </a>
       </div>
 
+      </div><!-- /#zona-del-intento -->
+
+      <!-- El descargo queda FUERA de la zona, asi que sigue a la vista con el
+           intento cargado. Es una advertencia sobre el sitio entero, no sobre la
+           presentacion: que desapareciera justo al empezar a practicar seria
+           quitarla en el momento en que mas se aplica. -->
       <p class="mt-8 font-mono text-[11px] text-mutedink leading-relaxed max-w-prose">
         Material de estudio no oficial. Practicar acá no acredita nada ante Talento Digital para Chile.
       </p>

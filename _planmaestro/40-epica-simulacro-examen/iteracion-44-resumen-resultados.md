@@ -88,6 +88,9 @@ empate, por número de módulo. **Pendiente de confirmar** en la lectura de alca
 - [ ] Enlaces a la guía (decisión 6).
 - [ ] Aviso de pregunta corregida después del intento (decisión 4).
 - [ ] Conservar el último resultado (decisión 5) y botón para rendir otro intento.
+- [ ] Enlazar el simulacro, recibido de la iteración 41: desde `index.html` (menú de escritorio y móvil, la sección `#repaso`
+  y el pie) y desde `cuestionario.html` (menú de escritorio y móvil y pie), con la marca de página activa en
+  `simulacro.html`. Las líneas exactas se comprueban al abrir la iteración.
 
 ## Criterios de aceptación
 
@@ -114,6 +117,8 @@ el reloj controlable de la 42.
   deja de estar guardado.
 - [ ] **Rendir otro intento pide una selección nueva** y no reutiliza la anterior.
 - [ ] **`probar:escapado` cubre la revisión**, con un bloque nuevo para el simulacro.
+- [ ] **El simulacro es alcanzable** desde el menú de escritorio, el menú móvil y el pie de las tres páginas y desde la
+  sección `#repaso`, comprobado sobre el HTML, y la comprobación de las copias sigue en verde.
 - [ ] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
 
 ### Los comprueba el autor en el navegador
@@ -122,6 +127,7 @@ el reloj controlable de la 42.
 - [ ] **El desglose dice qué estudiar** sin tener que interpretar números.
 - [ ] **La revisión se recorre cómodamente en el teléfono**, abriendo y plegando correctas.
 - [ ] **Los enlaces a la guía llevan donde prometen.**
+- [ ] **Los enlaces al simulacro funcionan** desde el menú, el pie y la portada, en escritorio y en teléfono.
 - [ ] **Ninguna frase sugiere una certificación ni equipara el simulacro con el examen real**, leída en pantalla.
 - [ ] **Sin errores de consola.**
 - [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.

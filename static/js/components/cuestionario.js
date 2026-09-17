@@ -72,6 +72,7 @@
 import { $, $$, esc, shuffle, icon, prefersReducedMotion } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
 import { crearTransicionDeCarga } from './transicion-de-carga.js';
+import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
 import {
   borrarAvance,
   guardarRespuesta,
@@ -701,64 +702,21 @@ function dibujarGrupo(grupo, aDibujar, respondida, enLaVisita) {
 }
 
 /**
- * Fecha legible en espanol, o null si no hay ninguna que leer.
- *
- * Devolver null y no una cadena vacia es a proposito: quien llama tiene que poder
- * decir «no se sabe de cuando es» en vez de dejar la frase a medias.
- */
-function fechaLegible(iso) {
-  const fecha = new Date(iso);
-  if (Number.isNaN(fecha.getTime())) return null;
-
-  return new Intl.DateTimeFormat('es-CL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(fecha);
-}
-
-/**
  * Aviso de que lo que se esta viendo sale de la instantanea y no de la base.
  *
- * ADR-008 lo pide con todas sus letras: el sitio sigue funcionando cuando la capa
- * de datos cae, y **avisa**, nunca en silencio. Por eso el aviso va arriba del
- * banco y no en el pie: el estudiante tiene que saberlo antes de estudiar, no
- * despues.
+ * El aviso entero —la frase, la fecha, el recuadro— se fue a
+ * `components/aviso-de-respaldo.js` en la iteracion 41, etapa B, porque el simulacro
+ * necesita el mismo. Lo que queda aqui es lo unico que de verdad es del
+ * cuestionario: **cual de sus dos fuentes cayo a la copia**, y como se nombra la
+ * pagina dentro de la frase.
  *
- * La fecha sale del sello del archivo generado, que es lo que ADR-023 obliga a
- * escribir dentro. Sin ese dato el aviso no podria decir de cuando es la copia, y
- * un «puede no estar al dia» sin fecha no le sirve a nadie para decidir si
- * confiar o no.
+ * Basta con que UNA de las dos venga de la copia. Ver `origen`.
  */
 function mostrarAvisoRespaldo() {
-  const contenedor = $('#aviso-respaldo');
-  if (!contenedor) return;
-
-  // Basta con que UNA de las dos fuentes venga de la copia. Ver `origen`.
-  const sello = origen.resumen ?? origen.modulo;
-
-  if (!sello) {
-    contenedor.innerHTML = '';
-    contenedor.classList.add('hidden');
-    return;
-  }
-
-  const fecha = fechaLegible(sello.generada_en);
-
-  const cuando = fecha
-    ? `Es la copia del ${esc(fecha)}.`
-    : 'La copia no trae fecha, asi que no se sabe de cuando es.';
-
-  contenedor.innerHTML = `
-      <div class="flex items-start gap-3 border border-jsyellow/40 bg-jsyellow/5 rounded-xl px-5 py-4">
-        ${icon('database', 'text-xl text-jsyellow shrink-0 mt-0.5')}
-        <div>
-          <p class="font-display font-bold text-paper text-sm">Estás viendo una copia guardada del banco de preguntas.</p>
-          <p class="mt-1 text-sm text-muted">No se pudo conectar con el servidor, así que el cuestionario se cargó desde la copia incluida en el sitio. Puedes practicar con normalidad, pero puede que falten preguntas nuevas o correcciones recientes. ${cuando}</p>
-        </div>
-      </div>`;
-
-  contenedor.classList.remove('hidden');
+  mostrarAvisoDeRespaldo({
+    sello: origen.resumen ?? origen.modulo,
+    loQueSeCargo: 'el cuestionario',
+  });
 }
 
 /**

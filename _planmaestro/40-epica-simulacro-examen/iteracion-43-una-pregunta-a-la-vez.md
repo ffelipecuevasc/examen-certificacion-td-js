@@ -62,6 +62,8 @@ funcione igual.** Usa el vocabulario de la actualización de ADR-022, incluida l
 - [ ] Anunciar el cambio de pregunta a tecnologías de asistencia.
 - [ ] Impedir volver atrás, también con el botón «atrás» del navegador.
 - [ ] Cerrar el texto de las reglas en la presentación (decisión 2).
+- [ ] Agregar a `probar:escapado` el bloque del simulacro, recibido de la iteración 41: la pregunta hostil se cuela
+  interceptando la petición `?ids=` y se revisa en el dibujo real de la pregunta.
 
 ## Criterios de aceptación
 
@@ -70,6 +72,8 @@ Cada uno se cierra con evidencia producida **provocando** el comportamiento, con
 ### Los provoca Claude Code
 
 - [ ] **Solo hay una pregunta en el HTML dibujado en cada momento.**
+- [ ] **`probar:escapado` cubre el texto del banco dibujado en el simulacro**: enunciado, alternativas e ícono del módulo
+  de la pregunta hostil, colada por intercepción, llegan como texto.
 - [ ] **Cambiar la alternativa antes de avanzar** deja registrada solo la última marcada.
 - [ ] **Avanzar con alternativa marcada** la registra y dibuja la siguiente pregunta.
 - [ ] **Un solo toque de «Omitir» no omite**; el segundo sí, y la pregunta queda omitida.

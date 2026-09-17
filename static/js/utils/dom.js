@@ -24,11 +24,25 @@ export function esc(value) {
   }[char]));
 }
 
-/** Devuelve una copia desordenada del arreglo (algoritmo de Fisher-Yates). */
-export function shuffle(array) {
+/**
+ * Devuelve una copia desordenada del arreglo (algoritmo de Fisher-Yates).
+ *
+ * LA FUENTE DE AZAR ENTRA POR PARAMETRO desde la iteracion 41, decision 10, y el
+ * valor por defecto deja intactas las llamadas del cuestionario, que no lo pasan.
+ *
+ * El motivo es que la muestra de 200 intentos del simulacro tiene que ser
+ * REPETIBLE: con `Math.random` escrito aqui dentro, una muestra que diera rojo no
+ * se podria volver a correr igual para mirar que paso, y un rojo que no se puede
+ * reproducir no se arregla, se discute. Quien prueba le pasa una fuente con
+ * semilla; el sitio no le pasa nada y se queda con `Math.random`.
+ *
+ * @param {Array} array
+ * @param {() => number} [azar] Devuelve un numero en [0, 1).
+ */
+export function shuffle(array, azar = Math.random) {
   const copy = array.slice();
   for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(azar() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;

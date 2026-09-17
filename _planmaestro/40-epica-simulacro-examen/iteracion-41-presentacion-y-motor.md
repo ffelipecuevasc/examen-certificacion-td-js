@@ -23,6 +23,10 @@ La página no arranca respondiendo, arranca explicando. Esta iteración deja lis
   solo sirve. La tercera, tras la lectura de alcance de esta iteración: el autor resolvió el encabezado y el pie, el corte en
   etapas, el paso de «una sola pestaña» a la iteración 42, qué pasa si se corrige una pregunta durante un intento, cuándo se
   pide la lista de ids y qué pasa si el almacenamiento se llena. Se agregaron las correcciones técnicas de la lectura.
+- **2026-09-16 · decisiones del plan de la etapa B.** D1 acepta como máximo 100 parámetros ligados por consulta (provocado):
+  el extremo trocea. El autor decidió rechazar ids repetidos, que la etapa B termine con un aviso «Intento listo» y que la
+  prueba de escapado del simulacro pase a la 43, y que el código viva en las carpetas existentes. Los enlaces al simulacro
+  pasan a la iteración 44, y el orden de los módulos al elegir se sortea en cada intento.
 
 ## Lo que hereda
 
@@ -55,8 +59,11 @@ Todas del autor, 2026-09-16.
 - En modo degradado, el mismo código elige desde la instantánea. **El algoritmo no sabe de qué camino vienen los ids.**
 - **Las justificaciones no viajan con el intento** (se piden en la 44).
 - Motivos: `vision.md:68-70` y el precedente de `generar-instantanea.mjs` de no duplicar lógica.
+- **Forma del extremo:** `?ids=` con un máximo de 120; mal formados, **repetidos**, o combinados con `?modulo` o
+  `?resumen` → `PETICION_INVALIDA`; inexistentes o retirados no vuelven. D1 admite **100 parámetros ligados por consulta**
+  (provocado el 2026-09-16), así que el extremo trocea por dentro en un solo `batch`.
 - Se documenta en una **ADR nueva**, que incluye: por qué el extremo no puede cachearse nunca; por qué aquí las preguntas se
-  guardan congeladas (decisión 6), apartándose de ADR-034; y qué se hace con `?ids` combinado con `?modulo` o `?resumen`.
+  guardan congeladas (decisión 6), apartándose de ADR-034; la forma del extremo; y el costo medido en filas leídas.
 
 ### 2 · Reparto parejo
 
@@ -68,6 +75,8 @@ Todas del autor, 2026-09-16.
 - La tabla se colapsa en **grupos**: ocho pares y un trío. Un intento trae como máximo una pregunta de cada grupo.
 - La exclusión es **global**: se arrastra un conjunto de prohibidos mientras se elige, así el par 25 ↔ 107 (módulos 2 y 3) no
   obliga a deshacer elecciones.
+- **El orden en que se recorren los módulos se sortea en cada intento**, para que ninguna pregunta de un grupo que cruza
+  módulos salga menos veces por estar en un módulo que elige después.
 - La lista vive en **`static/js/data/`**, como archivo de datos importado por el único módulo del algoritmo.
 - Con el banco actual, el módulo más apretado conserva 44 elegibles para una cuota máxima de 18.
 
@@ -117,7 +126,23 @@ cuestionario la usa igual que hoy. Las dos constantes siguen importables desde d
 Recibe los ids por módulo, la lista de hermanas y la **fuente de azar**. Así la muestra de 200 intentos es repetible, y
 `probar-escapado.mjs` puede colar la pregunta hostil interceptando la respuesta del extremo.
 
-### 11 · «Una sola pestaña» pasa a la iteración 42
+### 11 · Al terminar la carga, «Intento listo»
+
+Mientras no exista el recorrido (43), la etapa B termina con un aviso **«Intento listo»** que dice cuántas preguntas trajo
+y de qué módulos, **sin dibujar texto del banco**. La prueba de escapado del simulacro se escribe en la 43, contra el dibujo
+real de las preguntas.
+
+### 12 · Código en las carpetas existentes
+
+El algoritmo va en `static/js/servicios/`, las hermanas en `static/js/data/`, los componentes en `static/js/components/`.
+No se crea una carpeta propia del simulacro.
+
+### 13 · Los enlaces al simulacro se agregan en la iteración 44
+
+Hasta tener recorrido y resumen, el simulacro no se enlaza desde ninguna parte: un estudiante que entrara desde el menú no
+podría hacer nada después de «Comenzar».
+
+### 14 · «Una sola pestaña» pasa a la iteración 42
 
 La coordinación entre pestañas necesita un vencimiento por tiempo (si la pestaña dueña se cierra, la otra no puede quedar
 bloqueada para siempre) y la misma infraestructura del DOM falso que el reloj controlable. **No es parte de esta iteración.**
@@ -129,10 +154,10 @@ Cada etapa cierra con su evidencia antes de empezar la siguiente.
 - **Etapa A · la página.** `simulacro.html` sobre `ink` con la tercera copia vigilada, la presentación con su botón (todavía
   sin conectar), el registro en `build-dist.mjs`, y la extracción de la transición con el cuestionario intacto. **Los enlaces
   desde menús, pie y portada no se agregan en esta etapa**, para no enlazar una página a medias.
-- **Etapa B · elegir y traer.** Archivo de hermanas, algoritmo, extremo por ids, modo degradado, botón conectado con la
-  transición, y el bloque de `probar:escapado`.
+- **Etapa B · elegir y traer.** Archivo de hermanas, algoritmo, extremo por ids, modo degradado con su aviso, y botón
+  conectado con la transición hasta «Intento listo».
 - **Etapa C · guardar y retomar.** Formato del intento, guardado, retoma, dato corrupto, sin almacenamiento, almacenamiento
-  lleno, la ADR nueva, y **los enlaces** desde menús, pie y portada.
+  lleno y la ADR nueva.
 
 ## Tareas
 
@@ -144,12 +169,11 @@ Cada etapa cierra con su evidencia antes de empezar la siguiente.
 - [ ] **B ·** Crear el algoritmo de selección (decisiones 2, 3, 4 y 10).
 - [ ] **B ·** Provocar primero el límite de parámetros ligados de D1 con 120 ids, y crear el extremo por ids.
 - [ ] **B ·** Conectar el botón: lista de ids, elección y carga bajo una sola transición (decisión 5), con modo degradado.
-- [ ] **B ·** Agregar a `probar:escapado` el bloque del simulacro.
+- [ ] **B ·** Extraer el aviso de modo degradado del cuestionario a un componente, sin cambiar lo que dibuja.
+- [ ] **B ·** Agregar los archivos nuevos a `DONDE_BARRER` de `probar-filtrado.mjs`.
 - [ ] **C ·** Diseñar el formato del intento (decisión 6) y guardarlo, retomarlo e ignorar datos ininteligibles.
 - [ ] **C ·** Avisos sin almacenamiento y con almacenamiento lleno (decisión 7).
 - [ ] **C ·** Escribir la ADR nueva.
-- [ ] **C ·** Enlazar el simulacro desde `index.html:41`, `:56`, la sección `#repaso` (`:208-227`), `:349`, y
-  `cuestionario.html:38`, `:53`, `:252`.
 
 ## Criterios de aceptación
 
@@ -190,8 +214,11 @@ Cada uno se cierra con evidencia producida **provocando** el comportamiento, sal
 - [ ] **En modo degradado**, provocado, el intento se elige desde la instantánea y el aviso de ADR-008 queda visible.
 - [ ] **El algoritmo existe una sola vez**: el camino normal y el degradado importan la misma función (se comprueba leyendo
   los imports; es el único criterio que no se provoca).
-- [ ] **`probar:escapado` cubre el texto del banco dibujado en el simulacro**, con la pregunta hostil colada por
-  intercepción.
+- [ ] **Al terminar la carga aparece «Intento listo»** con la cantidad por módulo, y el HTML dibujado no contiene texto del
+  banco.
+- [ ] **El orden de los módulos varía entre intentos de la muestra**, y las preguntas 25 y 107 salen con frecuencias
+  compatibles con el azar.
+- [ ] **El aviso de modo degradado extraído dibuja en el cuestionario lo mismo que antes**, comprobado byte a byte.
 - [ ] **Se informan las filas leídas** por el resumen y el extremo en un intento. Si el entorno local no las reporta, se
   deja dicho y la medición pasa a la pasada del autor.
 
@@ -206,8 +233,6 @@ Cada uno se cierra con evidencia producida **provocando** el comportamiento, sal
 - [ ] **Un dato guardado corrupto o de otra versión se ignora** sin romper la página.
 - [ ] **Sin almacenamiento**, el intento empieza y se avisa que no sobrevive a una recarga.
 - [ ] **Con una escritura que falla a mitad del intento**, simulada, aparece el aviso de la decisión 7 y el intento sigue.
-- [ ] **El simulacro es alcanzable** desde los siete sitios de la tarea, comprobado sobre el HTML, y la comprobación de las
-  copias sigue en verde.
 
 **Todas las etapas**
 
@@ -221,7 +246,6 @@ Cada uno se cierra con evidencia producida **provocando** el comportamiento, sal
   limitada.
 - [ ] **B ·** Si el entorno local no reporta filas leídas, se miden contra producción con una petición de lectura.
 - [ ] **C ·** Recargar a mitad del intento lo retoma, en escritorio y en teléfono.
-- [ ] **C ·** Los enlaces al simulacro funcionan desde el menú, el pie y la portada, en escritorio y en teléfono.
 - [ ] **Cada etapa ·** Sin errores de consola.
 - [ ] **Cada etapa ·** `npm run verificar` termina en 0, con `npm run datos:dev` levantado.
 
