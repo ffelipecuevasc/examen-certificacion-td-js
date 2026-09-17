@@ -2799,9 +2799,26 @@ try {
 
   conectarDegradado();
 
-  globalThis.fetch = () => Promise.reject(new Error('caida provocada'));
+  // Se cuenta a que se sale, no solo que caiga: con el resumen ya caido a la copia,
+  // pedirle las preguntas a la capa seria gastar la espera del estudiante en un
+  // servicio que acaba de no contestar, y —si contestara— seria la mezcla al reves,
+  // ids elegidos sobre la copia pedidos a D1. Se descubrio que faltaba mutando el
+  // sitio el 2026-09-17: quitando esa guarda, todo lo demas seguia en verde.
+  const rutasDelDegradado = [];
+
+  globalThis.fetch = (ruta) => {
+    rutasDelDegradado.push(String(ruta));
+    return Promise.reject(new Error('caida provocada'));
+  };
 
   await comenzarDegradado();
+
+  if (rutasDelDegradado.some((ruta) => ruta.includes('ids='))) {
+    problemas.push(
+      'con el resumen ya caido a la copia, el simulacro salio igual a pedirle las preguntas a la ' +
+        'capa de datos: los ids se eligieron sobre la copia y se pidieron a otro banco'
+    );
+  }
 
   const degradadoHtml = domDegradado.html('#zona-del-intento');
 
@@ -2850,7 +2867,9 @@ try {
   notas.push(
     `Modo degradado del simulacro: con el fetch caido, las ${PREGUNTAS_DEL_INTENTO} preguntas se ` +
       'eligieron y se armaron desde la instantanea, y el aviso de ADR-008 quedo visible nombrando ' +
-      'al simulacro.'
+      `al simulacro. Salio ${rutasDelDegradado.length} vez al resumen y ninguna al extremo por ` +
+      'ids: con el resumen ya caido, las preguntas se le piden a la copia y no a un servicio que ' +
+      'acaba de no contestar.'
   );
 
   // --- 10i · El algoritmo existe una sola vez -----------------------------
@@ -2953,6 +2972,343 @@ try {
       'caracteres exactos que dibujaba antes de la extraccion, y el simulacro usa el mismo ' +
       'componente cambiando solo como se nombra la pagina.'
   );
+
+  // --- 10k · Un intento no mezcla bancos (correccion del 2026-09-17) ------
+  //
+  // EL CASO QUE ESTO VIGILA
+  //
+  // Son dos peticiones atadas: de `?resumen=1` salen los ids y `?ids=` los va a
+  // buscar. Cada una cae al respaldo por su cuenta, asi que se puede llegar a que el
+  // resumen conteste desde D1 y las preguntas salgan de la copia: **los ids se
+  // eligieron sobre un banco y se piden a otro.**
+  //
+  // Hoy los dos bancos coinciden y no se nota. Por eso el caso se provoca haciendo
+  // que dejen de coincidir: se le agregan al resumen de D1 ids que la copia no
+  // tiene, que es exactamente lo que vera el navegador el dia que el banco crezca y
+  // la instantanea se quede atras. Sin la correccion, medido el 2026-09-17, el
+  // intento gastaba sus tres rondas de reserva sobre ids del banco equivocado y
+  // terminaba en «No se pudo armar el simulacro» con 118 preguntas, justo cuando el
+  // respaldo tenia que salvarlo.
+  //
+  // COMO SE COMPRUEBA QUE NO MEZCLA, SIN VER LOS IDS
+  //
+  // Por las rondas de reserva, que son visibles desde aqui: si el intento se vuelve
+  // a elegir sobre los ids de la copia, **todo lo que se pide existe en la copia** y
+  // no hace falta reponer ni una vez. Una sola peticion al extremo, y 120 preguntas
+  // con su reparto. Con los bancos mezclados eso no puede pasar: lo que se pidio
+  // sobre D1 no esta entero en la copia y hay que salir a reponer.
+
+  /** Cuantas preguntas de D1 no tiene la copia, y en que modulo. */
+  const MODULO_QUE_CRECIO = 5;
+  const FANTASMAS = 60;
+  const PRIMER_FANTASMA = 900001;
+
+  /**
+   * El azar DEL SITIO, fijado mientras dura esta seccion.
+   *
+   * `elegirIntento()` y `shuffle()` resuelven su `azar = Math.random` en cada
+   * llamada, asi que reemplazarlo aqui hace repetible lo que el componente elige sin
+   * tocar ni una linea del sitio ni pedirle un parametro que en la pagina no tiene.
+   * Se devuelve al terminar: una prueba que deja el azar del proceso trucado le
+   * cambia el suelo a lo que corra despues.
+   */
+  const azarDeVerdad = Math.random;
+  Math.random = azarConSemilla(SEMILLA);
+
+  /**
+   * El resumen de D1, con ids que la copia no tiene metidos en un modulo.
+   *
+   * Se pide de verdad y se le agregan los fantasmas encima: escribir un resumen
+   * entero a mano seria probar el simulacro contra un banco inventado.
+   */
+  const resumenConFantasmas = async (ruta, opciones) => {
+    const respuesta = await fetchLimpio(ruta, opciones);
+    const cuerpo = await respuesta.json();
+
+    for (const fila of cuerpo.datos ?? []) {
+      if (fila.modulo !== MODULO_QUE_CRECIO) continue;
+      for (let i = 0; i < FANTASMAS; i += 1) fila.preguntas_ids.push(PRIMER_FANTASMA + i);
+      fila.preguntas = fila.preguntas_ids.length;
+    }
+
+    return new Response(JSON.stringify(cuerpo), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  };
+
+  /** Lo que «Intento listo» dice que trajo cada modulo. */
+  const cuentasDe = (html) =>
+    [...html.matchAll(/text-jsyellow">(\d+)</g)].map((m) => Number(m[1]));
+
+  /**
+   * Las tres cosas que un intento bien armado tiene que cumplir, miradas en el HTML.
+   *
+   * Se comparte entre los dos casos a proposito: son la misma promesa, y escrita dos
+   * veces se arregla en una sola el dia que cambie.
+   */
+  const revisarElIntento = (html, deQuien) => {
+    if (!html.includes('Intento listo')) {
+      problemas.push(`${deQuien}: el intento no se armo`);
+      return;
+    }
+
+    const cuentas = cuentasDe(html);
+    const total = cuentas.reduce((a, b) => a + b, 0);
+
+    if (total !== PREGUNTAS_DEL_INTENTO) {
+      problemas.push(
+        `${deQuien}: el intento quedo con ${total} preguntas y no con ${PREGUNTAS_DEL_INTENTO}`
+      );
+    }
+
+    if (
+      cuentas.filter((c) => c === PREGUNTAS_POR_MODULO + 1).length !== 1 ||
+      cuentas.filter((c) => c === PREGUNTAS_POR_MODULO).length !== 6
+    ) {
+      problemas.push(
+        `${deQuien}: el reparto dejo de ser ${PREGUNTAS_POR_MODULO} por modulo con uno en 18`
+      );
+    }
+  };
+
+  /** Que el aviso de ADR-008 quedo escrito y a la vista. */
+  const revisarElAviso = (unDom, deQuien) => {
+    if (unDom.html('#aviso-respaldo') === '' || unDom.oculto('#aviso-respaldo')) {
+      problemas.push(
+        `${deQuien}: el intento salio de la copia y el aviso de ADR-008 no quedo a la vista`
+      );
+    }
+  };
+
+  // --- 10k-1 · El resumen contesta desde D1 y `?ids=` se cae --------------
+
+  const domMezcla = prepararDomFalso();
+  let peticionesDeIds = 0;
+
+  globalThis.fetch = async (ruta, opciones) => {
+    const texto = String(ruta);
+
+    if (texto.includes('resumen=1')) return resumenConFantasmas(texto, opciones);
+
+    if (texto.includes('ids=')) {
+      peticionesDeIds += 1;
+      throw new Error('caida provocada del extremo por ids');
+    }
+
+    return fetchLimpio(texto, opciones);
+  };
+
+  const { conectarComienzo: conectarMezcla, comenzarElIntento: comenzarMezcla } =
+    await import(
+      `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?mezcla=1`
+    );
+
+  conectarMezcla();
+  await comenzarMezcla();
+
+  const mezclaHtml = domMezcla.html('#zona-del-intento');
+
+  revisarElIntento(mezclaHtml, 'Con el resumen de D1 y el extremo caido');
+  revisarElAviso(domMezcla, 'Con el resumen de D1 y el extremo caido');
+
+  // LA COMPROBACION QUE DA EL ROJO. Una sola peticion: la que cayo. Despues de ella
+  // el intento se vuelve a elegir sobre los ids de la copia, y la copia los tiene
+  // todos, asi que no hay nada que reponer. Sin la correccion, aqui salian cuatro.
+  if (peticionesDeIds !== 1) {
+    problemas.push(
+      `tras caer al respaldo, el simulacro salio ${peticionesDeIds} vez(ces) al extremo por ids: ` +
+        'con el intento reelegido sobre la copia no hace falta reponer ninguna vez'
+    );
+  }
+
+  notas.push(
+    `Mismo banco (resumen de D1 + extremo caido): con ${FANTASMAS} ids del modulo ` +
+      `${MODULO_QUE_CRECIO} que la copia no tiene, el intento se volvio a elegir entero desde la ` +
+      `copia —${peticionesDeIds} peticion al extremo, 0 rondas de reserva— y quedo con ` +
+      `${PREGUNTAS_DEL_INTENTO} preguntas y el aviso de ADR-008 a la vista.`
+  );
+
+  // --- 10k-2 · La capa se cae a mitad de las reservas ---------------------
+  //
+  // El mismo riesgo por el otro camino: la primera tanda sale de D1 —los fantasmas
+  // no vuelven, asi que el intento queda corto— y la capa se cae justo en la ronda
+  // de reserva. Sin la correccion, esas reservas salian de la copia y el intento
+  // terminaba con dos bancos adentro, o sin poder empezar.
+
+  const domReservas = prepararDomFalso();
+  let peticionesDeReserva = 0;
+  let servidasPorLaCapa = 0;
+
+  globalThis.fetch = async (ruta, opciones) => {
+    const texto = String(ruta);
+
+    if (texto.includes('resumen=1')) return resumenConFantasmas(texto, opciones);
+
+    if (texto.includes('ids=')) {
+      peticionesDeReserva += 1;
+
+      if (peticionesDeReserva === 1) {
+        const respuesta = await fetchLimpio(texto, opciones);
+        servidasPorLaCapa = (await respuesta.clone().json())?.datos?.length ?? 0;
+        return respuesta;
+      }
+
+      throw new Error('caida provocada a mitad de las reservas');
+    }
+
+    return fetchLimpio(texto, opciones);
+  };
+
+  const { conectarComienzo: conectarReservas, comenzarElIntento: comenzarReservas } =
+    await import(
+      `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?reservas=1`
+    );
+
+  conectarReservas();
+  await comenzarReservas();
+
+  const reservasHtml = domReservas.html('#zona-del-intento');
+
+  if (servidasPorLaCapa >= PREGUNTAS_DEL_INTENTO) {
+    problemas.push(
+      'no se pudo provocar la caida a mitad de las reservas: la primera tanda ya trajo las ' +
+        `${PREGUNTAS_DEL_INTENTO}, asi que no hubo ronda de reserva que hacer caer`
+    );
+  }
+
+  revisarElIntento(reservasHtml, 'Con la capa caida a mitad de las reservas');
+  revisarElAviso(domReservas, 'Con la capa caida a mitad de las reservas');
+
+  // Dos: la que salio bien contra D1 y la que cayo. Despues de esa, el intento se
+  // rehace entero sobre la copia y no vuelve a salir. Sin la correccion, cuatro.
+  if (peticionesDeReserva !== 2) {
+    problemas.push(
+      `con la capa caida a mitad de las reservas, el simulacro salio ${peticionesDeReserva} ` +
+        'vez(ces) al extremo por ids, y tenian que ser 2: la que funciono y la que cayo'
+    );
+  }
+
+  notas.push(
+    `Mismo banco (caida a mitad de las reservas): D1 sirvio ${servidasPorLaCapa} de ` +
+      `${PREGUNTAS_DEL_INTENTO} en la primera tanda y la ronda de reserva cayo; el intento se ` +
+      `rehizo entero desde la copia en ${peticionesDeReserva} peticiones y quedo con ` +
+      `${PREGUNTAS_DEL_INTENTO} preguntas.`
+  );
+
+  // --- 10k-3 · Elegir sobre la copia da un intento legitimo ---------------
+  //
+  // Lo de arriba comprueba que el intento se rehace; esto comprueba que lo que sale
+  // de rehacerlo vale. Se eligen 50 intentos sobre los ids que la copia declara y se
+  // les exige lo mismo que a los de D1: 120 preguntas, todas presentes en la copia,
+  // el reparto, y ni dos hermanas juntas.
+  //
+  // Los ids de la copia se piden por la puerta nueva —`leerResumenDelRespaldo()`— y
+  // se cotejan contra el archivo de la instantanea leido aparte. Una prueba que
+  // sacara los ids de la misma funcion que prueba no probaria nada (H-023).
+
+  const { leerResumenDelRespaldo } = await import(
+    pathToFileURL(join(SITIO, 'servicios', 'datos.js')).href
+  );
+
+  const resumenDeLaCopia = await leerResumenDelRespaldo();
+
+  const idsPorModuloDeLaCopia = Object.fromEntries(
+    (resumenDeLaCopia.datos ?? []).map((fila) => [fila.modulo, fila.preguntas_ids])
+  );
+
+  if (!resumenDeLaCopia.ok || !resumenDeLaCopia.meta?.respaldo) {
+    problemas.push(
+      'leerResumenDelRespaldo() no entrego el resumen de la copia con su sello: sin sello, un ' +
+        'intento servido desde la copia no encenderia el aviso de ADR-008'
+    );
+  }
+
+  for (const modulo of MODULOS_DEL_EXAMEN) {
+    const enElArchivo = instantanea.PREGUNTAS.filter((p) => p.modulo === modulo).length;
+    const enElResumen = idsPorModuloDeLaCopia[modulo]?.length ?? 0;
+
+    if (enElArchivo !== enElResumen) {
+      problemas.push(
+        `el resumen de la copia dice ${enElResumen} ids en el modulo ${modulo} y la instantanea ` +
+          `trae ${enElArchivo} preguntas`
+      );
+    }
+  }
+
+  const azarDeLaCopia = azarConSemilla(SEMILLA);
+  const idsQueLaCopiaTiene = new Set(instantanea.PREGUNTAS.map((p) => p.id));
+
+  let intentosDeLaCopia = 0;
+  let fueraDeLaCopia = 0;
+  let repartoMaloEnLaCopia = 0;
+  let hermanasJuntasEnLaCopia = 0;
+
+  for (let i = 0; i < 50; i += 1) {
+    const intento = elegirIntento({
+      idsPorModulo: idsPorModuloDeLaCopia,
+      azar: azarDeLaCopia,
+    });
+
+    if (!intento.ok) continue;
+    intentosDeLaCopia += 1;
+
+    if (
+      intento.ids.length !== PREGUNTAS_DEL_INTENTO ||
+      intento.ids.some((id) => !idsQueLaCopiaTiene.has(id))
+    ) {
+      fueraDeLaCopia += 1;
+    }
+
+    const cuotas = MODULOS_DEL_EXAMEN.map((m) => intento.porModulo[m].length);
+    if (
+      cuotas.filter((c) => c === PREGUNTAS_POR_MODULO + 1).length !== 1 ||
+      cuotas.filter((c) => c === PREGUNTAS_POR_MODULO).length !== 6
+    ) {
+      repartoMaloEnLaCopia += 1;
+    }
+
+    const elegidos = new Set(intento.ids);
+    for (const grupo of GRUPOS_DE_HERMANAS) {
+      if (grupo.filter((id) => elegidos.has(id)).length > 1) hermanasJuntasEnLaCopia += 1;
+    }
+  }
+
+  if (intentosDeLaCopia !== 50) {
+    problemas.push(
+      `sobre los ids de la copia solo se pudieron elegir ${intentosDeLaCopia} de 50 intentos: ` +
+        'el camino al que cae el simulacro cuando la capa no responde no puede fallar'
+    );
+  }
+
+  if (fueraDeLaCopia > 0) {
+    problemas.push(
+      `${fueraDeLaCopia} intento(s) elegidos sobre la copia piden preguntas que la copia no tiene`
+    );
+  }
+
+  if (repartoMaloEnLaCopia > 0) {
+    problemas.push(
+      `${repartoMaloEnLaCopia} intento(s) elegidos sobre la copia no reparten ` +
+        `${PREGUNTAS_POR_MODULO} por modulo con uno en 18`
+    );
+  }
+
+  if (hermanasJuntasEnLaCopia > 0) {
+    problemas.push(
+      `${hermanasJuntasEnLaCopia} vez(ces) un intento elegido sobre la copia trajo dos preguntas ` +
+        'del mismo grupo de hermanas'
+    );
+  }
+
+  notas.push(
+    `Intentos elegidos sobre la copia: los ${intentosDeLaCopia} traen ` +
+      `${PREGUNTAS_DEL_INTENTO} preguntas que la instantanea tiene, con el reparto y sin dos ` +
+      'hermanas juntas. El resumen de la copia coincide modulo a modulo con el archivo.'
+  );
+
+  Math.random = azarDeVerdad;
+  globalThis.fetch = fetchLimpio;
 
   // ------------------------------------------------------------------------
   // 11 · Veredicto

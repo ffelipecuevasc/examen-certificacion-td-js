@@ -32,9 +32,31 @@
  * no sabe de donde salieron. Lo unico que cambia aqui es que se mira el sello del
  * respaldo para encender el aviso de ADR-008: **el respaldo nunca se sirve en
  * silencio.**
+ *
+ * PERO UN INTENTO NO MEZCLA BANCOS (correccion del 2026-09-17)
+ *
+ * Que cada peticion caiga por su cuenta sirve para el cuestionario, donde una
+ * peticion trae una pantalla. Aqui son dos, y estan atadas: de la primera salen los
+ * ids y la segunda los va a buscar. Si el resumen contesta desde D1 y la peticion de
+ * preguntas cae a la copia, **los ids se eligieron sobre un banco y se piden a
+ * otro**. Hoy los dos bancos coinciden y no se nota; el dia que no coincidan, los
+ * elegidos —y los sobrantes de donde salen las reservas— apuntan a preguntas que la
+ * copia no trae, y el intento termina en «No se pudo armar el simulacro» justo
+ * cuando el respaldo tenia que salvarlo.
+ *
+ * La regla es una sola y esta escrita abajo, en `comenzarElIntento()`: **si alguna
+ * mitad sale de la copia, el intento entero se vuelve a elegir desde la copia.**
+ * Vale igual para la primera peticion y para una ronda de reserva que caiga a mitad
+ * de camino. El algoritmo sigue sin enterarse de nada: lo unico que cambia es de
+ * donde salen los ids que recibe.
  */
 import { $, esc } from '../utils/dom.js';
-import { leerPreguntasPorIds, leerResumen } from '../servicios/datos.js';
+import {
+  leerPreguntasPorIds,
+  leerPreguntasPorIdsDelRespaldo,
+  leerResumen,
+  leerResumenDelRespaldo,
+} from '../servicios/datos.js';
 import {
   FALTA_MODULO,
   MODULOS_DEL_EXAMEN,
@@ -66,6 +88,43 @@ const RONDAS_DE_RESERVA = 3;
  * el aviso tiene que aparecer si **alguna** lo hizo.
  */
 const origen = { resumen: null, preguntas: null };
+
+/**
+ * Los dos bancos de los que puede salir un intento, cada uno con sus dos lecturas.
+ *
+ * Se nombran como pareja a proposito: lo que la correccion del 2026-09-17 protege es
+ * justamente que las dos mitades salgan de la MISMA. Separarlas en cuatro funciones
+ * sueltas es lo que permitio mezclarlas sin que se viera.
+ *
+ * `DESDE_LA_CAPA.preguntas` sigue cayendo sola a la copia si la capa no contesta:
+ * eso no se toca, es ADR-008. Lo que se agrega es que despues de esa caida el
+ * intento se rehace entero desde `DESDE_LA_COPIA`.
+ */
+const DESDE_LA_CAPA = { resumen: leerResumen, preguntas: leerPreguntasPorIds };
+const DESDE_LA_COPIA = {
+  resumen: leerResumenDelRespaldo,
+  preguntas: leerPreguntasPorIdsDelRespaldo,
+};
+
+/**
+ * Las preguntas salieron de la copia y el resumen no: los ids se eligieron sobre un
+ * banco y se estan pidiendo a otro.
+ *
+ * El caso contrario —resumen de la copia, preguntas de la capa— no se pregunta
+ * porque no puede ocurrir: `unIntentoDe()` le pide las preguntas a la copia en
+ * cuanto el resumen vino de ahi.
+ */
+const seMezclaronLosBancos = () => Boolean(origen.preguntas) && !origen.resumen;
+
+/**
+ * Lo que devuelve `armarElIntento()` al detectar la mezcla.
+ *
+ * No trae `explicacion` a proposito: **no es un fracaso que se le cuente a nadie**,
+ * es un aviso interno de que hay que rehacer el intento desde la copia. Si algun dia
+ * se dibujara por descuido, la pantalla quedaria sin frase y se veria; con una frase
+ * puesta, se veria un mensaje de error donde en realidad no hubo ninguno.
+ */
+const HAY_MEZCLA = { ok: false, mezcla: true };
 
 /**
  * La transicion de esta pagina.
@@ -190,8 +249,8 @@ function dibujarNoSePudo(explicacion) {
  * de que volvieran menos de las pedidas. Lo primero es que no hay de donde sacar
  * nada; lo segundo es lo que las reservas existen para tapar.
  */
-async function traer(ids) {
-  const respuesta = await leerPreguntasPorIds(ids);
+async function traer(ids, pedir) {
+  const respuesta = await pedir(ids);
   if (!respuesta.ok) return null;
 
   // Cualquiera de las dos peticiones puede caer a la copia por su cuenta, asi que se
@@ -207,6 +266,12 @@ async function traer(ids) {
  * Devuelve `{ ok: true, porModulo }` con las preguntas que llegaron, o
  * `{ ok: false, explicacion }` con la frase que va a leer el estudiante.
  *
+ * `pedir` es de donde se traen las preguntas —la capa o la copia—, y entra por
+ * parametro por el mismo motivo por el que el azar entra por parametro en el
+ * algoritmo: asi esta funcion no tiene que saber cual de los dos bancos le toco, y
+ * quien la llama no puede equivocarse a medias. Ver la regla del mismo banco en la
+ * cabecera del archivo.
+ *
  * POR QUE LAS RESERVAS SE PIDEN POR MODULO Y NO EN MONTON
  *
  * Porque lo que hay que reponer es la CUOTA de cada modulo, no el total. Reponer
@@ -214,7 +279,7 @@ async function traer(ids) {
  * parejo es parte de lo que el intento promete. Los ids de todas las reservas de una
  * ronda si viajan juntos: son una sola peticion.
  */
-async function armarElIntento(idsPorModulo) {
+async function armarElIntento(idsPorModulo, pedir) {
   const eleccion = elegirIntento({ idsPorModulo });
 
   // Los dos motivos se separan porque al estudiante le dicen cosas distintas: uno es
@@ -238,7 +303,15 @@ async function armarElIntento(idsPorModulo) {
     };
   }
 
-  const traidas = await traer(eleccion.ids);
+  const traidas = await traer(eleccion.ids, pedir);
+
+  // Se corta AQUI y no al final. Seguir seria gastar las tres rondas de reserva
+  // —tres viajes mas, con el estudiante mirando la transicion— reponiendo sobre
+  // ids que ya se sabe que salieron del banco equivocado, para tirar el resultado
+  // igual. Provocado el 2026-09-17: cortando al final, las tres rondas se gastaban
+  // enteras antes de rehacer el intento.
+  if (seMezclaronLosBancos()) return HAY_MEZCLA;
+
   if (!traidas) {
     return {
       ok: false,
@@ -268,7 +341,13 @@ async function armarElIntento(idsPorModulo) {
 
     if (repuestos.length === 0) break;
 
-    const masTraidas = await traer(repuestos.map((r) => r.id));
+    const masTraidas = await traer(repuestos.map((r) => r.id), pedir);
+
+    // Una ronda de reserva que cae a la copia mezcla igual que la primera peticion:
+    // las 111 que ya llegaron son de D1 y estas nueve serian de la copia. Misma
+    // regla, mismo corte.
+    if (seMezclaronLosBancos()) return HAY_MEZCLA;
+
     if (!masTraidas) break;
 
     for (const { id, modulo } of repuestos) {
@@ -289,6 +368,44 @@ async function armarElIntento(idsPorModulo) {
 }
 
 /**
+ * Un intento completo pedido a UN solo banco: su resumen y sus preguntas.
+ *
+ * Deja anotado en `origen` de donde salio cada mitad, que es lo que despues mira la
+ * regla del mismo banco y lo que enciende el aviso de ADR-008.
+ *
+ * SI EL RESUMEN YA VINO DE LA COPIA, LAS PREGUNTAS NO SE LE PIDEN A LA CAPA.
+ *
+ * Es la misma regla mirada desde el otro lado, y ahorra ademas un viaje: la capa
+ * acaba de no contestar el resumen, asi que pedirle las preguntas es gastar la
+ * espera del estudiante en un servicio que ya se sabe caido —y, si contestara,
+ * seria justo la mezcla al reves: ids elegidos sobre la copia pedidos a D1—.
+ */
+async function unIntentoDe(fuente) {
+  origen.resumen = null;
+  origen.preguntas = null;
+
+  const resumen = await fuente.resumen();
+  origen.resumen = resumen.meta?.respaldo ?? null;
+
+  if (!resumen.ok) {
+    return {
+      ok: false,
+      explicacion:
+        'No se pudo consultar el banco de preguntas. Revisa tu conexión y vuelve a intentarlo.',
+    };
+  }
+
+  const pedir = origen.resumen ? DESDE_LA_COPIA.preguntas : fuente.preguntas;
+
+  return armarElIntento(
+    Object.fromEntries(
+      (resumen.datos ?? []).map((fila) => [fila.modulo, fila.preguntas_ids ?? []])
+    ),
+    pedir
+  );
+}
+
+/**
  * Lo que pasa al pulsar «Comenzar el simulacro».
  *
  * Se exporta para que `scripts/probar-filtrado.mjs` pueda provocarlo sin fingir un
@@ -300,13 +417,20 @@ async function armarElIntento(idsPorModulo) {
  *   1. se toma el numero de peticion y se abre el registro, en un solo acto;
  *   2. se dibuja la transicion;
  *   3. se pide;
- *   4. **antes de dibujar**, se comprueba que esta sigue siendo la ultima peticion;
- *   5. se espera el piso de 400 ms;
- *   6. se vuelve a comprobar, porque durante el piso pudo pulsarse otra vez;
- *   7. se cierra y se dibuja.
+ *   4. si las dos mitades no salieron del mismo banco, se vuelve a pedir entero a
+ *      la copia (la regla del mismo banco, en la cabecera del archivo);
+ *   5. **antes de dibujar**, se comprueba que esta sigue siendo la ultima peticion;
+ *   6. se espera el piso de 400 ms;
+ *   7. se vuelve a comprobar, porque durante el piso pudo pulsarse otra vez;
+ *   8. se cierra y se dibuja.
  *
- * Los pasos 4 y 6 son H-1 entero: sin ellos, una respuesta lenta apagaria la
+ * Los pasos 5 y 7 son H-1 entero: sin ellos, una respuesta lenta apagaria la
  * transicion de una carga posterior y dibujaria encima de ella.
+ *
+ * EL PASO 4 VA DENTRO DE LA MISMA TRANSICION, y no es un detalle: es la segunda
+ * mitad de la misma carga, no una carga nueva. `abrir()` se sigue llamando UNA vez,
+ * el piso de 400 ms se sigue midiendo desde el clic una sola vez, y el estudiante
+ * ve una transicion y no dos encadenadas.
  */
 export async function comenzarElIntento() {
   // Pulsar durante la carga no hace nada. `disabled` ya lo impide en el navegador;
@@ -317,21 +441,24 @@ export async function comenzarElIntento() {
   const miPeticion = transicion.abrir('el intento');
   transicion.dibujar('');
 
-  const resumen = await leerResumen();
-  origen.resumen = resumen.meta?.respaldo ?? null;
-  origen.preguntas = null;
+  // Primera pasada, contra la capa de datos.
+  let resultado = await unIntentoDe(DESDE_LA_CAPA);
 
-  const resultado = resumen.ok
-    ? await armarElIntento(
-        Object.fromEntries(
-          (resumen.datos ?? []).map((fila) => [fila.modulo, fila.preguntas_ids ?? []])
-        )
-      )
-    : {
-        ok: false,
-        explicacion:
-          'No se pudo consultar el banco de preguntas. Revisa tu conexión y vuelve a intentarlo.',
-      };
+  // LA REGLA DEL MISMO BANCO.
+  //
+  // `armarElIntento()` corto al ver que las preguntas venian de la copia y el
+  // resumen no: los ids se eligieron sobre D1 y se pidieron a la instantanea. Da
+  // igual en que momento se detecto —en la primera peticion o en una ronda de
+  // reserva a mitad de camino—: la marca es la misma y se atiende igual.
+  //
+  // Lo que se hace NO es completar lo que falta: es **volver a elegir el intento
+  // entero** desde la copia. Completar dejaria dentro las preguntas que ya habian
+  // llegado de D1, y un intento con dos bancos adentro es exactamente lo que esto
+  // existe para impedir. Elegir de nuevo cuesta una eleccion mas —trabajo de
+  // milisegundos, sin red— y devuelve un intento entero de un solo origen.
+  if (resultado.mezcla) {
+    resultado = await unIntentoDe(DESDE_LA_COPIA);
+  }
 
   if (!transicion.esLaUltima(miPeticion)) {
     transicion.cerrar(miPeticion);

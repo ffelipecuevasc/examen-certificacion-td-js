@@ -286,4 +286,106 @@ grupo se vuelve inerte solo. Las citas `m0X#N` remiten a `_planmaestro/00_produc
 
 ## Notas de la iteración
 
-_Pendiente._
+### Lista de verificación de navegador · etapa B
+
+*Actualizada el 2026-09-17 con la corrección de H-024. Se escribe acá —y no solo en la conversación—
+porque la pasada anterior tuvo que reconstruirse de memoria para poder corregir un paso.*
+
+**Antes de empezar:** `npm run datos:dev` levantado en otra terminal, DevTools abierto en la pestaña
+**Red** con «Conservar registro» marcado, y la **Consola** a la vista.
+
+1. **Abrir `http://127.0.0.1:8788/simulacro.html`.** El encabezado, el pie y el favicon se ven
+   iguales que en `index.html` y `cuestionario.html`. El fondo es `ink`.
+2. **Sin tocar nada, mirar la pestaña Red.** No sale **ninguna** petición a `/api/`. La presentación
+   se lee entera: la píldora «120 preguntas · 30 segundos cada una», las nueve tarjetas de reglas, y
+   los dos botones del final.
+3. **Pulsar «Comenzar el simulacro».** Aparece la transición de carga: el logotipo, «Preparando tu
+   simulacro…» y el hueco del texto lento. El botón queda deshabilitado mientras dura.
+4. **En Red salen exactamente dos peticiones:** `/api/preguntas?resumen=1` y
+   `/api/preguntas?ids=…`. La segunda lleva 120 ids separados por coma, sin ninguno repetido.
+5. **Al terminar aparece «Intento listo»** con los siete módulos y sus cifras. Suman **120**: 17 en
+   seis módulos y 18 en uno. El foco queda en el recuadro, no en el `body` —pulsar Tab sigue dentro
+   de la página, no vuelve a la barra de navegación—.
+6. **«Intento listo» no dibuja texto del banco.** Ni un enunciado, ni una alternativa, ni el título
+   de un módulo: solo el número del módulo y su cuenta.
+7. **Cronometrar desde el clic.** Nunca por debajo de ~0,4 s. Repetir con la red limitada
+   (DevTools → Red → «Slow 4G»): la transición se siente igual que la del cuestionario, y pasados
+   ~2,5 s aparece el texto de que está tardando, sin mover el foco.
+8. **Pulsar «Comenzar» dos veces seguidas, rápido.** Sale **una sola** tanda de peticiones y se ve
+   **una sola** transición: la segunda pulsación no hace nada.
+9. **Bloquear solo `*ids=*` y recargar.** En Red → clic derecho sobre la petición de ids →
+   «Bloquear URL de la solicitud», con el patrón `*ids=*`; `*resumen=1*` **se deja pasar**. Al
+   pulsar «Comenzar» tiene que verse:
+   - el `?resumen=1` en **200**, servido por D1;
+   - **una sola** petición a `?ids=` y fallida (bloqueada). **No cuatro**: antes de la corrección de
+     H-024 salían cuatro, porque se gastaban las tres rondas de reserva sobre ids del banco
+     equivocado;
+   - arriba, el aviso amarillo de ADR-008: «Estás viendo una copia guardada del banco de
+     preguntas… el simulacro se cargó desde la copia incluida en el sitio…», con su fecha;
+   - debajo, **«Intento listo» con 120 preguntas**, repartidas 17 en seis módulos y 18 en uno;
+   - **no** aparece «No se pudo armar el simulacro»;
+   - la consola, limpia.
+
+   Es el intento reelegido entero sobre la instantánea: resumen y preguntas del mismo banco.
+10. **Bloquear todo `*/api/*` y recargar.** Mismo resultado —aviso de ADR-008 y 120 preguntas—, y
+    en Red **ninguna** petición a `?ids=`: con el resumen ya caído a la copia, las preguntas no se
+    le piden a un servicio que acaba de no contestar.
+11. **Quitar los bloqueos y recargar.** Al pulsar «Comenzar», el aviso amarillo **no** aparece: la
+    página que se recupera deja de decir que está caída.
+12. **La caída de verdad.** Detener `npm run datos:dev` (Ctrl+C) y pulsar «Comenzar»: modo
+    degradado, con su aviso y sus 120. Volver a levantarlo, recargar y reintentar: vuelve a salir
+    de D1.
+13. **Movimiento reducido.** Con el sistema en «reducir movimiento» (o DevTools →
+    *Rendering* → `prefers-reduced-motion: reduce`), la transición sigue diciendo que está cargando
+    y conserva el logotipo, pero sin latido.
+14. **En el teléfono**, o en la vista responsive: la presentación se lee sin desbordes, el botón se
+    alcanza con el pulgar, y «Intento listo» no desborda a lo ancho.
+15. **Toda la pasada, sin errores de consola**, y `npm run verificar` termina en 0.
+
+
+### 2026-09-17 · H-024: un intento no mezcla bancos
+
+Corrección sobre la etapa B ya commiteada, pedida por el autor tras leer el paso 9 de la lista de
+navegador.
+
+**El agujero.** `?resumen=1` y `?ids=` caen al respaldo **cada una por su cuenta** (ADR-008, y para
+el cuestionario está bien: una petición, una pantalla). Aquí son dos peticiones **atadas**: de la
+primera salen los ids y la segunda los va a buscar. Si el resumen contesta desde D1 y las preguntas
+caen a la copia, los ids se eligieron sobre un banco y se piden a otro. Hoy los dos bancos coinciden
+y no se nota.
+
+**Provocado, sin tocar el código.** Se le agregaron al resumen de D1 **60 ids del módulo 5 que la
+instantánea no tiene** —lo que verá el navegador el día que el banco crezca y la copia se quede
+atrás— y se tumbó `?ids=`. Resultado: el intento gastó **sus tres rondas de reserva** sobre ids del
+banco equivocado y terminó en «No se pudo armar el simulacro» con **118 de 120**. Por el camino de
+las reservas —primera tanda desde D1, ronda de reserva caída a la copia— el resultado fue el mismo,
+y en otras corridas algo peor: el intento **sí se armaba**, con dos bancos adentro y sin que nada lo
+dijera.
+
+**La corrección.** Una sola regla: **si alguna mitad sale de la copia, el intento entero se vuelve a
+elegir desde la copia.** Vale igual para la primera petición y para una ronda de reserva que caiga a
+mitad de camino, y se corta apenas se detecta en vez de gastar las rondas sobre ids que ya se sabe
+que salieron del banco equivocado. Su reverso también: si el resumen ya vino de la copia, las
+preguntas se le piden a la copia y no a un servicio que acaba de no contestar.
+
+Lo que **no** cambió: el algoritmo sigue siendo una sola función que no sabe de dónde vienen los
+ids (`elegirIntento()` se sigue llamando una vez), la transición sigue siendo una sola medida desde
+el clic, y el aviso de ADR-008 sigue a la vista.
+
+**Dónde vive.** `static/js/servicios/datos.js` gana dos lecturas que no pasan por la capa
+—`leerResumenDelRespaldo()` y `leerPreguntasPorIdsDelRespaldo()`—, y `static/js/components/simulacro.js`
+la regla, en `unIntentoDe()` y en `comenzarElIntento()`.
+
+**Lo que lo vigila.** `scripts/probar-filtrado.mjs`, sección **10k**, en tres casos: el resumen de D1
+con el extremo caído, la caída a mitad de las reservas, y que elegir sobre la copia dé un intento
+legítimo —120 preguntas que la copia tiene, con el reparto y sin dos hermanas juntas—. La señal que
+da el rojo es **cuántas rondas de reserva se gastan**: si el intento se reeligió sobre los ids de la
+copia, todo lo que se pide existe en la copia y no hace falta reponer ni una vez. Con la corrección
+revertida, los tres casos dan rojo.
+
+De paso, **10h** pasa a contar a qué se sale en modo degradado: sin esa comprobación, quitar el
+reverso de la regla dejaba todo en verde.
+
+**Inerte que queda abierto.** `RONDAS_DE_RESERVA` puede bajar de 3 a 1 sin que ninguna comprobación
+se entere. Anotado en `_planmaestro/00_producto/registro_log.md`, «Sin asignar»: es del caso 10d de
+la etapa B, no de esta corrección.

@@ -153,20 +153,71 @@ export async function leerPreguntas(modulo) {
  * fallo del SERVICIO cambia al respaldo, y cuando lo hace se dice.
  */
 export async function leerPreguntasPorIds(ids) {
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return {
-      ok: false,
-      codigo: 'PETICION_INVALIDA',
-      mensaje: 'No se pidio ninguna pregunta.',
-      usar_respaldo: false,
-    };
-  }
+  if (!Array.isArray(ids) || ids.length === 0) return NO_SE_PIDIO_NADA;
 
   const respuesta = await consultar(`/api/preguntas?ids=${ids.join(',')}`);
 
   if (respuesta.ok || !respuesta.usar_respaldo) return respuesta;
 
   return (await leerIdsDeLaInstantanea(ids)) ?? respuesta;
+}
+
+/**
+ * Pedir nada no es un fallo de la capa: es un error del sitio.
+ *
+ * Por eso viaja con `usar_respaldo` en false. Taparlo con el respaldo es
+ * exactamente lo que advierte la cabecera de `functions/api/_comun.js`.
+ */
+const NO_SE_PIDIO_NADA = {
+  ok: false,
+  codigo: 'PETICION_INVALIDA',
+  mensaje: 'No se pidio ninguna pregunta.',
+  usar_respaldo: false,
+};
+
+/** Ni la copia esta disponible. No hay de donde sacar nada. */
+const NI_LA_COPIA = {
+  ok: false,
+  codigo: 'SIN_RESPALDO',
+  mensaje: 'No se pudo cargar la copia versionada del banco.',
+  usar_respaldo: false,
+};
+
+/**
+ * LAS DOS LECTURAS DE ARRIBA, PERO SIN PASAR POR LA CAPA DE DATOS.
+ *
+ * POR QUE EXISTEN (iteracion 41, etapa B, correccion del 2026-09-17)
+ *
+ * `leerResumen()` y `leerPreguntasPorIds()` caen SOLAS al respaldo, y cada una por
+ * su cuenta. Eso, que para el cuestionario esta bien —una peticion, un origen—,
+ * para el simulacro abre un caso que no se puede permitir: el resumen contesta
+ * desde D1 y la peticion de preguntas cae a la copia. Los ids se eligieron entonces
+ * sobre el banco de D1 y se piden a un banco distinto, y el dia que los dos no
+ * coincidan —D1 con preguntas que la copia no tiene, o al reves— los elegidos, y
+ * tambien los sobrantes de donde salen las reservas, apuntan a preguntas que la
+ * copia no trae. Provocado el 2026-09-17: con 60 ids en el resumen que la copia no
+ * tenia, el intento gasto sus tres rondas de reserva y termino en «No se pudo armar
+ * el simulacro» con 119 preguntas, justo cuando el respaldo tenia que salvarlo.
+ *
+ * Con estas dos, quien necesite que las dos mitades salgan del MISMO banco puede
+ * pedirle el intento entero a la copia, sin salir a la red a buscar un servicio que
+ * acaba de no contestar. Devuelven la misma forma que las de arriba, con
+ * `meta.respaldo` puesto: el aviso de ADR-008 se enciende igual, porque un respaldo
+ * servido en silencio sigue estando prohibido.
+ *
+ * **No eligen nada.** Siguen siendo lectura pura: quien elige es
+ * `servicios/eleccion-del-intento.js`, y este archivo no lo importa ni lo va a
+ * importar.
+ */
+export async function leerResumenDelRespaldo(modulo) {
+  return (await resumirLaInstantanea(modulo)) ?? NI_LA_COPIA;
+}
+
+/** El otro lado de lo mismo: las preguntas de una lista de ids, solo de la copia. */
+export async function leerPreguntasPorIdsDelRespaldo(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return NO_SE_PIDIO_NADA;
+
+  return (await leerIdsDeLaInstantanea(ids)) ?? NI_LA_COPIA;
 }
 
 /**
