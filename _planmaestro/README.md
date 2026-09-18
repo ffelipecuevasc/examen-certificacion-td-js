@@ -12,12 +12,14 @@ decisiones vale tanto como el código que las implementa.
 | **Iteración** | Ninguna en curso                                                                                                                                   |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
 | **Estado**    | 🔵 En curso                                                                                                                                        |
-| **Siguiente** | **Iteración 45 · Dirección visual del simulacro.** La **iteración 41 cerró el 2026-09-18** en sus tres etapas, y con ella `simulacro.html` existe, elige y guarda un intento de 120 preguntas. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**, con la 45 adelantada para fijar la dirección visual antes de construir el cronómetro. Los números de las iteraciones no cambian. |
+| **Siguiente** | **Iteración 42 · Cronómetros.** La **41 y la 45 cerraron el 2026-09-18**: `simulacro.html` existe, elige y guarda un intento de 120 preguntas, y la dirección visual ya está fijada con el marcado estático del intento y del resumen construido. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**. Los números de las iteraciones no cambian. |
 
-> **Antes de abrir la iteración 45.** La 41 dejó `simulacro.html` en pie pero **sin recorrido, sin cronómetros, sin
-> resumen y sin enlazar desde ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es
-> la presentación, el botón «Comenzar el simulacro», la carga bajo una sola transición y el aviso «Intento listo», que
-> sobrevive a una recarga.
+> **Antes de abrir la iteración 42.** El simulacro sigue **sin recorrido, sin cronómetros que cuenten, sin resumen
+> calculado y sin enlazar desde ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es
+> la presentación, el botón «Comenzar el simulacro», la carga bajo una sola transición, el aviso «Intento listo» que
+> sobrevive a una recarga, y el **marcado estático** del intento y del resumen que dejó la 45, que se mira con
+> `simulacro.html?maqueta=intento` y `?maqueta=resumen`. La 42 escribe dentro de los huecos que ese marcado ya tiene
+> marcados con `data-papel`; no tiene que dibujar la franja de nuevo.
 >
 > **La 41 dejó escrita ADR-035**, que reúne todo lo que el simulacro decidió: el navegador elige y el extremo solo
 > sirve, la forma del extremo por ids con el límite de 100 parámetros ligados de D1, por qué ese extremo no se puede
@@ -52,6 +54,7 @@ decisiones vale tanto como el código que las implementa.
 | 34 - Justificación y repaso            | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
 | 35 - Transición de carga               | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
 | 41 - Presentación, selección y protec. | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
+| 45 - Dirección visual del simulacro    | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

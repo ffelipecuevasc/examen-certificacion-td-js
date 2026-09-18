@@ -1,6 +1,6 @@
 # Épica 40 · Simulacro de examen
 
-**Estado:** 🔵 En curso · **iteración 41 cerrada el 2026-09-18**; lo siguiente en el orden de trabajo es la **45**
+**Estado:** 🔵 En curso · **iteraciones 41 y 45 cerradas el 2026-09-18**; lo siguiente en el orden de trabajo es la **42**
 **Depende de:** épica 20 (banco en D1) y épica 30 cerrada (capa de datos con modo degradado, escapado, justificación
 dibujada, transición de carga, memoria en el navegador y guiones de prueba con intercepción).
 
@@ -9,6 +9,11 @@ La entrega más grande del proyecto.
 ## Historial de este archivo
 
 - **2026-09-16 · primera reescritura**, tras cerrar la épica 30.
+- **2026-09-18 · cerrada la iteración 45**, la dirección visual. Se eligió el tratamiento «Sala de examen» entre tres, se
+  escribió la guía visual del simulacro, se construyó el marcado estático del intento y del resumen con el peor caso del
+  banco, y entró `scripts/probar-identidad-visual.mjs` como **octavo comprobador** de `npm run verificar`: hasta ese día
+  ninguna comprobación miraba el contraste ni que una clase `i-*` existiera en `icons.css`. El autor pidió tres
+  correcciones tras su pasada de navegador y quedaron aplicadas.
 - **2026-09-18 · cerrada la iteración 41**, en sus tres etapas. Durante ella se escribió **ADR-035**, se corrigió la
   decisión 3 de la 41 —el orden de las preguntas del intento lo fija el algoritmo, no quien las dibuja— y se cazó
   **H-024**: un intento podía elegir sobre D1 y pedir a la instantánea.
@@ -30,8 +35,9 @@ iteración 43 y los cronómetros la 42—, no hay resumen de resultados —la 44
 ninguna parte**: los enlaces desde los menús, el pie y la portada se agregan en la **iteración 44**, a propósito, para
 no llevar a nadie a una pantalla donde después de «Comenzar» no hay nada que hacer.
 
-**Lo siguiente en el orden de trabajo es la iteración 45**, que fija la dirección visual antes de construir el
-cronómetro.
+**Lo siguiente en el orden de trabajo es la iteración 42**, los cronómetros. La **45 cerró el 2026-09-18** y dejó la
+dirección visual fijada y el marcado estático construido: la 42 conecta el cronómetro de 30 segundos dentro de la franja
+que la 45 dibujó, escribiendo en los huecos que ya tienen su `data-papel`.
 
 ## Problema
 
@@ -136,8 +142,8 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 | # | Iteración | Estado |
 |---|---|---|
 | 41 | Presentación, selección y protección del intento | 🟢 Cerrada el 2026-09-18 · en tres etapas |
-| 45 | Dirección visual del simulacro | ⚪ No iniciada · **es la siguiente** |
-| 42 | Cronómetros | ⚪ No iniciada |
+| 45 | Dirección visual del simulacro | 🟢 Cerrada el 2026-09-18 |
+| 42 | Cronómetros | ⚪ No iniciada · **es la siguiente** |
 | 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada |
 | 44 | Resumen de resultados | ⚪ No iniciada |
 

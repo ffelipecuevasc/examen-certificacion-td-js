@@ -1,7 +1,7 @@
 # Iteración 45 · Dirección visual del simulacro
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · decisiones cerradas el 2026-09-18; dirección elegida, guía visual escrita y marcado construido
+**Estado:** 🟢 **Cerrada el 2026-09-18**
 **Depende de:** iteración 41, cerrada el 2026-09-18.
 **Orden de trabajo:** después de la 41 y antes de la 42. El número no cambia.
 
@@ -21,6 +21,11 @@ cronómetros dentro, y la 44 hereda la disposición del resumen.
 ## Historial de este archivo
 
 - **2026-09-16 · reescrita dos veces**, la segunda con el inventario de colores y los contrastes medidos.
+- **2026-09-18 · cerrada.** Se eligió «Sala de examen» entre tres tratamientos, se escribió la guía visual, se construyó
+  el marcado estático del intento y del resumen, y entró `scripts/probar-identidad-visual.mjs` como octavo comprobador de
+  `npm run verificar`. El autor hizo su pasada de navegador, pidió tres correcciones —«Siguiente» amarillo, la tarjeta del
+  resultado rellena de color, y la advertencia repetida fuera de las pantallas—, las repasó y quedaron confirmadas. El
+  criterio del presupuesto vertical se aflojó por decisión del autor, con el desplazamiento medido en su lugar.
 - **2026-09-18 · lectura de alcance y decisiones.** La lectura midió el presupuesto vertical en 375 px, el peor caso del
   banco y el alto real del panel del cuestionario, y encontró que tres guiones leen el diseño con expresiones regulares
   atadas a clases. El autor cerró las seis decisiones. Se corrigió una afirmación falsa del archivo: **el error individual
@@ -148,6 +153,14 @@ que esta iteración agregó a la presentación.
 
 `scripts/probar-identidad-visual.mjs` vigila las dos mitades: que ninguna de las cinco formas vuelva al cuerpo de las
 tres páginas, a los once componentes ni a las nueve pantallas dibujadas, **y que las tres sigan teniéndola en el pie**.
+
+**Confirmado por el autor el 2026-09-18.** Las dos frases de arriba —la de `components/modules.js:107` y su hermana sobre
+el origen de los 120 minutos en la presentación del simulacro— **se quedan tal como están**, por decisión de Felipe
+Cuevas. Hasta esa confirmación esto constaba como un juicio de Claude Code pendiente de revisión: el argumento técnico
+estaba escrito, pero la decisión de mantenerlas no se había tomado. Ahora sí, y el autor la hace suya con el mismo
+razonamiento: son la fuente de un dato sobre el examen real, no una advertencia repetida sobre el sitio, y sacarlas
+dejaría esos datos sin origen declarado, contra lo que exigen las iteraciones 36, 43 y 45. El argumento no cambia; lo que
+cambia es de quién es la decisión.
 
 ---
 
@@ -370,67 +383,125 @@ La alternativa con el token de 40 caracteres sin espacios mide **309 px** a 16 p
 
 ## Tareas
 
-- [ ] **Antes de rediseñar nada:** desacoplar de las clases las comprobaciones que leen el marcado con expresiones
+- [x] **Antes de rediseñar nada:** desacoplar de las clases las comprobaciones que leen el marcado con expresiones
   regulares (`probar-memoria.mjs:774-775`, `probar-filtrado.mjs:2637, 2811, 2897, 3120`) y la constante de 668 caracteres
-  del aviso de respaldo (`probar-filtrado.mjs:3030-3041`). Regla: **una prueba no dicta cómo se ve algo.**
-- [ ] Proponer al autor dos o tres tratamientos visuales dentro de las decisiones 1 a 8, y anotar el elegido, justificado.
-- [ ] Escribir en este archivo la **guía visual del simulacro**: qué clases y tamaños usa cada elemento, qué significa cada
-  color en el intento y en el resumen, y qué borde usa cada superficie.
-- [ ] Agregar los cuatro íconos que faltan, con su atribución en la deuda ya registrada.
-- [ ] Construir el **marcado estático** de la pantalla del intento —franja, cronómetro, transcurrido, avance, número de
+  del aviso de respaldo (`probar-filtrado.mjs:3030-3041`). Regla: **una prueba no dicta cómo se ve algo.** — *Claude
+  Code.* Siete comprobaciones desacopladas con `data-papel` y `data-cuenta-del-modulo`; la constante se sustituyó por la
+  comparación en vivo entre las dos páginas.
+- [x] Proponer al autor dos o tres tratamientos visuales dentro de las decisiones 1 a 8, y anotar el elegido, justificado.
+  — *Claude Code.* Tres tratamientos con su cálculo de alto a 375 px; el autor eligió «Sala de examen».
+- [x] Escribir en este archivo la **guía visual del simulacro**: qué clases y tamaños usa cada elemento, qué significa cada
+  color en el intento y en el resumen, y qué borde usa cada superficie. — *Claude Code.* Sección «Guía visual del
+  simulacro».
+- [x] Agregar los cuatro íconos que faltan, con su atribución en la deuda ya registrada. — *Claude Code.* `i-clock`,
+  `i-clock-total`, `i-next` e `i-skip`; la deuda de `acerca-de.html` sigue en tres atribuciones y no en cuatro.
+- [x] Construir el **marcado estático** de la pantalla del intento —franja, cronómetro, transcurrido, avance, número de
   pregunta y total, enunciado, cuatro alternativas, avanzar y omitir, avisos compactos— con el **peor caso del banco**
-  como contenido de ejemplo.
-- [ ] Construir el **marcado estático del resumen**: resultado, desglose por módulo y revisión con sus tres estados
-  (correcta, respondida mal, omitida).
-- [ ] Aplicar la dirección a la presentación y a la transición de carga. **La transición es compartida con el
+  como contenido de ejemplo. — *Claude Code.* `static/js/components/simulacro-maqueta.js`.
+- [x] Construir el **marcado estático del resumen**: resultado, desglose por módulo y revisión con sus tres estados
+  (correcta, respondida mal, omitida). — *Claude Code.* Mismo archivo, con los dos estados de la tarjeta del resultado.
+- [x] Aplicar la dirección a la presentación y a la transición de carga. **La transición es compartida con el
   cuestionario**: si cambia su aspecto, se hace con un parámetro, y el cuestionario sigue dibujando exactamente lo mismo.
-- [ ] Corregir de paso el texto de la presentación que la 43 dejó pendiente, ya que ese bloque se reescribe: el párrafo de
-  entrada no afirma nada del examen real sin fuente, y el dato de los 120 minutos lleva su origen.
-- [ ] Declarar `break-words` o equivalente donde pueda caer un token largo sin espacios.
+  — *Claude Code.* `crearTransicionDeCarga({ borde })` con `BORDE_POR_OMISION = 'border-panel3'`.
+- [x] Corregir de paso el texto de la presentación que la 43 dejó pendiente, ya que ese bloque se reescribe: el párrafo de
+  entrada no afirma nada del examen real sin fuente, y el dato de los 120 minutos lleva su origen. — *Claude Code.* Los
+  dos pendientes de la 43, cerrados.
+- [x] Declarar `break-words` o equivalente donde pueda caer un token largo sin espacios. — *Claude Code.* En el enunciado,
+  en las alternativas y en las tres filas de la revisión.
 
 ## Criterios de aceptación
 
 ### Los provoca Claude Code
 
-- [ ] **La dirección visual elegida está justificada por escrito** en este archivo, con la guía visual completa.
-- [ ] **El fondo de la presentación, la transición, el intento y el resumen es `ink`.**
-- [ ] **El marcado dibujado no usa colores fuera de los trece tokens**, ni siquiera heredados de `.quiz-option`.
-- [ ] **`ruby` no aparece como color de texto de tamaño normal** en ninguna pantalla del simulacro.
-- [ ] **Durante el intento no aparecen `ruby` ni `esmeralda`**, y en el resumen no aparece el cronómetro: se comprueba
-  sobre el marcado de las dos pantallas.
-- [ ] **Todo texto alcanza 4,5:1 (o 3:1 si es grande) y todo borde o ícono significativo 3:1 sobre su fondo real**, con
-  tabla calculada y no escrita a mano.
-- [ ] **Todo significado expresado con color trae además texto o ícono**, incluidas las tres marcas del resumen.
-- [ ] **El cronómetro no declara ninguna animación** ni contiene `<animate>`, y con el movimiento reducido simulado la
-  pantalla del intento no declara movimiento; con el DOM normal, el control positivo que corresponda sí lo declara.
-- [ ] **La franja cabe en 72 px o menos** según las clases declaradas, y la maqueta del intento con el peor caso del banco
-  no supera el presupuesto de 603 px: se informa el cálculo elemento por elemento.
-- [ ] **El marcado estático del intento y del resumen existe** con las piezas que piden la 42, la 43 y la 44.
-- [ ] **El peor caso del banco es el contenido de ejemplo** de la maqueta: pregunta 94 o 254.
-- [ ] **Los contenedores del enunciado y de las alternativas declaran el corte de palabras largas.**
-- [ ] **El cuestionario dibuja exactamente lo mismo que antes** durante la carga y en su tarjeta de pregunta, comprobado
-  byte a byte.
-- [ ] **Toda clase `i-*` usada existe en `icons.css`**, comprobado por guion.
-- [ ] **Los guiones del sitio siguen en verde** tras desacoplarlos de las clases, y `instantanea-banco.js` sin cambios.
+Todos verificados por **Claude Code** en la pasada final del **2026-09-18**, con el servidor local levantado.
+
+- [x] **La dirección visual elegida está justificada por escrito** en este archivo, con la guía visual completa. —
+  Secciones «Dirección visual elegida · Sala de examen» y «Guía visual del simulacro».
+- [x] **El fondo de la presentación, la transición, el intento y el resumen es `ink`.** — `probar:identidad` resuelve el
+  fondo caminando el árbol: la raíz de las cuatro es `#000000`.
+- [x] **El marcado dibujado no usa colores fuera de los trece tokens**, ni siquiera heredados de `.quiz-option`. — 258
+  mediciones, todas resuelven a un token. Las alternativas del intento son propias (decisión 5).
+- [x] **`ruby` no aparece como color de texto de tamaño normal** en ninguna pantalla del simulacro. — Aparece como ícono,
+  como borde y como **fondo** de la tarjeta reprobada; nunca como texto bajo umbral.
+- [x] **Durante el intento no aparecen `ruby` ni `esmeralda`**, y en el resumen no aparece el cronómetro: se comprueba
+  sobre el marcado de las dos pantallas. — Comprobado sobre las tres variantes del intento: reposo, con alternativa
+  marcada y urgencia.
+- [x] **Todo texto alcanza 4,5:1 (o 3:1 si es grande) y todo borde o ícono significativo 3:1 sobre su fondo real**, con
+  tabla calculada y no escrita a mano. — **258 mediciones, 0 bajo su umbral**, 2 con la excepción declarada del aviso
+  compartido de ADR-008.
+- [x] **Todo significado expresado con color trae además texto o ícono**, incluidas las tres marcas del resumen. —
+  `ESTADOS_DE_LA_REVISION` es una tabla única: color, ícono y palabra, los tres siempre.
+- [x] **El cronómetro no declara ninguna animación** ni contiene `<animate>`, y con el movimiento reducido simulado la
+  pantalla del intento no declara movimiento; con el DOM normal, el control positivo que corresponda sí lo declara. —
+  Ninguna de las nueve pantallas trae `animate-*`; el control positivo declara `animate-latido`.
+- [x] **La franja cabe en 72 px o menos** según las clases declaradas, **y las cuatro alternativas y los dos botones se
+  alcanzan cómodamente aunque haya que desplazar**: se informa el cálculo elemento por elemento y cuánto se desplaza. —
+  Franja de **57 px** (`h-14` + `border-b`). Con el peor caso del banco la pantalla pide 750 px bajo la franja: **204 px
+  de desplazamiento en 375×667 y 59 px en 375×812**.
+
+  > *Criterio corregido el 2026-09-18 por decisión del autor.* Antes decía «y la maqueta del intento con el peor caso del
+  > banco no supera el presupuesto de 603 px». El autor lo aflojó al elegir el tratamiento: un tratamiento que cupiera
+  > entero obligaba a volver a la escala del cuestionario, y entonces no había dirección visual que fijar. Lo exigible
+  > pasa a ser que la franja quepa en 72 px y que las alternativas y los botones se alcancen cómodamente. El
+  > desplazamiento queda medido, no escondido.
+
+- [x] **El marcado estático del intento y del resumen existe** con las piezas que piden la 42, la 43 y la 44. —
+  `simulacro-maqueta.js`, con funciones que la 43 conecta pasándoles la pregunta de verdad.
+- [x] **El peor caso del banco es el contenido de ejemplo** de la maqueta: pregunta 94 o 254. — Pregunta 94, 384
+  caracteres, empatada con la 254. Un guion lo comprueba contra la instantánea.
+- [x] **Los contenedores del enunciado y de las alternativas declaran el corte de palabras largas.** — `break-words`,
+  comprobado por `data-papel`.
+- [x] **El cuestionario dibuja exactamente lo mismo que antes** durante la carga y en su tarjeta de pregunta, comprobado
+  byte a byte. — El cuestionario no le pide aspecto a la transición compartida y dibuja `border-panel3`; el simulacro pide
+  `border-muted/60`. Es la única diferencia entre las dos.
+- [x] **Toda clase `i-*` usada existe en `icons.css`**, comprobado por guion. — 38 usadas, 44 disponibles, ninguna
+  faltante.
+- [x] **Los guiones del sitio siguen en verde** tras desacoplarlos de las clases, y `instantanea-banco.js` sin cambios. —
+  `probar:identidad`, `probar:filtrado`, `probar:memoria` y `probar:escapado` en 0; `git diff --stat` vacío sobre
+  `instantanea-banco.js` y `d1/respaldo-banco.sql`.
 
 ### Los comprueba el autor en el navegador
 
-- [ ] **La página se reconoce como parte del sitio, pero se distingue del cuestionario al primer vistazo.**
-- [ ] **El cronómetro es lo primero que se ve** en la maqueta del intento, en teléfono y en computador.
-- [ ] **Las cuatro pantallas mantienen coherencia entre sí.**
-- [ ] **En 375 px la maqueta del intento es cómoda con el pulgar**, con «Siguiente» y «Omitir» alcanzables sin
-  confundirse, y la franja no tapa la pregunta al desplazar.
-- [ ] **La alternativa más larga con un token de 40 caracteres no desborda** a lo ancho en 375 px.
-- [ ] **En escala de grises** se distinguen aciertos, errores, omitidas y la urgencia del cronómetro.
-- [ ] **El panel del cuestionario a 1280 × 700:** se comprueba si alcanza hasta «Reiniciar el módulo», porque el cálculo
-  de la lectura de alcance dice que no y ADR-032 afirma dos veces que sí. El resultado se registra.
-- [ ] **Sin errores de consola.**
-- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
+Todos comprobados por **Felipe Cuevas el 2026-09-18**. La pasada salió **exitosa en los 12 puntos** de la lista, y tras
+las tres correcciones de ese mismo día repitió los puntos **A, B y C** de la lista de repetición, también sin hallazgos.
+
+- [x] **La página se reconoce como parte del sitio, pero se distingue del cuestionario al primer vistazo.** — *Felipe
+  Cuevas, 2026-09-18, punto 1.*
+- [x] **El cronómetro es lo primero que se ve** en la maqueta del intento, en teléfono y en computador. — *Felipe Cuevas,
+  2026-09-18, punto 2.*
+- [x] **Las cuatro pantallas mantienen coherencia entre sí.** — *Felipe Cuevas, 2026-09-18, punto 8.*
+- [x] **En 375 px la maqueta del intento es cómoda con el pulgar**, con «Siguiente» y «Omitir» alcanzables sin
+  confundirse, y la franja no tapa la pregunta al desplazar. — *Felipe Cuevas, 2026-09-18, puntos 3 y 4*, y repetido en el
+  **punto A** tras la corrección de los botones.
+- [x] **La alternativa más larga con un token de 40 caracteres no desborda** a lo ancho en 375 px. — *Felipe Cuevas,
+  2026-09-18, punto 5.*
+- [x] **En escala de grises** se distinguen aciertos, errores, omitidas y la urgencia del cronómetro. — *Felipe Cuevas,
+  2026-09-18, puntos 6 y 7.*
+- [x] **El panel del cuestionario a 1280 × 700:** se comprueba si alcanza hasta «Reiniciar el módulo», porque el cálculo
+  de la lectura de alcance dice que no y ADR-032 afirma dos veces que sí. El resultado se registra. — *Felipe Cuevas,
+  2026-09-18, punto 11.* **La medición se hizo; el resultado todavía no está escrito aquí**, y hasta que lo esté no se
+  puede decidir cuál de los dos tiene razón. Ver «Lo que queda abierto».
+- [x] **Sin errores de consola.** — *Felipe Cuevas, 2026-09-18, punto 10.*
+- [x] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado. — *Felipe Cuevas, 2026-09-18, punto 10*, y
+  confirmado por Claude Code en la pasada final con el CSS ya commiteado: **VERIFICADO, código 0**, las ocho
+  comprobaciones en OK.
 
 ## Lo que esta iteración no puede afirmar
 
 - **Que el cronómetro funcione:** aquí solo se dibuja. Lo conecta la 42.
 - **Que el significado declarado de cada color sea el que el estudiante entiende.** Eso lo juzga la pasada del autor.
+
+## Lo que queda abierto al cerrar
+
+- **El resultado de la medición del panel del cuestionario a 1280 × 700.** El autor la hizo el 2026-09-18 dentro de su
+  pasada, y la pasada salió exitosa; pero ese punto **no es de aprobar o fallar**, es una medición cuyo número decide si
+  ADR-032 dice algo falso o si el cálculo de la lectura de alcance está mal. Falta escribir aquí qué se vio. Según cómo
+  salga: si el botón «Reiniciar el módulo» **no** se alcanza, hay que abrir una ADR que corrija a ADR-032, que lo afirma
+  dos veces; si **sí** se alcanza, hay que decir por qué el cálculo —1.340 a 1.366 px de alto natural sobre 636
+  disponibles— se equivocó. Anotado en `registro_log.md`.
+- **El borde `muted/60` en el resto del sitio.** Esta iteración lo fijó y lo aplicó a todas las superficies del simulacro;
+  el panel del cuestionario, la portada y las tres copias del encabezado y del pie siguen en `border-panel3`. La fila de
+  `registro_log.md` queda abierta con el valor ya decidido: quien haga esa pasada no elige borde, solo lo aplica.
 
 ## Lo que hay que repetir en el navegador tras las correcciones del 2026-09-18
 
@@ -585,6 +656,31 @@ normal.
 - **Qué cuenta como falla:** cualquier diferencia respecto de antes de esta iteración.
 
 ## Notas de la iteración
+
+- **Se eligió «Sala de examen» entre tres tratamientos, y lo que la eligió fue la escala.** Los otros dos fueron
+  «Continuidad» —la misma escala del cuestionario, que cabía entera sin desplazar y apenas se distinguía de la práctica— y
+  «Contrarreloj» —una cifra de 60 px en una franja de 120 px, que ganaba en dramatismo y se comía 120 px de un presupuesto
+  de 603—. La diferencia entre estudiar y rendir tiene que notarse antes de leer una palabra, y aquí la produce el salto
+  de 16 px a 20 px en negrita en el enunciado y de 14 px a 16 px en las alternativas, con la densidad acompañando. Costó
+  que el peor caso del banco no quepa: hay que desplazar 204 px en 375×667. El autor aflojó el criterio a sabiendas, y el
+  desplazamiento quedó medido.
+
+- **El desacople de las pruebas y las clases fue lo primero, y tenía que serlo.** Siete comprobaciones de
+  `probar-memoria.mjs` y `probar-filtrado.mjs` leían el marcado por sus clases de Tailwind —`text-jsyellow">`,
+  `font-display font-bold text-xl text-paper`— y una constante de 668 caracteres del aviso de respaldo lo fijaba entero,
+  clases incluidas. O sea que las pruebas eran las dueñas del aspecto: repintar daba siete rojos sin que nada se hubiera
+  roto, y la salida cómoda era editar la prueba hasta que pasara, que es como se aprende a no creerle. Ahora leen
+  `data-papel` y `data-cuenta-del-modulo`, y el aviso se compara **entre las dos páginas en vivo** en vez de contra un
+  literal. **La prueba del desacople es una mutación inerte:** repintar a la vez el título, la cuenta por módulo, el
+  recuadro del aviso y su ícono deja los tres guiones en verde, mientras que las siete mutaciones semánticas siguen dando
+  rojo cada una con su mensaje. Antes, ese mismo repintado daba siete rojos.
+
+- **El borde del simulacro es `muted/60`, y el resto del sitio no se alinea todavía.** Da 3,12:1 sobre `ink` y 3,12:1
+  sobre `panel`: es el único valor de la paleta cerrada que cruza el 3:1 de WCAG 1.4.11 en las dos superficies con un solo
+  token, contra los 1,31:1 y 1,18:1 de `border-panel3`. Se aplicó a **todas** las superficies del simulacro. El panel del
+  cuestionario, la portada y las tres copias del encabezado y del pie **se quedan como estaban**: cambiarlos habría
+  repintado la identidad visual de las tres páginas dentro de una iteración cuyo alcance es el simulacro. La fila de
+  `registro_log.md` queda abierta con el valor ya decidido, así que quien haga esa pasada no elige borde, solo lo aplica.
 
 - **La maqueta se mira con un parámetro, no con una cuarta página.** `?maqueta=intento` y `?maqueta=resumen`. Una página
   más habría duplicado por cuarta vez el encabezado y el pie —que `comprobar-copias.mjs` vigila justamente porque tres
