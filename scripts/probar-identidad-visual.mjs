@@ -395,6 +395,7 @@ const PANTALLAS = {
     marcada: 374,
   }),
   resumen: maqueta.dibujarPantallaDelResumen(),
+  'resumen reprobado': maqueta.dibujarPantallaDelResumen({ aprobado: false }),
 };
 
 // ---------------------------------------------------------------------------
@@ -968,7 +969,166 @@ if (!tarjeta || !enunciado || alternativas.length !== 4 || !numero || !lista || 
 }
 
 // ---------------------------------------------------------------------------
-// 15 · Veredicto
+// 15 · La franja en urgencia no se confunde con los botones
+// ---------------------------------------------------------------------------
+//
+// DESDE LA CORRECCION DEL 2026-09-18, «Siguiente» es amarillo como el boton principal
+// del resto del sitio, asi que **la franja en urgencia ya no es el unico amarillo de la
+// pantalla**. Lo que la distingue pasa a ser otra cosa, y conviene que sea otra cosa
+// comprobable y no una impresion: la franja **cambia su superficie entera** y **dice una
+// frase que ningun boton dice**, con una cifra grande al lado.
+//
+// Si alguien quitara el texto de urgencia, la franja quedaria siendo una barra amarilla
+// sin nada que la explique, al lado de un boton amarillo: exactamente la confusion que
+// el autor pidio comprobar que no ocurriera.
+
+const franjaUrgente = caminar(PANTALLAS['intento urgente']);
+
+const avisoDeUrgencia = franjaUrgente.find((el) => el.papel === 'aviso-de-urgencia');
+const cronometroUrgente = franjaUrgente.find((el) => el.papel === 'cronometro');
+const raizDeLaFranjaUrgente = franjaUrgente.find((el) => el.papel === 'franja-del-intento');
+
+if (!avisoDeUrgencia) {
+  problemas.push(
+    'la franja en urgencia no dice ninguna frase: con «Siguiente» tambien amarillo, el cambio ' +
+      'de superficie por si solo no la distingue de un boton'
+  );
+}
+
+if (!raizDeLaFranjaUrgente?.clases.includes('bg-jsyellow')) {
+  problemas.push('la franja en urgencia no cambia de superficie: la decision 3 pide que cambie');
+}
+
+const tamanoDelCronometro = TAMANOS[cronometroUrgente?.clases.find((c) => c in TAMANOS)] ?? 0;
+
+if (tamanoDelCronometro < 24) {
+  problemas.push(
+    `la cifra del cronometro mide ${tamanoDelCronometro} px en urgencia: por debajo de 24 px deja ` +
+      'de leerse como el elemento dominante de la franja'
+  );
+}
+
+// Y la franja se distingue del boton por su forma: ancho completo y fija. El boton no la
+// tiene, y si algun dia la tuviera, esto lo diria.
+const botonPrincipal = caminar(PANTALLAS.intento).find((el) => el.papel === 'siguiente');
+
+if (botonPrincipal?.clases.includes('fixed') || botonPrincipal?.clases.includes('inset-x-0')) {
+  problemas.push('«Siguiente» va fijo y de ancho completo, igual que la franja: se confunden');
+}
+
+notas.push(
+  `Franja en urgencia frente a los botones: la franja cambia a ` +
+    `«${raizDeLaFranjaUrgente?.clases.find((c) => c.startsWith('bg-'))}» de ancho completo y fija, ` +
+    `dice «${avisoDeUrgencia ? 'quedan N segundos' : '(nada)'}» y lleva la cifra a ` +
+    `${tamanoDelCronometro} px. «Siguiente» es un boton de 16 px en el flujo. Comparten el amarillo ` +
+    'y no la forma.'
+);
+
+// ---------------------------------------------------------------------------
+// 16 · La advertencia repetida no vuelve (decision del autor, 2026-09-18)
+// ---------------------------------------------------------------------------
+//
+// QUE SE QUITO, Y POR QUE. La advertencia de que el sitio no acredita estaba en el pie
+// de las tres paginas Y ADEMAS en el cuerpo del cuestionario, en el del simulacro y en
+// la tarjeta del resultado. Repetida, daba a entender que el sitio no sirve para
+// practicar: una lectora ajena al proyecto pregunto exactamente eso al ver los avisos.
+//
+// ESTO NO TOCA ADR-022. Esa ADR prohibe palabras que PROMETAN validez -«nota»,
+// «puntaje oficial», «calificacion»- y dice expresamente que el motivo de la restriccion
+// no se le advierte al estudiante en pantalla. Quitar la advertencia va en su direccion,
+// no contra ella.
+//
+// LO QUE NO SE TOCA, y es la distincion que esta comprobacion tiene que respetar: la
+// linea de components/modules.js que dice «Esto sale del testimonio de estudiantes que
+// rindieron el examen 2026. No es informacion oficial de Talento Digital para Chile».
+// **Eso no es una advertencia sobre el sitio: es la FUENTE de una afirmacion sobre el
+// examen real**, y las iteraciones 36, 43 y 45 exigen que toda afirmacion sobre el examen
+// real lleve su origen escrito al lado. Por eso los patrones de abajo van estrechos,
+// contra lo que el autor pidio quitar, y no contra cualquier frase que diga «oficial».
+
+const FRASES_RETIRADAS = [
+  { patron: /no acredita/i, que: 'no acredita nada ante Talento Digital' },
+  { patron: /material de (estudio|apoyo) no oficial/i, que: 'material de estudio o de apoyo no oficial' },
+  { patron: /sin validez de certificaci/i, que: 'sin validez de certificacion' },
+  { patron: /no vale como certificaci/i, que: 'no vale como certificacion' },
+  { patron: /no (te )?certifica\b/i, que: 'no te certifica' },
+];
+
+const sinComentariosHtml = (html) => html.replace(/<!--[\s\S]*?-->/g, '');
+const sinComentariosJs = (js) =>
+  js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+for (const nombre of ['index.html', 'cuestionario.html', 'simulacro.html']) {
+  const ruta = join(RAIZ, nombre);
+  if (!existsSync(ruta)) continue;
+
+  const html = sinComentariosHtml(readFileSync(ruta, 'utf8'));
+
+  const pie = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0] ?? '';
+  const cuerpo = html.replace(pie, '');
+
+  for (const { patron, que } of FRASES_RETIRADAS) {
+    if (patron.test(cuerpo)) {
+      problemas.push(
+        `${nombre} vuelve a decir «${que}» fuera del pie: esa advertencia se quito el 2026-09-18 ` +
+          'y queda solo ahi'
+      );
+    }
+  }
+
+  // Y la otra mitad: que no se haya ido tambien del pie. Una pagina sin advertencia en
+  // ninguna parte seria pasarse de largo en la direccion contraria.
+  if (!/material de (estudio|apoyo) no oficial/i.test(pie)) {
+    problemas.push(`${nombre} se quedo sin la advertencia en el pie, que es donde si va`);
+  }
+}
+
+// Los componentes dibujan texto que no esta en ningun HTML, asi que se miran aparte: su
+// fuente sin comentarios, y ademas lo que las pantallas dibujan de verdad.
+const COMPONENTES = [
+  'simulacro-maqueta.js',
+  'simulacro.js',
+  'cuestionario.js',
+  'modules.js',
+  'aviso-de-respaldo.js',
+  'aviso-de-guardado.js',
+  'transicion-de-carga.js',
+  'indice-modulos.js',
+  'estado-datos.js',
+  'roadmap.js',
+  'nav.js',
+];
+
+for (const nombre of COMPONENTES) {
+  const ruta = join(SITIO, 'components', nombre);
+  if (!existsSync(ruta)) continue;
+
+  const fuente = sinComentariosJs(readFileSync(ruta, 'utf8'));
+
+  for (const { patron, que } of FRASES_RETIRADAS) {
+    if (patron.test(fuente)) {
+      problemas.push(`components/${nombre} vuelve a dibujar «${que}», que se quito el 2026-09-18`);
+    }
+  }
+}
+
+for (const [nombre, html] of Object.entries(PANTALLAS)) {
+  for (const { patron, que } of FRASES_RETIRADAS) {
+    if (patron.test(html)) {
+      problemas.push(`la pantalla «${nombre}» dibuja «${que}», que se quito el 2026-09-18`);
+    }
+  }
+}
+
+notas.push(
+  `Advertencia repetida: ninguna de las ${FRASES_RETIRADAS.length} formas aparece en el cuerpo de ` +
+    `las tres paginas, ni en los ${COMPONENTES.length} componentes, ni en las ` +
+    `${Object.keys(PANTALLAS).length} pantallas dibujadas; y las tres siguen teniendola en el pie. ` +
+    'La linea de procedencia de components/modules.js no es una de ellas y sigue en su sitio.'
+);
+
+// ---------------------------------------------------------------------------
+// 17 · Veredicto
 // ---------------------------------------------------------------------------
 
 const anchoColumna = {

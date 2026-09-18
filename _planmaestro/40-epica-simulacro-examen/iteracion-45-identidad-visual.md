@@ -124,6 +124,33 @@ qué significa cada color en esas dos pantallas.
 para resolverlo. La guía visual decide qué borde usa cada superficie del simulacro y deja escrito si el resto del sitio
 se alinea después o se queda como está.
 
+### 9 · La advertencia de que el sitio no acredita va solo en el pie
+
+**Decisión del autor, 2026-09-18**, tomada *después* de su pasada de navegador, a diferencia de las ocho anteriores.
+
+La frase «Practicar acá no acredita nada ante Talento Digital para Chile» —y sus formas equivalentes— estaba en el pie de
+las tres páginas **y además** en el cuerpo del cuestionario, en el del simulacro y en la tarjeta del resultado. Repetida,
+daba a entender que el sitio no sirve para practicar: **una lectora ajena al proyecto preguntó exactamente eso** al ver
+los avisos.
+
+Queda **solo en el pie** de las tres páginas, y más adelante en `acerca-de.html`.
+
+**Esto no toca ADR-022.** Esa ADR prohíbe las palabras que *prometen* validez —«nota», «puntaje oficial»,
+«calificación»— y dice expresamente que el motivo de esa restricción **no se le advierte al estudiante en pantalla**.
+Quitar la advertencia va en la dirección de esa ADR, no contra ella. Las palabras prohibidas siguen sin aparecer.
+
+**Lo que no se tocó, y es la distinción que importa:** la línea de `components/modules.js` que dice «Esto sale del
+testimonio de estudiantes que rindieron el examen 2026. No es información oficial de Talento Digital para Chile». **Eso
+no es una advertencia sobre el sitio: es la fuente de una afirmación sobre el examen real**, y las iteraciones 36, 43 y
+45 exigen que toda afirmación sobre el examen real lleve su origen escrito al lado. Quitarla dejaría una afirmación sin
+fuente, que es justo lo que la 43 pidió arreglar. Por el mismo motivo se queda la línea de procedencia de los 120 minutos
+que esta iteración agregó a la presentación.
+
+`scripts/probar-identidad-visual.mjs` vigila las dos mitades: que ninguna de las cinco formas vuelva al cuerpo de las
+tres páginas, a los once componentes ni a las nueve pantallas dibujadas, **y que las tres sigan teniéndola en el pie**.
+
+---
+
 ## Dirección visual elegida · «Sala de examen»
 
 Elegida por el autor el 2026-09-18 entre tres tratamientos propuestos. Los otros dos fueron **«Continuidad»** —la misma
@@ -157,11 +184,22 @@ hay ni un número escrito a mano en esa comprobación.
 
 **En la pantalla del intento.** Solo tres colores portan significado; el resto es superficie y texto.
 
-| Color | Qué dice, y solo eso | Cómo se dice además sin color |
+| Color | Qué dice | Cómo se dice además sin color |
 |---|---|---|
-| `jsyellow` | **El tiempo.** La cifra del cronómetro, y la franja entera cuando quedan pocos segundos | La cifra baja; en urgencia aparece «quedan N segundos» |
-| `paper` | **Lo que tú controlas.** El borde de la alternativa marcada y el fondo de «Siguiente» | La alternativa marcada gana el ícono `i-check-circle` |
+| `jsyellow` | **El tiempo y la acción.** La cifra del cronómetro, la franja entera en urgencia, «Siguiente» y el borde e ícono de «Omitir» | La cifra baja; en urgencia aparece «quedan N segundos»; los botones dicen lo que hacen |
+| `paper` | **Lo que ya elegiste.** El borde de la alternativa marcada, y el texto de «Omitir» | La alternativa marcada gana el ícono `i-check-circle` |
 | `muted` | **Lo secundario.** Avance, tiempo transcurrido, número de pregunta y bordes en reposo | — |
+
+**`jsyellow` significa dos cosas en el intento, y es una decisión del autor del 2026-09-18, no un descuido.** La primera
+versión pintó «Siguiente» en `paper` justamente para que el amarillo significara solo el tiempo; al verlo en el navegador
+el autor decidió lo contrario, y el argumento es mejor: un botón principal que en esta página se pinta distinto que en las
+otras dos rompe la costumbre del sitio para resolver un problema que la franja ya resuelve sola.
+
+**La urgencia no se distingue por ser el único amarillo de la pantalla —no lo es—, sino por dos cosas que ningún botón
+tiene:** la franja **cambia su superficie entera** a `bg-jsyellow` de ancho completo y fija bajo el encabezado, y
+**aparece su texto**, «quedan N segundos», junto a una cifra de 36 px. Un botón de 16 px en el flujo del documento no se
+confunde con eso. Lo comprueba un guion: si alguien quitara el texto de urgencia o el cambio de superficie, o si la cifra
+bajara de 24 px, da rojo.
 
 `ruby` y `esmeralda` **no aparecen en el intento** (decisión 3). Comprobado por guion sobre las tres variantes de la
 pantalla —reposo, con alternativa marcada y urgencia—.
@@ -258,18 +296,41 @@ el dedo que acaba de tocarlo.
 
 | Elemento | `data-papel` | Clases | Tamaño |
 |---|---|---|---|
-| «Siguiente» | `siguiente` | `grow bg-paper text-ink font-display font-bold text-base px-6 py-4 rounded` con `icon i-next text-xl` | 16 px |
-| «Omitir» | `omitir` | `shrink-0 border border-muted/60 text-paper font-display font-bold text-base px-5 py-4 rounded` con `icon i-skip text-xl` | 16 px |
+| «Siguiente» | `siguiente` | `grow bg-jsyellow text-ink font-display font-bold text-base px-6 py-4 rounded hover:bg-jsyellowdim` con `icon i-next text-xl` | 16 px |
+| «Omitir» | `omitir` | `shrink-0 border border-jsyellow text-paper font-display font-bold text-base px-5 py-4 rounded hover:bg-panel2` con `icon i-skip text-xl text-jsyellow` | 16 px |
 
-**«Siguiente» es `paper` y no `jsyellow`**, contra la costumbre del sitio: en esta pantalla el amarillo ya significa el
-tiempo, y un botón amarillo junto a un cronómetro amarillo son dos cosas distintas del mismo color a veinte centímetros.
-Sobre `ink`, `paper` da 19,57:1 y se lee como el control principal sin pedirle prestado el significado a nadie.
+**«Siguiente» es amarillo, como el botón principal del resto del sitio** (corrección del autor, 2026-09-18). `ink` sobre
+`jsyellow` da 15,53:1. **«Omitir» conserva el fondo oscuro** y pasa su borde y su ícono a `jsyellow` —15,53:1 sobre
+`ink`—, con el texto en `paper` a 19,57:1: es el secundario de la pareja sin dejar de ser de la misma familia.
 
-**El resumen.** Resultado en `bg-panel border border-muted/60 rounded-xl p-6 text-center`, con la cifra en
-`font-display font-bold text-5xl text-esmeralda tabular-nums` (48 px) y la píldora `border border-esmeralda rounded-full`.
-Desglose con una fila por módulo, `border-b border-muted/60 py-3`, y las tres cifras en `font-mono text-sm text-paper`
-cada una con su ícono de color. Revisión con `bg-panel border-l-2` del color del estado, la palabra en
-`font-display font-bold text-sm text-paper` y el ícono en el color del estado.
+**La tarjeta del resultado va rellena de color** (corrección del autor, 2026-09-18). Era oscura como el resto y no
+llamaba la atención, que en la pantalla donde se entrega el resultado es lo contrario de lo que hace falta.
+
+| Elemento | `data-papel` | Clases | Tamaño |
+|---|---|---|---|
+| Tarjeta, aprobado | `resultado` | `bg-esmeralda rounded-xl p-6 text-center` | — |
+| Tarjeta, reprobado | `resultado` | `bg-ruby rounded-xl p-6 text-center` | — |
+| Rótulo | — | `font-display font-bold text-xl text-ink` | 20 px negrita |
+| Cifra | `cifra-del-resultado` | `font-display font-bold text-5xl text-ink tabular-nums` | 48 px |
+| «de 120» | — | `font-display font-bold text-xl text-ink` | 20 px negrita |
+| Veredicto | `veredicto` | `border border-ink rounded-full px-4 py-2`, texto `font-display font-bold text-xl text-ink`, ícono `text-xl text-ink` | 20 px negrita |
+| Explicación | `explicacion-del-resultado` | `mt-4 text-sm text-muted leading-relaxed`, **fuera de la tarjeta** | 14 px |
+
+**Por qué la explicación quedó fuera de la tarjeta, y es una restricción medida y no una preferencia.** `ink` sobre
+`esmeralda` da **8,28:1** y cumple a cualquier tamaño; `ink` sobre `ruby` da **4,41:1**, que cumple el 3:1 del texto
+grande y de lo no textual, pero **no el 4,5:1 del texto normal**. Dentro de la tarjeta, por lo tanto, no cabe ni un texto
+chico: el rótulo, la cifra, el «de 120» y el veredicto están todos a 20 px en negrita o más —el umbral de texto grande es
+18,66 px en negrita—, y así los dos estados cumplen. La frase explicativa es un párrafo y no podía subir a 20 px en
+negrita sin quedar ridícula, así que **se movió justo debajo de la tarjeta**, sobre `ink`, donde `muted` da 7,37:1. No se
+inventó ningún color ni se salió de los trece tokens: se movió el único elemento que no cabía.
+
+**La tarjeta perdió su borde**, y no es un olvido ni una excepción a la decisión 8: un borde existe para separar una
+superficie de lo que la rodea, y `esmeralda` sobre `ink` da 8,28:1 y `ruby` 4,41:1, los dos muy por encima del 3:1 de
+WCAG 1.4.11. La separación la hace el relleno.
+
+**El resto del resumen no cambió.** Desglose con una fila por módulo, `border-b border-muted/60 py-3`, y las tres cifras
+en `font-mono text-sm text-paper` cada una con su ícono de color. Revisión con `bg-panel border-l-2` del color del estado,
+la palabra en `font-display font-bold text-sm text-paper` y el ícono en el color del estado.
 
 ### Los cuatro íconos
 
@@ -371,6 +432,41 @@ La alternativa con el token de 40 caracteres sin espacios mide **309 px** a 16 p
 - **Que el cronómetro funcione:** aquí solo se dibuja. Lo conecta la 42.
 - **Que el significado declarado de cada color sea el que el estudiante entiende.** Eso lo juzga la pasada del autor.
 
+## Lo que hay que repetir en el navegador tras las correcciones del 2026-09-18
+
+La pasada del autor salió exitosa en los 12 puntos **antes** de las tres correcciones. Estos tres puntos cambiaron y hay
+que volver a mirarlos; los demás no se tocaron.
+
+### A · Los dos botones del intento
+
+- **Qué hacer:** abre `?maqueta=intento` y `?maqueta=intento&urgente=1` en 375 px, y alterna entre las dos.
+- **Qué deberías ver:** «Siguiente» amarillo relleno con el texto en negro, como el botón principal de la portada y del
+  cuestionario; «Omitir» oscuro con el borde y el ícono amarillos y el texto claro. Y la franja en urgencia, que también
+  es amarilla, se sigue leyendo como otra cosa: ocupa el ancho completo, va pegada al encabezado, lleva la cifra de 36 px
+  y dice «quedan 5 segundos».
+- **Qué cuenta como falla:** que a primera vista la franja en urgencia parezca un botón más, o que «Omitir» se lea como
+  el control principal en vez de «Siguiente».
+
+### B · La tarjeta del resultado, en sus dos estados
+
+- **Qué hacer:** abre `?maqueta=resumen` y `?maqueta=resumen&reprobado=1` en 375 px y en 1280 px.
+- **Qué deberías ver:** la tarjeta rellena de verde en el primero y de rojo en el segundo, con el rótulo, la cifra, el
+  «de 120» y el veredicto en negro dentro de ella, y la frase explicativa **debajo** de la tarjeta, en gris sobre el
+  fondo negro de la página. El resto del resumen igual que antes.
+- **Qué cuenta como falla:** que algún texto dentro de la tarjeta roja cueste leerse, que la explicación haya quedado
+  dentro de la tarjeta, o que la tarjeta no destaque sobre el resto de la pantalla.
+
+### C · Ninguna advertencia repetida quedó en pantalla
+
+- **Qué hacer:** recorre `index.html`, `cuestionario.html`, `simulacro.html` y las dos maquetas, mirando solo el cuerpo
+  de cada página.
+- **Qué deberías ver:** la advertencia de que el sitio no acredita **solo en el pie**, una vez por página. En el
+  cuestionario, el párrafo de entrada termina en «entiende el porqué». En el simulacro ya no hay descargo bajo el botón.
+  En el resumen, la explicación del resultado no la menciona.
+- **Qué cuenta como falla:** encontrarla dos veces en la misma página, o no encontrarla en el pie de alguna.
+
+---
+
 ## Lista de verificación en el navegador
 
 Con `npm run datos:dev` levantado, en `http://127.0.0.1:8788`. Las tres direcciones se escriben a mano: no hay enlace a
@@ -380,6 +476,7 @@ ninguna, igual que no lo hay a la página (los enlaces son de la iteración 44).
     simulacro.html?maqueta=intento&urgente=1
     simulacro.html?maqueta=intento&avisos=1
     simulacro.html?maqueta=resumen
+    simulacro.html?maqueta=resumen&reprobado=1
     simulacro.html?maqueta=resumen&avisos=1
 
 `avisos=1` enciende los dos avisos de la decisión 6. Van detrás de un parámetro porque son estados excepcionales:
@@ -531,6 +628,19 @@ normal.
 - **Los dos pendientes del texto de la presentación se cerraron**, y eran de la iteración 43: el párrafo de entrada ya no
   afirma nada del examen real —compara con el cuestionario de práctica, que es algo que este sitio sí sabe— y el dato de
   los 120 minutos lleva su origen escrito debajo, con la misma forma que el aviso de programación de la iteración 36.
+
+- **Tres correcciones del autor el 2026-09-18, después de su pasada de navegador**, que salió exitosa en los 12 puntos.
+  **Una:** «Siguiente» vuelve a ser amarillo como el botón principal del resto del sitio, y «Omitir» pasa su borde y su
+  ícono a `jsyellow`. Con eso `jsyellow` significa en el intento **el tiempo y la acción**, y la urgencia se distingue
+  porque cambia la superficie entera de la franja y aparece su texto, no por ser el único amarillo. **Dos:** la tarjeta
+  del resultado pasa a fondo `esmeralda` o `ruby`, con todo lo de dentro en `ink`. **Tres:** la advertencia repetida sale
+  de las pantallas y queda solo en el pie (decisión 9).
+
+- **La tarjeta de color obligó a mover un párrafo, y el número lo decidió.** `ink` sobre `ruby` da 4,41:1: cumple el 3:1
+  del texto grande y **no** el 4,5:1 del normal. Todo lo que quedó dentro de la tarjeta está a 20 px en negrita o más;
+  la frase explicativa, que es un párrafo y no podía subir de tamaño sin quedar ridícula, salió fuera de la tarjeta a
+  `muted` sobre `ink`, 7,37:1. Sin inventar colores y sin salir de los trece tokens. El guion lo caza: devolver el rótulo
+  a 12 px da `da 4.41:1 sobre #E0115F y necesita 4.5:1`.
 
 - **Lo que esta iteración no puede afirmar sigue siendo lo que decía:** que el cronómetro funcione —aquí solo se dibuja,
   lo conecta la 42— y que el significado declarado de cada color sea el que el estudiante entiende.

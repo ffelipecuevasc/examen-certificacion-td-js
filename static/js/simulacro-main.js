@@ -67,10 +67,17 @@ if (maqueta) {
     // fuera otra función se podrían despintar una de la otra sin que se notara.
     const urgente = parametros.get('urgente') === '1';
 
+    // `reprobado=1` muestra el otro estado de la tarjeta del resultado. Va por
+    // parámetro y no como otra maqueta por el mismo motivo que `urgente`: es la MISMA
+    // pantalla con otro dato, y separarlas en dos funciones dejaría que una se
+    // despintara sin que se notara en la otra. Y es el estado donde el contraste
+    // aprieta —`ink` sobre `ruby` da 4,41:1—, así que tiene que poder mirarse.
+    const reprobado = parametros.get('reprobado') === '1';
+
     zona.innerHTML =
       maqueta === 'intento'
         ? dibujarPantallaDelIntento(urgente ? { segundos: 5, urgente: true, marcada: 374 } : {})
-        : dibujarPantallaDelResumen();
+        : dibujarPantallaDelResumen({ aprobado: !reprobado });
 
     // `avisos=1` enciende los dos avisos, para poder mirar la decisión 6: **en una
     // línea mientras dura el intento, con su texto completo en la presentación y en

@@ -20,6 +20,7 @@
  *   simulacro.html?maqueta=intento&urgente=1
  *   simulacro.html?maqueta=intento&avisos=1
  *   simulacro.html?maqueta=resumen
+ *   simulacro.html?maqueta=resumen&reprobado=1
  *   simulacro.html?maqueta=resumen&avisos=1
  *
  * `avisos=1` enciende los dos avisos de la decision 6 -el de la copia guardada y el de
@@ -269,12 +270,23 @@ export function dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada 
 /**
  * Los dos botones del pie del intento.
  *
- * «SIGUIENTE» ES `paper` Y NO `jsyellow`, y es la unica decision de esta funcion que
- * necesita explicacion. El boton principal del sitio es amarillo en todas partes; aca
- * no, porque en esta pantalla el amarillo ya significa el tiempo. Un boton amarillo al
- * lado de un cronometro amarillo son dos cosas distintas del mismo color a veinte
- * centimetros de distancia. Sobre `ink`, `paper` da 19,57:1 y se lee como el control
- * principal sin pedirle prestado el significado a nadie.
+ * «SIGUIENTE» ES AMARILLO, COMO EL BOTON PRINCIPAL DE TODO EL SITIO (correccion del
+ * autor, 2026-09-18). La primera version lo puso en `paper` para que en esta pantalla
+ * el amarillo significara solo el tiempo; el autor decidio lo contrario tras verlo en
+ * el navegador, y con razon: un boton principal que en esta pagina se pinta distinto
+ * que en las otras dos rompe la costumbre del sitio para resolver un problema que la
+ * franja ya resuelve sola.
+ *
+ * **En el intento, `jsyellow` significa el tiempo Y la accion.** La urgencia no se
+ * distingue por ser el unico amarillo de la pantalla -no lo es-, sino porque **cambia
+ * la superficie entera de la franja** y **aparece su texto**. Un boton amarillo de
+ * 16 px al pie no se confunde con una barra amarilla de ancho completo pegada al
+ * encabezado que dice «quedan 5 segundos» con una cifra de 36 px al lado.
+ *
+ * «OMITIR» conserva el fondo oscuro y **pasa su borde y su icono a `jsyellow`**: es el
+ * secundario de la pareja, y se lee como tal sin dejar de pertenecer a la misma
+ * familia. Su texto se queda en `paper` -19,57:1 sobre `ink`-, que es lo que lo hace
+ * legible; el amarillo del borde da 15,53:1 y el del icono lo mismo.
  *
  * «OMITIR» PIDE UN SEGUNDO TOQUE (regla 5 del simulacro), y eso lo conecta la 43. Lo
  * que la maqueta deja puesto es el sitio y el icono; el texto de confirmacion lo
@@ -283,8 +295,8 @@ export function dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada 
 export function dibujarBotonesDelIntento() {
   return `
       <div data-papel="botones-del-intento" class="mt-6 flex items-center gap-3">
-        <button type="button" data-papel="siguiente" class="inline-flex items-center justify-center gap-2 grow bg-paper text-ink font-display font-bold text-base px-6 py-4 rounded hover:bg-muted transition-colors">Siguiente${icon('next', 'text-xl')}</button>
-        <button type="button" data-papel="omitir" class="inline-flex items-center justify-center gap-2 shrink-0 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-base px-5 py-4 rounded hover:border-paper transition-colors">${icon('skip', 'text-xl')}Omitir</button>
+        <button type="button" data-papel="siguiente" class="inline-flex items-center justify-center gap-2 grow bg-jsyellow text-ink font-display font-bold text-base px-6 py-4 rounded hover:bg-jsyellowdim transition-colors">Siguiente${icon('next', 'text-xl')}</button>
+        <button type="button" data-papel="omitir" class="inline-flex items-center justify-center gap-2 shrink-0 border border-jsyellow text-paper font-display font-bold text-base px-5 py-4 rounded hover:bg-panel2 transition-colors">${icon('skip', 'text-xl text-jsyellow')}Omitir</button>
       </div>`;
 }
 
@@ -423,8 +435,30 @@ function dibujarFilaDeLaRevision({ posicion, enunciado, estado, tuRespuesta }) {
  *
  * LAS CIFRAS DE EJEMPLO SUMAN 120 y el 60 % justo -72 correctas, 39 incorrectas, 9
  * omitidas-, porque una maqueta cuyos numeros no cuadran ensena a no mirarlos.
+ *
+ * LA TARJETA DEL RESULTADO VA RELLENA DE COLOR (correccion del autor, 2026-09-18).
+ * Era oscura como el resto y no llamaba la atencion, que en la pantalla donde se
+ * entrega el resultado es justo lo contrario de lo que hace falta. `esmeralda` si se
+ * aprobo, `ruby` si no, y todo lo de dentro en `ink`.
+ *
+ * Y ESO OBLIGO A MOVER UN PARRAFO, por una razon medida y no por gusto. `ink` sobre
+ * `esmeralda` da **8,28:1** y cumple a cualquier tamano; `ink` sobre `ruby` da
+ * **4,41:1**, que cumple el 3:1 del texto grande y de lo no textual pero **no el 4,5:1
+ * del texto normal**. Dentro de la tarjeta, por lo tanto, no puede quedar ni un texto
+ * chico: el rotulo, la cifra, el «de 120» y el veredicto pasan todos a 20 px o mas en
+ * negrita -o a 48 px la cifra-, que es el umbral de 3:1. Y **la frase explicativa, que
+ * es un parrafo y no puede ir en 20 px en negrita sin quedar ridicula, sale de la
+ * tarjeta** y se queda justo debajo, sobre `ink`, donde `muted` da 7,37:1. No se
+ * invento ningun color ni se salio de los trece tokens: se movio el unico elemento que
+ * no cabia.
+ *
+ * LA TARJETA PIERDE SU BORDE, y no es un olvido ni una excepcion a la decision 8: un
+ * borde existe para separar una superficie de lo que la rodea, y `esmeralda` sobre
+ * `ink` da 8,28:1 y `ruby` 4,41:1, los dos muy por encima del 3:1 que WCAG 1.4.11
+ * pide. La separacion la hace el relleno; agregarle un borde gris encima seria
+ * decorar, no distinguir.
  */
-export function dibujarPantallaDelResumen() {
+export function dibujarPantallaDelResumen({ aprobado = true } = {}) {
   const modulos = [
     { modulo: 2, correctas: 11, incorrectas: 5, omitidas: 1 },
     { modulo: 3, correctas: 10, incorrectas: 6, omitidas: 2 },
@@ -436,6 +470,17 @@ export function dibujarPantallaDelResumen() {
   ];
 
   const filas = modulos.map(dibujarFilaDelModulo).join('');
+
+  // Los dos estados de la tarjeta del resultado. El reprobado no es una variante
+  // decorativa: es la mitad de los casos, y es donde el contraste aprieta.
+  const superficie = aprobado ? 'bg-esmeralda' : 'bg-ruby';
+  const correctas = aprobado ? 72 : 61;
+  const iconoDelVeredicto = aprobado ? 'check-circle' : 'cancel';
+  const veredicto = aprobado ? 'Aprobaste el simulacro' : 'No alcanzaste el 60 %';
+
+  const explicacion = aprobado
+    ? 'Son 72 correctas de 120, el 60 % justo. Para aprobar el simulacro hacen falta 72.'
+    : 'Son 61 correctas de 120. Para aprobar el simulacro hacen falta 72, que es el 60 %.';
 
   const revision = [
     {
@@ -464,16 +509,17 @@ export function dibujarPantallaDelResumen() {
   return `
     <div data-papel="pantalla-del-resumen">
 
-      <section data-papel="resultado" class="bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-6 text-center">
-        <p class="font-mono text-xs text-muted">Resultado del simulacro</p>
+      <section data-papel="resultado" class="${superficie} rounded-xl p-6 text-center">
+        <h2 class="font-display font-bold text-xl text-ink">Resultado del simulacro</h2>
         <p class="mt-2 flex items-baseline justify-center gap-2">
-          <span class="font-display font-bold text-5xl text-esmeralda tabular-nums">72</span><span class="font-display font-bold text-xl text-paper">de 120</span>
+          <span data-papel="cifra-del-resultado" class="font-display font-bold text-5xl text-ink tabular-nums">${esc(correctas)}</span><span class="font-display font-bold text-xl text-ink">de 120</span>
         </p>
-        <p class="mt-3 inline-flex items-center gap-2 border border-esmeralda rounded-full px-4 py-1.5">
-          ${icon('check-circle', 'text-lg text-esmeralda')}<span class="font-display font-bold text-sm text-esmeralda">Aprobaste el simulacro</span>
+        <p data-papel="veredicto" class="mt-3 inline-flex items-center gap-2 border border-ink rounded-full px-4 py-2">
+          ${icon(iconoDelVeredicto, 'text-xl text-ink')}<span class="font-display font-bold text-xl text-ink">${veredicto}</span>
         </p>
-        <p class="mt-4 text-sm text-muted leading-relaxed">Son 72 correctas de 120, el 60 % justo. Aprobar acá no acredita nada ante Talento Digital para Chile.</p>
       </section>
+
+      <p data-papel="explicacion-del-resultado" class="mt-4 text-sm text-muted leading-relaxed">${explicacion}</p>
 
       <section data-papel="desglose" class="mt-6 bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-6">
         <h2 class="font-display font-bold text-xl text-paper">Cómo te fue en cada módulo</h2>
