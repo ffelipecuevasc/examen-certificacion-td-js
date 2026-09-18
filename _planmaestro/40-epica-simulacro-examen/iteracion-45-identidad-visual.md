@@ -57,12 +57,8 @@ Según la lectura de alcance del 2026-09-16:
   alternativa correcta está marcada en amarillo» (`cuestionario.js:386`).
 - **`jsyellow`** es a la vez el color de marca y el de «mira la correcta».
 
-**Hallazgo preexistente, fuera de esta épica:** `#valor-incorrectas` se declara en `cuestionario.html:125` con
-`class="ml-auto font-display font-bold text-sm text-ruby"` sobre `panel`, que
+**Hallazgo preexistente, fuera de esta épica:** `#valor-incorrectas` usa `text-ruby text-sm font-bold` sobre `panel`, que
 da 3,98:1 con 14 px en negrita, bajo el 4,5:1 exigido. Se registra en `registro_log.md`; esta iteración no lo corrige.
-
-*Cita corregida el 2026-09-16, a pedido del autor: antes decía `text-ruby text-sm font-bold`, que resume bien los
-colores y el tamaño pero no es lo que está escrito en el archivo. El hallazgo y sus cifras no cambian.*
 
 ## Decisiones sin resolver
 

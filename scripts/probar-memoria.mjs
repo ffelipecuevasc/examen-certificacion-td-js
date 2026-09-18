@@ -772,8 +772,20 @@ function retratoDelSimulacro(dom, paso, simulacro) {
   return {
     paso,
     // El titulo del recuadro: «Intento listo», «Intento retomado» o «No se pudo…».
-    titulo: zona.match(/font-display font-bold text-xl text-paper">([^<]*)</)?.[1] ?? '',
-    cuentasPorModulo: [...zona.matchAll(/text-jsyellow">(\d+)</g)].map((m) => Number(m[1])),
+    //
+    // SE LEE POR `data-papel` Y NO POR LAS CLASES. Hasta la iteracion 45 esto
+    // buscaba «font-display font-bold text-xl text-paper», o sea que la prueba
+    // dictaba el tamano de la letra del titulo: cambiarlo daba rojo sin que nada se
+    // hubiera roto. Lo que aqui hay que vigilar es CUAL de los tres recuadros se
+    // dibujo —«Intento listo», «Intento retomado», «No se pudo…»—, y eso no depende
+    // de como se vea. Sigue dando rojo si el titulo cambia, desaparece o se dibuja
+    // el recuadro equivocado.
+    titulo: zona.match(/data-papel="titulo-del-recuadro"[^>]*>([^<]*)</)?.[1] ?? '',
+    // Igual con las cuentas por modulo: la marca dice que el numero ES la cuenta de
+    // un modulo, no de que color se pinta.
+    cuentasPorModulo: [...zona.matchAll(/data-cuenta-del-modulo="\d+"[^>]*>(\d+)</g)].map((m) =>
+      Number(m[1])
+    ),
     tieneBoton: zona.includes('id="comenzar-simulacro"'),
     rotuloDelBoton: (
       zona.match(/id="comenzar-simulacro"[^>]*>([\s\S]*?)<\/button>/)?.[1] ?? ''

@@ -152,6 +152,22 @@ function consultar(sql) {
 const idsDibujados = (html) =>
   [...html.matchAll(/data-pregunta="q(\d+)"/g)].map((m) => Number(m[1]));
 
+/**
+ * Lo que «Intento listo» dice que trajo cada modulo, en el orden en que se dibujo.
+ *
+ * SE LEE POR `data-cuenta-del-modulo` Y NO POR LAS CLASES. Hasta la iteracion 45
+ * esto buscaba `text-jsyellow">`, copiado en cuatro sitios de este archivo: la
+ * prueba decia de que color tenia que ser el numero, y repintarlo daba cuatro rojos
+ * sin que nada se hubiera roto. Lo que hay que vigilar es que el aviso diga una
+ * cuenta por cada modulo y que sumen las del intento, y eso no depende del color.
+ *
+ * Esta escrito una sola vez a proposito: cuatro copias de la misma lectura se
+ * arreglan en cuatro sitios, y el dia que alguien olvide uno esa comprobacion deja
+ * de mirar lo que cree que mira.
+ */
+const cuentasDelIntento = (html) =>
+  [...html.matchAll(/data-cuenta-del-modulo="\d+"[^>]*>(\d+)</g)].map((m) => Number(m[1]));
+
 /** El bloque de una pregunta dentro del HTML dibujado, o '' si no esta. */
 function bloqueDePregunta(html, id) {
   const marca = `data-pregunta="q${id}"`;
@@ -2634,9 +2650,7 @@ try {
     );
   }
 
-  const cuentasConReservas = [...conReservas.matchAll(/text-jsyellow">(\d+)</g)].map((m) =>
-    Number(m[1])
-  );
+  const cuentasConReservas = cuentasDelIntento(conReservas);
 
   if (cuentasConReservas.length !== MODULOS_DEL_EXAMEN.length) {
     problemas.push('el aviso «Intento listo» no dijo la cuenta de los siete modulos');
@@ -2808,9 +2822,7 @@ try {
     problemas.push('la carga del simulacro no termino en el aviso «Intento listo»');
   }
 
-  const cuentasDelAviso = [...listoHtml.matchAll(/text-jsyellow">(\d+)</g)].map((m) =>
-    Number(m[1])
-  );
+  const cuentasDelAviso = cuentasDelIntento(listoHtml);
 
   if (cuentasDelAviso.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
     problemas.push(
@@ -2894,9 +2906,7 @@ try {
     problemas.push('con la capa de datos caida, el simulacro no pudo armar el intento');
   }
 
-  const cuentasDegradadas = [...degradadoHtml.matchAll(/text-jsyellow">(\d+)</g)].map((m) =>
-    Number(m[1])
-  );
+  const cuentasDegradadas = cuentasDelIntento(degradadoHtml);
 
   if (cuentasDegradadas.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
     problemas.push(
@@ -3017,38 +3027,77 @@ try {
       'quien elige. servicios/datos.js no importa ni el algoritmo ni las hermanas.'
   );
 
-  // --- 10j · El aviso extraido dibuja lo mismo, byte a byte ---------------
+  // --- 10j · El aviso extraido dibuja lo mismo en las dos paginas ---------
   //
-  // El aviso salio de components/cuestionario.js en esta etapa. La extraccion no
-  // puede haber cambiado ni un caracter de lo que ve el estudiante, asi que se
-  // compara contra el HTML exacto que se dibujaba antes, escrito aqui entero.
+  // El aviso salio de components/cuestionario.js en la iteracion 41, etapa B, para
+  // que el simulacro no tuviera una segunda copia. Lo que hay que vigilar de una
+  // extraccion asi no es que el HTML sea EL DE AQUEL DIA: es que las dos paginas
+  // sigan diciendo lo mismo. Dos copias no fallan cuando divergen, se quedan
+  // calladas, y en un aviso de ADR-008 eso es lo peor que puede pasar.
   //
-  // Se compara contra lo que dibujo el CUESTIONARIO en la seccion 9b, con la caida
-  // provocada de verdad, y no contra una llamada preparada para esta comprobacion:
-  // lo que hay que proteger es lo que ve quien abre la pagina.
-
-  const AVISO_ANTES_DE_LA_EXTRACCION =
-    '\n      <div class="flex items-start gap-3 border border-jsyellow/40 bg-jsyellow/5 rounded-xl px-5 py-4">\n' +
-    '        <span class="icon i-database text-xl text-jsyellow shrink-0 mt-0.5" aria-hidden="true"></span>\n' +
-    '        <div>\n' +
-    '          <p class="font-display font-bold text-paper text-sm">Estás viendo una copia guardada del banco de preguntas.</p>\n' +
-    '          <p class="mt-1 text-sm text-muted">No se pudo conectar con el servidor, así que el cuestionario se cargó desde la copia incluida en el sitio. Puedes practicar con normalidad, pero puede que falten preguntas nuevas o correcciones recientes. Es la copia del 10 de septiembre de 2026.</p>\n' +
-    '        </div>\n' +
-    '      </div>';
+  // HASTA LA ITERACION 45 ESTO SE COMPARABA CONTRA 668 CARACTERES ESCRITOS AQUI,
+  // clases incluidas, o sea que este guion era el dueno del aspecto del aviso:
+  // repintarlo daba rojo sin que nada se hubiera roto, y la salida comoda era editar
+  // la prueba hasta que pasara, que es como se aprende a no creerle. Lo que aquel
+  // literal protegia -«la extraccion no cambio ni un caracter»- ya no se puede
+  // romper hoy: el codigo de antes de la extraccion no existe, y aquella comparacion
+  // quedo hecha y escrita en la bitacora de la 41.
+  //
+  // Se comparan los dos HTML que dibujaron LAS DOS PAGINAS de verdad, cada una con
+  // su caida provocada -el cuestionario en 9b, el simulacro en 10h-, y no dos
+  // llamadas preparadas aqui: lo que hay que proteger es lo que ve quien abre la
+  // pagina.
 
   const avisoDelCuestionario = dom.html('#aviso-respaldo');
 
-  if (avisoDelCuestionario !== AVISO_ANTES_DE_LA_EXTRACCION) {
+  // La UNICA diferencia que la extraccion dejo entrar por parametro. Se sustituye en
+  // el del cuestionario y el resultado tiene que ser, caracter por caracter, el del
+  // simulacro: cualquier otra diferencia -una clase, un espacio, una palabra- sale
+  // aqui. Y si la sustitucion no cambiara nada, la diferencia permitida habria
+  // desaparecido y la comparacion de abajo pasaria sin comparar nada, asi que
+  // tambien se comprueba que cambie.
+  const comoLoDiriaElSimulacro = avisoDelCuestionario.replace(
+    'el cuestionario se cargó',
+    'el simulacro se cargó'
+  );
+
+  if (comoLoDiriaElSimulacro === avisoDelCuestionario) {
     problemas.push(
-      'el aviso de respaldo del cuestionario cambio al extraerse a su componente: el HTML ya no ' +
-        'es el mismo byte a byte'
+      'el aviso del cuestionario ya no nombra lo que se cargo: la unica diferencia permitida ' +
+        'entre las dos paginas dejo de existir, y compararlas dejo de probar nada'
     );
   }
 
+  if (avisoDelSimulacro !== comoLoDiriaElSimulacro) {
+    problemas.push(
+      'el aviso de respaldo dejo de ser el mismo en las dos paginas: cambiando solo como se ' +
+        'nombra lo que se cargo, el HTML del simulacro y el del cuestionario ya no coinciden ' +
+        'byte a byte'
+    );
+  }
+
+  // Que las dos digan lo mismo no basta: las dos podrian haberse quedado en blanco a
+  // la vez. Lo que ADR-008 pide del contenido se mira aparte y por lo que se lee, no
+  // por como se pinta. Que diga de cuando es la copia es la mitad que sirve para
+  // decidir si confiar; el icono se exige por que EXISTA, sin decir cual, que es
+  // asunto de la identidad visual y no de este guion.
+  for (const [deQuien, aviso] of [
+    ['del cuestionario', avisoDelCuestionario],
+    ['del simulacro', avisoDelSimulacro],
+  ]) {
+    if (!/Es la copia del \d+ de \S+ de \d{4}\./.test(aviso)) {
+      problemas.push(`el aviso de respaldo ${deQuien} no dice de cuando es la copia`);
+    }
+
+    if (!/class="icon i-[a-z0-9-]+/.test(aviso)) {
+      problemas.push(`el aviso de respaldo ${deQuien} se quedo sin icono`);
+    }
+  }
+
   notas.push(
-    `Aviso de respaldo extraido: el cuestionario dibuja los ${AVISO_ANTES_DE_LA_EXTRACCION.length} ` +
-      'caracteres exactos que dibujaba antes de la extraccion, y el simulacro usa el mismo ' +
-      'componente cambiando solo como se nombra la pagina.'
+    `Aviso de respaldo extraido: las dos paginas dibujan los mismos ${avisoDelCuestionario.length} ` +
+      'caracteres cambiando solo como se nombra lo que se cargo, y las dos dicen de cuando es la ' +
+      'copia y la acompanan de un icono.'
   );
 
   // --- 10k · Un intento no mezcla bancos (correccion del 2026-09-17) ------
@@ -3115,10 +3164,6 @@ try {
     });
   };
 
-  /** Lo que «Intento listo» dice que trajo cada modulo. */
-  const cuentasDe = (html) =>
-    [...html.matchAll(/text-jsyellow">(\d+)</g)].map((m) => Number(m[1]));
-
   /**
    * Las tres cosas que un intento bien armado tiene que cumplir, miradas en el HTML.
    *
@@ -3131,7 +3176,7 @@ try {
       return;
     }
 
-    const cuentas = cuentasDe(html);
+    const cuentas = cuentasDelIntento(html);
     const total = cuentas.reduce((a, b) => a + b, 0);
 
     if (total !== PREGUNTAS_DEL_INTENTO) {

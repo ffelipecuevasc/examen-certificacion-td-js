@@ -200,9 +200,14 @@ function dibujarRecuadro({ titulo, cuerpo }) {
   const zona = $('#zona-del-intento');
   if (!zona) return;
 
+  // `data-papel` dice QUE ES cada nodo, no como se ve. Los guiones leen el HTML
+  // dibujado por esta marca y no por sus clases: una prueba no puede dictar la
+  // apariencia, porque entonces cambiar un tamano de letra da rojo sin que nada se
+  // haya roto, y se aprende a editar la prueba hasta que pase. La iteracion 45
+  // reescribe estas clases enteras; el papel del nodo sigue siendo el mismo.
   zona.innerHTML = `
       <div id="mensaje-simulacro" tabindex="-1" class="bg-panel border border-panel3 rounded-xl p-8 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
-        <p class="font-display font-bold text-xl text-paper">${titulo}</p>
+        <p data-papel="titulo-del-recuadro" class="font-display font-bold text-xl text-paper">${titulo}</p>
         ${cuerpo}
       </div>`;
 
@@ -230,7 +235,7 @@ function dibujarIntentoListo(preguntas, { retomado = false } = {}) {
     (modulo) => `
           <li class="flex items-baseline justify-between gap-4 border-b border-panel3 py-2 last:border-b-0">
             <span class="font-display font-semibold text-paper text-sm">Módulo ${esc(modulo)}</span>
-            <span class="font-mono text-sm text-jsyellow">${esc(cuantasDe(modulo))}</span>
+            <span data-cuenta-del-modulo="${esc(modulo)}" class="font-mono text-sm text-jsyellow">${esc(cuantasDe(modulo))}</span>
           </li>`
   ).join('');
 
