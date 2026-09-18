@@ -79,6 +79,7 @@ import {
   olvidarElIntento,
 } from '../servicios/intento-guardado.js';
 import { crearTransicionDeCarga } from './transicion-de-carga.js';
+import { BORDE_DEL_SIMULACRO } from './simulacro-maqueta.js';
 import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
 import { mostrarAvisoDeGuardado } from './aviso-de-guardado.js';
 
@@ -170,6 +171,11 @@ const transicion = crearTransicionDeCarga({
   controles: ['#comenzar-simulacro'],
   idDelMensaje: 'mensaje-simulacro',
   idDelAvisoLento: 'carga-lenta-simulacro',
+  // La UNICA diferencia de aspecto entre la transicion de las dos paginas, y entra
+  // por parametro justamente para que el cuestionario siga dibujando lo suyo: la
+  // pieza es una sola y la comparten (decision 9 de la iteracion 41, decision 8 de
+  // la 45).
+  borde: BORDE_DEL_SIMULACRO,
   textos: {
     titulo: () => 'Preparando tu simulacro…',
     detalle: 'Eligiendo tus 120 preguntas y pidiéndolas al banco.',
@@ -206,7 +212,7 @@ function dibujarRecuadro({ titulo, cuerpo }) {
   // haya roto, y se aprende a editar la prueba hasta que pase. La iteracion 45
   // reescribe estas clases enteras; el papel del nodo sigue siendo el mismo.
   zona.innerHTML = `
-      <div id="mensaje-simulacro" tabindex="-1" class="bg-panel border border-panel3 rounded-xl p-8 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
+      <div id="mensaje-simulacro" tabindex="-1" class="bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-8 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
         <p data-papel="titulo-del-recuadro" class="font-display font-bold text-xl text-paper">${titulo}</p>
         ${cuerpo}
       </div>`;
@@ -233,7 +239,7 @@ function dibujarIntentoListo(preguntas, { retomado = false } = {}) {
 
   const filas = MODULOS_DEL_EXAMEN.map(
     (modulo) => `
-          <li class="flex items-baseline justify-between gap-4 border-b border-panel3 py-2 last:border-b-0">
+          <li class="flex items-baseline justify-between gap-4 border-b ${BORDE_DEL_SIMULACRO} py-2 last:border-b-0">
             <span class="font-display font-semibold text-paper text-sm">Módulo ${esc(modulo)}</span>
             <span data-cuenta-del-modulo="${esc(modulo)}" class="font-mono text-sm text-jsyellow">${esc(cuantasDe(modulo))}</span>
           </li>`
@@ -245,7 +251,7 @@ function dibujarIntentoListo(preguntas, { retomado = false } = {}) {
   const pie = retomado
     ? `
         <div class="mt-6">
-          <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
+          <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
         </div>`
     : '';
 
@@ -281,7 +287,7 @@ function dibujarNoSePudo(explicacion) {
         <p class="mt-3 text-sm text-muted leading-relaxed">${explicacion}</p>
         <div class="mt-6 flex flex-wrap items-center gap-3">
           <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3 rounded hover:bg-jsyellowdim transition-colors">Volver a intentarlo</button>
-          <a href="cuestionario.html" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Practicar sin reloj</a>
+          <a href="cuestionario.html" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Practicar sin reloj</a>
         </div>`,
   });
 }

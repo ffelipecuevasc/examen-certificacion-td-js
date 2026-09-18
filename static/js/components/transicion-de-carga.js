@@ -98,6 +98,20 @@ export const PISO_DE_LA_TRANSICION_MS = 400;
 export const PLAZO_DE_CARGA_LENTA_MS = 2500;
 
 /**
+ * El borde del recuadro cuando quien llama no pide otro.
+ *
+ * ES EL DEL CUESTIONARIO, Y POR ESO ES EL POR OMISION. La iteracion 45 le cambio el
+ * borde al simulacro —`muted/60`, 3,12:1 sobre `ink` y sobre `panel`, contra los
+ * 1,31:1 de `panel3`— y no al resto del sitio. Poner el valor nuevo aqui habria
+ * repintado el cuestionario de paso, que es justamente lo que la iteracion no puede
+ * hacer: la transicion es una sola pieza y la comparten las dos paginas.
+ *
+ * Se exporta para que los guiones comprueben quien usa cual **leyendo esta
+ * constante**, y no una clase escrita a mano en la prueba.
+ */
+export const BORDE_POR_OMISION = 'border-panel3';
+
+/**
  * Arma una transicion sobre un contenedor, con sus textos y sus controles.
  *
  * @param {object} ajustes
@@ -109,6 +123,10 @@ export const PLAZO_DE_CARGA_LENTA_MS = 2500;
  *                                         foco, asi que quien llama lo necesita
  *                                         para poder ir a el.
  * @param {string} ajustes.idDelAvisoLento Id del hueco del texto de carga lenta.
+ * @param {string} [ajustes.borde] La clase de borde del recuadro. Es LO UNICO del
+ *        aspecto que entra por parametro, y entra porque la iteracion 45 le cambio
+ *        el borde al simulacro sin tocar el del cuestionario. Por omision, el del
+ *        cuestionario: quien no pide nada sigue viendo lo que veia.
  * @param {object} ajustes.textos
  * @param {(dato: string) => string} ajustes.textos.titulo
  *        Arma la primera linea. **Recibe el dato YA ESCAPADO**: el escapado se hace
@@ -128,6 +146,7 @@ export function crearTransicionDeCarga({
   controles = [],
   idDelMensaje,
   idDelAvisoLento,
+  borde = BORDE_POR_OMISION,
   textos,
 }) {
   const { titulo, detalle, lento, iconoLento = 'history-edu' } = textos;
@@ -383,7 +402,7 @@ export function crearTransicionDeCarga({
             <span class="w-2 h-2 rounded-full bg-jsyellow${latido}" style="animation-delay:${retraso}ms"></span>`;
 
       zona.innerHTML = `
-      <div id="${idDelMensaje}" tabindex="-1" class="bg-panel border border-panel3 rounded-xl p-8 text-center focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
+      <div id="${idDelMensaje}" tabindex="-1" class="bg-panel border ${borde} rounded-xl p-8 text-center focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
         <img src="static/resources/js-logo.svg" alt="" class="w-12 h-12 mx-auto rounded-lg">
         <p class="mt-4 font-display font-bold text-paper">${titulo(esc(dato))}</p>
         <p class="mt-2 text-sm text-muted">${detalle}</p>

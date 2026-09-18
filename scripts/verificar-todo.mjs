@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los siete comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los ocho comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -32,8 +32,9 @@
  *   3. comprobar-instantanea.mjs  la instantanea dice lo mismo que el respaldo
  *   4. comprobar-cifra.mjs        la portada publica la cifra del banco
  *   5. comprobar-copias.mjs       las tres paginas dicen lo mismo en encabezado y pie
- *   6. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
- *   7. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
+ *   6. probar-identidad-visual.mjs  el contraste, la paleta y los iconos del simulacro
+ *   7. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
+ *   8. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
  * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
@@ -50,6 +51,14 @@
  * portada publicaba «21 preguntas de practica» con 368 en el banco, y sobrevivio
  * al llenado entero porque ninguna comprobacion tenia el deber de mirarla.
  *
+ * La sexta entro con la iteracion 45, y por el mismo motivo que la cuarta y la
+ * quinta: hasta ese dia **ninguna comprobacion miraba el contraste**, ni que una clase
+ * `i-*` existiera en `icons.css`. Las dos cosas se revisaban a mano, y una revision a
+ * mano de veinte contrastes se hace entera la primera vez y por encima la cuarta: el
+ * `text-ruby` a 14 px en negrita de `#valor-incorrectas` —3,98:1 sobre un umbral de
+ * 4,5— llevaba meses publicado sin que nada se quejara. Corre aqui y no aparte porque
+ * es barata, sobre archivos del repositorio, y no necesita servidor ni base D1.
+ *
  * La quinta entro con la iteracion 41, y por el mismo motivo: al aparecer la tercera
  * pagina, el encabezado y el pie pasaron a estar escritos tres veces a mano, y nada
  * obligaba a que las tres dijeran lo mismo. Corre aqui —y no aparte— porque es una
@@ -58,7 +67,7 @@
  * Una comprobacion que hay que acordarse de correr no vigila nada.
  *
  * Codigos de salida:
- *   0  VERIFICADO             las siete comprobaciones hechas y en verde
+ *   0  VERIFICADO             las ocho comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -79,7 +88,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los siete comprobadores, con la traduccion de sus codigos.
+ * Los ocho comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -133,6 +142,15 @@ const COMPROBADORES = [
       0: [OK, 'las tres paginas dicen lo mismo en su encabezado, su pie y su favicon'],
       1: [FALLO, 'COPIAS DISTINTAS: una pagina se desfaso del encabezado o del pie de las otras'],
       2: [AVISO, 'no se pudo comparar: falta una pagina o no trae alguno de los tres bloques'],
+    },
+  },
+  {
+    nombre: 'identidad',
+    guion: 'probar-identidad-visual.mjs',
+    codigos: {
+      0: [OK, 'el contraste, la paleta y los iconos del simulacro estan donde la guia visual dice'],
+      1: [FALLO, 'IDENTIDAD ROTA: un contraste bajo umbral, un color de fuera de la paleta o un icono que no existe'],
+      2: [AVISO, 'no se pudo comprobar: falta la paleta o no se dejaron cargar los componentes'],
     },
   },
   {

@@ -73,10 +73,19 @@
        mismas se piden recien al pulsar «Comenzar» (decision 5). En la etapa A ese
        boton todavia no esta conectado a nada; lo conecta la etapa B.
 
-       ESTE TEXTO ES PROVISIONAL. Dice las reglas que el autor fijo el 2026-09-16
-       —estan en _planmaestro/40-epica-simulacro-examen/README.md—, y se redacta de
-       nuevo cuando la iteracion 45 fije la direccion visual del simulacro. Lo que
-       no cambia con la redaccion son dos cosas:
+       LOS DOS PENDIENTES DEL TEXTO PROVISIONAL SE CERRARON EN LA ITERACION 45, que
+       es la que reescribio este bloque. Eran los que la 43 tenia anotados:
+
+         - El parrafo de entrada decia que el simulacro practica «lo mas dificil del
+           dia del examen». Era una afirmacion sobre el examen real sin fuente, y
+           ahora la frase compara con el cuestionario de practica, que es algo que
+           este sitio si sabe.
+         - El dato de los 120 minutos y del formato mezclado ahora DICE DE DONDE
+           SALE, en la linea de abajo del recuadro y con la misma forma que el aviso
+           de programacion de la iteracion 36: el correo explicativo de Talento
+           Digital, recogido en _planmaestro/00_producto/contexto-del-examen.md.
+
+       Lo que no cambia con ninguna redaccion son dos cosas:
 
          1. NINGUNA PANTALLA AFIRMA QUE EL EXAMEN REAL FUNCIONE IGUAL. Las reglas de
             abajo son del simulacro, y el recuadro amarillo lo dice antes que ellas.
@@ -114,7 +123,7 @@
            explicacion de por que no se pudo. -->
       <div id="zona-del-intento">
 
-      <span class="inline-flex items-center gap-2 border border-panel3 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow">
+      <span class="inline-flex items-center gap-2 border border-muted/60 rounded-full px-4 py-1.5 font-mono text-[11px] text-jsyellow">
         <span class="icon i-bolt text-base" aria-hidden="true"></span>120 preguntas · 30 segundos cada una
       </span>
 
@@ -123,19 +132,22 @@
       </h1>
 
       <p class="mt-6 text-lg text-muted leading-relaxed">
-        Un intento de 120 preguntas de alternativas, con reloj, para practicar lo más difícil del día del examen: decidir rápido y seguir adelante. Acá no se vuelve atrás ni se piensa sin apuro, como sí puedes hacerlo en el cuestionario de práctica.
+        Un intento de 120 preguntas de alternativas, con reloj, para entrenar lo que el cuestionario de práctica no entrena: decidir rápido y seguir adelante. Acá no se vuelve atrás ni se piensa sin apuro, como sí puedes hacerlo allá.
       </p>
 
       <!-- El aviso va ARRIBA de las reglas y no al final, por el mismo motivo por el
            que el aviso de respaldo del cuestionario vive sobre las preguntas: quien
            lee esto tiene que enterarse antes de tomarse las reglas por las del
            examen real, no despues. -->
-      <div class="mt-8 bg-panel border border-jsyellow/40 rounded-xl p-6">
+      <div class="mt-8 bg-panel border border-jsyellow/60 rounded-xl p-6">
         <p class="font-display font-bold text-paper flex items-center gap-3">
           <span class="icon i-lightbulb text-2xl text-jsyellow shrink-0" aria-hidden="true"></span>Estas reglas son del simulacro, no del examen real
         </p>
         <p class="mt-3 text-sm text-muted leading-relaxed">
           El examen de Talento Digital dura 120 minutos en total y mezcla preguntas de alternativas con preguntas de programación. Este simulacro entrena <strong class="font-semibold text-paper">una sola parte</strong> de eso —responder alternativas con el tiempo encima— y para lograrlo usa reglas propias, pensadas para practicar.
+        </p>
+        <p class="mt-3 font-mono text-[11px] text-mutedink leading-relaxed">
+          Los 120 minutos y el formato mezclado salen del correo explicativo que Talento Digital para Chile envió a participantes e instructores. Ninguna otra cifra de esta página viene del examen real: son reglas de este simulacro.
         </p>
       </div>
 
@@ -145,7 +157,7 @@
 
       <ol class="mt-6 flex flex-col gap-3">
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">01</span>
           <div>
             <p class="font-display font-bold text-paper">120 preguntas de alternativas</p>
@@ -153,7 +165,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">02</span>
           <div>
             <p class="font-display font-bold text-paper">30 segundos para cada una</p>
@@ -161,7 +173,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">03</span>
           <div>
             <p class="font-display font-bold text-paper">No hay un tiempo total que se te acabe</p>
@@ -169,7 +181,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">04</span>
           <div>
             <p class="font-display font-bold text-paper">Puedes cambiar tu respuesta mientras no avances</p>
@@ -177,7 +189,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">05</span>
           <div>
             <p class="font-display font-bold text-paper">Puedes saltarte una pregunta</p>
@@ -185,7 +197,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">06</span>
           <div>
             <p class="font-display font-bold text-paper">Si se acaba el tiempo y no marcaste nada, queda omitida</p>
@@ -193,7 +205,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">07</span>
           <div>
             <p class="font-display font-bold text-paper">Una omitida cuenta como incorrecta</p>
@@ -201,7 +213,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">08</span>
           <div>
             <p class="font-display font-bold text-paper">Se aprueba el simulacro con al menos el 60 %</p>
@@ -209,7 +221,7 @@
           </div>
         </li>
 
-        <li class="bg-panel border border-panel3 rounded-xl p-5 flex items-start gap-4">
+        <li class="bg-panel border border-muted/60 rounded-xl p-5 flex items-start gap-4">
           <span class="font-display font-bold text-xl text-jsyellow/70 shrink-0 w-7" aria-hidden="true">09</span>
           <div>
             <p class="font-display font-bold text-paper">El reloj no se detiene si te vas</p>
@@ -239,7 +251,7 @@
         <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-base px-8 py-4 rounded hover:bg-jsyellowdim transition-colors">
           <span class="icon i-rocket-launch text-xl" aria-hidden="true"></span>Comenzar el simulacro
         </button>
-        <a href="cuestionario.html" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-6 py-3.5 rounded hover:border-jsyellow transition-colors">
+        <a href="cuestionario.html" class="inline-flex items-center gap-2 border border-muted/60 text-paper font-display font-bold text-sm px-6 py-3.5 rounded hover:border-jsyellow transition-colors">
           <span class="icon i-quiz text-lg" aria-hidden="true"></span>Prefiero practicar sin reloj
         </a>
       </div>

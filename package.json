@@ -34,6 +34,7 @@
     "verificar:copias": "node scripts/comprobar-copias.mjs",
     "probar:escapado": "node scripts/probar-escapado.mjs",
     "probar:filtrado": "node scripts/probar-filtrado.mjs",
+    "probar:identidad": "node scripts/probar-identidad-visual.mjs",
     "probar:restricciones": "node scripts/probar-restricciones.mjs",
     "probar:instantanea": "node scripts/comprobar-instantanea.mjs",
     "probar:memoria": "node scripts/probar-memoria.mjs"

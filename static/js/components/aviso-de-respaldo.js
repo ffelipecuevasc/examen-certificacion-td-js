@@ -62,6 +62,21 @@ function fechaLegible(iso) {
  * @param {string} ajustes.loQueSeCargo Como se nombra en la frase lo que se cargo.
  *        Va con su articulo: «el cuestionario», «el simulacro».
  *
+ * @param {boolean} [ajustes.compacto] Lo mete en UNA LINEA (decision 6 de la
+ *        iteracion 45). Se usa solo mientras dura el intento del simulacro, donde el
+ *        recuadro entero se come una franja del presupuesto vertical con el
+ *        estudiante contra el reloj. **No se deja de avisar**: lo que cambia es el
+ *        espacio, no si se avisa. La linea corta conserva las dos mitades que
+ *        sirven para decidir —que lo que se ve es una copia, y de cuando es—, y
+ *        deja fuera la explicacion. La presentacion y el resumen lo muestran entero.
+ *
+ * **ESTE AVISO NO CAMBIA DE COLOR NI DE BORDE EN LA ITERACION 45, y es a proposito.**
+ * Lo comparten el cuestionario y el simulacro, asi que repintarlo aqui repintaria de
+ * paso el cuestionario, que esta iteracion no toca. Su `border-jsyellow/40` da
+ * 2,96:1 sobre `ink`, por debajo del 3:1 de WCAG 1.4.11, y no lo incumple: el aviso
+ * no es un control y no se identifica por su borde, sino por su texto en `paper`
+ * —19,57:1— y por su icono en `jsyellow` —15,53:1—. Queda escrito en la guia visual.
+ *
  * `loQueSeCargo` es texto del sitio, no dato de la capa, asi que va a `innerHTML`
  * tal cual, igual que iba cuando estaba escrito dentro de la frase. El unico dato
  * que viene de fuera es la fecha del sello, y esa se escapa.
@@ -70,6 +85,7 @@ export function mostrarAvisoDeRespaldo({
   contenedor = '#aviso-respaldo',
   sello,
   loQueSeCargo,
+  compacto = false,
 }) {
   const zona = $(contenedor);
   if (!zona) return;
@@ -85,6 +101,16 @@ export function mostrarAvisoDeRespaldo({
   const cuando = fecha
     ? `Es la copia del ${esc(fecha)}.`
     : 'La copia no trae fecha, asi que no se sabe de cuando es.';
+
+  if (compacto) {
+    zona.innerHTML = `
+      <p class="flex items-center gap-2 border border-jsyellow/40 bg-jsyellow/5 rounded-lg px-3 py-2 text-xs text-paper">
+        ${icon('database', 'text-base text-jsyellow shrink-0')}<span>Estás viendo una copia guardada del banco. ${cuando}</span>
+      </p>`;
+
+    zona.classList.remove('hidden');
+    return;
+  }
 
   zona.innerHTML = `
       <div class="flex items-start gap-3 border border-jsyellow/40 bg-jsyellow/5 rounded-xl px-5 py-4">

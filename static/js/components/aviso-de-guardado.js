@@ -54,11 +54,27 @@ import { $, icon } from '../utils/dom.js';
  *        escritura. Este componente no lo averigua por su cuenta: si lo hiciera
  *        habria dos sitios decidiendo lo mismo.
  *
+ * @param {boolean} [ajustes.compacto] Lo mete en UNA LINEA (decision 6 de la
+ *        iteracion 45), y solo mientras dura el intento. Conserva el TITULO, que es
+ *        la mitad accionable —«no se está guardando» / «ya no se está guardando»— y
+ *        deja fuera la explicacion, que se lee con calma y no con el reloj encima.
+ *        En la presentacion y en el resumen va entero.
+ *
+ * **EL BORDE CAMBIO EN LA ITERACION 45, y aqui si se podia.** Este aviso vive solo en
+ * el simulacro —arriba esta escrito por que no se compartio con el cuestionario—, asi
+ * que cambiarlo no repinta ninguna otra pagina. Pasa de `border-panel3` —1,31:1 sobre
+ * `ink`— a `border-muted/60` —3,12:1—, que es lo que la decision 8 fija para todas
+ * las superficies del simulacro.
+ *
  * No hay ni un dato del banco en este archivo, asi que no hay nada que escapar. La
  * regla del proyecto sigue en pie: el dia que alguien meta aqui texto que venga de
  * `data/` o de la capa, pasa por `esc()`.
  */
-export function mostrarAvisoDeGuardado({ contenedor = '#aviso-guardado', estado }) {
+export function mostrarAvisoDeGuardado({
+  contenedor = '#aviso-guardado',
+  estado,
+  compacto = false,
+}) {
   const zona = $(contenedor);
   if (!zona) return;
 
@@ -78,8 +94,18 @@ export function mostrarAvisoDeGuardado({ contenedor = '#aviso-guardado', estado 
       ? 'Este navegador no permite guardar datos del sitio: puede ser el bloqueo de cookies o que el almacenamiento esté lleno. Puedes rendir el simulacro igual, pero si recargas la página el intento se pierde y hay que empezar otro.'
       : 'El navegador dejó de aceptar lo que se guarda, lo más probable es que el almacenamiento se haya llenado. El simulacro sigue funcionando y puedes terminarlo, pero si recargas la página se pierde.';
 
+  if (compacto) {
+    zona.innerHTML = `
+      <p class="flex items-center gap-2 border border-muted/60 bg-panel rounded-lg px-3 py-2 text-xs text-paper">
+        ${icon('restart-alt', 'text-base text-jsyellow shrink-0')}<span>${titulo}</span>
+      </p>`;
+
+    zona.classList.remove('hidden');
+    return;
+  }
+
   zona.innerHTML = `
-      <div class="flex items-start gap-3 border border-panel3 bg-panel rounded-xl px-5 py-4">
+      <div class="flex items-start gap-3 border border-muted/60 bg-panel rounded-xl px-5 py-4">
         ${icon('restart-alt', 'text-xl text-jsyellow shrink-0 mt-0.5')}
         <div>
           <p class="font-display font-bold text-paper text-sm">${titulo}</p>

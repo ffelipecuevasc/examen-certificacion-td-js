@@ -1,7 +1,7 @@
 # Iteración 45 · Dirección visual del simulacro
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · lectura de alcance hecha el 2026-09-18; decisiones cerradas
+**Estado:** 🔵 En curso · decisiones cerradas el 2026-09-18; dirección elegida, guía visual escrita y marcado construido
 **Depende de:** iteración 41, cerrada el 2026-09-18.
 **Orden de trabajo:** después de la 41 y antes de la 42. El número no cambia.
 
@@ -124,6 +124,189 @@ qué significa cada color en esas dos pantallas.
 para resolverlo. La guía visual decide qué borde usa cada superficie del simulacro y deja escrito si el resto del sitio
 se alinea después o se queda como está.
 
+## Dirección visual elegida · «Sala de examen»
+
+Elegida por el autor el 2026-09-18 entre tres tratamientos propuestos. Los otros dos fueron **«Continuidad»** —la misma
+escala del cuestionario, que cabía entera sin desplazar pero apenas se distinguía de la práctica— y **«Contrarreloj»**
+—una cifra de 60 px en una franja de 120 px, que ganaba en dramatismo y perdía 120 px de un presupuesto de 603.
+
+**Por qué esta.** La diferencia entre estudiar y rendir tiene que notarse antes de leer una palabra, y lo que la produce
+aquí es la **escala**: el enunciado sube de 16 px a 20 px en negrita y las alternativas de 14 px a 16 px. No es un ajuste
+fino, es un salto que se ve de reojo. La densidad acompaña —`p-6` contra `p-5`, `py-3.5` contra `py-3`, `gap-2.5` contra
+`gap-2`— y con eso una sola pregunta ocupa la pantalla entera, que es exactamente lo que ocurre cuando se rinde.
+
+**Lo que costó, dicho de frente.** Con el peor caso del banco la pantalla no cabe: hay que desplazar **204 px en
+375×667** y **59 px en 375×812**. El autor aflojó el criterio a sabiendas el 2026-09-18: lo exigible es que la franja
+quepa en 72 px y que las cuatro alternativas y los dos botones se alcancen cómodamente, no que todo entre sin mover el
+dedo. Un tratamiento que cupiera entero exigía volver a la escala del cuestionario, y entonces no habría dirección visual
+que fijar.
+
+**Lo que se tomó de los otros dos.** De «Continuidad», el borde `muted/60` para todas las superficies —es el único valor
+de la paleta cerrada que cruza el 3:1 sobre `ink` y sobre `panel` con un solo token—. De «Contrarreloj», la idea de que
+la franja no compite con la pregunta: se quedó en 57 px, no en 120.
+
+---
+
+## Guía visual del simulacro
+
+La siguen la 42, la 43 y la 44. **Si el marcado y esta tabla no coinciden, manda la tabla.** Todas las razones de
+contraste las calcula `scripts/probar-identidad-visual.mjs` sobre el fondo real de cada elemento, caminando el árbol; no
+hay ni un número escrito a mano en esa comprobación.
+
+### Qué significa cada color
+
+**En la pantalla del intento.** Solo tres colores portan significado; el resto es superficie y texto.
+
+| Color | Qué dice, y solo eso | Cómo se dice además sin color |
+|---|---|---|
+| `jsyellow` | **El tiempo.** La cifra del cronómetro, y la franja entera cuando quedan pocos segundos | La cifra baja; en urgencia aparece «quedan N segundos» |
+| `paper` | **Lo que tú controlas.** El borde de la alternativa marcada y el fondo de «Siguiente» | La alternativa marcada gana el ícono `i-check-circle` |
+| `muted` | **Lo secundario.** Avance, tiempo transcurrido, número de pregunta y bordes en reposo | — |
+
+`ruby` y `esmeralda` **no aparecen en el intento** (decisión 3). Comprobado por guion sobre las tres variantes de la
+pantalla —reposo, con alternativa marcada y urgencia—.
+
+`jsyellow` sigue significando además tres cosas heredadas del sitio que pueden aparecer sobre esta pantalla: el anillo de
+foco, el latido de la transición de carga y el aviso de ADR-008. La decisión 7 lo acepta explícitamente: el criterio se
+aplica a lo que esta iteración dibuja, no a lo que el sitio arrastra.
+
+**En la pantalla del resumen.** Aquí sí entran los dos colores reservados, y el cronómetro no existe.
+
+| Color | Qué dice | Ícono que lo acompaña | Palabra |
+|---|---|---|---|
+| `esmeralda` | Correcta, y el resultado aprobado | `i-check-circle` | «Correcta» / «Aprobaste el simulacro» |
+| `ruby` | Incorrecta | `i-cancel` | «Incorrecta» |
+| `muted` | Omitida | `i-skip` | «Omitida» |
+
+**Las palabras de estado van en `paper`, no en el color del estado**, y esto salió de medir: «Incorrecta» en `text-ruby` a
+14 px en negrita da **3,98:1 sobre `panel`**, bajo el 4,5:1 de un texto normal y sin llegar a los 18,66 px que la
+dejarían pasar como texto grande. Las otras dos pasaban —`esmeralda` 7,46:1 y `muted` 6,65:1—, que es justo como se cuela
+la tercera. El color lo llevan el ícono y el borde, donde el umbral es 3:1 y los tres lo cruzan.
+
+`jsyellow` no aparece en el resumen.
+
+### Qué borde usa cada superficie (decisión 8)
+
+**`border-muted/60` en todas las superficies del simulacro.** Da **3,12:1 sobre `ink`** y **3,12:1 sobre `panel`**: es el
+único valor de la paleta cerrada que cruza el 3:1 de WCAG 1.4.11 en las dos superficies con un solo token. Lo que había,
+`border-panel3`, daba 1,31:1 y 1,18:1.
+
+| Superficie | Borde | Sobre | Razón |
+|---|---|---|---|
+| Franja del intento, en reposo | `border-b border-muted/60` | `ink` | 3,12:1 |
+| Franja del intento, en urgencia | `border-b border-jsyellow` | `ink` | 15,53:1 |
+| Tarjeta de la pregunta | `border border-muted/60` | `ink` | 3,12:1 |
+| Alternativa sin marcar | `border border-muted/60` | `panel` | 3,12:1 |
+| Alternativa marcada | `border border-paper` | `panel` | 17,64:1 |
+| «Omitir» | `border border-muted/60` | `ink` | 3,12:1 |
+| Recuadro de la transición de carga | `border border-muted/60` | `ink` | 3,12:1 |
+| «Intento listo» y «No se pudo…» | `border border-muted/60` | `ink` | 3,12:1 |
+| Fila del desglose por módulo | `border-b border-muted/60` | `panel` | 3,12:1 |
+| Fila de la revisión | `border-l-2` del color del estado | `ink` | 8,28 / 3,98 / 7,37:1 |
+| Aviso de guardado | `border border-muted/60` | `ink` | 3,12:1 |
+| Recuadro «estas reglas son del simulacro» | `border border-jsyellow/60` | `panel` | 4,23:1 |
+
+**Dos excepciones, y las dos con su motivo escrito.**
+
+1. **El aviso de ADR-008 se queda en `border-jsyellow/40`, 2,96:1.** Lo comparten el cuestionario y el simulacro:
+   repintarlo aquí repintaría el cuestionario, que esta iteración no toca. No incumple 1.4.11 porque el aviso no es un
+   control y no se identifica por su borde, sino por su texto en `paper` —19,57:1— y su ícono en `jsyellow` —15,53:1—.
+2. **El encabezado y el pie se quedan en `border-panel3`.** La decisión 1 dice que la franja no los toca, y
+   `comprobar-copias.mjs` exige que las tres páginas digan lo mismo: cambiarlos aquí obligaría a cambiarlos en las tres.
+
+**El resto del sitio no se alinea ahora.** La fila de `registro_log.md` que esperaba esta decisión queda abierta con el
+valor ya fijado: `muted/60` es el borde que el sitio adopta cuando alguien decida hacer esa pasada. Hacerla dentro de esta
+iteración habría significado repintar el panel del cuestionario, la portada y el pie —o sea, cambiar la identidad visual
+de las tres páginas— para cerrar una deuda que viene de las iteraciones 31 y 32.
+
+### Elemento por elemento
+
+**La franja fija del intento.** Alto total **57 px** (`h-14` + `border-b`), dentro de los 56 a 72 de la decisión 1. Con el
+encabezado fijo son **121 px permanentes**, bajo los 136 que esa decisión permite.
+
+| Elemento | `data-papel` | Clases | Tamaño |
+|---|---|---|---|
+| Contenedor | `franja-del-intento` | `fixed top-16 inset-x-0 z-40 bg-ink border-b border-muted/60` | — |
+| Fila interior | — | `max-w-3xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-4` | 56 px |
+| Ícono del reloj | — | `icon i-clock text-lg text-jsyellow` | 18 px |
+| Cifra del cronómetro | `cronometro` | `font-mono font-bold text-4xl leading-none tabular-nums text-jsyellow` | 36 px |
+| Unidad «s» | — | `font-mono text-xs text-muted` | 12 px |
+| Avance | `avance-del-intento` | `font-mono text-xs text-muted truncate` | 12 px |
+| Ícono del reloj total | — | `icon i-clock-total text-base text-muted` | 16 px |
+| Tiempo transcurrido | `transcurrido` | `font-mono text-sm tabular-nums text-muted` | 14 px |
+
+**En urgencia** cambian tres cosas y ninguna sola basta: el contenedor pasa a `bg-jsyellow border-b border-jsyellow`,
+toda la tinta pasa a `text-ink`, y el hueco del avance lo ocupa `aviso-de-urgencia` con «quedan N segundos» en
+`font-display font-bold text-sm text-ink`. **El alto no cambia**: si creciera, empujaría la pregunta justo en el segundo
+en que se está decidiendo.
+
+**La tarjeta de la pregunta.**
+
+| Elemento | `data-papel` | Clases | Tamaño |
+|---|---|---|---|
+| Tarjeta | `tarjeta-de-la-pregunta` | `bg-panel border border-muted/60 rounded-xl p-6` | — |
+| Número y módulo | `numero-de-pregunta` | `font-mono text-xs text-muted` | 12 px |
+| Enunciado | `enunciado` | `mt-3 font-display font-bold text-xl text-paper leading-snug break-words` | 20 px |
+| Lista | `alternativas` | `mt-5 grid gap-2.5` | — |
+| Alternativa | `alternativa` | `border border-muted/60 bg-panel rounded-lg px-4 py-3.5 text-base text-paper leading-normal break-words` | 16 px |
+| Alternativa marcada | `alternativa` | `border-paper bg-panel2`, más `icon i-check-circle text-xl text-paper` | 16 px |
+
+La marca ocupa su sitio siempre (`w-5`), puesta o no: si apareciera solo al marcar, el texto se correría a la derecha bajo
+el dedo que acaba de tocarlo.
+
+**Los dos botones.**
+
+| Elemento | `data-papel` | Clases | Tamaño |
+|---|---|---|---|
+| «Siguiente» | `siguiente` | `grow bg-paper text-ink font-display font-bold text-base px-6 py-4 rounded` con `icon i-next text-xl` | 16 px |
+| «Omitir» | `omitir` | `shrink-0 border border-muted/60 text-paper font-display font-bold text-base px-5 py-4 rounded` con `icon i-skip text-xl` | 16 px |
+
+**«Siguiente» es `paper` y no `jsyellow`**, contra la costumbre del sitio: en esta pantalla el amarillo ya significa el
+tiempo, y un botón amarillo junto a un cronómetro amarillo son dos cosas distintas del mismo color a veinte centímetros.
+Sobre `ink`, `paper` da 19,57:1 y se lee como el control principal sin pedirle prestado el significado a nadie.
+
+**El resumen.** Resultado en `bg-panel border border-muted/60 rounded-xl p-6 text-center`, con la cifra en
+`font-display font-bold text-5xl text-esmeralda tabular-nums` (48 px) y la píldora `border border-esmeralda rounded-full`.
+Desglose con una fila por módulo, `border-b border-muted/60 py-3`, y las tres cifras en `font-mono text-sm text-paper`
+cada una con su ícono de color. Revisión con `bg-panel border-l-2` del color del estado, la palabra en
+`font-display font-bold text-sm text-paper` y el ícono en el color del estado.
+
+### Los cuatro íconos
+
+Los cuatro son **Material Symbols Light, de Google, bajo Apache 2.0**, la misma fuente y la misma licencia que los otros
+cuarenta de `static/resources/`. El crédito viaja dentro de cada SVG. **La atribución pendiente de `acerca-de.html` no
+crece con esto**: Material Symbols ya estaba en esa lista.
+
+| Clase | Archivo | Dónde va |
+|---|---|---|
+| `i-clock` | `clock.svg` | El cronómetro de 30 s de la franja |
+| `i-clock-total` | `clock-total.svg` | El tiempo transcurrido. Forma distinta del anterior a propósito: dos relojes iguales se confunden |
+| `i-next` | `next.svg` | «Siguiente» |
+| `i-skip` | `skip.svg` | «Omitir», y las omitidas del desglose y de la revisión |
+
+### El presupuesto vertical, calculado
+
+Con el peor caso del banco —**pregunta 94**, 384 caracteres, empatada con la 254— a 375 px de ancho. Lo calcula
+`probar-identidad-visual.mjs` leyendo las clases del marcado; el modelo de ancho de letra tiene un error esperado de ±5 %,
+así que el número exacto lo confirma el navegador.
+
+| | px |
+|---|---|
+| Ancho útil del contenido (sección `px-5`) | 335 |
+| Número de pregunta | 16 |
+| Enunciado, 4 líneas a 20 px | 110 |
+| Alternativas, 3+3+3+3 líneas a 16 px | 438 |
+| **Tarjeta entera** | **646** |
+| Botones | 56 |
+| **Pide bajo la franja** (24 de aire + tarjeta + 24 + botones) | **750** |
+| Útiles en 375×667 (667 − 64 de encabezado − 57 de franja) | 546 → **desplazar 204** |
+| Útiles en 375×812 | 691 → **desplazar 59** |
+
+La alternativa con el token de 40 caracteres sin espacios mide **309 px** a 16 px y la caja le da **219 px**: sin
+`break-words` desbordaría a lo ancho; con él, ocupa dos líneas.
+
+---
+
 ## Tareas
 
 - [ ] **Antes de rediseñar nada:** desacoplar de las clases las comprobaciones que leen el marcado con expresiones
@@ -188,6 +371,166 @@ se alinea después o se queda como está.
 - **Que el cronómetro funcione:** aquí solo se dibuja. Lo conecta la 42.
 - **Que el significado declarado de cada color sea el que el estudiante entiende.** Eso lo juzga la pasada del autor.
 
+## Lista de verificación en el navegador
+
+Con `npm run datos:dev` levantado, en `http://127.0.0.1:8788`. Las tres direcciones se escriben a mano: no hay enlace a
+ninguna, igual que no lo hay a la página (los enlaces son de la iteración 44).
+
+    simulacro.html?maqueta=intento
+    simulacro.html?maqueta=intento&urgente=1
+    simulacro.html?maqueta=intento&avisos=1
+    simulacro.html?maqueta=resumen
+    simulacro.html?maqueta=resumen&avisos=1
+
+`avisos=1` enciende los dos avisos de la decisión 6. Van detrás de un parámetro porque son estados excepcionales:
+encendidos por omisión sumarían su alto al presupuesto vertical y el número calculado dejaría de ser el de la pantalla
+normal.
+
+### 1 · Se reconoce como el sitio, y no es el cuestionario
+
+- **Qué hacer:** abre `cuestionario.html` y `simulacro.html?maqueta=intento` en dos pestañas y alterna entre ellas sin
+  leer el texto.
+- **Qué deberías ver:** el mismo negro, la misma tipografía y el mismo amarillo; y una sola pregunta grande contra una
+  lista de sesenta pequeñas.
+- **Qué cuenta como falla:** que haya que leer para saber en cuál estás, o que el simulacro parezca de otro sitio.
+
+### 2 · El cronómetro es lo primero que se ve
+
+- **Qué hacer:** abre `?maqueta=intento` en teléfono (375 px) y en computador (1280 px). Mira la pantalla medio segundo y
+  cierra los ojos.
+- **Qué deberías ver:** el «30» amarillo de 36 px arriba a la izquierda, antes que cualquier otra cosa.
+- **Qué cuenta como falla:** que lo primero sea el enunciado, el botón «Siguiente» o el encabezado.
+
+### 3 · La franja no tapa la pregunta al desplazar
+
+- **Qué hacer:** en 375×667, desplaza hasta el final de la maqueta del intento y vuelve arriba.
+- **Qué deberías ver:** la franja siempre visible bajo el encabezado, y el texto pasando por debajo sin que ninguna línea
+  quede escondida detrás de ella al detenerse.
+- **Qué cuenta como falla:** que la primera línea del enunciado nazca tapada, o que la franja se desplace con la página.
+
+### 4 · Las cuatro alternativas y los dos botones se alcanzan con el pulgar
+
+- **Qué hacer:** en 375×667, con el peor caso ya cargado, recorre la pantalla con el pulgar hasta pulsar «Omitir».
+- **Qué deberías ver:** hay que desplazar —unos 204 px, un gesto— y los dos botones quedan separados lo suficiente para
+  no confundirlos. «Siguiente» ocupa el ancho sobrante y «Omitir» es el estrecho de la derecha.
+- **Qué cuenta como falla:** que haga falta más de un gesto de desplazamiento, que los botones queden pegados, o que al
+  pulsar uno se toque el otro.
+
+### 5 · La alternativa con el token de 40 caracteres no desborda
+
+- **Qué hacer:** abre `?maqueta=resumen` en 375 px y busca la fila roja de la revisión, la de «pregunta 13». Su respuesta
+  es `document.getElementById("nodo").click();`, el token más largo del banco sin un solo espacio.
+- **Qué deberías ver:** el token partido en dos líneas dentro de su caja.
+- **Qué cuenta como falla:** que aparezca una barra de desplazamiento horizontal en la página, que el texto se salga de
+  la tarjeta, o que la tarjeta se ensanche más allá de los 335 px de contenido.
+
+### 6 · La urgencia se distingue, y en escala de grises también
+
+- **Qué hacer:** abre `?maqueta=intento` y `?maqueta=intento&urgente=1` en dos pestañas y alterna. Repite con el filtro de
+  escala de grises de DevTools (Rendering → Emulate vision deficiencies → Achromatopsia).
+- **Qué deberías ver:** en color, la franja pasa de negra a amarilla entera con la tinta en negro y «quedan 5 segundos» en
+  el sitio del avance. En gris, pasa de casi negra a casi blanca.
+- **Qué cuenta como falla:** que en escala de grises las dos franjas se parezcan, o que la franja cambie de alto y empuje
+  la pregunta.
+
+### 7 · Aciertos, errores y omitidas se distinguen en escala de grises
+
+- **Qué hacer:** `?maqueta=resumen` con el mismo filtro de escala de grises.
+- **Qué deberías ver:** tres siluetas distintas —el círculo con tilde, la equis en círculo, el círculo con la barra— y
+  las tres palabras «Correcta», «Incorrecta» y «Omitida».
+- **Qué cuenta como falla:** que dos estados queden indistinguibles sin leer.
+
+### 8 · Las cuatro pantallas son coherentes entre sí
+
+- **Qué hacer:** recorre en orden la presentación (`simulacro.html`), la transición (pulsa «Comenzar el simulacro»), el
+  intento (`?maqueta=intento`) y el resumen (`?maqueta=resumen`).
+- **Qué deberías ver:** el mismo borde gris en todas las superficies, el mismo fondo negro, la misma familia de tarjeta.
+- **Qué cuenta como falla:** una pantalla con bordes de otro color o de otro grosor que las demás.
+
+### 9 · El movimiento reducido no deja nada moviéndose
+
+- **Qué hacer:** activa «Emulate CSS prefers-reduced-motion: reduce» en DevTools y recorre las tres maquetas.
+- **Qué deberías ver:** nada se mueve en ninguna de las tres. La transición de carga sigue mostrando sus tres puntos,
+  quietos.
+- **Qué cuenta como falla:** cualquier cosa que lata, gire o se desplace sola dentro de las maquetas.
+
+### 10 · Sin errores de consola
+
+- **Qué hacer:** abre la consola y recorre las tres maquetas y la presentación, pulsando «Comenzar el simulacro».
+- **Qué deberías ver:** ni un error ni una advertencia nueva.
+- **Qué cuenta como falla:** cualquier mensaje rojo o amarillo que no estuviera antes.
+
+### 11 · El panel del cuestionario a 1280 × 700, que el cálculo desmiente
+
+- **Qué hacer:** abre `cuestionario.html` con la ventana en exactamente 1280 × 700, elige un módulo y **sin desplazar la
+  página**, mira hasta dónde llega el panel de la derecha.
+- **Qué deberías ver:** según ADR-032, el panel entero, hasta «Reiniciar el módulo» incluido. Según el cálculo de la
+  lectura de alcance del 2026-09-18, el panel pide **1.340 a 1.366 px** de alto natural sobre **636 disponibles**, así que
+  el botón debería quedar fuera por más de 700 px.
+- **Qué cuenta como falla:** esto no es una falla de la iteración 45 en ninguno de los dos resultados; es la medición que
+  decide cuál de los dos tiene razón. **Anota lo que veas**: si el botón no se alcanza, ADR-032 afirma dos veces algo
+  falso y hay que abrir una ADR que la corrija; si se alcanza, el cálculo de la lectura de alcance está mal y hay que
+  decir por qué. En los dos casos, el resultado se registra en `registro_log.md`.
+
+### 12 · Los avisos compactos dicen lo mismo en una línea (decisión 6)
+
+- **Qué hacer:** abre `?maqueta=intento&avisos=1` y `?maqueta=resumen&avisos=1` en 375 px, y compáralos.
+- **Qué deberías ver:** en el intento, dos líneas de una sola altura sobre la franja —«Estás viendo una copia guardada
+  del banco. Es la copia del 10 de septiembre de 2026.» y «Tu intento ya no se está guardando.»—, cada una con su ícono.
+  En el resumen, los dos avisos enteros, con su explicación.
+- **Qué cuenta como falla:** que el aviso compacto ocupe dos líneas de texto, que pierda la fecha de la copia, o que en
+  alguno de los dos deje de avisarse algo que antes se avisaba.
+
+### 13 · El cuestionario no cambió
+
+- **Qué hacer:** abre `cuestionario.html`, elige un módulo y mira la transición de carga y una tarjeta de pregunta.
+- **Qué deberías ver:** exactamente lo de siempre, con su borde `panel3`, no el borde gris del simulacro.
+- **Qué cuenta como falla:** cualquier diferencia respecto de antes de esta iteración.
+
 ## Notas de la iteración
 
-_Pendiente._
+- **La maqueta se mira con un parámetro, no con una cuarta página.** `?maqueta=intento` y `?maqueta=resumen`. Una página
+  más habría duplicado por cuarta vez el encabezado y el pie —que `comprobar-copias.mjs` vigila justamente porque tres
+  copias a mano ya fueron demasiado—, y la maqueta tiene que verse **bajo este encabezado fijo**, porque el presupuesto
+  vertical de la decisión 1 se cuenta desde ahí. La rama corta antes de conectar nada: no se arma intento, no se registra
+  ningún oyente y no sale ni una petición.
+
+- **El marcado son funciones, no HTML pegado en la página.** Lo que la 43 tiene que hacer para conectar el intento es
+  llamar a `dibujarPantallaDelIntento()` con la pregunta de verdad en vez de la de ejemplo. Con HTML suelto, conectarlo
+  habría significado volver a escribirlo, que es lo que esta iteración existe para evitar.
+
+- **La pregunta de ejemplo está copiada a mano y no importada de la instantánea**, y hay un guion que comprueba que siga
+  siendo el peor caso. Importarla tendría dos problemas: la maqueta dibujaría el peor caso *del día*, que puede dejar de
+  serlo, y traería el banco entero a una página para sacar 384 caracteres.
+
+- **Entró un comprobador nuevo, `probar-identidad-visual.mjs`, y corre dentro de `npm run verificar`.** Hasta hoy
+  **ninguna comprobación miraba el contraste** ni que una clase `i-*` existiera en `icons.css`: el `text-ruby` a 14 px de
+  `#valor-incorrectas` llevaba meses publicado sin que nada se quejara. Camina el árbol del marcado para saber sobre qué
+  fondo está cada elemento, así que la tabla dice «sobre `panel`» porque el elemento está dentro de un `bg-panel`, no
+  porque alguien lo escribió.
+
+- **Dos errores del comprobador salieron de provocarle rojos, y los dos importan.** El primero: leía `border-b` y
+  `border-l-2` como colores y daba trece rojos contra el marcado correcto —una comprobación que grita con el código bueno
+  se aprende a ignorar, que es H-013—. El segundo, peor: `border-[#7a2e2e]` **pasaba en verde**, porque la detección pedía
+  una letra después del guion y ahí venía un corchete. Ese es exactamente uno de los dos colores de fuera de la paleta que
+  pinta `.quiz-option[data-state='wrong']`, o sea el caso que más importaba era el único que no se miraba.
+
+- **La palabra de estado de la revisión va en `paper` y no en el color del estado**, y eso también salió de medir:
+  «Incorrecta» en `text-ruby` a 14 px en negrita da 3,98:1 sobre un umbral de 4,5. Las otras dos pasaban, que es como se
+  cuela la tercera.
+
+- **El aviso de ADR-008 no se repintó a propósito.** Lo comparten las dos páginas, así que su `border-jsyellow/40` de
+  2,96:1 se queda: cambiarlo habría repintado el cuestionario. Queda escrito en la guía visual, con el motivo por el que
+  no incumple 1.4.11.
+
+- **La transición de carga cambió de aspecto por parámetro.** `crearTransicionDeCarga({ borde })`, con
+  `BORDE_POR_OMISION = 'border-panel3'` exportado. El cuestionario no pide nada y sigue dibujando lo suyo; el simulacro
+  pide el borde de la decisión 8. Hay un guion que comprueba las tres mitades: que el cuestionario no pida aspecto, que el
+  simulacro sí, y que el borde por omisión no haya cambiado.
+
+- **Los dos pendientes del texto de la presentación se cerraron**, y eran de la iteración 43: el párrafo de entrada ya no
+  afirma nada del examen real —compara con el cuestionario de práctica, que es algo que este sitio sí sabe— y el dato de
+  los 120 minutos lleva su origen escrito debajo, con la misma forma que el aviso de programación de la iteración 36.
+
+- **Lo que esta iteración no puede afirmar sigue siendo lo que decía:** que el cronómetro funcione —aquí solo se dibuja,
+  lo conecta la 42— y que el significado declarado de cada color sea el que el estudiante entiende.
