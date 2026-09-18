@@ -1992,6 +1992,52 @@ de la iteración 33 —que el avance vive solo en este dispositivo, y que no se 
 viven en la **zona de preguntas**, no en el panel. El panel no crece ni una fila, y la ventana
 de 700 px de alto sigue alcanzando hasta el botón de reiniciar.
 
+### Actualización · 2026-09-18 · la ventana de 700 px NO alcanza el botón de reiniciar
+
+*Medición confirmada por el autor con captura de pantalla real, al cerrar la iteración 45.*
+
+**La afirmación de esta ADR es falsa, y lo era desde que se escribió.** Esta ADR dice dos
+veces que en una ventana de 700 px de alto el panel llega hasta «Reiniciar el módulo» sin que
+haya que desplazarse: una en la actualización del 2026-09-11 —«por eso la iteración 32 mantiene
+el criterio de la ventana de 700 px de alto»— y otra, con todas sus letras, al final de la
+actualización del 2026-09-15 —«la ventana de 700 px de alto sigue alcanzando hasta el botón de
+reiniciar»—. **No alcanza.**
+
+**Lo que se midió, a 1280 × 700, en la parte superior de la página y sin desplazar:**
+
+- El **índice de los siete módulos se corta a la mitad de la fila del Módulo 6.**
+- Quedan fuera de los 700 px, y hay que desplazarse para verlos: **las tres barras de
+  progreso**, el botón **«Reiniciar el módulo»** y los **enlaces de NotebookLM**.
+- El panel mide entre **1.340 y 1.366 px** de alto natural contra **636 px** disponibles bajo
+  el encabezado fijo. Sobra más del doble de lo que cabe.
+
+**De dónde salió.** El cálculo lo hizo la lectura de alcance de la **iteración 45** el
+2026-09-18, sumando el alto declarado de cada bloque del panel, y contradecía a esta ADR. Por
+eso la 45 lo puso como punto 11 de su lista de verificación en el navegador —**no** como un
+criterio de aprobar o fallar, sino como la medición que decidía cuál de los dos tenía razón— y
+dejó el resultado anotado en `registro_log.md` mientras faltaba. La captura del autor lo
+resolvió: **tenía razón el cálculo.**
+
+**Esto NO pide arreglar nada.** No es un encargo de achicar el panel, de reordenarlo ni de
+tocar el diseño. Lo único que hace esta actualización es **dejar registrada la afirmación
+corregida**, para que nadie vuelva a apoyarse en ella. Si más adelante se decide acortar el
+panel, será **una decisión de diseño aparte**, con su propia ADR o su propia iteración.
+
+**Qué queda en pie de esta ADR, que es casi todo.** El sitio del control no se mueve: los tres
+motivos de la decisión original —un control no puede ir después de lo que gobierna, el panel es
+pegajoso mientras la zona derecha no lo es, y en teléfono esta columna se apila primero— no
+dependen de que el panel quepa en 700 px. Lo que se cae es **el argumento del coste vertical**
+tal como estaba escrito: la frase «el panel no crece ni una fila, y la ventana de 700 px de
+alto sigue alcanzando hasta el botón de reiniciar» se sostenía sobre una premisa que nadie
+había medido. «El panel no crece ni una fila» sigue siendo cierto y sigue siendo una buena
+regla; lo falso era la conclusión que se le colgaba.
+
+**Y la lección, que vale más que el dato.** Esta afirmación sobrevivió a dos actualizaciones de
+su propia ADR y a tres iteraciones, repetida cada vez con más confianza, **sin que nadie la
+midiera ni una sola vez**. Es el mismo patrón del contador de la portada —«21 preguntas de
+práctica» con 368 en el banco— y del `text-ruby` de `#valor-incorrectas`: lo que no tiene quien
+lo compruebe se degrada en silencio, y repetirlo no lo vuelve verdadero.
+
 ---
 
 ## ADR-033 · `/api/preguntas?resumen=1`: los siete conteos por módulo, sin traerse el banco
