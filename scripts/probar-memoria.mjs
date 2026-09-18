@@ -117,6 +117,8 @@ async function correrLaVisita(archivoDeEncargo) {
     // que hay que vigilar aqui es lo que NO se movio —el panel, el almacen y la
     // memoria de la visita— alrededor de un clic concreto.
     alPulsarLoViejo: [],
+    // Lo que se anoto en el intento del simulacro, con si quedo guardado.
+    anotadas: [],
   };
 
   /** El lector del DOM falso. Vive aqui fuera para poder retratarlo pase lo que pase. */
@@ -135,7 +137,10 @@ async function correrLaVisita(archivoDeEncargo) {
     let almacen = null;
 
     if (encargo.almacen === 'normal' || encargo.almacen === 'escritura-lanza') {
-      almacen = almacenDeMentira({ escrituraProhibida: encargo.almacen === 'escritura-lanza' });
+      almacen = almacenDeMentira({
+        escrituraProhibida: encargo.almacen === 'escritura-lanza',
+        cupo: encargo.cupo ?? Infinity,
+      });
       for (const [clave, valor] of Object.entries(guardado)) almacen.datos.set(clave, valor);
     }
 
@@ -194,6 +199,52 @@ async function correrLaVisita(archivoDeEncargo) {
     // desde una copia del arbol a la que le falta el archivo, que es la unica forma
     // honesta de provocar «ni resumen ni instantanea» sin tocar el repositorio.
     const raizDelSitio = encargo.sitio ?? SITIO;
+
+    // --- La pagina del simulacro (iteracion 41, etapa C) ---------------------
+    //
+    // Se monta aqui y no en un guion aparte a proposito. Lo que hace falta para
+    // probar el intento guardado es exactamente lo que este archivo ya tiene: un
+    // proceso por visita, el almacen persistido a un archivo —que es lo unico que
+    // convierte «otra visita» en una recarga de verdad—, `almacenDeMentira` con sus
+    // tres formas de negarse, y la intercepcion del banco. Copiarlo a otro guion
+    // dejaria dos orquestadores que se quedan callados el dia que divergen.
+    if (encargo.pagina === 'simulacro') {
+      const simulacro = await import(
+        pathToFileURL(join(raizDelSitio, 'components', 'simulacro.js')).href
+      );
+
+      const intentoGuardado = await import(
+        pathToFileURL(join(raizDelSitio, 'servicios', 'intento-guardado.js')).href
+      );
+
+      // Lo mismo que hace static/js/simulacro-main.js al abrir la pagina, y en el
+      // mismo orden. Si esa lista creciera y esta no, la visita estaria probando una
+      // pagina a medio conectar.
+      simulacro.conectarComienzo();
+      simulacro.retomarElIntento();
+
+      // Un retrato ANTES de dar ningun paso: es lo que se ve al abrir, y es donde se
+      // mira si un intento guardado se retomo solo.
+      salida.pasos.push(retratoDelSimulacro(dom, { tipo: 'al-abrir' }, simulacro));
+
+      for (const paso of encargo.pasos) {
+        await darElPasoDelSimulacro(paso, dom, simulacro, intentoGuardado, salida, { almacen });
+        salida.pasos.push(retratoDelSimulacro(dom, paso, simulacro));
+      }
+
+      console.warn = warnReal;
+
+      salida.almacen =
+        almacen && typeof almacen !== 'function' ? Object.fromEntries(almacen.datos) : {};
+
+      if (almacen && typeof almacen !== 'function') {
+        writeFileSync(encargo.disco, JSON.stringify(salida.almacen, null, 2));
+      }
+
+      salida.final = retratoDelSimulacro(dom, { tipo: 'final' }, simulacro);
+      writeFileSync(encargo.salida, JSON.stringify(salida, null, 2));
+      return;
+    }
 
     const cuestionario = await import(
       pathToFileURL(join(raizDelSitio, 'components', 'cuestionario.js')).href
@@ -702,6 +753,122 @@ function retrato(dom, paso) {
   };
 }
 
+/**
+ * Lo que se ve de la pagina del simulacro despues de un paso.
+ *
+ * Se mira **lo que el componente dibujo**, como en el resto de este archivo, y ademas
+ * dos cosas que no estan en el HTML y que son justo las que hay que vigilar aqui: los
+ * ids del intento en curso y cual era la correcta de cada pregunta. No estan
+ * dibujadas porque la decision 11 prohibe dibujar texto del banco, asi que se piden
+ * al componente —`preguntasDelIntento()` existe para esto—.
+ */
+function retratoDelSimulacro(dom, paso, simulacro) {
+  const zona = dom.html('#zona-del-intento');
+  const preguntas = simulacro.preguntasDelIntento();
+
+  const correctaDe = (pregunta) =>
+    pregunta.alternativas.find((a) => a.es_correcta === 1) ?? null;
+
+  return {
+    paso,
+    // El titulo del recuadro: «Intento listo», «Intento retomado» o «No se pudo…».
+    titulo: zona.match(/font-display font-bold text-xl text-paper">([^<]*)</)?.[1] ?? '',
+    cuentasPorModulo: [...zona.matchAll(/text-jsyellow">(\d+)</g)].map((m) => Number(m[1])),
+    tieneBoton: zona.includes('id="comenzar-simulacro"'),
+    rotuloDelBoton: (
+      zona.match(/id="comenzar-simulacro"[^>]*>([\s\S]*?)<\/button>/)?.[1] ?? ''
+    )
+      .replace(/<[^>]*>/g, '')
+      .trim(),
+    largoDelHtml: zona.length,
+    enfocado: dom.enfocado(),
+    // El intento que el componente tiene entre manos, en su orden.
+    idsDelIntento: preguntas.map((p) => p.id),
+    modulosDelIntento: preguntas.map((p) => p.modulo),
+    // Con que se va a corregir: el id y el texto de la correcta de cada pregunta,
+    // sacados de la copia que el componente tiene, no del banco. Es lo que delata que
+    // alguien volvio a pedirle las preguntas al banco al retomar.
+    correctasDelIntento: preguntas.map((p) => correctaDe(p)?.id ?? null),
+    textosCorrectos: preguntas.map((p) => correctaDe(p)?.texto ?? null),
+    avisoGuardado: {
+      oculto: dom.oculto('#aviso-guardado'),
+      html: dom.html('#aviso-guardado'),
+    },
+    avisoRespaldo: { oculto: dom.oculto('#aviso-respaldo') },
+  };
+}
+
+/** Ejecuta un paso del encargo sobre la pagina del simulacro. */
+async function darElPasoDelSimulacro(paso, dom, simulacro, intentoGuardado, salida, { almacen }) {
+  // Pulsar «Comenzar el simulacro» o «Empezar otro intento». Se dispara el evento
+  // sobre la zona, que es donde el componente puso su oyente, en vez de llamar a la
+  // funcion: asi se prueba el camino que recorre el estudiante, botones nuevos
+  // incluidos.
+  if (paso.tipo === 'comenzar') {
+    dom.disparar('#zona-del-intento', 'click', {
+      target: { closest: (s) => (s === '#comenzar-simulacro' ? {} : null) },
+    });
+
+    // El oyente no es `async`, asi que hay que esperar a que la carga termine. El
+    // piso de la transicion son 400 ms y la carga local unos 300: 1500 es holgado sin
+    // ser una espera ciega larga.
+    await new Promise((listo) => setTimeout(listo, paso.espera ?? 1500));
+    return;
+  }
+
+  // Responder las siguientes N preguntas del intento, por la costura que la
+  // iteracion 43 va a usar. Se elige SIEMPRE la alternativa que esta en la posicion
+  // `paso.alternativa` (0 por defecto) de la copia congelada, para que lo anotado sea
+  // predecible y se pueda comparar despues.
+  if (paso.tipo === 'responder') {
+    const preguntas = simulacro.preguntasDelIntento();
+    const desde = paso.desde ?? 0;
+
+    for (let i = 0; i < paso.cuantas; i += 1) {
+      const pregunta = preguntas[desde + i];
+      if (!pregunta) break;
+
+      const cual = paso.alternativa ?? 0;
+      const alternativa = pregunta.alternativas[cual] ?? pregunta.alternativas[0];
+      const omitida = paso.omitir === true;
+
+      const pudo = simulacro.anotarEnElIntento({
+        pregunta_id: pregunta.id,
+        alternativa_id: omitida ? null : alternativa.id,
+        estado: omitida ? 'omitida' : 'respondida',
+        agotada: Boolean(paso.agotada),
+        resuelta_en: 1789000000000 + (desde + i) * 30000,
+      });
+
+      salida.anotadas.push({
+        pregunta_id: pregunta.id,
+        alternativa_id: omitida ? null : alternativa.id,
+        guardada: pudo,
+      });
+    }
+
+    return;
+  }
+
+  // El almacen se llena a mitad del intento. No es una bandera de arranque: el
+  // estudiante empezo con sitio y se quedo sin el (decision 7).
+  if (paso.tipo === 'llenar-el-almacen') {
+    if (almacen && typeof almacen !== 'function') almacen.prohibirEscritura();
+    return;
+  }
+
+  // Lo que el servicio de guardado devuelve al leer, sin pasar por la pantalla. Es la
+  // otra mitad del criterio del dato corrupto: la pantalla no se rompe Y la lectura
+  // dice que no hay nada que entender.
+  if (paso.tipo === 'mirar-lo-guardado') {
+    salida.loGuardado = intentoGuardado.leerIntentoGuardado();
+    salida.estadoDelGuardado = intentoGuardado.estadoDelGuardado();
+    return;
+  }
+
+  throw new Error(`paso del simulacro desconocido: ${paso.tipo}`);
+}
+
 /** Lo que dice cada fila del indice: su cifra y su nombre accesible. */
 function filasDelIndice(html) {
   return [...html.matchAll(/data-modulo="(\d+)"[\s\S]*?aria-label="([^"]*)"[\s\S]*?text-mutedink[^>]*>([^<]*)</g)].map(
@@ -851,6 +1018,11 @@ function visitar({
   // Cuanto tarda la respuesta de cada modulo, en ms (iteracion 35). Sin retraso,
   // la carga local dura unos 30 ms y no hay ventana en la que pulsar nada.
   retrasos = null,
+  // Que pagina abre la visita: 'cuestionario' (lo de siempre) o 'simulacro'
+  // (iteracion 41, etapa C). El almacen, el disco y la intercepcion son los mismos.
+  pagina = 'cuestionario',
+  // Cuantos bytes caben en el almacen. Sin esto, Infinity (iteracion 41, etapa C).
+  cupo = null,
 }) {
   visitas += 1;
 
@@ -859,7 +1031,7 @@ function visitar({
 
   writeFileSync(
     encargo,
-    JSON.stringify({ disco, almacen, pasos, intercepcion, sitio, salida, caerLaRed, retrasos })
+    JSON.stringify({ disco, almacen, pasos, intercepcion, sitio, salida, caerLaRed, retrasos, pagina, cupo })
   );
 
   const corrida = spawnSync(process.execPath, [join(AQUI, 'probar-memoria.mjs'), `--visita=${encargo}`], {
@@ -2838,6 +3010,757 @@ for (const ruta of rutasVistas) {
 notas.push(
   `El avance no viaja: en ${todasLasVisitas.length} visitas, las unicas rutas pedidas fueron ` +
     `${[...rutasVistas].sort().join(', ')}, todas sin cuerpo.`
+);
+
+// ===========================================================================
+// 12 · El intento del simulacro (iteracion 41, etapa C)
+//
+// Otra pagina y otro formato, pero exactamente la misma pregunta que las once
+// secciones de arriba: **¿lo que se guarda dice la verdad al volver?**
+//
+// Lo que cambia respecto del cuestionario, y por que hay que probarlo aparte:
+//
+//   1. **Las preguntas se guardan congeladas.** ADR-034 recalcula el veredicto
+//      contra el banco vigente; aqui el intento se corrige con lo que el estudiante
+//      vio (decision 6 de la iteracion 41). Son reglas opuestas, y la de aqui solo
+//      se puede comprobar cambiando el banco entre una visita y la otra.
+//   2. **Son dos claves atadas.** Media copia congelada con las respuestas de otro
+//      intento es la peor lectura posible, y la unica forma de verlo es plantarla.
+//   3. **El intento no se puede jugar a medias.** Un intento de 119 no es corto, es
+//      roto: donde el cuestionario descarta una respuesta, aqui se descarta todo.
+// ===========================================================================
+
+/** Un disco con lo que se le plante dentro, para poder provocar datos rotos. */
+function discoCon(nombre, contenido) {
+  const ruta = join(taller, `${nombre}.json`);
+  writeFileSync(ruta, JSON.stringify(contenido, null, 2));
+  return ruta;
+}
+
+const CLAVE_PREGUNTAS = 'examen-td-js.simulacro.preguntas';
+const CLAVE_RESPUESTAS = 'examen-td-js.simulacro.respuestas';
+
+/**
+ * Interpreta una clave del disco, o cierra en rojo diciendo cual falta.
+ *
+ * NO se usa `JSON.parse` a pelo. Se descubrio provocandolo el 2026-09-18: con la
+ * retoma mutada para volver a pedirle las preguntas al banco, la clave no estaba y el
+ * guardian termino con un volcado de pila en vez de un veredicto. Un guardian que se
+ * cae no da veredicto, y H-013 dice que eso NO es un aprobado: el mutante tiene que
+ * salir por la puerta de los rojos, con su frase, no por la de los errores.
+ */
+function claveDelDisco(guardado, clave, cuando) {
+  const crudo = guardado[clave];
+
+  if (typeof crudo !== 'string') {
+    problemas.push(`${cuando}: no quedo la clave ${clave} en el almacen`);
+    veredictoRoto();
+  }
+
+  try {
+    return JSON.parse(crudo);
+  } catch {
+    problemas.push(`${cuando}: la clave ${clave} quedo con algo que no es JSON`);
+    veredictoRoto();
+  }
+
+  return null;
+}
+
+const discoSimulacro = discoNuevo('simulacro');
+
+// --- 12a · Al empezar, el intento queda guardado --------------------------
+
+const s1 = visitar({
+  disco: discoSimulacro,
+  pagina: 'simulacro',
+  pasos: [{ tipo: 'comenzar' }],
+});
+
+if (s1.final.titulo !== 'Intento listo') {
+  problemas.push(
+    `al pulsar «Comenzar» el simulacro no armo el intento: dijo «${s1.final.titulo}»`
+  );
+  veredictoRoto();
+}
+
+const guardadoTrasEmpezar = leerDisco(discoSimulacro);
+
+if (!guardadoTrasEmpezar[CLAVE_PREGUNTAS] || !guardadoTrasEmpezar[CLAVE_RESPUESTAS]) {
+  problemas.push(
+    'al empezar el intento no quedaron las DOS claves bajo examen-td-js.simulacro.: ' +
+      `hay ${Object.keys(guardadoTrasEmpezar).join(', ') || 'ninguna'}`
+  );
+  veredictoRoto();
+}
+
+// Ninguna otra clave. El simulacro no puede escribir fuera de su tramo: es lo que la
+// convencion de la actualizacion de ADR-034 existe para garantizar, y lo que impide
+// que «Reiniciar el modulo» del cuestionario le borre algo.
+const clavesAjenas = Object.keys(guardadoTrasEmpezar).filter(
+  (clave) => !clave.startsWith('examen-td-js.simulacro.')
+);
+
+if (clavesAjenas.length > 0) {
+  problemas.push(
+    `el simulacro escribio fuera de su tramo de claves: ${clavesAjenas.join(', ')}`
+  );
+}
+
+const preguntasGuardadas = claveDelDisco(guardadoTrasEmpezar, CLAVE_PREGUNTAS, 'al empezar el intento');
+const respuestasGuardadas = claveDelDisco(guardadoTrasEmpezar, CLAVE_RESPUESTAS, 'al empezar el intento');
+
+if (preguntasGuardadas.v !== 1 || respuestasGuardadas.v !== 1) {
+  problemas.push(
+    'el intento guardado no lleva la version DENTRO del dato: ' +
+      `preguntas v=${preguntasGuardadas.v}, respuestas v=${respuestasGuardadas.v}`
+  );
+}
+
+if (
+  typeof preguntasGuardadas.intento_id !== 'string' ||
+  preguntasGuardadas.intento_id !== respuestasGuardadas.intento_id
+) {
+  problemas.push('las dos claves del intento no traen el mismo intento_id');
+}
+
+if (!Array.isArray(preguntasGuardadas.preguntas) || preguntasGuardadas.preguntas.length !== 120) {
+  problemas.push(
+    `la copia congelada no trae 120 preguntas: trae ${preguntasGuardadas.preguntas?.length}`
+  );
+}
+
+// Las preguntas se guardan ENTERAS: con sus alternativas y con cual era la correcta.
+// Sin eso el intento no se puede corregir sin volver a pedirle el banco a nadie, que
+// es justo lo que la decision 6 impide.
+const sinCorrecta = (preguntasGuardadas.preguntas ?? []).filter(
+  (p) =>
+    !Array.isArray(p.alternativas) ||
+    p.alternativas.length !== 4 ||
+    p.alternativas.filter((a) => a.es_correcta === 1).length !== 1
+);
+
+if (sinCorrecta.length > 0) {
+  problemas.push(
+    `${sinCorrecta.length} pregunta(s) de la copia congelada no traen sus 4 alternativas con 1 correcta`
+  );
+}
+
+// Y NO traen justificacion: no viajan con el intento (decision 1), las pide la 44.
+const conJustificacionGuardada = (preguntasGuardadas.preguntas ?? []).filter(
+  (p) => 'justificacion' in p
+);
+
+if (conJustificacionGuardada.length > 0) {
+  problemas.push(
+    `la copia congelada guardo ${conJustificacionGuardada.length} justificacion(es), y el intento no las lleva`
+  );
+}
+
+// Los campos previstos para las tres iteraciones que vienen. Se comprueban por
+// nombre y no «que haya algo»: la decision 6 los fija AHORA para no tener que subir
+// de version a mitad de epica, y un campo que falte se descubre en la 42 o en la 43,
+// con intentos de estudiantes reales ya guardados.
+const CAMPOS_PREVISTOS = {
+  empezado_en: 'iteracion 42 · tiempo transcurrido',
+  posicion: 'iteracion 43 · que pregunta esta en pantalla',
+  comenzada_en: 'iteracion 42 · los 30 segundos de la pregunta',
+  terminado_en: 'iteraciones 42 y 44 · el final del intento',
+  respuestas: 'iteracion 43 · lo respondido y lo omitido',
+};
+
+for (const [campo, para] of Object.entries(CAMPOS_PREVISTOS)) {
+  if (!(campo in respuestasGuardadas)) {
+    problemas.push(`al intento guardado le falta el campo «${campo}» (${para})`);
+  }
+}
+
+// Y el que NO tiene que estar (decision del autor, 2026-09-18): el resultado no se
+// guarda. Se recalcula desde la copia congelada y las respuestas, que ya estan las
+// dos ahi. Una segunda fuente de verdad para un numero derivable es lo que ADR-034
+// no admite.
+if ('resultado' in respuestasGuardadas) {
+  problemas.push(
+    'el intento guardado trae un campo «resultado»: el resultado se recalcula, no se guarda'
+  );
+}
+
+if (respuestasGuardadas.posicion !== 0 || respuestasGuardadas.respuestas.length !== 0) {
+  problemas.push(
+    `al empezar, el intento guardado no arranca en blanco: posicion ${respuestasGuardadas.posicion}, ` +
+      `${respuestasGuardadas.respuestas.length} respuesta(s)`
+  );
+}
+
+// Con almacenamiento sano no hay nada que avisar.
+if (s1.final.avisoGuardado.html !== '' || !s1.final.avisoGuardado.oculto) {
+  problemas.push(
+    'con almacenamiento sano, el simulacro dibujo el aviso de que no se esta guardando'
+  );
+}
+
+const pesoPreguntas = guardadoTrasEmpezar[CLAVE_PREGUNTAS].length;
+const pesoRespuestasVacia = guardadoTrasEmpezar[CLAVE_RESPUESTAS].length;
+
+notas.push(
+  `Intento guardado al empezar: dos claves bajo examen-td-js.simulacro., version 1 dentro del ` +
+    `dato, mismo intento_id en las dos, 120 preguntas congeladas con su correcta y sin ` +
+    `justificaciones, los ${Object.keys(CAMPOS_PREVISTOS).length} campos previstos para la 42, la ` +
+    `43 y la 44, y ningun campo «resultado». Pesan ${pesoPreguntas} y ${pesoRespuestasVacia} bytes.`
+);
+
+// --- 12b · Un cambio de respuesta reescribe SOLO su clave -----------------
+
+const s2 = visitar({
+  disco: discoSimulacro,
+  pagina: 'simulacro',
+  pasos: [{ tipo: 'responder', cuantas: 3 }],
+});
+
+const trasResponderTres = leerDisco(discoSimulacro);
+
+// Byte a byte. Es la unica forma de distinguir «la clave dice lo mismo» de «la clave
+// no se toco»: si se reescribiera con el mismo contenido, el estudiante pagaria 77
+// KiB por respuesta y nada en el dato lo delataria.
+if (trasResponderTres[CLAVE_PREGUNTAS] !== guardadoTrasEmpezar[CLAVE_PREGUNTAS]) {
+  problemas.push(
+    'responder reescribio la clave de las preguntas: tiene que reescribirse SOLO la de respuestas'
+  );
+}
+
+const respuestasTrasTres = claveDelDisco(trasResponderTres, CLAVE_RESPUESTAS, 'tras responder 3');
+
+if (respuestasTrasTres.posicion !== 3 || respuestasTrasTres.respuestas.length !== 3) {
+  problemas.push(
+    `tras responder 3, el intento guardado dice posicion ${respuestasTrasTres.posicion} y ` +
+      `${respuestasTrasTres.respuestas.length} respuesta(s)`
+  );
+}
+
+const CAMPOS_DE_UNA_RESPUESTA = ['pregunta_id', 'alternativa_id', 'estado', 'agotada', 'resuelta_en'];
+
+for (const campo of CAMPOS_DE_UNA_RESPUESTA) {
+  if (respuestasTrasTres.respuestas.some((r) => !(campo in r))) {
+    problemas.push(`a alguna respuesta guardada le falta el campo «${campo}»`);
+  }
+}
+
+// Lo anotado es lo guardado, y en el mismo orden: las tres primeras preguntas del
+// intento, con la alternativa que se eligio.
+const anotadasEsperadas = s2.anotadas.map((a) => [a.pregunta_id, a.alternativa_id]);
+const anotadasGuardadas = respuestasTrasTres.respuestas.map((r) => [r.pregunta_id, r.alternativa_id]);
+
+if (JSON.stringify(anotadasEsperadas) !== JSON.stringify(anotadasGuardadas)) {
+  problemas.push('lo guardado no coincide con lo que se anoto, o esta en otro orden');
+}
+
+if (s2.anotadas.some((a) => !a.guardada)) {
+  problemas.push('alguna respuesta no se pudo guardar con el almacenamiento sano');
+}
+
+notas.push(
+  `Un cambio reescribe una sola clave: tras 3 respuestas, la de preguntas quedo byte a byte ` +
+    `identica (${pesoPreguntas} bytes) y la de respuestas paso de ${pesoRespuestasVacia} a ` +
+    `${trasResponderTres[CLAVE_RESPUESTAS].length} bytes, con posicion 3 y los ` +
+    `${CAMPOS_DE_UNA_RESPUESTA.length} campos de cada entrada.`
+);
+
+// --- 12c · Simulando una recarga, el intento se retoma --------------------
+
+const s3 = visitar({ disco: discoSimulacro, pagina: 'simulacro', pasos: [] });
+
+const alAbrir = s3.pasos[0];
+
+if (alAbrir.titulo !== 'Intento retomado') {
+  problemas.push(
+    `al volver con un intento a medias, la pagina no lo retomo: dijo «${alAbrir.titulo}»`
+  );
+  veredictoRoto();
+}
+
+// LAS MISMAS 120, EN EL MISMO ORDEN. Se compara la secuencia entera y no el conjunto:
+// dos intentos con las mismas preguntas en distinto orden son intentos distintos en
+// cuanto la iteracion 43 empiece a recorrerlos por posicion.
+if (JSON.stringify(alAbrir.idsDelIntento) !== JSON.stringify(s1.final.idsDelIntento)) {
+  const mismoConjunto =
+    JSON.stringify([...alAbrir.idsDelIntento].sort((a, b) => a - b)) ===
+    JSON.stringify([...s1.final.idsDelIntento].sort((a, b) => a - b));
+
+  problemas.push(
+    mismoConjunto
+      ? 'el intento retomado trae las mismas 120 preguntas pero EN OTRO ORDEN'
+      : 'el intento retomado no trae las mismas 120 preguntas'
+  );
+}
+
+// Y no sale ni una peticion: se lee del almacen, no del banco.
+if (s3.peticiones.length !== 0) {
+  problemas.push(
+    `retomar el intento salio a la red ${s3.peticiones.length} vez(ces): tiene que salir de lo guardado`
+  );
+}
+
+// El orden guardado sigue siendo un orden MEZCLADO (decision del autor, 2026-09-18).
+// Sin esto, un retomado que reordenara por modulo pasaria las dos comprobaciones de
+// arriba el dia que el guardado tambien lo hiciera.
+const cambiosDeModulo = alAbrir.modulosDelIntento.filter(
+  (m, i) => i > 0 && m !== alAbrir.modulosDelIntento[i - 1]
+).length;
+
+if (cambiosDeModulo < 80) {
+  problemas.push(
+    `el intento retomado viene agrupado por modulo: solo ${cambiosDeModulo} cambios de modulo en 120`
+  );
+}
+
+if (alAbrir.rotuloDelBoton !== 'Empezar otro intento') {
+  problemas.push(
+    `tras retomar no hay forma de empezar otro intento: el boton dice «${alAbrir.rotuloDelBoton}»`
+  );
+}
+
+notas.push(
+  `Retoma: al volver, la pagina dijo «Intento retomado» con las mismas 120 preguntas en el mismo ` +
+    `orden —${cambiosDeModulo} cambios de modulo, o sea mezclado—, sin salir a la red ni una vez, ` +
+    'y con un boton para empezar otro.'
+);
+
+// --- 12d · Con el banco cambiado entre la carga y la recarga --------------
+//
+// Se corrige una pregunta DEL INTENTO en el banco: se le mueve la correcta de
+// alternativa, se le cambia el texto de una y se le renuevan los ids de las cuatro,
+// que es lo que hace `banco:actualizar` de verdad. El intento retomado tiene que
+// seguir trayendo la version que el estudiante vio.
+
+const unaDelIntento = preguntasGuardadas.preguntas[0];
+const textoQueSeCorrige = unaDelIntento.alternativas[0].texto;
+
+const s4 = visitar({
+  disco: discoSimulacro,
+  pagina: 'simulacro',
+  pasos: [{ tipo: 'mirar-lo-guardado' }],
+  intercepcion: { tipo: 'correcta-movida', pregunta: unaDelIntento.id, texto: textoQueSeCorrige },
+});
+
+const alAbrirConBancoCambiado = s4.pasos[0];
+
+if (
+  JSON.stringify(alAbrirConBancoCambiado.correctasDelIntento) !==
+  JSON.stringify(s1.final.correctasDelIntento)
+) {
+  problemas.push(
+    'con el banco corregido entre la carga y la recarga, el intento retomado cambio de correctas: ' +
+      'se esta corrigiendo con el banco de hoy y no con lo que el estudiante vio'
+  );
+}
+
+if (
+  JSON.stringify(alAbrirConBancoCambiado.textosCorrectos) !==
+  JSON.stringify(s1.final.textosCorrectos)
+) {
+  problemas.push('el intento retomado cambio el texto de alguna alternativa correcta');
+}
+
+// LA PRUEBA DE QUE NO SE VOLVIO A PEDIR. Es la mitad que de verdad cierra el caso:
+// si no salio ni una peticion, no hay forma de que el banco corregido haya entrado.
+if (s4.peticiones.length !== 0) {
+  problemas.push(
+    `con el banco cambiado, la retoma salio a la red ${s4.peticiones.length} vez(ces)`
+  );
+}
+
+notas.push(
+  `Banco cambiado entre la carga y la recarga: con la correcta de la pregunta ${unaDelIntento.id} ` +
+    'movida de alternativa y los ids de las cuatro renovados por intercepcion, el intento retomado ' +
+    'conservo las 120 correctas y sus textos, y no salio a la red ni una vez.'
+);
+
+// --- 12e · Un dato corrupto o de otra version se ignora -------------------
+//
+// Cuatro formas de que lo guardado no se pueda entender, y las cuatro terminan igual:
+// la pagina se queda en su presentacion, no lanza, y `leerIntentoGuardado()` dice que
+// no hay nada. Se descarta el intento ENTERO y no entrada por entrada, porque una
+// entrada rota desalinea `respuestas[i]` de `preguntas[i]` y con eso la posicion pasa
+// a mentir.
+
+const conVersionVieja = {
+  [CLAVE_PREGUNTAS]: JSON.stringify({ ...preguntasGuardadas, v: 99 }),
+  [CLAVE_RESPUESTAS]: JSON.stringify({ ...respuestasGuardadas, v: 99 }),
+};
+
+const conJsonRoto = {
+  [CLAVE_PREGUNTAS]: guardadoTrasEmpezar[CLAVE_PREGUNTAS].slice(0, 4000),
+  [CLAVE_RESPUESTAS]: guardadoTrasEmpezar[CLAVE_RESPUESTAS],
+};
+
+const conIdCruzado = {
+  [CLAVE_PREGUNTAS]: guardadoTrasEmpezar[CLAVE_PREGUNTAS],
+  [CLAVE_RESPUESTAS]: JSON.stringify({ ...respuestasGuardadas, intento_id: 'otro-intento' }),
+};
+
+const conEntradaRota = {
+  [CLAVE_PREGUNTAS]: guardadoTrasEmpezar[CLAVE_PREGUNTAS],
+  [CLAVE_RESPUESTAS]: JSON.stringify({
+    ...respuestasGuardadas,
+    posicion: 2,
+    respuestas: [
+      { pregunta_id: preguntasGuardadas.preguntas[0].id, alternativa_id: 1, estado: 'respondida', agotada: false, resuelta_en: 1789000000000 },
+      { pregunta_id: 'no soy un id', alternativa_id: 1, estado: 'respondida', agotada: false, resuelta_en: 1789000000000 },
+    ],
+  }),
+};
+
+// Y una quinta: media copia. Solo la clave de respuestas, sin las preguntas.
+const soloLaMitad = { [CLAVE_RESPUESTAS]: guardadoTrasEmpezar[CLAVE_RESPUESTAS] };
+
+const datosRotos = [
+  ['version 99', conVersionVieja],
+  ['JSON truncado', conJsonRoto],
+  ['intento_id cruzado', conIdCruzado],
+  ['una entrada de respuesta rota', conEntradaRota],
+  ['media copia: respuestas sin preguntas', soloLaMitad],
+];
+
+const visitasRotas = [];
+
+for (const [comoEsta, contenido] of datosRotos) {
+  const visita = visitar({
+    disco: discoCon(`simulacro-roto-${visitasRotas.length}`, contenido),
+    pagina: 'simulacro',
+    pasos: [{ tipo: 'mirar-lo-guardado' }],
+  });
+
+  visitasRotas.push(visita);
+
+  if (visita.pasos[0].titulo !== '') {
+    problemas.push(
+      `con ${comoEsta}, la pagina dibujo un intento en vez de quedarse en la presentacion: ` +
+        `«${visita.pasos[0].titulo}»`
+    );
+  }
+
+  if (visita.loGuardado !== null) {
+    problemas.push(`con ${comoEsta}, leerIntentoGuardado() devolvio algo en vez de null`);
+  }
+
+  // Y en silencio, como manda ADR-034: ni aviso en pantalla ni ruido en la consola.
+  if (visita.pasos[0].avisoGuardado.html !== '' || visita.avisos.length > 0) {
+    problemas.push(`con ${comoEsta}, la pagina avisó de un formato interno al estudiante`);
+  }
+}
+
+notas.push(
+  `Dato que no se entiende: las ${datosRotos.length} formas —${datosRotos.map(([c]) => c).join(', ')}— ` +
+    'se ignoran en silencio, la presentacion queda intacta y no hay error de consola.'
+);
+
+// --- 12f · Sin almacenamiento, el intento empieza y se avisa --------------
+
+const sinAlmacen = [
+  // 'ninguno' no es 'normal' ni ninguno de los dos que lanzan, asi que el DOM falso
+  // se queda sin `localStorage`. Pasar `undefined` NO serviria: el valor por defecto
+  // de `visitar()` es 'normal', y la visita habria corrido con un almacen sano
+  // diciendo que probaba el caso sin almacen. Se descubrio provocandolo el 2026-09-18.
+  ['sin localStorage', 'ninguno'],
+  ['con la lectura denegada (Chrome con las cookies bloqueadas)', 'lectura-lanza'],
+  ['con la escritura denegada (Safari «bloquear todas las cookies»)', 'escritura-lanza'],
+];
+
+const visitasSinAlmacen = [];
+
+for (const [comoEs, cual] of sinAlmacen) {
+  const visita = visitar({
+    disco: discoCon(`simulacro-sin-almacen-${visitasSinAlmacen.length}`, {}),
+    pagina: 'simulacro',
+    almacen: cual,
+    pasos: [{ tipo: 'comenzar' }, { tipo: 'responder', cuantas: 2 }],
+  });
+
+  visitasSinAlmacen.push(visita);
+
+  // El intento EMPIEZA igual. Es la mitad que se olvida: avisar y no dejar estudiar
+  // seria peor que no avisar.
+  if (visita.pasos[1].titulo !== 'Intento listo') {
+    problemas.push(
+      `${comoEs}, el simulacro no pudo armar el intento: dijo «${visita.pasos[1].titulo}»`
+    );
+    continue;
+  }
+
+  if (visita.pasos[1].cuentasPorModulo.reduce((a, b) => a + b, 0) !== 120) {
+    problemas.push(`${comoEs}, el intento no quedo con 120 preguntas`);
+  }
+
+  // Y SE AVISA. Se mira lo escrito ademas de la clase, por lo que se descubrio en la
+  // etapa B: el DOM falso no arranca con las clases del HTML, asi que preguntar solo
+  // por `oculto()` daria verde con el aviso apagado del todo.
+  if (visita.final.avisoGuardado.html === '' || visita.final.avisoGuardado.oculto) {
+    problemas.push(`${comoEs}, el simulacro no avisó de que el intento no se esta guardando`);
+  } else if (!visita.final.avisoGuardado.html.includes('Tu intento no se está guardando.')) {
+    problemas.push(`${comoEs}, el aviso no dice que el intento no se esta guardando`);
+  } else if (!visita.final.avisoGuardado.html.includes('si recargas la página el intento se pierde')) {
+    problemas.push(`${comoEs}, el aviso no dice que al recargar se pierde el intento`);
+  }
+
+  // Responder sigue funcionando toda la visita, aunque no se guarde nada.
+  if (visita.anotadas.length !== 2) {
+    problemas.push(`${comoEs}, no se pudo responder: el intento tiene que jugarse igual`);
+  }
+
+  if (visita.anotadas.some((a) => a.guardada)) {
+    problemas.push(`${comoEs}, alguna respuesta dijo que se habia guardado`);
+  }
+
+  // Y NUNCA MEDIA COPIA: con la escritura denegada no puede quedar la clave de
+  // respuestas sin la de preguntas.
+  const quedo = Object.keys(visita.almacen ?? {});
+  if (quedo.includes(CLAVE_RESPUESTAS) && !quedo.includes(CLAVE_PREGUNTAS)) {
+    problemas.push(`${comoEs}, quedo media copia guardada: respuestas sin preguntas`);
+  }
+}
+
+notas.push(
+  `Sin almacenamiento: en las ${sinAlmacen.length} formas de negarse —sin localStorage, lectura ` +
+    'denegada y escritura denegada— el intento se armo con 120 preguntas, se pudo responder, no ' +
+    'quedo media copia guardada, y el aviso dijo que al recargar se pierde.'
+);
+
+// --- 12f-bis · El almacen tiene sitio para las respuestas y no para las preguntas ---
+//
+// Es el unico caso donde puede quedar MEDIA COPIA guardada, y por eso existe aparte:
+// con el almacen que dice que no a todo, la clave de respuestas tampoco entraria y la
+// regla se cumpliria sola. Con cupo, la copia congelada de 76,8 KiB no cabe y las
+// respuestas de 12,7 KiB si. Si el sitio siguiera escribiendo respuestas despues de
+// que la copia congelada no entrara, al recargar quedaria un intento con respuestas y
+// sin preguntas: el peor dato posible, y el que la comprobacion cruzada tiene que
+// descartar entero.
+
+const discoJusto = discoNuevo('simulacro-cupo-justo');
+
+const s7 = visitar({
+  disco: discoJusto,
+  pagina: 'simulacro',
+  almacen: 'normal',
+  cupo: 20000,
+  pasos: [{ tipo: 'comenzar' }, { tipo: 'responder', cuantas: 2 }],
+});
+
+if (s7.pasos[1].titulo !== 'Intento listo') {
+  problemas.push(
+    `con el almacen sin sitio para la copia congelada, el intento no se armo: «${s7.pasos[1].titulo}»`
+  );
+}
+
+const quedoConCupoJusto = Object.keys(leerDisco(discoJusto));
+
+if (quedoConCupoJusto.length > 0) {
+  problemas.push(
+    'con el almacen sin sitio para la copia congelada quedo algo guardado: ' +
+      `${quedoConCupoJusto.join(', ')}. Nunca media copia`
+  );
+}
+
+if (s7.anotadas.some((a) => a.guardada)) {
+  problemas.push(
+    'con la copia congelada fuera del almacen, alguna respuesta dijo que se habia guardado'
+  );
+}
+
+if (s7.final.avisoGuardado.html === '' || s7.final.avisoGuardado.oculto) {
+  problemas.push(
+    'con el almacen sin sitio para la copia congelada, no se avisó de que no se esta guardando'
+  );
+}
+
+notas.push(
+  'Nunca media copia: con un almacen de 20 000 bytes —sitio para las respuestas, no para los ' +
+    '78 KiB de la copia congelada— el intento se armo y se pudo responder, no quedo NI UNA clave ' +
+    'guardada, y el aviso salio.'
+);
+
+// --- 12g · Una escritura que falla a mitad del intento --------------------
+//
+// El caso mas realista de todos y el que no se podia provocar hasta esta etapa: el
+// estudiante empieza con sitio y el almacen se llena a mitad. Se responde, se llena,
+// se responde otra vez.
+
+const discoQueSeLlena = discoNuevo('simulacro-se-llena');
+
+const s5 = visitar({
+  disco: discoQueSeLlena,
+  pagina: 'simulacro',
+  pasos: [
+    { tipo: 'comenzar' },
+    { tipo: 'responder', cuantas: 2 },
+    { tipo: 'llenar-el-almacen' },
+    { tipo: 'responder', cuantas: 2, desde: 2 },
+  ],
+});
+
+const antesDeLlenarse = s5.anotadas.slice(0, 2);
+const despuesDeLlenarse = s5.anotadas.slice(2);
+
+if (antesDeLlenarse.some((a) => !a.guardada)) {
+  problemas.push('con el almacen sano, alguna de las dos primeras respuestas no se guardo');
+}
+
+if (despuesDeLlenarse.some((a) => a.guardada)) {
+  problemas.push('con el almacen lleno, alguna respuesta dijo que se habia guardado igual');
+}
+
+// EL INTENTO SIGUE. Es la mitad de la decision 7 que importa mas: se avisa y se
+// sigue, no se avisa y se para.
+if (s5.final.titulo !== 'Intento listo') {
+  problemas.push(
+    `al llenarse el almacen a mitad, el intento dejo de estar en pie: «${s5.final.titulo}»`
+  );
+}
+
+if (s5.anotadas.length !== 4) {
+  problemas.push('al llenarse el almacen a mitad, no se pudieron seguir anotando respuestas');
+}
+
+// Y SE DICE, con la otra frase: esta no es «no se esta guardando» sino «ya no».
+if (s5.final.avisoGuardado.html === '' || s5.final.avisoGuardado.oculto) {
+  problemas.push('al llenarse el almacen a mitad del intento, no aparecio ningun aviso');
+} else if (!s5.final.avisoGuardado.html.includes('Tu intento ya no se está guardando.')) {
+  problemas.push(
+    'el aviso del almacen lleno no dice que el intento YA NO se esta guardando: ' +
+      `dijo «${s5.final.avisoGuardado.html.match(/text-sm">([^<]*)</)?.[1] ?? ''}»`
+  );
+}
+
+// Antes de llenarse no habia aviso: si estuviera puesto desde el principio, la
+// comprobacion de arriba se cumpliria sola.
+if (s5.pasos[2].avisoGuardado.html !== '') {
+  problemas.push('el aviso del almacen lleno ya estaba puesto antes de llenarse');
+}
+
+// Lo que alcanzo a guardarse sigue ahi: dos respuestas, no cero y no cuatro.
+const loQueQuedo = claveDelDisco(leerDisco(discoQueSeLlena), CLAVE_RESPUESTAS, 'tras llenarse el almacen');
+
+if (loQueQuedo.respuestas.length !== 2) {
+  problemas.push(
+    `tras llenarse el almacen quedaron ${loQueQuedo.respuestas.length} respuestas guardadas y ` +
+      'tenian que quedar las 2 que alcanzaron a escribirse'
+  );
+}
+
+notas.push(
+  'Almacen lleno a mitad del intento: las 2 primeras respuestas quedaron guardadas, las 2 de ' +
+    'despues no, el intento siguio en pie y se pudo seguir respondiendo, y el aviso cambio a «Tu ' +
+    'intento ya no se está guardando» sin haber estado puesto antes.'
+);
+
+// --- 12h · «Empezar otro intento» reemplaza el anterior -------------------
+
+const s6 = visitar({
+  disco: discoSimulacro,
+  pagina: 'simulacro',
+  pasos: [{ tipo: 'comenzar' }],
+});
+
+const nuevoGuardado = leerDisco(discoSimulacro);
+const nuevasPreguntas = claveDelDisco(nuevoGuardado, CLAVE_PREGUNTAS, 'tras empezar otro intento');
+const nuevasRespuestas = claveDelDisco(nuevoGuardado, CLAVE_RESPUESTAS, 'tras empezar otro intento');
+
+if (s6.pasos[0].titulo !== 'Intento retomado') {
+  problemas.push('la visita que empieza otro intento no partio de uno retomado');
+}
+
+if (s6.final.titulo !== 'Intento listo') {
+  problemas.push(`«Empezar otro intento» no armo uno nuevo: dijo «${s6.final.titulo}»`);
+}
+
+if (nuevasPreguntas.intento_id === preguntasGuardadas.intento_id) {
+  problemas.push('«Empezar otro intento» conservo el intento_id del anterior');
+}
+
+if (nuevasPreguntas.intento_id !== nuevasRespuestas.intento_id) {
+  problemas.push('tras empezar otro intento, las dos claves quedaron con intento_id distinto');
+}
+
+if (nuevasRespuestas.respuestas.length !== 0 || nuevasRespuestas.posicion !== 0) {
+  problemas.push('el intento nuevo heredó las respuestas del anterior');
+}
+
+notas.push(
+  'Empezar otro intento: reemplaza las dos claves con un intento_id nuevo y sin heredar ninguna ' +
+    'de las 3 respuestas del anterior.'
+);
+
+// --- 12h-bis · Empezar otro intento que NO se puede armar -----------------
+//
+// El caso que obliga a olvidar lo guardado ANTES de pedir nada, y no despues: el
+// estudiante tiene un intento a medias, pulsa «Empezar otro intento», y la carga
+// falla. Si el anterior siguiera en el almacen, la pantalla estaria diciendo que no
+// se pudo armar ninguno mientras al recargar vuelve uno que ya se dio por perdido.
+//
+// Para que la carga falle de verdad hace falta que no haya NI capa NI copia: con el
+// fetch caido a secas, el resumen baja a la instantanea y el intento se arma igual.
+// Se usa el mismo arbol pelado que la seccion 8, por el mismo motivo.
+
+const s8 = visitar({
+  disco: discoSimulacro,
+  pagina: 'simulacro',
+  sitio: sitioSinInstantanea,
+  caerLaRed: true,
+  pasos: [{ tipo: 'comenzar' }],
+});
+
+if (s8.pasos[0].titulo !== 'Intento retomado') {
+  problemas.push('la visita que falla al empezar otro intento no partio de uno retomado');
+}
+
+if (!s8.final.titulo.startsWith('No se pudo')) {
+  problemas.push(
+    `sin capa ni copia, el simulacro dijo «${s8.final.titulo}» en vez de explicar que no se pudo`
+  );
+}
+
+const trasFallarElNuevo = Object.keys(leerDisco(discoSimulacro));
+
+if (trasFallarElNuevo.length > 0) {
+  problemas.push(
+    'tras fallar «Empezar otro intento», el anterior sigue guardado: al recargar volveria un ' +
+      `intento que la pantalla ya dio por perdido (${trasFallarElNuevo.join(', ')})`
+  );
+}
+
+// Y al volver a abrir, la presentacion: no hay nada que retomar.
+const s9 = visitar({ disco: discoSimulacro, pagina: 'simulacro', pasos: [] });
+
+if (s9.pasos[0].titulo !== '') {
+  problemas.push(
+    `tras fallar «Empezar otro intento», al recargar volvio un intento: «${s9.pasos[0].titulo}»`
+  );
+}
+
+notas.push(
+  'Empezar otro intento que falla: sin capa ni copia, la pantalla explica que no se pudo, el ' +
+    'almacen queda vacio, y al recargar sale la presentacion y no el intento viejo.'
+);
+
+// --- 12i · El intento tampoco sale del dispositivo ------------------------
+
+const visitasDelSimulacro = [s1, s2, s3, s4, s5, s6, s7, s8, s9, ...visitasRotas, ...visitasSinAlmacen];
+
+for (const visita of visitasDelSimulacro) {
+  for (const peticion of visita.peticiones) {
+    if (peticion.cuerpo !== null) {
+      problemas.push(`una peticion del simulacro llevaba cuerpo: ${peticion.ruta}`);
+    }
+    if (!/^\/api\/preguntas\?(resumen=1|ids=[\d,]+)$/.test(peticion.ruta)) {
+      problemas.push(
+        `una peticion del simulacro no tiene la forma de las dos que la pagina hace: «${peticion.ruta}»`
+      );
+    }
+  }
+}
+
+notas.push(
+  `El intento no viaja: en las ${visitasDelSimulacro.length} visitas del simulacro las unicas rutas ` +
+    'pedidas fueron /api/preguntas?resumen=1 y /api/preguntas?ids=…, todas sin cuerpo.'
 );
 
 // ===========================================================================

@@ -51,8 +51,25 @@
  * cara de la distincion que la otra. Sorteando el orden, cada una gana la carrera
  * la mitad de las veces.
  *
- * El sorteo del orden **no cambia el orden de las preguntas dentro del intento**:
- * eso lo decide quien las dibuja, y hoy nadie las dibuja todavia.
+ * EL INTENTO SE ENTREGA MEZCLADO (decision del autor, 2026-09-18)
+ *
+ * Las 120 salen **barajadas entre si**, sin agrupar por modulo: el intento no va 17
+ * de bases de datos seguidas y despues 17 de asincronia. Se baraja el conjunto
+ * completo **al final**, despues del reparto y de la exclusion, para que mezclar no
+ * pueda alterar ninguna de las dos: el reparto ya esta hecho cuando se mezcla, y
+ * barajar no agrega ni quita preguntas.
+ *
+ * El motivo es de producto y no de codigo: en el examen real las preguntas vienen en
+ * orden aleatorio, y **cambiar de tema de golpe es parte de lo que el simulacro
+ * entrena**. Un intento ordenado por modulo entrena otra cosa —contestar de corrido
+ * sobre un tema que ya se tiene en la cabeza—, que es justo lo que el cuestionario
+ * ya hace.
+ *
+ * Es distinto del sorteo del recorrido de mas arriba, y conviene no confundirlos: el
+ * recorrido decide **en que orden se elige** y no se ve en ninguna parte; esto decide
+ * **en que orden se responde** y es lo que el estudiante va a ver. El primero existe
+ * para que ninguna hermana salga menos veces; el segundo, para que el intento se
+ * parezca a un examen.
  */
 import { shuffle } from '../utils/dom.js';
 import { GRUPOS_DE_HERMANAS, indiceDeHermanas } from '../data/hermanas.js';
@@ -97,7 +114,7 @@ export const SIN_CANDIDATOS = 'sin_candidatos';
  * Devuelve, si se pudo:
  *
  *   ok               true
- *   ids              los 120, agrupados por modulo en orden del 2 al 8
+ *   ids              los 120, **barajados entre si**: es el orden del intento
  *   porModulo        { 2: [...], ..., 8: [...] } con la cuota de cada uno
  *   moduloDelExtra   a quien le toco la pregunta 120
  *   orden            en que orden se recorrieron los modulos este intento
@@ -185,10 +202,18 @@ export function elegirIntento({
     sobrantes[modulo] = noElegidos;
   }
 
-  // Se devuelven agrupados del 2 al 8 y no en el orden barajado: el recorrido es un
-  // detalle de COMO se eligio, y dos intentos con las mismas preguntas se verian
-  // distintos solo por eso.
-  const ids = MODULOS_DEL_EXAMEN.flatMap((modulo) => porModulo[modulo]);
+  // 5 · El orden del intento.
+  //
+  // Se juntan del 2 al 8 —el recorrido barajado es un detalle de COMO se eligio, y
+  // dos intentos con las mismas preguntas se verian distintos solo por eso— y se
+  // baraja el conjunto ENTERO encima. Ese es el orden en que el estudiante las va a
+  // responder, y el que se guarda.
+  //
+  // Se mezcla AL FINAL y no mientras se elige, a proposito: cuando esta linea corre,
+  // el reparto por modulo ya esta hecho y la exclusion de hermanas ya se aplico, asi
+  // que barajar no puede alterar ninguna de las dos. Mezclar antes obligaria a que
+  // las dos reglas supieran del orden, que es como se rompen las reglas sin querer.
+  const ids = shuffle(MODULOS_DEL_EXAMEN.flatMap((modulo) => porModulo[modulo]), azar);
 
   return {
     ok: true,

@@ -2300,6 +2300,31 @@ try {
   let repetidasODeBaja = 0;
   let dosAntesQueTres = 0;
 
+  // El intento se entrega MEZCLADO (decision del autor, 2026-09-18).
+  //
+  // COMO SE MIDE «no agrupado», que es lo que hay que poder afirmar. Dos numeros por
+  // intento, y los dos delatan el agrupamiento de inmediato:
+  //
+  //   cambios de modulo   cuantas veces la pregunta siguiente es de otro modulo.
+  //                       Agrupado por modulo son exactamente 6, una por frontera.
+  //                       Barajado, alrededor de 119 x 6/7 = 102.
+  //   racha mas larga     cuantas seguidas del mismo modulo. Agrupado son 17 o 18.
+  //
+  // Se vigilan los dos y no uno: el primero caza el agrupamiento entero, el segundo
+  // caza un agrupamiento parcial —por ejemplo, barajar dentro de cada mitad— que
+  // podria dejar el primero por encima del umbral.
+  const CAMBIOS_MINIMOS = 80;
+  const RACHA_MAXIMA = 8;
+
+  let sinMezclar = 0;
+  let conRacha = 0;
+  let sumaDeCambios = 0;
+  let laRachaMasLarga = 0;
+  const moduloDeId = new Map();
+  for (const [modulo, ids] of Object.entries(idsPorModulo)) {
+    for (const id of ids) moduloDeId.set(id, Number(modulo));
+  }
+
   for (const intento of muestra) {
     if (!intento.ok) continue;
 
@@ -2335,6 +2360,42 @@ try {
 
     ordenesDistintos.add(intento.orden.join(','));
     if (intento.orden.indexOf(2) < intento.orden.indexOf(3)) dosAntesQueTres += 1;
+
+    // Los modulos en el orden en que el estudiante los va a ver.
+    const modulos = intento.ids.map((id) => moduloDeId.get(id));
+
+    let cambios = 0;
+    let racha = 1;
+    let maxRacha = 1;
+
+    for (let i = 1; i < modulos.length; i += 1) {
+      if (modulos[i] !== modulos[i - 1]) {
+        cambios += 1;
+        racha = 1;
+      } else {
+        racha += 1;
+        if (racha > maxRacha) maxRacha = racha;
+      }
+    }
+
+    sumaDeCambios += cambios;
+    if (maxRacha > laRachaMasLarga) laRachaMasLarga = maxRacha;
+    if (cambios < CAMBIOS_MINIMOS) sinMezclar += 1;
+    if (maxRacha > RACHA_MAXIMA) conRacha += 1;
+  }
+
+  if (sinMezclar > 0) {
+    problemas.push(
+      `${sinMezclar} intento(s) de la muestra entregan las preguntas agrupadas por modulo: ` +
+        `menos de ${CAMBIOS_MINIMOS} cambios de modulo en las ${PREGUNTAS_DEL_INTENTO}`
+    );
+  }
+
+  if (conRacha > 0) {
+    problemas.push(
+      `${conRacha} intento(s) de la muestra traen mas de ${RACHA_MAXIMA} preguntas seguidas del ` +
+        `mismo modulo (la racha mas larga fue de ${laRachaMasLarga})`
+    );
   }
 
   if (repetidasODeBaja > 0) {
@@ -2456,6 +2517,13 @@ try {
       'y uno en 18. Extra por modulo: ' +
       [...extraPorModulo].map(([m, v]) => `${m}:${v}`).join(' · ') +
       '.'
+  );
+
+  notas.push(
+    `Intento mezclado: los ${INTENTOS_DE_LA_MUESTRA} entregan las 120 barajadas entre modulos, con ` +
+      `${(sumaDeCambios / INTENTOS_DE_LA_MUESTRA).toFixed(1)} cambios de modulo de media —agrupado ` +
+      `por modulo serian 6, el minimo exigido es ${CAMBIOS_MINIMOS}— y una racha maxima de ` +
+      `${laRachaMasLarga} seguidas del mismo modulo (tope ${RACHA_MAXIMA}).`
   );
 
   notas.push(
@@ -2891,7 +2959,17 @@ try {
     problemas.push('el simulacro no importa el algoritmo de servicios/eleccion-del-intento.js');
   }
 
-  const vecesQueSeElige = (fuenteDelSimulacro.match(/elegirIntento\(/g) ?? []).length;
+  // Se cuentan LLAMADAS, no menciones. Se descubrio el 2026-09-18, en la etapa C:
+  // un comentario que explicaba de donde vienen las preguntas escribio
+  // «elegirIntento()» y esta comprobacion dio rojo con el codigo intacto. Un rojo
+  // que se dispara por un comentario ensena a no creerle a la comprobacion, que es
+  // peor que no tenerla. Los comentarios se quitan antes de contar, y con eso lo que
+  // queda es codigo.
+  const sinComentarios = fuenteDelSimulacro
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+  const vecesQueSeElige = (sinComentarios.match(/elegirIntento\(/g) ?? []).length;
 
   if (vecesQueSeElige !== 1) {
     problemas.push(

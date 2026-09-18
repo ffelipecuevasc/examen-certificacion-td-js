@@ -76,7 +76,9 @@ Todas del autor, 2026-09-16.
 - La exclusión es **global**: se arrastra un conjunto de prohibidos mientras se elige, así el par 25 ↔ 107 (módulos 2 y 3) no
   obliga a deshacer elecciones.
 - **El orden en que se recorren los módulos se sortea en cada intento**, para que ninguna pregunta de un grupo que cruza
-  módulos salga menos veces por estar en un módulo que elige después.
+  módulos salga menos veces por estar en un módulo que elige después. *(Corrección del 2026-09-18, al abrir la etapa C:
+  esta frase hablaba del orden en que se **elige**, y añadía que el orden de las preguntas dentro del intento «lo decide
+  quien las dibuja». **Ya no**: lo fija el algoritmo. Ver la corrección fechada más abajo.)*
 - La lista vive en **`static/js/data/`**, como archivo de datos importado por el único módulo del algoritmo.
 - Con el banco actual, el módulo más apretado conserva 44 elegibles para una cuota máxima de 18.
 
@@ -284,7 +286,121 @@ grupo se vuelve inerte solo. Las citas `m0X#N` remiten a `_planmaestro/00_produc
 - **Que pedir 120 preguntas por id lea pocas filas**: la vista `pregunta_activa` entra por el índice de estado y no por la
   clave primaria. Se mide y queda para la épica 50.
 
+## Corrección fechada · 2026-09-18 · el orden del intento lo fija el algoritmo
+
+**Decisión del autor**, tomada al aprobar el plan de la etapa C.
+
+La decisión 3 decía que el sorteo del recorrido «no cambia el orden de las preguntas dentro del intento: eso lo decide
+quien las dibuja». **Deja de ser así.** Las 120 se entregan **mezcladas, sin agrupar por módulo**, y el orden se fija al
+elegir: se baraja el conjunto completo con la misma fuente de azar inyectada, **después** del reparto y de la exclusión de
+hermanas, para que mezclar no pueda alterar ninguna de las dos.
+
+**El motivo es de producto.** En el examen real las preguntas vienen en orden aleatorio, y **cambiar de tema de golpe es
+parte de lo que el simulacro entrena**. Un intento ordenado por módulo entrena otra cosa —responder de corrido sobre un
+tema que ya se tiene en la cabeza—, que es justo lo que el cuestionario ya hace.
+
+**Qué cambia y qué no.**
+
+- **Cambia** `elegirIntento()`, que devuelve `ids` barajados entre módulos en vez de agrupados del 2 al 8; y la reposición
+  de reservas, que ahora trabaja sobre **ranuras**: lo que no vuelve deja su sitio vacío y la reserva entra en ese mismo
+  sitio. Si las reservas se agregaran al final, un intento con nueve descartes traería las nueve reposiciones juntas al
+  terminar, que es el agrupamiento que barajar viene a evitar.
+- **No cambia** el formato guardado: el arreglo de la copia congelada ya era el orden del intento.
+- **No cambia** el sorteo del recorrido de la decisión 3, que sigue existiendo por el par {25, 107} y sigue sin verse en
+  ninguna parte. Son dos sorteos distintos: uno decide **en qué orden se elige** y el otro **en qué orden se responde**.
+
+**Cómo se vigila.** Dos comprobaciones por intento, en `scripts/probar-filtrado.mjs` sobre la muestra de 200, y una más
+sobre el intento retomado en `scripts/probar-memoria.mjs`:
+
+- **cambios de módulo**, cuántas veces la pregunta siguiente es de otro módulo. Agrupado por módulo son exactamente 6, una
+  por frontera; barajado, alrededor de 102. El mínimo exigido es 80.
+- **la racha más larga** de preguntas seguidas del mismo módulo. Agrupado son 17 o 18; el tope exigido es 8.
+
+Se vigilan las dos y no una: la primera caza el agrupamiento entero, la segunda caza un agrupamiento parcial que podría
+dejar la primera por encima del umbral.
+
 ## Notas de la iteración
+
+### 2026-09-18 · Etapa C: el intento guardado
+
+**El formato, aprobado por el autor el 2026-09-18** tras el plan del paso 0, con dos cambios suyos: las 120 van
+mezcladas (corrección fechada de más arriba) y **el resultado calculado no se guarda**.
+
+**Dos claves, bajo `examen-td-js.simulacro.`:**
+
+| Clave | Qué guarda | Cuándo se escribe | Peso medido |
+|---|---|---|---|
+| `…preguntas` | La copia congelada: las 120 tal como llegaron, con sus alternativas y su correcta, en el orden del intento | **Una vez**, al armarse | **78 623 B · 76,8 KiB** |
+| `…respuestas` | Todo lo que cambia: `empezado_en`, `posicion`, `comenzada_en`, `terminado_en` y `respuestas[]` | En cada cambio | 158 B vacía · **12 996 B · 12,7 KiB** con las 120 |
+| `…dueno` | *Reservada para la iteración 42.* No se escribe en esta iteración | — | — |
+
+Un intento completo son 121 escrituras y **850,2 KiB**. Con las preguntas en la misma clave serían **10 056,4 KiB, 11,8
+veces más**, y la escritura número 120 costaría 91 556 bytes en vez de 12 996. Medido, no supuesto: es lo que justifica
+la separación de la decisión 6.
+
+**Cada entrada de `respuestas[]`:** `pregunta_id`, `alternativa_id` —el id **dentro de la copia congelada**, o `null` si
+se omitió—, `estado`, `agotada` y `resuelta_en`. Los dos últimos son de la iteración 42.
+
+**Lo que no está:** no hay campo `resultado`. Se recalcula desde la copia congelada y las respuestas, que ya están las
+dos guardadas. Una segunda fuente de verdad para un número derivable es justo lo que ADR-034 no admite.
+
+**Todo lo demás está en ADR-035**, que escribe esta etapa: por qué el navegador elige, la forma del extremo por ids con
+el límite de 100 parámetros de D1, por qué ese extremo no se puede cachear nunca, el costo medido en filas leídas, la
+regla de no mezclar bancos de H-024, por qué las preguntas se congelan apartándose de ADR-034 y cómo la 44 avisa de una
+pregunta corregida, por qué el resultado no se guarda, y por qué aquí sí se coordinan las pestañas.
+
+**Lo que se agregó al sitio.** `static/js/servicios/intento-guardado.js` (las claves, el formato y las lecturas),
+`static/js/components/aviso-de-guardado.js` (los dos estados del aviso de la decisión 7), el hueco `#aviso-guardado` en
+`simulacro.html`, y en `components/simulacro.js` el guardado al armar, la retoma al abrir y la costura
+`anotarEnElIntento()` que la iteración 43 va a conectar al botón de avanzar. La sonda de escritura **no se duplicó**: se
+exportó `almacenDelNavegador()` de `servicios/memoria.js`, porque la sonda es de toda la página y no del cuestionario.
+
+**Lo que lo vigila.** `scripts/probar-memoria.mjs`, sección **12**, con el mismo orquestador de siempre —un proceso por
+visita, el almacén persistido a un archivo— y un interruptor `pagina: 'simulacro'`. Nueve casos: el guardado al empezar,
+que responder reescriba una sola clave, la retoma, el banco cambiado entre la carga y la recarga, cinco formas de dato
+que no se entiende, tres formas de navegador sin almacenamiento, el almacén sin sitio para la copia congelada, el
+almacén que se llena a mitad, y «Empezar otro intento» tanto cuando funciona como cuando falla.
+
+**Dos huecos que aparecieron mutando y quedaron cerrados.**
+
+- `almacenDeMentira()` solo sabía decir que no a **todas** las escrituras. Con eso no se podía provocar ni el almacén que
+  se llena a mitad del intento —el caso que la decisión 7 nombra— ni el que tiene sitio para las respuestas y no para los
+  76,8 KiB de la copia congelada, que es el único donde puede quedar **media copia** guardada. Ahora tiene
+  `prohibirEscritura()` y un `cupo` en bytes.
+- Nada probaba que «Empezar otro intento» **olvide el anterior antes de pedir nada**. Quitando esa llamada todo seguía en
+  verde, y sin embargo el fallo es feo: la pantalla diciendo que no se pudo armar ninguno y, al recargar, un intento que
+  ya se había dado por perdido.
+
+**Una comprobación de la etapa B que daba rojo por un comentario.** La de «el algoritmo existe una sola vez» contaba
+apariciones de `elegirIntento(` en el archivo, y un comentario nuevo que la nombraba la puso en rojo con el código
+intacto. Ahora cuenta llamadas: quita los comentarios antes de contar. Un rojo que se dispara por un comentario enseña a
+no creerle a la comprobación.
+
+### Lista de verificación de navegador · etapa C
+
+*Escrita el 2026-09-18. Cubre solo lo de esta etapa; la de la etapa B sigue valiendo entera.*
+
+**Antes de empezar:** `npm run datos:dev` levantado, DevTools abierto en **Aplicación → Almacenamiento local →
+`http://127.0.0.1:8788`**, y la **Consola** a la vista.
+
+| # | Qué hacer | Qué deberías ver | Qué cuenta como falla |
+|---|---|---|---|
+| 1 | Abrir `simulacro.html` y pulsar «Comenzar el simulacro» | Al terminar la carga, «Intento listo» con los siete módulos. En Almacenamiento local aparecen **dos** claves: `examen-td-js.simulacro.preguntas` y `…respuestas` | Que no aparezca alguna de las dos, o que aparezca alguna clave más del simulacro |
+| 2 | Abrir el valor de `…preguntas` | Empieza por `{"v":1,"intento_id":"…"` y trae 120 preguntas con sus alternativas y su `es_correcta`. Pesa alrededor de **77 KiB** | Que no traiga `v`, que traiga menos de 120, o que traiga `justificacion` |
+| 3 | Abrir el valor de `…respuestas` | Mismo `intento_id` que la otra, `posicion: 0`, `respuestas: []`, y los campos `empezado_en`, `comenzada_en` y `terminado_en` | Que el `intento_id` no coincida, o que aparezca un campo `resultado` |
+| 4 | **Recargar la página** (F5) | Sale **«Intento retomado»** con las mismas cuentas por módulo, y un botón «Empezar otro intento». En la pestaña **Red**, **ninguna** petición a `/api/` | Que vuelva la presentación, que las cuentas cambien, o que salga cualquier petición a `/api/` |
+| 5 | Recargar dos veces más | Siempre «Intento retomado», siempre las mismas cuentas | Que alguna vez cambien |
+| 6 | **Dato corrupto.** En Almacenamiento local, editar `…respuestas` y cambiar `"v":1` por `"v":99`. Recargar | Vuelve la **presentación**, como si no hubiera intento. **Sin errores en la consola** y sin ningún aviso en pantalla | Cualquier error de consola, una página en blanco, o un aviso hablando del formato |
+| 7 | **La otra mitad.** Deshacer lo anterior, y ahora borrar solo la clave `…preguntas`. Recargar | Lo mismo: la presentación, en silencio | Que retome un intento con respuestas y sin preguntas |
+| 8 | **`intento_id` cruzado.** Volver a empezar un intento, y luego editar `…respuestas` cambiando su `intento_id` por cualquier otro texto. Recargar | Lo mismo: la presentación, en silencio | Que retome |
+| 9 | **Sin almacenamiento.** Chrome → candado de la barra → *Configuración del sitio* → **Cookies y datos del sitio: Bloquear**. Recargar y pulsar «Comenzar» | El intento se arma igual, con sus 120, y arriba sale el aviso **«Tu intento no se está guardando.»**, que dice que al recargar el intento se pierde | Que el intento no se arme, o que no salga el aviso |
+| 10 | Con el bloqueo puesto, recargar | Vuelve la presentación —no hay nada guardado— y no hay ningún error | Un error de consola |
+| 11 | Quitar el bloqueo, recargar y empezar otro intento | El aviso **desaparece** y las dos claves vuelven a escribirse | Que el aviso siga puesto |
+| 12 | **Almacenamiento lleno.** Con un intento en curso, abrir la Consola y llenar el almacén: `try { let b = 'x'.repeat(1024*1024); for (let i = 0; i < 10; i++) localStorage.setItem('relleno-'+i, b); } catch (e) { console.log('lleno:', e.name); }` | La consola dice `lleno: QuotaExceededError`. *(El aviso «Tu intento ya no se está guardando» aparece al intentar guardar la respuesta siguiente, y eso no se puede provocar hasta la iteración 43, que conecta el recorrido. Lo que se comprueba aquí es que el navegador de verdad lanza el error que el guion simula.)* | Que no lance nada: entonces el almacén no se llenó y el caso no se probó |
+| 13 | Limpiar: en la Consola, `for (let i = 0; i < 10; i++) localStorage.removeItem('relleno-'+i)`. Recargar | «Intento retomado», con su intento intacto | Que el intento se haya perdido |
+| 14 | **En el teléfono**, o en la vista responsive: empezar un intento y recargar | «Intento retomado» y los avisos legibles, sin desbordes | Texto cortado o desbordado a lo ancho |
+| 15 | **Pulsar «Empezar otro intento»** | Arranca la transición y sale «Intento listo» con un reparto nuevo. En Almacenamiento local, el `intento_id` de las dos claves **cambió** y `respuestas` volvió a `[]` | Que conserve el `intento_id` anterior, o que herede respuestas |
+| 16 | Toda la pasada | **Sin errores de consola**, y `npm run verificar` termina en 0 | Cualquier error |
 
 ### Lista de verificación de navegador · etapa B
 

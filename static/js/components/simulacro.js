@@ -3,10 +3,11 @@
  *
  * QUE HACE ESTE ARCHIVO, Y QUE NO
  *
- * Es la etapa B de la iteracion 41. Conecta «Comenzar el simulacro» con la maquina
- * que la iteracion deja montada: pide la lista de ids, elige las 120 en el
- * navegador, las viene a buscar, repone lo que falte, y termina en un aviso
- * **«Intento listo»** (decision 11).
+ * Son las etapas B y C de la iteracion 41. Conecta «Comenzar el simulacro» con la
+ * maquina que la iteracion deja montada: pide la lista de ids, elige las 120 en el
+ * navegador, las viene a buscar, repone lo que falte, **las guarda congeladas** y
+ * termina en un aviso **«Intento listo»** (decision 11). Al abrir la pagina con un
+ * intento a medias, lo retoma desde lo guardado.
  *
  * **Todavia no dibuja ni una pregunta.** El recorrido —una pregunta a la vez, con
  * su reloj— es de las iteraciones 42 y 43, y adelantarlo aqui significaria escribir
@@ -14,7 +15,12 @@
  * modulos, y **ningun texto del banco**: lo que se puede comprobar hoy es que el
  * intento se armo, no como se ve.
  *
- * Tampoco guarda nada. Eso es la etapa C.
+ * QUE SE GUARDA, Y QUIEN LO GUARDA
+ *
+ * El formato y las claves viven en `servicios/intento-guardado.js`, no aqui: este
+ * archivo no sabe cuantas claves son ni como se llaman. Lo que si decide aqui es
+ * **cuando** —al armarse el intento, antes de dibujarlo— y **que se dice** si no se
+ * pudo, que es el aviso de la decision 7.
  *
  * TODO SE PIDE AL PULSAR, Y BAJO UNA SOLA TRANSICION (decision 5)
  *
@@ -65,8 +71,16 @@ import {
   elegirIntento,
   reponerDelModulo,
 } from '../servicios/eleccion-del-intento.js';
+import {
+  estadoDelGuardado,
+  guardarAvance,
+  guardarIntentoNuevo,
+  leerIntentoGuardado,
+  olvidarElIntento,
+} from '../servicios/intento-guardado.js';
 import { crearTransicionDeCarga } from './transicion-de-carga.js';
 import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
+import { mostrarAvisoDeGuardado } from './aviso-de-guardado.js';
 
 /**
  * Cuantas veces se sale a reponer antes de rendirse (decision 4).
@@ -88,6 +102,20 @@ const RONDAS_DE_RESERVA = 3;
  * el aviso tiene que aparecer si **alguna** lo hizo.
  */
 const origen = { resumen: null, preguntas: null };
+
+/**
+ * El intento que se esta jugando ahora, en memoria.
+ *
+ * Es lo mismo que hay guardado, y existe por dos motivos. Uno: sin almacenamiento no
+ * hay nada guardado, y el intento tiene que poder jugarse igual toda la visita —es
+ * la decision 7, y es la misma idea que la «memoria de la visita» de ADR-034—. Dos:
+ * releer 77 KiB del almacen en cada respuesta para agregarle una entrada seria
+ * pagar un parseo entero por cada toque.
+ *
+ * `null` mientras no haya intento. No sobrevive a una recarga, y no tiene por que:
+ * lo que sobrevive es lo guardado.
+ */
+let elIntento = null;
 
 /**
  * Los dos bancos de los que puede salir un intento, cada uno con sus dos lecturas.
@@ -195,26 +223,37 @@ function dibujarRecuadro({ titulo, cuerpo }) {
  * a vigilar ese HTML; hoy no hay nada que vigilar, y decirlo es mas honesto que
  * dibujar media pregunta para tener algo que probar.
  */
-function dibujarIntentoListo(porModulo) {
-  const total = MODULOS_DEL_EXAMEN.reduce(
-    (suma, modulo) => suma + (porModulo[modulo]?.length ?? 0),
-    0
-  );
+function dibujarIntentoListo(preguntas, { retomado = false } = {}) {
+  const cuantasDe = (modulo) => preguntas.filter((p) => p.modulo === modulo).length;
 
   const filas = MODULOS_DEL_EXAMEN.map(
     (modulo) => `
           <li class="flex items-baseline justify-between gap-4 border-b border-panel3 py-2 last:border-b-0">
             <span class="font-display font-semibold text-paper text-sm">Módulo ${esc(modulo)}</span>
-            <span class="font-mono text-sm text-jsyellow">${esc(porModulo[modulo]?.length ?? 0)}</span>
+            <span class="font-mono text-sm text-jsyellow">${esc(cuantasDe(modulo))}</span>
           </li>`
   ).join('');
 
+  // El boton de abajo existe por una razon sencilla: sin recorrido todavia, un
+  // intento retomado seria un callejon sin salida. Lleva el mismo id que «Comenzar»
+  // porque hace lo mismo —armar un intento— y porque el oyente vive en la zona.
+  const pie = retomado
+    ? `
+        <div class="mt-6">
+          <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border border-panel3 text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
+        </div>`
+    : '';
+
+  const entrada = retomado
+    ? `Retomamos el intento que tenías a medias, con las mismas <strong class="font-semibold text-paper">${esc(preguntas.length)} preguntas</strong> y en el mismo orden. Todavía no se puede responder: el recorrido con el reloj llega en una versión próxima.`
+    : `Se eligieron <strong class="font-semibold text-paper">${esc(preguntas.length)} preguntas</strong> y ya están cargadas. Todavía no se puede responder: el recorrido con el reloj llega en una versión próxima.`;
+
   dibujarRecuadro({
-    titulo: 'Intento listo',
+    titulo: retomado ? 'Intento retomado' : 'Intento listo',
     cuerpo: `
-        <p class="mt-3 text-sm text-muted leading-relaxed">Se eligieron <strong class="font-semibold text-paper">${esc(total)} preguntas</strong> y ya están cargadas. Todavía no se puede responder: el recorrido con el reloj llega en una versión próxima.</p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">${entrada}</p>
         <ul class="mt-5">${filas}
-        </ul>`,
+        </ul>${pie}`,
   });
 }
 
@@ -263,8 +302,11 @@ async function traer(ids, pedir) {
 /**
  * Arma el intento entero: elegir, traer y reponer hasta 120.
  *
- * Devuelve `{ ok: true, porModulo }` con las preguntas que llegaron, o
- * `{ ok: false, explicacion }` con la frase que va a leer el estudiante.
+ * Devuelve `{ ok: true, preguntas }` con las 120 preguntas enteras y **en el orden
+ * del intento**, o `{ ok: false, explicacion }` con la frase que va a leer el
+ * estudiante. Devuelve las preguntas y no sus ids porque a partir de la etapa C hay
+ * que guardarlas congeladas: volver a pedirlas para guardarlas seria un viaje mas
+ * para traer lo que ya se tenia en la mano.
  *
  * `pedir` es de donde se traen las preguntas —la capa o la copia—, y entra por
  * parametro por el mismo motivo por el que el azar entra por parametro en el
@@ -272,12 +314,9 @@ async function traer(ids, pedir) {
  * quien la llama no puede equivocarse a medias. Ver la regla del mismo banco en la
  * cabecera del archivo.
  *
- * POR QUE LAS RESERVAS SE PIDEN POR MODULO Y NO EN MONTON
- *
- * Porque lo que hay que reponer es la CUOTA de cada modulo, no el total. Reponer
- * seis preguntas de donde sea dejaria 120 en total y 14 de un modulo, y el reparto
- * parejo es parte de lo que el intento promete. Los ids de todas las reservas de una
- * ronda si viajan juntos: son una sola peticion.
+ * EL ORDEN DEL INTENTO SE RESPETA AL REPONER. Las 120 llegan ya barajadas entre
+ * modulos desde `elegirIntento()`, y esta funcion trabaja sobre **ranuras**: lo que
+ * no vuelve deja su sitio vacio y la reserva entra en ese mismo sitio. Ver el bucle.
  */
 async function armarElIntento(idsPorModulo, pedir) {
   const eleccion = elegirIntento({ idsPorModulo });
@@ -320,28 +359,47 @@ async function armarElIntento(idsPorModulo, pedir) {
     };
   }
 
-  const porModulo = {};
+  // LAS 120 RANURAS, EN EL ORDEN DEL INTENTO.
+  //
+  // `eleccion.ids` ya viene barajado entre modulos, y ese es el orden en que el
+  // estudiante va a responder. Reponer no lo puede alterar: una pregunta que no
+  // volvio deja su ranura vacia, y la reserva **entra en esa misma ranura**. Si las
+  // reservas se agregaran al final, un intento con nueve descartes traeria las nueve
+  // reposiciones juntas al terminar, que es justo el agrupamiento que barajar viene a
+  // evitar.
+  const moduloDe = new Map();
   for (const modulo of MODULOS_DEL_EXAMEN) {
-    porModulo[modulo] = eleccion.porModulo[modulo].filter((id) => traidas.has(id));
+    for (const id of eleccion.porModulo[modulo]) moduloDe.set(id, modulo);
   }
 
-  // Las rondas de reposicion. En el camino sano no entra ninguna: `faltan` es cero
-  // en los siete modulos y el bucle termina en la primera vuelta.
+  const ranuras = eleccion.ids.map((id) => ({
+    modulo: moduloDe.get(id),
+    pregunta: traidas.get(id) ?? null,
+  }));
+
+  // Las rondas de reposicion. En el camino sano no entra ninguna: no hay ranuras
+  // vacias y el bucle termina en la primera vuelta.
   for (let ronda = 0; ronda < RONDAS_DE_RESERVA; ronda += 1) {
-    const repuestos = [];
+    const vacias = ranuras.filter((ranura) => ranura.pregunta === null);
+    if (vacias.length === 0) break;
+
+    // Se pide POR MODULO y no en monton porque lo que hay que reponer es la CUOTA de
+    // cada modulo, no el total: reponer seis preguntas de donde sea dejaria 120 en
+    // total y 14 de un modulo. Los ids de todas las reservas de una ronda si viajan
+    // juntos, en una sola peticion.
+    const pedidos = [];
 
     for (const modulo of MODULOS_DEL_EXAMEN) {
-      const faltan = eleccion.porModulo[modulo].length - porModulo[modulo].length;
-      if (faltan <= 0) continue;
+      const suyas = vacias.filter((ranura) => ranura.modulo === modulo);
+      if (suyas.length === 0) continue;
 
-      for (const id of reponerDelModulo(eleccion.reservas, modulo, faltan)) {
-        repuestos.push({ id, modulo });
-      }
+      const repuestos = reponerDelModulo(eleccion.reservas, modulo, suyas.length);
+      repuestos.forEach((id, i) => pedidos.push({ ranura: suyas[i], id }));
     }
 
-    if (repuestos.length === 0) break;
+    if (pedidos.length === 0) break;
 
-    const masTraidas = await traer(repuestos.map((r) => r.id), pedir);
+    const masTraidas = await traer(pedidos.map((p) => p.id), pedir);
 
     // Una ronda de reserva que cae a la copia mezcla igual que la primera peticion:
     // las 111 que ya llegaron son de D1 y estas nueve serian de la copia. Misma
@@ -350,21 +408,24 @@ async function armarElIntento(idsPorModulo, pedir) {
 
     if (!masTraidas) break;
 
-    for (const { id, modulo } of repuestos) {
-      if (masTraidas.has(id)) porModulo[modulo].push(id);
+    for (const { ranura, id } of pedidos) {
+      const pregunta = masTraidas.get(id);
+      if (pregunta) ranura.pregunta = pregunta;
     }
   }
 
-  const total = MODULOS_DEL_EXAMEN.reduce((suma, m) => suma + porModulo[m].length, 0);
+  const preguntas = ranuras
+    .filter((ranura) => ranura.pregunta !== null)
+    .map((ranura) => ranura.pregunta);
 
-  if (total < PREGUNTAS_DEL_INTENTO) {
+  if (preguntas.length < PREGUNTAS_DEL_INTENTO) {
     return {
       ok: false,
-      explicacion: `Solo se pudieron reunir ${esc(total)} preguntas de las ${esc(PREGUNTAS_DEL_INTENTO)} que necesita un simulacro, así que no tiene sentido empezarlo a medias. Vuelve a intentarlo en un rato.`,
+      explicacion: `Solo se pudieron reunir ${esc(preguntas.length)} preguntas de las ${esc(PREGUNTAS_DEL_INTENTO)} que necesita un simulacro, así que no tiene sentido empezarlo a medias. Vuelve a intentarlo en un rato.`,
     };
   }
 
-  return { ok: true, porModulo };
+  return { ok: true, preguntas };
 }
 
 /**
@@ -438,6 +499,17 @@ export async function comenzarElIntento() {
   // falso ejecuta los oyentes aunque el nodo este deshabilitado.
   if (transicion.enCurso()) return;
 
+  // El instante del clic, no el de despues de la carga. Es lo que la iteracion 42 va
+  // a usar como origen del tiempo transcurrido, y tomarlo al terminar de cargar le
+  // regalaria al estudiante los segundos que tardo el banco en contestar.
+  const empezadoEn = Date.now();
+
+  // Y se olvida lo guardado ANTES de pedir nada. Si el estudiante pulsa «Empezar otro
+  // intento» y la carga falla, lo que no puede quedar es el intento anterior en el
+  // almacen y la pantalla diciendo que no se pudo armar ninguno: al recargar volveria
+  // uno que la pantalla ya habia dado por perdido.
+  olvidarElIntento();
+
   const miPeticion = transicion.abrir('el intento');
   transicion.dibujar('');
 
@@ -474,6 +546,25 @@ export async function comenzarElIntento() {
 
   transicion.cerrar(miPeticion);
 
+  // SE GUARDA ANTES DE DIBUJAR, y ese orden importa. El aviso de que el intento no se
+  // esta guardando tiene que poder salir junto con «Intento listo» y no un instante
+  // despues: quien lee la pantalla de arriba abajo se entera de que esto no sobrevive
+  // a una recarga antes de ponerse a responder, que es cuando todavia sirve saberlo.
+  //
+  // Se guarda al OCURRIR y no al salir (decision 6): no hay `beforeunload` ni
+  // `pagehide` en este sitio, y la memoria de un intento de una hora no puede depender
+  // de que el estudiante salga por una puerta concreta.
+  if (resultado.ok) {
+    elIntento = {
+      preguntas: resultado.preguntas,
+      respuestas: [],
+      posicion: 0,
+      comenzada_en: empezadoEn,
+    };
+
+    guardarIntentoNuevo(resultado.preguntas, empezadoEn);
+  }
+
   // El aviso del respaldo se enciende ANTES de dibujar el resultado, para que quien
   // lea la pantalla de arriba abajo se entere de que esto sale de una copia antes de
   // leer lo que la copia dio.
@@ -482,17 +573,121 @@ export async function comenzarElIntento() {
     loQueSeCargo: 'el simulacro',
   });
 
-  if (resultado.ok) dibujarIntentoListo(resultado.porModulo);
+  mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+
+  if (resultado.ok) dibujarIntentoListo(resultado.preguntas);
   else dibujarNoSePudo(resultado.explicacion);
+}
+
+/**
+ * Las preguntas del intento que se esta jugando, en su orden.
+ *
+ * Se exporta por el mismo motivo que `comenzarElIntento()`: para que
+ * `scripts/probar-memoria.mjs` pueda anotar respuestas sobre el intento REAL sin
+ * reimplementar el recorrido que todavia no existe. Devuelve una copia del arreglo
+ * para que nadie de fuera pueda reordenarlo.
+ */
+export const preguntasDelIntento = () => (elIntento ? [...elIntento.preguntas] : []);
+
+/**
+ * Anota una pregunta ya resuelta y la guarda.
+ *
+ * ES LA COSTURA QUE LA ITERACION 43 VA A USAR. Hoy no hay recorrido, asi que nadie
+ * la llama desde la pantalla; existe porque el guardado es de esta etapa y sin ella
+ * no habria forma de provocar una escritura a mitad del intento sobre el codigo de
+ * verdad. La 43 le conectara el boton de avanzar y el de omitir, y la 42 el
+ * agotamiento de los 30 segundos —de ahi `agotada`—.
+ *
+ * @param {object} entrada
+ * @param {number} entrada.pregunta_id     el id de la pregunta resuelta
+ * @param {number|null} entrada.alternativa_id  la alternativa elegida DENTRO de la
+ *        copia congelada, o null si se omitio
+ * @param {'respondida'|'omitida'} entrada.estado
+ * @param {boolean} entrada.agotada        si se resolvio porque se acabo el tiempo
+ * @param {number} [entrada.resuelta_en]   instante en que quedo resuelta
+ *
+ * Devuelve si quedo GUARDADA. Un `false` no deshace nada: la respuesta queda anotada
+ * en memoria y el intento sigue, que es la decision 7. Lo unico que cambia es que se
+ * dice, y eso lo hace el aviso de aqui abajo.
+ */
+export function anotarEnElIntento(entrada) {
+  if (!elIntento) return false;
+
+  const resueltaEn = entrada.resuelta_en ?? Date.now();
+
+  elIntento.respuestas.push({
+    pregunta_id: entrada.pregunta_id,
+    alternativa_id: entrada.alternativa_id ?? null,
+    estado: entrada.estado,
+    agotada: Boolean(entrada.agotada),
+    resuelta_en: resueltaEn,
+  });
+
+  // La posicion sale de contar lo resuelto, no de un contador aparte. Con dos
+  // numeros que dicen lo mismo, el dia que se desincronicen no habria forma de saber
+  // cual manda —es el mismo motivo por el que el resultado no se guarda—.
+  elIntento.posicion = elIntento.respuestas.length;
+
+  // Y la siguiente pregunta empieza cuando termina esta. El instante es de la 42;
+  // acá se deja puesto para que lo guardado sea coherente desde el primer dia.
+  elIntento.comenzada_en = resueltaEn;
+
+  const pudo = guardarAvance({
+    posicion: elIntento.posicion,
+    comenzada_en: elIntento.comenzada_en,
+    terminado_en:
+      elIntento.posicion === elIntento.preguntas.length ? resueltaEn : null,
+    respuestas: elIntento.respuestas,
+  });
+
+  mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+
+  return pudo;
+}
+
+/**
+ * Al abrir la pagina: si hay un intento guardado, se retoma.
+ *
+ * NO SALE NI UNA PETICION. Se lee del almacen del navegador y nada mas, asi que la
+ * regla de la decision 5 —«la presentacion no pide nada»— sigue intacta: quien abre
+ * la pagina con un intento a medias no gasta ni un viaje a la red, y quien la abre
+ * sin intento tampoco.
+ *
+ * Y NO SE VUELVE A ELEGIR NADA. Las preguntas salen de la copia congelada, en el
+ * mismo orden en que se guardaron. Volver a pedirlas por id al banco seria
+ * exactamente lo que la decision 6 prohibe: el resultado se calcula con lo que el
+ * estudiante vio, y una pregunta corregida entre la carga y la recarga le cambiaria
+ * el intento por debajo.
+ *
+ * Si no hay intento, o si lo que hay no se entiende, esta funcion no hace nada y la
+ * presentacion se queda como estaba. En silencio, como manda ADR-034.
+ */
+export function retomarElIntento() {
+  const guardado = leerIntentoGuardado();
+  if (!guardado) return;
+
+  elIntento = {
+    preguntas: guardado.preguntas,
+    respuestas: guardado.respuestas,
+    posicion: guardado.posicion,
+    comenzada_en: guardado.comenzada_en,
+  };
+
+  dibujarIntentoListo(guardado.preguntas, { retomado: true });
+
+  // El aviso se recalcula al retomar y no se hereda: el navegador pudo llenarse
+  // entre una visita y la otra, y el estado de la visita anterior no se guarda en
+  // ninguna parte —ni debe—.
+  mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
 }
 
 /**
  * Conecta el boton.
  *
  * El oyente va en la zona y no en el boton, y es a proposito: «Volver a intentarlo»
- * es un boton NUEVO, dibujado despues de un fracaso, con el mismo id. Un oyente
- * puesto sobre el boton original se habria ido con el al reescribirse la zona, y el
- * reintento seria un boton que miente.
+ * y «Empezar otro intento» son botones NUEVOS, dibujados despues, con el mismo id.
+ * Un oyente puesto sobre el boton original se habria ido con el al reescribirse la
+ * zona, y los dos serian botones que mienten.
  */
 export function conectarComienzo() {
   const zona = $('#zona-del-intento');

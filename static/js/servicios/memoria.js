@@ -141,7 +141,22 @@ function visitaDe(modulo) {
  */
 let almacenRecordado;
 
-function almacen() {
+/**
+ * El almacen del navegador, o null.
+ *
+ * **Se exporta desde la iteracion 41, etapa C**, para que el simulacro use ESTA
+ * sonda y no escriba la suya. La sonda no es del cuestionario: es de la pagina
+ * entera, y su clave lo dice —`examen-td-js.prueba-de-escritura`, sin tramo de
+ * funcionalidad, por la convencion de la actualizacion de ADR-034—. Dos sondas
+ * escribiendo y borrando la misma clave en la misma carga serian dos escrituras
+ * para averiguar lo mismo, y el dia que una cambiara de criterio el sitio tendria
+ * dos respuestas distintas a «¿se puede guardar?».
+ *
+ * Quien solo necesite el si o el no tiene `sePuedeGuardar()` aqui abajo. Esto
+ * devuelve el almacen porque `servicios/intento-guardado.js` necesita escribir en
+ * el, con sus propias claves.
+ */
+export function almacenDelNavegador() {
   if (almacenRecordado !== undefined) return almacenRecordado;
 
   try {
@@ -169,7 +184,7 @@ function almacen() {
  * impide estudiar: el cuestionario funciona igual y lo unico que se pierde es el
  * recuerdo entre visitas. Lo que no puede pasar es que se pierda en silencio.
  */
-export const sePuedeGuardar = () => almacen() !== null;
+export const sePuedeGuardar = () => almacenDelNavegador() !== null;
 
 /**
  * Lo respondido de un modulo: id de pregunta -> texto de la alternativa elegida.
@@ -219,7 +234,7 @@ export function respondidasEnLaVisita(modulo) {
 /** Lo que hay en el almacen del navegador, sin lo de la visita. */
 function leerLoGuardado(modulo) {
   const vacio = new Map();
-  const donde = almacen();
+  const donde = almacenDelNavegador();
   if (!donde) return vacio;
 
   let crudo;
@@ -283,7 +298,7 @@ export function guardarRespuesta(modulo, preguntaId, texto) {
   // mas abajo se va sin anotar nada si se deja para el final.
   visitaDe(modulo).set(preguntaId, texto);
 
-  const donde = almacen();
+  const donde = almacenDelNavegador();
   if (!donde) return false;
 
   const respuestas = Object.fromEntries(leerAvance(modulo));
@@ -315,7 +330,7 @@ export function guardarRespuesta(modulo, preguntaId, texto) {
 export function borrarAvance(modulo) {
   laVisita.delete(modulo);
 
-  const donde = almacen();
+  const donde = almacenDelNavegador();
   if (!donde) return;
 
   try {

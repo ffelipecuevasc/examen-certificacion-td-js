@@ -2411,3 +2411,290 @@ fuera del almacén ni del DOM, y tres criterios de esa iteración dependían de 
 
 **Lo que esta actualización no resuelve, y ya estaba asumido.** Dos pestañas abiertas se siguen
 pisando, y ahora además de forma asimétrica: ver la limitación declarada en la iteración 34.
+
+---
+
+## ADR-035 · El intento del simulacro: el navegador elige, el extremo sirve por id, y lo elegido se congela
+
+**Fecha:** 2026-09-18 · **Estado:** ✅ Aceptada · **Decide:** Felipe Cuevas
+
+### Contexto
+
+El simulacro necesita 120 preguntas de un banco de 368, repartidas parejo entre los
+siete módulos, sin dos preguntas hermanas y sin repetir. Y necesita que el intento
+sobreviva a una recarga en mitad de una hora de examen.
+
+Esas dos cosas se podrían haber resuelto en el Worker: un extremo `/api/simulacro`
+que eligiera y devolviera el intento armado, y una tabla en D1 con los intentos en
+curso. **No se hizo, y esta ADR explica por qué**, junto con las cinco decisiones que
+se derivan de ello. Todas las tomó el autor entre el 2026-09-16 y el 2026-09-18, y se
+escriben juntas porque se sostienen unas a otras: quitar una deja a las demás sin
+motivo.
+
+---
+
+### Parte 1 · El navegador elige; el extremo solo sirve
+
+**Decisión.** El navegador parte de los `preguntas_ids` que ya entrega
+`?resumen=1` (ADR-033), **elige ahí mismo** las 120 —reparto, exclusión de hermanas,
+reservas y orden— y le pide al extremo únicamente **las preguntas de una lista de
+ids**. El extremo no elige, no reparte, no excluye y no sabe qué es un simulacro.
+
+**Motivo.** `vision.md:68-70` promete que el formato funciona íntegramente en el
+navegador y que ningún servicio externo es condición para que funcione. Un extremo
+que eligiera sería **la única parte del simulacro imposible de degradar**: con la
+capa de datos caída no habría intento, justo en la página más larga y menos
+interrumpible del sitio. Eligiendo en el navegador, el modo degradado de ADR-008 usa
+**la misma función** sobre la instantánea, y no hay dos algoritmos que mantener al
+día. `scripts/probar-filtrado.mjs` lo comprueba por sus imports: un solo archivo del
+sitio importa `elegirIntento()` y la llama una vez.
+
+**Motivo segundo.** ADR-009 acota el Worker a lectura. Elegir es una decisión de
+producto —cuántas por módulo, qué preguntas no pueden salir juntas— y meterla en la
+capa de datos la convertiría en algo que hay que desplegar para corregir una regla
+del examen.
+
+**Consecuencia.** El algoritmo vive en `static/js/servicios/eleccion-del-intento.js`,
+recibe los ids por módulo, la lista de hermanas y **la fuente de azar**, y no importa
+`servicios/datos.js`. Con el azar inyectado, la muestra de 200 intentos con la que se
+comprueban el reparto, la exclusión y el solapamiento es repetible: un rojo que no se
+puede volver a correr no se arregla, se discute.
+
+---
+
+### Parte 2 · La forma del extremo por ids, y los 100 parámetros de D1
+
+**Decisión.** `/api/preguntas?ids=25,107,205,…`
+
+- Máximo **120 ids**. Más, o una lista mal formada —vacía, con algo que no es número,
+  con decimales, negativos, el cero, una coma de más, **ids repetidos**— o combinada
+  con `?modulo` o `?resumen`, se rechaza con `PETICION_INVALIDA`.
+- Los ids **inexistentes o retirados no vuelven**, y eso no es un error: es lo que
+  las reservas del intento existen para tapar.
+- No devuelve justificaciones. Son el campo más pesado del banco y durante el intento
+  no se corrige; las pide la iteración 44 al llegar al resumen.
+- Reutiliza `SQL_PREGUNTAS`, `sqlAlternativas()` y `validarPreguntas()` sin copiarlas,
+  y sin romper a `generar-instantanea.mjs`, su único importador externo.
+
+**El límite de D1, provocado antes de escribir el extremo.** **D1 acepta como máximo
+100 parámetros ligados por consulta.** Se provocó el 2026-09-16 pidiendo 120: la
+consulta falla. El extremo **trocea por dentro** —cuatro consultas de a 30 dentro de
+un solo `batch`— y quien lo llama no se entera: sigue siendo una petición con 120
+ids. Está medido y no supuesto porque el número no aparece en la documentación de D1
+con ese nombre, y el día que cambie lo va a decir un rojo y no una sorpresa en
+producción.
+
+**Los ids repetidos se rechazan en vez de deduplicarse.** Deduplicar sería adivinar:
+una lista con un id dos veces es un error de quien la arma, y devolver 119 preguntas
+para 120 ids pedidos dejaría al navegador reponiendo una pregunta que sí existía.
+
+---
+
+### Parte 3 · Este extremo no se puede cachear nunca
+
+**Decisión.** `/api/preguntas?ids=…` **no lleva caché de ningún tipo** —ni cabecera,
+ni Cache API, ni caché de borde— y cuando la épica 50 introduzca caché para las otras
+lecturas, esta queda explícitamente fuera.
+
+**Motivo.** Los otros dos extremos tienen un espacio de respuestas diminuto y estable:
+`?resumen=1` es una respuesta, `?modulo=N` son siete. Este tiene **un número
+astronómico**: cada intento pide una combinación distinta de 120 ids entre 368, y dos
+estudiantes no piden nunca la misma. Una caché sobre eso no acierta jamás —cada
+petición es una entrada nueva— y a cambio llena el almacenamiento de entradas que no
+se van a volver a leer. Es el peor caso posible para una caché: coste completo,
+beneficio cero.
+
+**Motivo segundo, y es el que importa.** Aunque acertara, no debe. Una respuesta
+cacheada es una foto del banco en el momento en que se guardó, y el banco se corrige.
+Un intento servido desde una caché de ayer traería preguntas que el autor ya arregló,
+sin que nada lo dijera. El respaldo de ADR-008 también está desfasado, pero **lo
+declara con un aviso en pantalla**; una caché de borde no tiene forma de declararlo.
+
+**Consecuencia.** Queda anotado para la épica 50, que es la que introduce caché.
+
+---
+
+### Parte 4 · Lo que cuesta un intento, medido
+
+Medido el 2026-09-17 contra la base local, que sí reporta `rows_read`:
+
+| Petición | Filas leídas |
+|---|---|
+| `?resumen=1` | 1 111 |
+| `?ids=` con 120 ids | 2 791 |
+| **Total de un intento** | **3 902** |
+
+Para comparar: traerse el banco entero son 4 783 filas y 371,8 KB. El resumen son 2,4
+KB y el intento 120 preguntas.
+
+**No es una cifra buena, y se dice.** La vista `pregunta_activa` entra por el índice
+de estado y no por la clave primaria, así que pedir 120 preguntas por id lee bastante
+más que 120 filas. **Se acepta a sabiendas y queda para la épica 50**, que es la que
+mira el coste de la capa de datos. Lo que esta ADR fija es que el número **está
+medido**: cualquier optimización futura tiene contra qué compararse.
+
+---
+
+### Parte 5 · Un intento no mezcla bancos (H-024)
+
+**Decisión.** Las dos peticiones de un intento —el resumen y las preguntas— tienen
+que salir del **mismo banco**. Si alguna mitad cae al respaldo de ADR-008, **el
+intento entero se vuelve a elegir desde el respaldo**.
+
+**Motivo.** `servicios/datos.js` hace que cada lectura caiga al respaldo por su
+cuenta, y para el cuestionario está bien: una petición, una pantalla. Aquí son dos
+peticiones **atadas** —de la primera salen los ids y la segunda los va a buscar— y se
+podía llegar a que el resumen contestara desde D1 y las preguntas salieran de la
+copia. Los ids se habrían elegido sobre un banco y pedido a otro.
+
+**Provocado el 2026-09-17**, agregándole al resumen de D1 sesenta ids del módulo 5
+que la instantánea no tiene —lo que verá el navegador el día que el banco crezca y la
+copia se quede atrás— y tumbando `?ids=`: el intento gastó sus tres rondas de reserva
+sobre ids del banco equivocado y terminó en «No se pudo armar el simulacro» con 118
+de 120, **justo cuando el respaldo tenía que salvarlo**. Por el camino de las
+reservas el resultado fue peor: el intento sí se armaba, con dos bancos adentro y sin
+que nada lo dijera.
+
+**Consecuencias.**
+
+- La regla se atiende **apenas se detecta** y no al final: seguir sería gastar tres
+  viajes más reponiendo sobre ids que ya se sabe que salieron del banco equivocado.
+- Su reverso también vale: si el resumen ya vino de la copia, las preguntas se le
+  piden a la copia y no a un servicio que acaba de no contestar.
+- El algoritmo **sigue sin enterarse**: lo único que cambia es de dónde salen los ids
+  que recibe.
+- El aviso de ADR-008 sigue a la vista, y la transición sigue siendo una sola medida
+  desde el clic.
+
+---
+
+### Parte 6 · Las preguntas del intento se guardan congeladas
+
+**Decisión.** Al armarse el intento, las 120 preguntas se guardan en el navegador
+**tal como llegaron**, con sus alternativas y con cuál era la correcta, bajo
+`examen-td-js.simulacro.preguntas`. El intento se corrige contra esa copia, **no
+contra el banco vigente**. Y la respuesta del estudiante apunta a esa copia por el
+**id de la alternativa**.
+
+**Esto se aparta de la decisión central de ADR-034**, y conviene decirlo con todas sus
+letras. ADR-034 manda lo contrario para el cuestionario: no guardar el veredicto,
+recalcularlo contra el banco de hoy, y **no anclar en el id de la alternativa** porque
+`banco:actualizar` borra las cuatro y las reinserta con ids nuevos a la primera
+corrección.
+
+**Por qué aquí es al revés.** Lo que ADR-034 protege es que el sitio no le enseñe al
+estudiante una regla que la corrección desmintió. En el cuestionario eso se consigue
+recalculando, porque el cuestionario **es** una herramienta de aprendizaje y el
+veredicto de ayer no vale nada. El simulacro **mide**: un intento de una hora que se
+corrigiera contra el banco de mañana podría bajarle el resultado a alguien por una
+corrección que ocurrió mientras respondía, y ninguna pantalla podría explicárselo. El
+resultado tiene que ser el de lo que el estudiante vio.
+
+Y una vez congelada la copia, **el id de la alternativa deja de ser frágil**: no
+apunta a D1, apunta a un arreglo que vive en el navegador del estudiante y que ningún
+`banco:actualizar` puede reescribir. Es exacto incluso si dos alternativas
+compartieran texto, y pesa 3 104 bytes menos repartidos en las 120 reescrituras.
+
+**Cómo se cubre lo que ADR-034 protegía.** Lo resuelve la iteración 44 por el otro
+lado: al pedir las justificaciones al banco vigente, el resumen compara con la copia
+congelada y, **si una pregunta cambió desde el intento, la revisión muestra la versión
+corregida con un aviso** del tipo «Esta pregunta se corrigió después de tu intento».
+El resultado no cambia —es el de lo que el estudiante vio— y nadie aprende una regla
+que la corrección desmintió. Las dos mitades de ADR-034 se conservan, una en cada
+sitio.
+
+**El formato, en dos claves.**
+
+```
+  examen-td-js.simulacro.preguntas    la copia congelada. Se escribe UNA vez.
+  examen-td-js.simulacro.respuestas   todo lo que cambia. Se reescribe en cada
+                                      respuesta.
+```
+
+La versión va **dentro del dato** (`v: 1`), como en ADR-034 y por el mismo motivo. Las
+dos claves llevan el mismo `intento_id`, y **si no coinciden se descarta el intento
+entero**: son un solo intento repartido en dos, y media copia congelada con las
+respuestas de otra es la peor lectura posible. Se descarta el intento entero y no
+entrada por entrada —al revés que en el cuestionario— porque una entrada rota
+desalinea las respuestas de las preguntas y con eso la posición pasa a mentir: un
+intento de 119 no es un intento corto, es un intento roto.
+
+**Por qué dos claves y no una, medido el 2026-09-18** sobre intentos reales del banco
+de 368:
+
+| | Bytes |
+|---|---|
+| `…preguntas` | 78 623 · **76,8 KiB**, escrita 1 vez |
+| `…respuestas` vacía | 158 |
+| `…respuestas` con las 120 | 12 996 · **12,7 KiB** |
+| Un intento completo (121 escrituras) | **850,2 KiB** |
+| Lo mismo con una sola clave | **10 056,4 KiB · 11,8 veces más** |
+
+`localStorage` es síncrono y bloquea el hilo que dibuja. Con una sola clave, la
+escritura número 120 costaría 91 556 bytes en vez de 12 996, y en un teléfono modesto
+eso se siente en cada respuesta.
+
+---
+
+### Parte 7 · El resultado no se guarda
+
+**Decisión del autor, 2026-09-18.** El intento **no guarda** las cuentas del
+resultado —correctas, incorrectas, omitidas—. Se recalculan desde la copia congelada
+y las respuestas cada vez que hagan falta.
+
+**Motivo.** Es el argumento de ADR-034 aplicado a lo único donde todavía podía
+colarse: **una segunda fuente de verdad para un número que ya se puede derivar**. Los
+dos ingredientes están guardados; guardar además el resultado abre la posibilidad de
+que un día discrepen, y entonces no habría forma de saber cuál de los dos manda.
+
+**Consecuencia.** La iteración 44 conserva el resumen conservando **el intento
+terminado** —sus preguntas, sus respuestas y su `terminado_en`—, no un número aparte.
+El resumen se vuelve a calcular al dibujarlo, y da siempre lo mismo porque la copia
+congelada no cambia.
+
+---
+
+### Parte 8 · Por qué aquí sí se coordinan las pestañas
+
+**Decisión.** El simulacro **coordina dos pestañas**: la que abre último toma el
+intento y la otra se bloquea con un aviso, con un vencimiento por tiempo para que
+cerrar la dueña no deje a la otra bloqueada para siempre. Lo construye la iteración
+42; lo que se fija aquí es **que se hace**, y bajo su propia clave —
+`examen-td-js.simulacro.dueno`—, aparte de las dos del intento.
+
+**Por qué es distinto del cuestionario.** ADR-034 aceptó expresamente que dos
+pestañas del cuestionario se pisen: «gana la última que guarda… el caso es raro y la
+alternativa cuesta más que lo que evita». Eso era cierto **ahí**, y por dos razones
+que aquí no se cumplen:
+
+1. **Lo que se pisa es distinto.** En el cuestionario, dos pestañas pisándose cuestan
+   una respuesta suelta, recuperable respondiéndola otra vez. Aquí cuestan **el
+   intento entero**: dos pestañas escribiendo `…respuestas` con posiciones distintas
+   dejan un intento cuya posición no corresponde a sus respuestas, y eso no se
+   recupera respondiendo de nuevo, porque en el simulacro **no se vuelve atrás**.
+2. **El error es invisible hasta el final.** El cuestionario corrige al responder, así
+   que una respuesta perdida se ve enseguida. El simulacro no corrige hasta el
+   resumen: el estudiante descubriría el destrozo después de una hora.
+
+**La clave del dueño va aparte de las dos del intento**, y es una decisión de forma
+con dos motivos concretos: el arriendo se renueva cada pocos segundos y dentro de
+`…respuestas` cada latido reescribiría 12,7 KiB; y la coordinación se apoya en el
+evento `storage`, que dispara por clave, así que un oyente sobre una clave que también
+cambia al responder no podría distinguir «la otra pestaña tomó el intento» de «la otra
+pestaña respondió».
+
+**Lo que esta parte no decide** es el mecanismo —vencimiento, renovación, qué pasa al
+recuperar el intento— ni cómo se prueba. Es de la iteración 42, que necesita además un
+reloj controlable.
+
+---
+
+### Lo que esta ADR no puede afirmar
+
+- **Que un intento no se pueda inspeccionar.** Las respuestas correctas viajan al
+  navegador y están en el repositorio público (ADR-022). Congelarlas en el
+  almacenamiento local no cambia nada: ya estaban a la vista.
+- **Que un intento sobreviva a borrar los datos del navegador**, o a cambiar de
+  dispositivo. Es la misma consecuencia que ADR-034 ya declara para el avance.
+- **Que dos intentos seguidos no repitan preguntas.** No hay historial: cada intento
+  se elige sin saber del anterior.

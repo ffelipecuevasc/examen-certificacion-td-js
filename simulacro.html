@@ -98,6 +98,16 @@
            cuestionario, y lo llena el mismo componente. -->
       <div id="aviso-respaldo" class="hidden mb-8" role="status" aria-live="polite"></div>
 
+      <!-- Y EL AVISO DE QUE EL INTENTO NO SE ESTA GUARDANDO (iteracion 41, decision 7).
+           Aqui por los dos mismos motivos que el de arriba: fuera de #zona-del-intento
+           para que la transicion no lo borre, y existiendo vacio desde el HTML para que
+           el lector de pantalla lo anuncie cuando se llene.
+
+           Van los dos seguidos y en este orden a proposito: el de arriba habla de lo que
+           el estudiante esta viendo, y este de lo que va a pasar con lo que responda.
+           Lo llena static/js/components/aviso-de-guardado.js. -->
+      <div id="aviso-guardado" class="hidden mb-8" role="status" aria-live="polite"></div>
+
       <!-- LO QUE LA CARGA REESCRIBE.
            La presentacion entera vive aca dentro, y al pulsar «Comenzar» se
            sustituye por la transicion y despues por «Intento listo» o por la

@@ -140,8 +140,35 @@ function crearNodo(selector, registrar, foco) {
  * NO es la ventana privada: desde Safari 11 esa escribe sin problemas, en memoria
  * (WebKit 157010). `lecturaProhibida` reproduce un almacen que tampoco deja leer.
  */
-export function almacenDeMentira({ escrituraProhibida = false, lecturaProhibida = false } = {}) {
+export function almacenDeMentira({
+  escrituraProhibida = false,
+  lecturaProhibida = false,
+  // Cuantos bytes caben en total. `Infinity` por defecto, que es lo que veian todos
+  // los que ya llamaban a esta funcion. Con un numero, una escritura que no quepa
+  // lanza como lanza el navegador de verdad —`QuotaExceededError`— y las que si
+  // quepan siguen funcionando.
+  //
+  // POR QUE HACE FALTA UN CUPO Y NO BASTA CON `escrituraProhibida` (iteracion 41,
+  // etapa C). Con la bandera, el almacen dice que no a TODO. El caso que el simulacro
+  // tiene que aguantar es otro: un almacen con sitio para los 12,7 KiB de las
+  // respuestas y sin sitio para los 76,8 KiB de la copia congelada. Ahi es donde se
+  // puede quedar media copia guardada —respuestas sin preguntas—, que al recargar es
+  // el peor dato posible. Sin cupo, ese caso no se puede provocar y la regla de
+  // «nunca media copia» no la vigila nadie: se descubrio mutandola el 2026-09-18 y
+  // no dio rojo.
+  cupo = Infinity,
+} = {}) {
   const datos = new Map();
+
+  const ocupado = () => {
+    let total = 0;
+    for (const [clave, valor] of datos) total += clave.length + valor.length;
+    return total;
+  };
+
+  // Se guarda en una variable y no se lee del parametro, para que `prohibirEscritura()`
+  // pueda cambiarlo con el almacen ya instalado y ya lleno.
+  let noDejaEscribir = escrituraProhibida;
 
   return {
     getItem(clave) {
@@ -149,12 +176,39 @@ export function almacenDeMentira({ escrituraProhibida = false, lecturaProhibida 
       return datos.has(clave) ? datos.get(clave) : null;
     },
     setItem(clave, valor) {
-      if (escrituraProhibida) throw new Error('escritura denegada por el navegador de mentira');
-      datos.set(clave, String(valor));
+      if (noDejaEscribir) throw new Error('escritura denegada por el navegador de mentira');
+
+      const texto = String(valor);
+      const anterior = datos.get(clave) ?? '';
+      const despues = ocupado() - (anterior === '' ? 0 : clave.length + anterior.length) + clave.length + texto.length;
+
+      if (despues > cupo) {
+        // El mismo nombre que lanza el navegador de verdad al llenarse.
+        const error = new Error('no cabe en el navegador de mentira');
+        error.name = 'QuotaExceededError';
+        throw error;
+      }
+
+      datos.set(clave, texto);
     },
     removeItem(clave) {
-      if (escrituraProhibida) throw new Error('escritura denegada por el navegador de mentira');
+      if (noDejaEscribir) throw new Error('escritura denegada por el navegador de mentira');
       datos.delete(clave);
+    },
+    /**
+     * El almacen se llena A MITAD DE CAMINO (iteracion 41, etapa C).
+     *
+     * Hasta ahora `escrituraProhibida` se fijaba al crearlo, y con eso solo se podia
+     * reproducir el navegador que **nunca** dejo guardar. El caso que la decision 7
+     * del simulacro nombra es otro y es el mas realista de los dos: el estudiante
+     * empieza con sitio, responde ochenta preguntas, y el almacen se llena. Eso no
+     * se puede provocar con una bandera de constructor.
+     *
+     * Devuelve el propio almacen para poder encadenarlo.
+     */
+    prohibirEscritura() {
+      noDejaEscribir = true;
+      return this;
     },
     /** Lo guardado, para poder mirarlo desde la prueba. No es parte de la API real. */
     datos,
