@@ -1,6 +1,6 @@
 # Épica 40 · Simulacro de examen
 
-**Estado:** 🔵 En curso · iteración 41 en tres etapas
+**Estado:** 🔵 En curso · **iteración 41 cerrada el 2026-09-18**; lo siguiente en el orden de trabajo es la **45**
 **Depende de:** épica 20 (banco en D1) y épica 30 cerrada (capa de datos con modo degradado, escapado, justificación
 dibujada, transición de carga, memoria en el navegador y guiones de prueba con intercepción).
 
@@ -9,12 +9,29 @@ La entrega más grande del proyecto.
 ## Historial de este archivo
 
 - **2026-09-16 · primera reescritura**, tras cerrar la épica 30.
+- **2026-09-18 · cerrada la iteración 41**, en sus tres etapas. Durante ella se escribió **ADR-035**, se corrigió la
+  decisión 3 de la 41 —el orden de las preguntas del intento lo fija el algoritmo, no quien las dibuja— y se cazó
+  **H-024**: un intento podía elegir sobre D1 y pedir a la instantánea.
 - **2026-09-16 · segunda reescritura**, tras la lectura de alcance de la épica completa hecha por Claude Code. Esa
   lectura mostró que las cifras del simulacro no tenían fuente escrita, que `contexto-del-examen.md` dice otra
   duración, que un extremo que elige preguntas choca con `vision.md` y obliga a duplicar lógica en el modo degradado,
   y reancló las preguntas hermanas a ids de D1. El autor resolvió en cinco rondas las decisiones que quedaban abiertas.
   Se corrigieron además tres afirmaciones erróneas de la primera reescritura: el título «reglas del examen real», la
   cita a ADR-001 (sustituida) y la supuesta desaparición de `modulo-0X.json`.
+
+## Qué entregó la iteración 41
+
+**Cerrada el 2026-09-18, en sus tres etapas.** `simulacro.html` existe, con su presentación, su copia vigilada del
+encabezado y el pie, y un intento de 120 preguntas que el navegador elige, viene a buscar por id y guarda congelado en
+el propio navegador, retomándolo tras una recarga. Todo lo que decide se escribió en **ADR-035**.
+
+**Lo que todavía NO hace, y conviene tenerlo presente al leer lo de abajo:** no se puede responder —el recorrido es la
+iteración 43 y los cronómetros la 42—, no hay resumen de resultados —la 44— y **la página no está enlazada desde
+ninguna parte**: los enlaces desde los menús, el pie y la portada se agregan en la **iteración 44**, a propósito, para
+no llevar a nadie a una pantalla donde después de «Comenzar» no hay nada que hacer.
+
+**Lo siguiente en el orden de trabajo es la iteración 45**, que fija la dirección visual antes de construir el
+cronómetro.
 
 ## Problema
 
@@ -106,8 +123,8 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 
 | # | Iteración | Estado |
 |---|---|---|
-| 41 | Presentación, selección y protección del intento | 🔵 En curso · en tres etapas |
-| 45 | Dirección visual del simulacro | ⚪ No iniciada |
+| 41 | Presentación, selección y protección del intento | 🟢 Cerrada el 2026-09-18 · en tres etapas |
+| 45 | Dirección visual del simulacro | ⚪ No iniciada · **es la siguiente** |
 | 42 | Cronómetros | ⚪ No iniciada |
 | 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada |
 | 44 | Resumen de resultados | ⚪ No iniciada |

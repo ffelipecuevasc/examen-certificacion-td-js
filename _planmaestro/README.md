@@ -8,29 +8,27 @@ decisiones vale tanto como el código que las implementa.
 ## Iteración activa
 
 | Campo         | Valor                                                                                                                                              |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Iteración** | Ninguna en curso                                                                                                                                   |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
-| **Estado**    | ⚪ No iniciada                                                                                                                                      |
-| **Siguiente** | **Iteración 41 · Presentación, selección y protección del intento.** La épica 30 cerró el 2026-09-16 con la iteración 35, y con ella el orden **33 → 36 → 34 → 35** que el autor fijó el 2026-09-15. La 40 es la siguiente por el orden escrito más abajo: «las épicas se ejecutan en orden». **Orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16: 41 → 45 → 42 → 43 → 44**, con la 45 adelantada para fijar la dirección visual antes de construir el cronómetro. Los números de las iteraciones no cambian. |
+| **Estado**    | 🔵 En curso                                                                                                                                        |
+| **Siguiente** | **Iteración 45 · Dirección visual del simulacro.** La **iteración 41 cerró el 2026-09-18** en sus tres etapas, y con ella `simulacro.html` existe, elige y guarda un intento de 120 preguntas. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**, con la 45 adelantada para fijar la dirección visual antes de construir el cronómetro. Los números de las iteraciones no cambian. |
 
-> **Antes de abrir la iteración 41.** Los archivos de la épica 40 **fueron reescritos el
-> 2026-09-16** y las decisiones que quedaban abiertas las cerró el autor ese mismo día.
-> **Las cifras y las reglas del simulacro —120 preguntas, 30 segundos por pregunta, el
-> sobrante perdido, omitida cuenta como incorrecta, 72 de 120 para aprobar— son
-> decisiones de diseño del autor, no datos del examen real**, y viven en
-> `40-epica-simulacro-examen/README.md`. No se cotejan contra
-> `00_producto/contexto-del-examen.md`: ese documento describe el examen real —120
-> minutos, alternativas y programación mezcladas— y desde el 2026-09-16 dice
+> **Antes de abrir la iteración 45.** La 41 dejó `simulacro.html` en pie pero **sin recorrido, sin cronómetros, sin
+> resumen y sin enlazar desde ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es
+> la presentación, el botón «Comenzar el simulacro», la carga bajo una sola transición y el aviso «Intento listo», que
+> sobrevive a una recarga.
+>
+> **La 41 dejó escrita ADR-035**, que reúne todo lo que el simulacro decidió: el navegador elige y el extremo solo
+> sirve, la forma del extremo por ids con el límite de 100 parámetros ligados de D1, por qué ese extremo no se puede
+> cachear nunca, el costo medido —3 902 filas leídas por intento—, la regla de no mezclar bancos de H-024, por qué las
+> preguntas del intento se guardan congeladas apartándose de ADR-034, y por qué aquí sí se coordinan las pestañas.
+>
+> **Las cifras y las reglas del simulacro —120 preguntas, 30 segundos por pregunta, el sobrante perdido, omitida cuenta
+> como incorrecta, 72 de 120 para aprobar— son decisiones de diseño del autor, no datos del examen real**, y viven en
+> `40-epica-simulacro-examen/README.md`. No se cotejan contra `00_producto/contexto-del-examen.md`: ese documento
+> describe el examen real —120 minutos, alternativas y programación mezcladas— y desde el 2026-09-16 dice
 > explícitamente que el simulacro no toma de él ninguna cifra.
->
-> **La actualización de ADR-022 ya está escrita** (`00_producto/decisiones.md`, al final
-> de esa ADR): el resumen puede decir «Aprobaste el simulacro» o «Reprobaste el
-> simulacro», con esa forma exacta y ninguna otra. Era el requisito que la iteración 41
-> declaraba como dependencia.
->
-> **Lo siguiente es la lectura de alcance de la iteración 41**, que además tiene que
-> resolver su decisión 8, el encabezado y el pie compartidos entre las tres páginas.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -53,6 +51,7 @@ decisiones vale tanto como el código que las implementa.
 | 36 - Orientación en la portada         | 30 - Cuestionario           | 2026-09-15 | 🟢 Completada |
 | 34 - Justificación y repaso            | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
 | 35 - Transición de carga               | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
+| 41 - Presentación, selección y protec. | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

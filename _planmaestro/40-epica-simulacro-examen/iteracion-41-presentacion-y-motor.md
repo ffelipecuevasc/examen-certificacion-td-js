@@ -1,7 +1,7 @@
 # Iteración 41 · Presentación, selección y protección del intento
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · lectura de alcance hecha el 2026-09-16; decisiones cerradas; en tres etapas
+**Estado:** 🟢 **Cerrada el 2026-09-18** · lectura de alcance hecha el 2026-09-16; decisiones cerradas; entregada en tres etapas
 **Depende de:** épica 30 cerrada (cumplido) y la actualización de ADR-022 escrita en `decisiones.md` (cumplido el
 2026-09-16).
 **Siguiente en el orden de trabajo:** iteración 45.
@@ -23,6 +23,10 @@ La página no arranca respondiendo, arranca explicando. Esta iteración deja lis
   solo sirve. La tercera, tras la lectura de alcance de esta iteración: el autor resolvió el encabezado y el pie, el corte en
   etapas, el paso de «una sola pestaña» a la iteración 42, qué pasa si se corrige una pregunta durante un intento, cuándo se
   pide la lista de ids y qué pasa si el almacenamiento se llena. Se agregaron las correcciones técnicas de la lectura.
+- **2026-09-18 · cerrada.** Las tres etapas entregadas y commiteadas por el autor, con `npm run verificar` en 0
+  tras cada commit y las tres pasadas de navegador exitosas: la de la etapa A, la de la etapa B con sus 15 pasos ya
+  corregidos por H-024, y la de la etapa C con sus 16. Durante el camino se escribió **ADR-035**, se corrigió la
+  decisión 3 —el orden del intento lo fija el algoritmo— y se cazó **H-024**, que el plan no preveía.
 - **2026-09-16 · decisiones del plan de la etapa B.** D1 acepta como máximo 100 parámetros ligados por consulta (provocado):
   el extremo trocea. El autor decidió rechazar ids repetidos, que la etapa B termine con un aviso «Intento listo» y que la
   prueba de escapado del simulacro pase a la 43, y que el código viva en las carpetas existentes. Los enlaces al simulacro
@@ -163,19 +167,19 @@ Cada etapa cierra con su evidencia antes de empezar la siguiente.
 
 ## Tareas
 
-- [ ] **A ·** Crear `simulacro.html` sobre `ink` con encabezado y pie copiados (decisión 8) y la presentación con su botón.
-- [ ] **A ·** Crear la comprobación de las tres copias del encabezado y el pie.
-- [ ] **A ·** Agregar `simulacro.html` a `LISTA_COPIA` y a `PAGINAS` en `scripts/build-dist.mjs:63-70`.
-- [ ] **A ·** Extraer la transición de carga (decisión 9).
-- [ ] **B ·** Crear el archivo de datos de hermanas con los grupos de la tabla.
-- [ ] **B ·** Crear el algoritmo de selección (decisiones 2, 3, 4 y 10).
-- [ ] **B ·** Provocar primero el límite de parámetros ligados de D1 con 120 ids, y crear el extremo por ids.
-- [ ] **B ·** Conectar el botón: lista de ids, elección y carga bajo una sola transición (decisión 5), con modo degradado.
-- [ ] **B ·** Extraer el aviso de modo degradado del cuestionario a un componente, sin cambiar lo que dibuja.
-- [ ] **B ·** Agregar los archivos nuevos a `DONDE_BARRER` de `probar-filtrado.mjs`.
-- [ ] **C ·** Diseñar el formato del intento (decisión 6) y guardarlo, retomarlo e ignorar datos ininteligibles.
-- [ ] **C ·** Avisos sin almacenamiento y con almacenamiento lleno (decisión 7).
-- [ ] **C ·** Escribir la ADR nueva.
+- [x] **A ·** Crear `simulacro.html` sobre `ink` con encabezado y pie copiados (decisión 8) y la presentación con su botón.
+- [x] **A ·** Crear la comprobación de las tres copias del encabezado y el pie.
+- [x] **A ·** Agregar `simulacro.html` a `LISTA_COPIA` y a `PAGINAS` en `scripts/build-dist.mjs:63-70`.
+- [x] **A ·** Extraer la transición de carga (decisión 9).
+- [x] **B ·** Crear el archivo de datos de hermanas con los grupos de la tabla.
+- [x] **B ·** Crear el algoritmo de selección (decisiones 2, 3, 4 y 10).
+- [x] **B ·** Provocar primero el límite de parámetros ligados de D1 con 120 ids, y crear el extremo por ids.
+- [x] **B ·** Conectar el botón: lista de ids, elección y carga bajo una sola transición (decisión 5), con modo degradado.
+- [x] **B ·** Extraer el aviso de modo degradado del cuestionario a un componente, sin cambiar lo que dibuja.
+- [x] **B ·** Agregar los archivos nuevos a `DONDE_BARRER` de `probar-filtrado.mjs`.
+- [x] **C ·** Diseñar el formato del intento (decisión 6) y guardarlo, retomarlo e ignorar datos ininteligibles.
+- [x] **C ·** Avisos sin almacenamiento y con almacenamiento lleno (decisión 7).
+- [x] **C ·** Escribir la ADR nueva.
 
 ## Criterios de aceptación
 
@@ -185,71 +189,145 @@ Cada uno se cierra con evidencia producida **provocando** el comportamiento, sal
 
 **Etapa A · la página**
 
-- [ ] **`simulacro.html` usa `ink` de fondo** y su encabezado, pie y favicon son copia de los de las otras páginas.
-- [ ] **La comprobación de las copias da rojo** al introducir en una copia una diferencia no permitida, y verde con las
+- [x] **`simulacro.html` usa `ink` de fondo** y su encabezado, pie y favicon son copia de los de las otras páginas.
+  · *Evidencia:* `simulacro.html:20` (`<body class="bg-ink …">`); `npm run verificar` → `copias OK`. · **Claude Code**
+- [x] **La comprobación de las copias da rojo** al introducir en una copia una diferencia no permitida, y verde con las
   diferencias permitidas.
-- [ ] **`npm run build` copia `simulacro.html` a `dist/`** y comprueba sus enlaces sin recursos rotos.
-- [ ] **La transición extraída se usa en el cuestionario** y `probar:filtrado` sigue en verde con sus mediciones y sus rojos
+  · *Evidencia:* `scripts/comprobar-copias.mjs:82` (las tres páginas) y `:27` (las diferencias permitidas, escritas en el
+  propio guion). · **Claude Code**
+- [x] **`npm run build` copia `simulacro.html` a `dist/`** y comprueba sus enlaces sin recursos rotos.
+  · *Evidencia:* `scripts/build-dist.mjs:66` y `:71`; salida del build: «4 entradas copiadas a dist/ · 28 recursos
+  enlazados, ninguno roto». · **Claude Code**
+- [x] **La transición extraída se usa en el cuestionario** y `probar:filtrado` sigue en verde con sus mediciones y sus rojos
   de la 35 (H-1, piso, texto lento, movimiento reducido).
-- [ ] **El cuestionario no cambia lo que dibuja** durante la carga: el HTML de la transición es el mismo antes y después de
+  · *Evidencia:* `static/js/components/transicion-de-carga.js:126`, importada en `components/cuestionario.js:74`;
+  `probar-filtrado.mjs:1539` (8f-1) y sus notas de tiempos. · **Claude Code**
+- [x] **El cuestionario no cambia lo que dibuja** durante la carga: el HTML de la transición es el mismo antes y después de
   la extracción.
+  · *Evidencia:* `probar-filtrado.mjs:1539`, que compara el HTML dibujado pieza por pieza. · **Claude Code**
 
 **Etapa B · elegir y traer**
 
-- [ ] **Con 120 ids en una sola petición**, el extremo responde bien; si D1 limita los parámetros por debajo de eso, se
+- [x] **Con 120 ids en una sola petición**, el extremo responde bien; si D1 limita los parámetros por debajo de eso, se
   informa el límite medido y cómo se resolvió.
-- [ ] **El extremo devuelve exactamente las preguntas pedidas**, sin justificaciones, con el contrato de `_comun.js`; los ids
+  · *Evidencia:* **D1 acepta 100 parámetros ligados**, provocado el 2026-09-16; el extremo trocea en cuatro consultas de un
+  solo `batch`. `functions/api/preguntas.js:171` y `:386`; `probar-filtrado.mjs:2109`. · **Claude Code**
+- [x] **El extremo devuelve exactamente las preguntas pedidas**, sin justificaciones, con el contrato de `_comun.js`; los ids
   inexistentes o retirados no vuelven, y los repetidos se tratan según la ADR.
-- [ ] **Rechaza una lista mal formada** con `PETICION_INVALIDA`, y lo que no es lectura por `soloLectura()`.
-- [ ] **`generar-instantanea.mjs` sigue funcionando** sin cambios de comportamiento.
-- [ ] **Sobre 200 intentos con azar fijado**, cada intento trae 120 preguntas distintas y activas, con 17 por módulo y un
+  · *Evidencia:* `probar-filtrado.mjs:2109`; los repetidos se **rechazan** (ADR-035, parte 2). · **Claude Code**
+- [x] **Rechaza una lista mal formada** con `PETICION_INVALIDA`, y lo que no es lectura por `soloLectura()`.
+  · *Evidencia:* `probar-filtrado.mjs:2109`, diez formas de pedir mal rechazadas y un POST parado por `soloLectura()`.
+  · **Claude Code**
+- [x] **`generar-instantanea.mjs` sigue funcionando** sin cambios de comportamiento.
+  · *Evidencia:* `npm run verificar` → `instantanea OK`; el extremo reusa `SQL_PREGUNTAS`, `sqlAlternativas()` y
+  `validarPreguntas()` sin copiarlas. · **Claude Code**
+- [x] **Sobre 200 intentos con azar fijado**, cada intento trae 120 preguntas distintas y activas, con 17 por módulo y un
   módulo con 18; se informa cuántas veces le tocó el extra a cada módulo.
-- [ ] **Ningún intento de la muestra trae dos preguntas de un mismo grupo**, incluidos el par 25 ↔ 107 y el trío 205, 210,
+  · *Evidencia:* `probar-filtrado.mjs:2278` · «Muestra de 200 intentos con semilla 20260916… Extra por modulo: 2:30 · 3:38 ·
+  4:25 · 5:30 · 6:26 · 7:26 · 8:25». · **Claude Code**
+- [x] **Ningún intento de la muestra trae dos preguntas de un mismo grupo**, incluidos el par 25 ↔ 107 y el trío 205, 210,
   222.
-- [ ] **El solapamiento promedio entre intentos es como mucho 42 preguntas** (esperado 38,9); más es rojo.
-- [ ] **Con un id de hermana retirado del resumen**, simulado interceptando, el algoritmo sigue funcionando.
-- [ ] **Con preguntas descartadas o que no vuelven**, simulado interceptando, el intento se completa con reservas del mismo
+  · *Evidencia:* `probar-filtrado.mjs:2278`; los dos grupos que el criterio nombra van **anclados a mano** en el guion,
+  porque el bucle recorre el mismo archivo que vigila. · **Claude Code**
+- [x] **El solapamiento promedio entre intentos es como mucho 42 preguntas** (esperado 38,9); más es rojo.
+  · *Evidencia:* `probar-filtrado.mjs:2278` · **39,6** sobre los 19 900 pares. · **Claude Code**
+- [x] **Con un id de hermana retirado del resumen**, simulado interceptando, el algoritmo sigue funcionando.
+  · *Evidencia:* `probar-filtrado.mjs:2546` · con la 107 fuera, los 50 intentos se eligieron igual. · **Claude Code**
+- [x] **Con preguntas descartadas o que no vuelven**, simulado interceptando, el intento se completa con reservas del mismo
   módulo hasta 120.
-- [ ] **Con descartes que impiden reunir 120**, el intento no empieza y la pantalla lo explica.
-- [ ] **Antes de pulsar «Comenzar» no sale ninguna petición**; al pulsar salen la del resumen y la del extremo, bajo una sola
+  · *Evidencia:* `probar-filtrado.mjs:2584` · nueve descartadas, intento completado conservando el reparto. · **Claude Code**
+- [x] **Con descartes que impiden reunir 120**, el intento no empieza y la pantalla lo explica.
+  · *Evidencia:* `probar-filtrado.mjs:2658` · «No se pudo armar el simulacro», con un botón que de verdad reintenta.
+  · **Claude Code**
+- [x] **Antes de pulsar «Comenzar» no sale ninguna petición**; al pulsar salen la del resumen y la del extremo, bajo una sola
   transición medida como `max(carga, 400 ms)` desde el clic.
-- [ ] **En modo degradado**, provocado, el intento se elige desde la instantánea y el aviso de ADR-008 queda visible.
-- [ ] **El algoritmo existe una sola vez**: el camino normal y el degradado importan la misma función (se comprueba leyendo
+  · *Evidencia:* `probar-filtrado.mjs:2716` · 0 peticiones antes, 2 después, 2 escrituras de la zona, 403 ms desde el clic.
+  · **Claude Code**
+- [x] **En modo degradado**, provocado, el intento se elige desde la instantánea y el aviso de ADR-008 queda visible.
+  · *Evidencia:* `probar-filtrado.mjs:2854` · con el fetch caído, 120 preguntas desde la copia y el aviso a la vista
+  nombrando al simulacro. · **Claude Code**
+- [x] **El algoritmo existe una sola vez**: el camino normal y el degradado importan la misma función (se comprueba leyendo
   los imports; es el único criterio que no se provoca).
-- [ ] **Al terminar la carga aparece «Intento listo»** con la cantidad por módulo, y el HTML dibujado no contiene texto del
+  · *Evidencia:* `probar-filtrado.mjs:2943` · un solo importador en todo el sitio y una sola llamada; `servicios/datos.js` no
+  importa ni el algoritmo ni las hermanas. · **Claude Code**
+- [x] **Al terminar la carga aparece «Intento listo»** con la cantidad por módulo, y el HTML dibujado no contiene texto del
   banco.
-- [ ] **El orden de los módulos varía entre intentos de la muestra**, y las preguntas 25 y 107 salen con frecuencias
+  · *Evidencia:* `probar-filtrado.mjs:2799` · ninguno de los 600 textos del banco del intento aparece en su HTML.
+  · **Claude Code**
+- [x] **El orden de los módulos varía entre intentos de la muestra**, y las preguntas 25 y 107 salen con frecuencias
   compatibles con el azar.
-- [ ] **El aviso de modo degradado extraído dibuja en el cuestionario lo mismo que antes**, comprobado byte a byte.
-- [ ] **Se informan las filas leídas** por el resumen y el extremo en un intento. Si el entorno local no las reporta, se
+  · *Evidencia:* `probar-filtrado.mjs:2278` · 196 órdenes distintos, el 2 antes que el 3 en 112 de 200, la 25 en 52 y la 107
+  en 42. · **Claude Code**
+- [x] **El aviso de modo degradado extraído dibuja en el cuestionario lo mismo que antes**, comprobado byte a byte.
+  · *Evidencia:* `probar-filtrado.mjs:3020` · los 668 caracteres exactos de antes de la extracción. · **Claude Code**
+- [x] **Se informan las filas leídas** por el resumen y el extremo en un intento. Si el entorno local no las reporta, se
   deja dicho y la medición pasa a la pasada del autor.
+  · *Evidencia:* `probar-filtrado.mjs:2109` · **1 111 el resumen + 2 791 el extremo = 3 902 filas** por intento. El entorno
+  local **sí** las reporta, así que no hizo falta la pasada del autor. La cifra **se comprueba**, no solo se imprime: hay un
+  piso derivado de lo que la respuesta trae en la mano, y fue rojo cuando el extremo sumaba un solo trozo. · **Claude Code**
 
 **Etapa C · guardar y retomar**
 
-- [ ] **Al empezar, el intento queda guardado** bajo `examen-td-js.simulacro.` con versión dentro del dato, preguntas y
+- [x] **Al empezar, el intento queda guardado** bajo `examen-td-js.simulacro.` con versión dentro del dato, preguntas y
   respuestas en claves separadas, y los campos previstos para la 42, la 43 y la 44.
-- [ ] **Un cambio de respuesta reescribe solo su clave**, no la de las preguntas.
-- [ ] **Simulando una recarga**, el intento se retoma con las mismas 120 preguntas en el mismo orden.
-- [ ] **Con el banco cambiado entre la carga y la recarga**, simulado interceptando, el intento retomado conserva las
+  · *Evidencia:* `probar-memoria.mjs:3072`; el formato en `static/js/servicios/intento-guardado.js:142`. Los cinco campos se
+  comprueban **por nombre**. · **Claude Code**
+- [x] **Un cambio de respuesta reescribe solo su clave**, no la de las preguntas.
+  · *Evidencia:* `probar-memoria.mjs:3212` · la clave de preguntas queda **byte a byte** idéntica (78 477 bytes) mientras la
+  de respuestas pasa de 146 a 464. · **Claude Code**
+- [x] **Simulando una recarga**, el intento se retoma con las mismas 120 preguntas en el mismo orden.
+  · *Evidencia:* `probar-memoria.mjs:3268` · cada visita es un proceso nuevo con el almacén en disco; misma secuencia y cero
+  peticiones. · **Claude Code**
+- [x] **Con el banco cambiado entre la carga y la recarga**, simulado interceptando, el intento retomado conserva las
   preguntas como llegaron.
-- [ ] **Un dato guardado corrupto o de otra versión se ignora** sin romper la página.
-- [ ] **Sin almacenamiento**, el intento empieza y se avisa que no sobrevive a una recarga.
-- [ ] **Con una escritura que falla a mitad del intento**, simulada, aparece el aviso de la decisión 7 y el intento sigue.
+  · *Evidencia:* `probar-memoria.mjs:3328` · correcta movida de alternativa e ids renovados; las 120 correctas y sus textos
+  intactos, y **ni una petición**. · **Claude Code**
+- [x] **Un dato guardado corrupto o de otra versión se ignora** sin romper la página.
+  · *Evidencia:* `probar-memoria.mjs:3378` · cinco formas —versión 99, JSON truncado, `intento_id` cruzado, entrada rota y
+  media copia—, todas en silencio y sin error de consola. · **Claude Code**
+- [x] **Sin almacenamiento**, el intento empieza y se avisa que no sobrevive a una recarga.
+  · *Evidencia:* `probar-memoria.mjs:3457` · tres formas de negarse; el intento se arma, se puede responder, y el aviso lo
+  dice. · **Claude Code**
+- [x] **Con una escritura que falla a mitad del intento**, simulada, aparece el aviso de la decisión 7 y el intento sigue.
+  · *Evidencia:* `probar-memoria.mjs:3581`, con el `cupo` y `prohibirEscritura()` que la etapa C agregó a
+  `scripts/dom-falso.mjs:159` y `:209`. · **Claude Code**
+
+**Agregados el 2026-09-18 por la decisión del autor sobre el orden** (ver la corrección fechada más arriba)
+
+- [x] **Ningún intento de la muestra entrega las preguntas agrupadas por módulo.**
+  · *Evidencia:* `probar-filtrado.mjs:2278` · **102,6 cambios de módulo** de media —agrupado serían 6— y racha máxima de 6
+  seguidas del mismo módulo, con umbrales de 80 y 8. · **Claude Code**
+- [x] **El orden guardado es el que se retoma tras una recarga.**
+  · *Evidencia:* `probar-memoria.mjs:3268` · la secuencia coincide **y** lo retomado sigue mezclado, con 110 cambios de
+  módulo. · **Claude Code**
 
 **Todas las etapas**
 
-- [ ] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
+- [x] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
+  · *Evidencia:* `probar:filtrado` FILTRADO CORRECTO · `probar:memoria` MEMORIA CORRECTA (60 procesos) · `probar:escapado`
+  ESCAPADO EN PIE · `npm run build` en 0 · `npm run verificar` VERIFICADO con sus siete OK. `git diff --stat` vacío sobre
+  `static/js/data/instantanea-banco.js` y `d1/respaldo-banco.sql`. · **Claude Code**
 
 ### Los comprueba el autor en el navegador
 
-- [ ] **A ·** La presentación se entiende sin tecnicismos, leída en el teléfono, y el encabezado y el pie se ven igual que en
+- [x] **A ·** La presentación se entiende sin tecnicismos, leída en el teléfono, y el encabezado y el pie se ven igual que en
   las otras páginas.
-- [ ] **B ·** Al pulsar «Comenzar», la transición se siente igual que en el cuestionario, con buena conexión y con la red
+  · **Felipe Cuevas, 2026-09-18, pasada de navegador** · etapa A, y confirmado otra vez en la lista de la **etapa B, pasos
+  1, 2 y 14**. *(La lista de la etapa A no quedó versionada; las de la B y la C sí, más abajo.)*
+- [x] **B ·** Al pulsar «Comenzar», la transición se siente igual que en el cuestionario, con buena conexión y con la red
   limitada.
-- [ ] **B ·** Si el entorno local no reporta filas leídas, se miden contra producción con una petición de lectura.
-- [ ] **C ·** Recargar a mitad del intento lo retoma, en escritorio y en teléfono.
-- [ ] **Cada etapa ·** Sin errores de consola.
-- [ ] **Cada etapa ·** `npm run verificar` termina en 0, con `npm run datos:dev` levantado.
+  · **Felipe Cuevas, 2026-09-18, pasada de navegador** · etapa B, **paso 7**.
+- [x] **B ·** Si el entorno local no reporta filas leídas, se miden contra producción con una petición de lectura.
+  · **No aplicó**: el entorno local **sí** las reporta —3 902 filas por intento, medidas y comprobadas—, así que la
+  condición del criterio nunca se dio y no hubo nada que medir contra producción. · **Claude Code**
+- [x] **C ·** Recargar a mitad del intento lo retoma, en escritorio y en teléfono.
+  · **Felipe Cuevas, 2026-09-18, pasada de navegador** · etapa C, **pasos 4, 5 y 14**. *(Hasta que la iteración 43 construya
+  el recorrido no existe «mitad del intento»: lo que se recargó fue un intento armado y guardado, sin responder.)*
+- [x] **Cada etapa ·** Sin errores de consola.
+  · **Felipe Cuevas, 2026-09-18, pasada de navegador** · etapa A; etapa B, **paso 15**; etapa C, **paso 16**.
+- [x] **Cada etapa ·** `npm run verificar` termina en 0, con `npm run datos:dev` levantado.
+  · **Felipe Cuevas, 2026-09-18** · terminó en 0 tras cada uno de los cuatro commits de la iteración. También en la etapa B,
+  **paso 15**, y en la etapa C, **paso 16**.
 
 ## Preguntas hermanas
 
@@ -320,6 +398,80 @@ Se vigilan las dos y no una: la primera caza el agrupamiento entero, la segunda 
 dejar la primera por encima del umbral.
 
 ## Notas de la iteración
+
+### 2026-09-18 · Cierre: lo que la iteración deja escrito
+
+**Cinco decisiones del autor, tomadas sobre la marcha y no en la lectura de alcance.** Tres durante las etapas: los **ids
+repetidos se rechazan** con `PETICION_INVALIDA` en vez de deduplicarse, porque deduplicar sería adivinar y devolver 119
+preguntas para 120 ids pedidos dejaría al navegador reponiendo una que sí existía; la etapa B termina en el aviso
+**«Intento listo»** y **la prueba de escapado del simulacro pasa a la iteración 43**, contra el dibujo real de una
+pregunta, porque hoy no hay texto del banco en la pantalla y dibujar media pregunta solo para tener algo que vigilar
+habría sido peor; y **el código vive en las carpetas existentes** —el algoritmo en `servicios/`, las hermanas en `data/`,
+los componentes en `components/`—, sin carpeta propia del simulacro. Dos más al aprobar el plan del paso 0 de la etapa C:
+las **120 preguntas van mezcladas**, sin agrupar por módulo (corrección fechada más arriba), y **el resultado calculado
+no se guarda**, porque se deriva de lo que ya está guardado y una segunda fuente de verdad es lo que ADR-034 no admite.
+
+**D1 acepta 100 parámetros ligados por consulta.** No estaba escrito con ese nombre en ninguna parte: se provocó el
+2026-09-16 pidiendo los 120 ids de un intento, y la consulta falla. El extremo **trocea por dentro** —cuatro consultas de
+a treinta dentro de un solo `batch`— y quien lo llama no se entera: sigue siendo una petición con 120 ids. Está medido y
+no supuesto porque el día que el límite cambie lo va a decir un rojo y no una sorpresa en producción.
+
+**Un intento cuesta 3 902 filas leídas:** 1 111 el resumen y 2 791 el extremo por ids. No es una cifra buena y se dice —la
+vista `pregunta_activa` entra por el índice de estado y no por la clave primaria—, pero queda **medida**, así que la
+épica 50 tiene contra qué comparar cualquier optimización.
+
+**H-024 · un intento no mezcla bancos.** Apareció leyendo el paso 9 de la lista de navegador de la etapa B, ya commiteada.
+El resumen y las preguntas caen al respaldo **cada uno por su cuenta**, y para el cuestionario eso está bien: una
+petición, una pantalla. Aquí son dos peticiones **atadas** —de la primera salen los ids y la segunda los va a buscar—, así
+que se podía llegar a elegir sobre D1 y pedir a la copia. Hoy los dos bancos coinciden y no se nota; provocado con
+sesenta ids que la instantánea no tiene, el intento gastó sus tres rondas de reserva sobre el banco equivocado y terminó
+en «No se pudo armar el simulacro» con 118 de 120, justo cuando el respaldo tenía que salvarlo. Por el camino de las
+reservas era peor: el intento **sí** se armaba, con dos bancos adentro y sin que nada lo dijera. La regla que lo cierra es
+una sola —si alguna mitad sale de la copia, el intento entero se vuelve a elegir desde la copia— y se atiende apenas se
+detecta, no al final.
+
+**Por qué se guarda el `alternativa_id` y no el texto.** ADR-034 prohíbe anclar en el id de la alternativa porque
+`banco:actualizar` borra las cuatro y las reinserta con ids nuevos a la primera corrección, y el avance del cuestionario
+apunta al **banco vivo**. Aquí la respuesta no apunta al banco vivo: apunta a la **copia congelada** que el propio intento
+guardó, que ningún `banco:actualizar` puede reescribir. Dentro de ella el id es exacto incluso si dos alternativas
+compartieran texto, y pesa 3 104 bytes menos repartidos en las 120 reescrituras. Lo que ADR-034 protegía lo cubre la
+iteración 44 por el otro lado: avisa si una pregunta se corrigió después del intento.
+
+**Y por qué dos claves y no una**, con los números que lo deciden: la copia congelada pesa **76,8 KiB** y se escribe una
+vez; la de respuestas llega a **12,7 KiB** con las 120 dentro y se reescribe en cada cambio. Un intento completo son 121
+escrituras y **850 KiB**. Con las preguntas dentro de la misma clave serían **10 056 KiB, 11,8 veces más**, y la escritura
+número 120 costaría 91 556 bytes en vez de 12 996, sobre un `localStorage` que es síncrono y bloquea el hilo que dibuja.
+
+**Cinco hallazgos de método, que son lo que esta iteración deja para las que vienen.**
+
+1. **Un rojo que sacaba su verdad del archivo que vigilaba.** La comprobación de hermanas recorría `GRUPOS_DE_HERMANAS`
+   para decidir si un intento traía dos del mismo grupo, o sea el mismo archivo que se quería proteger: escrito el trío
+   {205, 210, 222} como el par {205, 210}, un intento con la 210 y la 222 juntas pasaba en verde. Los dos grupos que el
+   criterio nombra van ahora **anclados a mano** en el guion. Es H-023 otra vez.
+2. **`dom.oculto()` daba verde sobre un aviso que nunca se dibujó.** El DOM falso no arranca con las clases del HTML, así
+   que un nodo que nadie tocó no está `hidden` para él: preguntar solo por `oculto()` cazaba que el componente **pusiera**
+   la clase, pero no que el componente **no hiciera nada**, que es el fallo que importa en un aviso obligatorio. Se
+   resolvió mirando además lo escrito. **Dos comprobaciones de la iteración 22 siguen apoyándose solo en `oculto()`** y
+   quedaron anotadas.
+3. **Las filas leídas se imprimían sin comprobarse.** Un número que solo se imprime es un número que nadie mira: sumando
+   el `rows_read` de un solo trozo en vez de los cuatro, el extremo informaba 468 y todo lo demás seguía en verde. Ahora
+   hay un piso derivado de lo que la respuesta ya trae en la mano.
+4. **El almacén de mentira solo sabía decir que sí o que no a todo.** Con eso no se podía provocar ni el almacén que **se
+   llena a mitad** del intento —el caso que la decisión 7 nombra— ni el que tiene sitio para las respuestas y no para los
+   76,8 KiB de la copia congelada, que es el único donde puede quedar **media copia** guardada. Ganó
+   `prohibirEscritura()` y un `cupo` en bytes. La lección vale más allá de esta iteración: un doble que solo conoce el sí
+   y el no deja sin probar los fallos parciales, que son los que ocurren.
+5. **Un rojo que se disparaba por un comentario.** La comprobación de «el algoritmo existe una sola vez» contaba
+   apariciones de `elegirIntento(` en el archivo; un comentario nuevo que la nombraba la puso en rojo con el código
+   intacto. Ahora quita los comentarios antes de contar. Un rojo que se dispara por un comentario enseña a no creerle a la
+   comprobación, que es peor que no tenerla.
+
+**Lo que se adelantó de otras iteraciones, y por qué.** `anotarEnElIntento()` (`components/simulacro.js:613`) es la
+**costura de la iteración 43**: la 43 le va a conectar el botón de avanzar y el de omitir. Se escribió aquí porque sin
+ella no había forma de provocar una escritura a mitad del intento sobre el código de verdad, y el criterio se habría
+cerrado contra una reimplementación del guion. Y dos campos de cada respuesta guardada —`agotada` y `resuelta_en`— son de
+la **iteración 42**: se dejan puestos desde el primer día para que lo guardado sea coherente y el formato no tenga que
+subir de versión a mitad de épica, con intentos de estudiantes reales ya escritos.
 
 ### 2026-09-18 · Etapa C: el intento guardado
 
