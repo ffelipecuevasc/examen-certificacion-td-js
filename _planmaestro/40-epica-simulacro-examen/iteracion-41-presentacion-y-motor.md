@@ -104,6 +104,11 @@ degradado, la instantánea se descarga después del clic, bajo esa misma transic
   avisa (ver la 44).
 - **El formato se diseña ahora con los campos que usarán la 42, la 43 y la 44** (instantes, posición, alternativa marcada,
   respuestas, omitidas, resultado conservado), para no cambiar de versión a mitad de épica.
+  *(Corrección del 2026-09-18, en el paso 0 de la etapa C: **el campo `resultado` se quitó**, por decisión del autor.
+  El resumen se recalcula desde la copia congelada y las respuestas, que ya están las dos guardadas; guardarlo además
+  sería una segunda fuente de verdad para un número derivable, que es lo que ADR-034 no admite.
+  `scripts/probar-memoria.mjs` da **rojo** si el campo aparece. Los demás campos de esta lista sí están, y se comprueban
+  por nombre.)*
 - **Las preguntas y las respuestas van en claves separadas**: las preguntas se escriben una vez; las respuestas, en cada
   cambio. No se reescriben 79 KB por respuesta.
 - Al volver con un intento en curso, se retoma. (Cómo cuenta el tiempo al volver es de la 42.)

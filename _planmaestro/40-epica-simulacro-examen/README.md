@@ -62,7 +62,12 @@ reglas del simulacro.
 
 No vienen del examen real: son decisiones para entrenar.
 
-1. **120 preguntas**, repartidas parejo: **17 por módulo** y la número 120 en un módulo elegido al azar.
+1. **120 preguntas**, repartidas parejo: **17 por módulo** y la número 120 en un módulo elegido al azar. Y se
+   entregan **mezcladas entre módulos**, no agrupadas: el intento no va 17 de bases de datos seguidas y después 17 de
+   asincronía. *(Decisión del autor del 2026-09-18, al aprobar el plan de la etapa C de la iteración 41. El motivo:
+   en el examen real las preguntas vienen en orden aleatorio, y cambiar de tema de golpe es parte de lo que el
+   simulacro entrena. Un intento ordenado por módulo entrena otra cosa —responder de corrido sobre un tema que ya se
+   tiene en la cabeza—, que es lo que el cuestionario ya hace.)*
 2. **30 segundos por pregunta.** El tiempo sobrante **se pierde**: avanzar antes solo acorta el intento.
 3. **El tiempo total no es un límite**: con el sobrante perdido nunca puede agotarse antes que las preguntas. Se
    muestra como tiempo transcurrido.
@@ -79,7 +84,10 @@ No vienen del examen real: son decisiones para entrenar.
 ## Arquitectura (decisiones del autor, 2026-09-16)
 
 - **El navegador elige las preguntas.** Parte de los ids por módulo que ya entrega `?resumen=1` (ADR-033), aplica el
-  reparto y excluye las preguntas hermanas en todo el intento. **Hay una sola copia del algoritmo**, en `static/js/`.
+  reparto, excluye las preguntas hermanas en todo el intento y **baraja las 120 entre módulos** —al final, después
+  del reparto y de la exclusión, para que mezclar no pueda alterar ninguna de las dos—. **Hay una sola copia del
+  algoritmo**, en `static/js/`. *(El barajado es decisión del autor del 2026-09-18: en el examen real las preguntas
+  vienen en orden aleatorio. Ver la regla 1.)*
 - **Un extremo de solo lectura sirve las preguntas por id.** No elige, no reparte, no excluye: `vision.md` queda
   intacto y ADR-009 no cambia.
 - **En modo degradado (ADR-008)** el mismo algoritmo elige desde la instantánea.
@@ -94,7 +102,11 @@ No vienen del examen real: son decisiones para entrenar.
 - **Si el almacenamiento falla a mitad del intento**, se avisa en pantalla y el intento sigue.
 - **Una sola pestaña escribe el intento**: la que abre último lo toma, y la otra se bloquea con un aviso. Se construye en la
   iteración 42, porque necesita un vencimiento por tiempo y la infraestructura del reloj.
-- **El último resultado se conserva** en el navegador hasta que se empieza otro intento. No hay historial.
+- **El último intento terminado se conserva** en el navegador hasta que se empieza otro, y **el resumen se recalcula
+  desde él**: no se guarda ningún resultado aparte. No hay historial. *(Corregido el 2026-09-18, en el paso 0 de la
+  etapa C de la iteración 41: esta línea decía «el último resultado se conserva», y sonaba a que había un resultado
+  guardado. El autor decidió que no lo hubiera, porque se deriva de la copia congelada y las respuestas, que ya están
+  las dos guardadas.)*
 
 ## Vocabulario del resultado · actualización de ADR-022
 
