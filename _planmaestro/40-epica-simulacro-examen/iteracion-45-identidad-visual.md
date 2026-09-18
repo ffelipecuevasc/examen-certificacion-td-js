@@ -479,8 +479,11 @@ las tres correcciones de ese mismo día repitió los puntos **A, B y C** de la l
   2026-09-18, puntos 6 y 7.*
 - [x] **El panel del cuestionario a 1280 × 700:** se comprueba si alcanza hasta «Reiniciar el módulo», porque el cálculo
   de la lectura de alcance dice que no y ADR-032 afirma dos veces que sí. El resultado se registra. — *Felipe Cuevas,
-  2026-09-18, punto 11.* **La medición se hizo; el resultado todavía no está escrito aquí**, y hasta que lo esté no se
-  puede decidir cuál de los dos tiene razón. Ver «Lo que queda abierto».
+  2026-09-18, punto 11.* **Tenía razón el cálculo: el panel NO cabe.** Con captura de pantalla real a 1280 × 700, arriba
+  de la página y sin desplazar, el índice se corta a la mitad de la fila del **Módulo 6**, y quedan fuera las tres barras
+  de progreso, «Reiniciar el módulo» y los enlaces de NotebookLM. Escrito como actualización fechada en
+  `_planmaestro/00_producto/decisiones.md`, **«ADR-032 · Actualización · 2026-09-18 · la ventana de 700 px NO alcanza el
+  botón de reiniciar»**, sin reescribir la decisión original.
 - [x] **Sin errores de consola.** — *Felipe Cuevas, 2026-09-18, punto 10.*
 - [x] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado. — *Felipe Cuevas, 2026-09-18, punto 10*, y
   confirmado por Claude Code en la pasada final con el CSS ya commiteado: **VERIFICADO, código 0**, las ocho
@@ -493,12 +496,12 @@ las tres correcciones de ese mismo día repitió los puntos **A, B y C** de la l
 
 ## Lo que queda abierto al cerrar
 
-- **El resultado de la medición del panel del cuestionario a 1280 × 700.** El autor la hizo el 2026-09-18 dentro de su
-  pasada, y la pasada salió exitosa; pero ese punto **no es de aprobar o fallar**, es una medición cuyo número decide si
-  ADR-032 dice algo falso o si el cálculo de la lectura de alcance está mal. Falta escribir aquí qué se vio. Según cómo
-  salga: si el botón «Reiniciar el módulo» **no** se alcanza, hay que abrir una ADR que corrija a ADR-032, que lo afirma
-  dos veces; si **sí** se alcanza, hay que decir por qué el cálculo —1.340 a 1.366 px de alto natural sobre 636
-  disponibles— se equivocó. Anotado en `registro_log.md`.
+- ~~El resultado de la medición del panel del cuestionario a 1280 × 700.~~ **RESUELTO el 2026-09-18.** La captura del
+  autor confirmó el cálculo de la lectura de alcance —1.340 a 1.366 px de alto natural contra 636 disponibles— y desmintió
+  lo que **ADR-032 afirmaba dos veces**. Corregido en `_planmaestro/00_producto/decisiones.md`, **«ADR-032 ·
+  Actualización · 2026-09-18 · la ventana de 700 px NO alcanza el botón de reiniciar»**, sin reescribir la decisión
+  original y sin pedir que se arregle el layout: acortar el panel, si alguna vez se decide, será una decisión de diseño
+  aparte. La fila de `registro_log.md` quedó cerrada.
 - **El borde `muted/60` en el resto del sitio.** Esta iteración lo fijó y lo aplicó a todas las superficies del simulacro;
   el panel del cuestionario, la portada y las tres copias del encabezado y del pie siguen en `border-panel3`. La fila de
   `registro_log.md` queda abierta con el valor ya decidido: quien haga esa pasada no elige borde, solo lo aplica.
