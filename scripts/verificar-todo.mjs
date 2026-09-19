@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los ocho comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los nueve comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -33,8 +33,9 @@
  *   4. comprobar-cifra.mjs        la portada publica la cifra del banco
  *   5. comprobar-copias.mjs       las tres paginas dicen lo mismo en encabezado y pie
  *   6. probar-identidad-visual.mjs  el contraste, la paleta y los iconos del simulacro
- *   7. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
- *   8. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
+ *   7. probar-cronometros.mjs     los dos relojes del simulacro y el arriendo de pestana
+ *   8. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
+ *   9. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
  * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
@@ -50,6 +51,13 @@
  * La cuarta entro con la iteracion 36, y por un motivo que conviene no olvidar: la
  * portada publicaba «21 preguntas de practica» con 368 en el banco, y sobrevivio
  * al llenado entero porque ninguna comprobacion tenia el deber de mirarla.
+ *
+ * La septima entro con la iteracion 42, y es la que vigila el tiempo. Corre aqui —y no
+ * junto a `probar:filtrado` y `probar:memoria`, que quedan fuera— por una diferencia
+ * concreta: **no necesita servidor**. No prueba de donde salen las preguntas, sino que
+ * pasa con el reloj una vez que el intento existe, y para eso le basta con escribir el
+ * intento en un almacen de mentira y retomarlo. Sin esto, el reloj controlable seria
+ * lo unico de la iteracion 42 que nadie mira salvo cuando alguien se acuerda.
  *
  * La sexta entro con la iteracion 45, y por el mismo motivo que la cuarta y la
  * quinta: hasta ese dia **ninguna comprobacion miraba el contraste**, ni que una clase
@@ -67,7 +75,7 @@
  * Una comprobacion que hay que acordarse de correr no vigila nada.
  *
  * Codigos de salida:
- *   0  VERIFICADO             las ocho comprobaciones hechas y en verde
+ *   0  VERIFICADO             las nueve comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -88,7 +96,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los ocho comprobadores, con la traduccion de sus codigos.
+ * Los nueve comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -151,6 +159,20 @@ const COMPROBADORES = [
       0: [OK, 'el contraste, la paleta y los iconos del simulacro estan donde la guia visual dice'],
       1: [FALLO, 'IDENTIDAD ROTA: un contraste bajo umbral, un color de fuera de la paleta o un icono que no existe'],
       2: [AVISO, 'no se pudo comprobar: falta la paleta o no se dejaron cargar los componentes'],
+    },
+  },
+  {
+    // ENTRA EN `verificar` Y `probar:filtrado` NO, Y LA DIFERENCIA ES EL SERVIDOR.
+    // Este guion no pide ni una vez a la red: arma el intento escribiendolo en el
+    // almacen de mentira y lo retoma, que es el mismo camino de una recarga. Por eso
+    // puede correr siempre, y por eso el reloj controlable de la iteracion 42 queda
+    // vigilado en cada verificacion y no solo cuando alguien se acuerda.
+    nombre: 'cronometros',
+    guion: 'probar-cronometros.mjs',
+    codigos: {
+      0: [OK, 'los dos cronometros cuentan bien, y una sola pestana escribe el intento'],
+      1: [FALLO, 'CRONOMETRO ROTO: una cifra, un agotamiento o el arriendo de la pestana no cuadra'],
+      2: [AVISO, 'no se pudo comprobar: no se dejaron cargar los componentes del simulacro'],
     },
   },
   {

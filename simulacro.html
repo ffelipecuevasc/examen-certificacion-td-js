@@ -117,6 +117,22 @@
            Lo llena static/js/components/aviso-de-guardado.js. -->
       <div id="aviso-guardado" class="hidden mb-8" role="status" aria-live="polite"></div>
 
+      <!-- LA FRANJA DE LOS DOS CRONOMETROS (iteracion 42).
+           Vacia desde el HTML y fuera de #zona-del-intento, por el mismo motivo que
+           los dos avisos de arriba: la transicion de carga reescribe la zona entera,
+           y una franja que viviera dentro se borraria sola al armar el intento.
+
+           Se llena cuando hay un intento en curso y se vacia cuando no lo hay. Su
+           contenido lo dibuja dibujarFranjaDelIntento() de components/simulacro-maqueta.js,
+           que es el marcado que fijo la iteracion 45: aqui no se repite ni una clase.
+
+           SIN role NI aria-live, Y ES A PROPOSITO. Un cronometro que se anuncia solo
+           cada segundo deja a un lector de pantalla hablando encima del enunciado que
+           el estudiante esta tratando de leer, durante una hora. El tiempo restante
+           tambien esta escrito en la pantalla y la urgencia se dice con texto; lo que
+           no puede hacer es interrumpir. -->
+      <div id="franja-del-simulacro"></div>
+
       <!-- LO QUE LA CARGA REESCRIBE.
            La presentacion entera vive aca dentro, y al pulsar «Comenzar» se
            sustituye por la transicion y despues por «Intento listo» o por la

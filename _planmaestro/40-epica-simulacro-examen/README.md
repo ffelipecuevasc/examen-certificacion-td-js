@@ -143,7 +143,7 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 |---|---|---|
 | 41 | Presentación, selección y protección del intento | 🟢 Cerrada el 2026-09-18 · en tres etapas |
 | 45 | Dirección visual del simulacro | 🟢 Cerrada el 2026-09-18 |
-| 42 | Cronómetros | ⚪ No iniciada · **es la siguiente** |
+| 42 | Cronómetros | 🔵 En curso · construida el 2026-09-18, falta la pasada del autor en el navegador |
 | 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada |
 | 44 | Resumen de resultados | ⚪ No iniciada |
 
@@ -155,7 +155,10 @@ las demoras y las caídas se simulan interceptando la respuesta del extremo, nun
 `banco:insertar`, `datos:instantanea` ni nada que regenere `static/js/data/instantanea-banco.js`.
 
 - **El tiempo se simula** con un reloj controlable que construye la iteración 42. Hasta entonces no existe: ningún
-  criterio de la 41 lo usa.
+  criterio de la 41 lo usa. **Existe desde el 2026-09-18:** `static/js/servicios/reloj.js` en el sitio, y
+  `relojDeMentira()` y `dosPestanas()` en `scripts/dom-falso.mjs`. La 43 y la 44 lo usan tal cual, sin construir nada.
+  Se adelanta con `avanzar(ms)` —los temporizadores vencen a su hora— y con `saltar(ms)` —el tiempo pasa y no vence
+  ninguno, que es el teléfono bloqueado—, y **no toca el `Date.now()` del proceso**.
 - **`npm run verificar` exige `npm run datos:dev` levantado** en otra terminal. Sin servidor da código 2 («no se pudo
   probar»), que no es un aprobado.
 - **`npm run verificar` no corre `probar:filtrado` ni `probar:memoria`** (pendiente de la épica 50): sus salidas se

@@ -125,9 +125,30 @@ async function correrLaVisita(archivoDeEncargo) {
   let dom = null;
 
   try {
-    const { almacenDeMentira, prepararDomFalso } = await import(
+    const { almacenDeMentira, prepararDomFalso, relojDeMentira } = await import(
       pathToFileURL(join(AQUI, 'dom-falso.mjs')).href
     );
+
+    /**
+     * El reloj de esta visita, PARADO (iteracion 42).
+     *
+     * Este guion prueba la MEMORIA, no el tiempo. Desde que la iteracion 42 conecto
+     * los cronometros, el simulacro avanza solo al agotarse cada pregunta, y con el
+     * reloj de verdad eso convertia estas pruebas en una carrera contra el
+     * cronometro: cada visita es un proceso aparte, la suite entera tarda unos
+     * cuarenta segundos, y un intento creado en la visita 30 y retomado en la 40 ya
+     * tenia preguntas vencidas. Se vio, y el sintoma era desconcertante: «tras
+     * responder 3, el intento guardado dice posicion 122».
+     *
+     * Con un reloj de mentira que nadie adelanta, el plazo de 30 segundos no vence
+     * nunca y lo que se mide vuelve a ser solo lo que este guion existe para medir.
+     * El instante es fijo y no `Date.now()`, para que dos visitas del mismo encargo
+     * vean exactamente la misma hora aunque corran con segundos de diferencia.
+     *
+     * Que el plazo SI venza cuando tiene que vencer lo prueba
+     * `scripts/probar-cronometros.mjs`, que para eso adelanta el reloj a proposito.
+     */
+    const relojParado = relojDeMentira({ desde: 1767225600000 });
 
     // --- El almacen, cargado desde el archivo que hace de disco ---------------
     const guardado = existsSync(encargo.disco)
@@ -152,7 +173,7 @@ async function correrLaVisita(archivoDeEncargo) {
       };
     }
 
-    dom = prepararDomFalso({ almacen });
+    dom = prepararDomFalso({ almacen, reloj: relojParado });
 
     // --- El fetch: el servidor real, salvo lo que esta visita intercepte -------
     const fetchReal = globalThis.fetch;
@@ -209,6 +230,16 @@ async function correrLaVisita(archivoDeEncargo) {
     // tres formas de negarse, y la intercepcion del banco. Copiarlo a otro guion
     // dejaria dos orquestadores que se quedan callados el dia que divergen.
     if (encargo.pagina === 'simulacro') {
+      // El asiento del reloj, ANTES de importar el simulacro. Se importa desde
+      // `raizDelSitio` y no desde otro sitio a proposito: tiene que ser la MISMA
+      // instancia del modulo que `components/simulacro.js` va a cargar por dentro, y
+      // eso solo lo garantiza resolver a la misma ruta.
+      const { usarReloj } = await import(
+        pathToFileURL(join(raizDelSitio, 'servicios', 'reloj.js')).href
+      );
+
+      usarReloj(relojParado);
+
       const simulacro = await import(
         pathToFileURL(join(raizDelSitio, 'components', 'simulacro.js')).href
       );

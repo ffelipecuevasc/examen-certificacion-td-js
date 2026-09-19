@@ -9,7 +9,7 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | Ninguna en curso                                                                                                                                   |
+| **Iteración** | **42 · Cronómetros** — abierta el 2026-09-18                                                                                                       |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
 | **Estado**    | 🔵 En curso                                                                                                                                        |
 | **Siguiente** | **Iteración 42 · Cronómetros.** La **41 y la 45 cerraron el 2026-09-18**: `simulacro.html` existe, elige y guarda un intento de 120 preguntas, y la dirección visual ya está fijada con el marcado estático del intento y del resumen construido. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**. Los números de las iteraciones no cambian. |

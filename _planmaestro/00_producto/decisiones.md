@@ -2735,6 +2735,117 @@ reloj controlable.
 
 ---
 
+### Actualización · 2026-09-18 · el mecanismo del arriendo, y las reglas del tiempo
+
+*Escrita al abrir la iteración 42. Cierra lo que la Parte 8 dejó pendiente en su propio
+texto —«el mecanismo —vencimiento, renovación, qué pasa al recuperar el intento— ni cómo se
+prueba»— y recoge las cuatro reglas del tiempo que hasta hoy solo vivían en
+`_planmaestro/40-epica-simulacro-examen/README.md` y en `registro_log.md`. **No sustituye
+ninguna decisión anterior**: la Parte 8 sigue vigente entera, y esto es su continuación.*
+
+---
+
+#### El arriendo de la pestaña dueña
+
+**Números del autor, 2026-09-18.** La clave es la que la Parte 8 reservó,
+`examen-td-js.simulacro.dueno`, y guarda `{ v, pestana, visto_en }`.
+
+| | |
+|---|---|
+| **Quién lo toma** | La pestaña que abre **último**, siempre y sin preguntar |
+| **Renovación** | cada **5 segundos** |
+| **Vencimiento** | **15 segundos** sin renovar, o sea tres renovaciones perdidas |
+| **La bloqueada** | mira cada **5 segundos** si venció, y si venció lo toma |
+
+**Por qué 15 y no 6.** El margen de tres latidos perdidos no es holgura por si acaso: un
+navegador móvil estrangula los temporizadores de una pestaña incluso visible, y con un
+vencimiento de un solo latido la pestaña dueña podría quitarse el intento **a sí misma** por
+haberse dormido seis segundos. Lo que el vencimiento tiene que distinguir es «cerrada» de
+«lenta», y 15 segundos lo distingue.
+
+**Qué pasa al recuperar el intento.** La pestaña que estaba bloqueada y ve el arriendo
+vencido **lo toma y vuelve a leer lo guardado**, no lo que tenía en memoria. Es importante:
+mientras estuvo bloqueada, la otra pestaña siguió respondiendo, y el intento que hay en el
+almacén ya no es el que esta pestaña recordaba. Retomar desde memoria le devolvería al
+estudiante un intento viejo y le borraría lo que hizo en la otra pestaña, que es exactamente
+el destrozo que toda la Parte 8 existe para impedir.
+
+**Lo primero que hace la bloqueada es dejar de contar.** Antes de dibujar el aviso, apaga sus
+cronómetros. Mientras sigan vivos, cada plazo que venza escribe una respuesta sobre el intento
+que la **otra** pestaña está jugando. El aviso puede esperar un milisegundo; la escritura no.
+Y **no borra nada**: lo que hay guardado es del intento de la otra.
+
+**El almacén que se niega no bloquea a nadie.** Si no hay `localStorage`, o si escribir el
+arriendo falla, esta pestaña se declara dueña y no coordina. Un navegador que no guarda no
+tiene intento compartido que dos pestañas puedan estropear: cada una vive en su memoria y se
+pierde al recargar, que es lo que el aviso de la iteración 41 ya dice. Bloquear ahí sería
+quitarle el simulacro a alguien para proteger un dato que no existe.
+
+---
+
+#### Las cuatro reglas del tiempo
+
+Las tomó el autor el 2026-09-16 y estaban escritas en el README de la épica 40 (reglas 2, 3, 4
+y 9) y en `registro_log.md`. Se recogen aquí porque son decisiones de producto que el código
+implementa, y un ADR es donde se busca el porqué seis meses después.
+
+**1 · El sobrante se pierde.** Cada pregunta tiene 30 segundos y avanzar antes solo acorta el
+intento. De ahí se sigue lo que la fila de `registro_log.md` de la iteración 42 ya corrigió el
+2026-09-16: **no existe un cronómetro total de 60 minutos**. Con el sobrante perdido, 120
+preguntas de 30 segundos no pueden agotarse antes que las preguntas, así que el total no es un
+plazo sino **tiempo transcurrido**, y **«terminar por tiempo total» no existe como camino**.
+Los 60 minutos son la duración máxima teórica, no un límite.
+
+**2 · Al agotarse los 30 segundos.** Con una alternativa marcada, cuenta como respondida con
+esa alternativa; sin ninguna, queda omitida. En los dos casos se avanza sola y no se vuelve
+atrás.
+
+**3 · El reloj sigue corriendo fuera de la página.** Salir, bloquear el teléfono o recargar no
+lo detiene. Al volver, el tiempo mostrado es el real y **cada pregunta cuyo plazo venció
+mientras tanto se resuelve con la regla 2, en orden y cada una con SU instante de
+vencimiento**, no todas con el del regreso. Un intento que volviera con cuatro preguntas
+resueltas en el mismo milisegundo estaría mintiendo sobre cuándo ocurrieron.
+
+**4 · El tiempo se calcula desde instantes guardados.** «Ahora menos el instante guardado»,
+nunca sumando pulsos de un temporizador. Un temporizador en pestaña oculta se atrasa, y un
+cronómetro que contara pulsos se quedaría corto justo en el caso que la regla 3 describe. El
+temporizador del simulacro existe **solo para repintar**: si se atrasa, la pantalla se refresca
+tarde y el número que escribe cuando por fin corre sigue siendo el correcto.
+
+---
+
+#### Cómo se prueba, que es la otra mitad que la Parte 8 dejó abierta
+
+**Con un reloj inyectable, y sin tocar el `Date.now()` del proceso.** El simulacro pide la hora
+a `static/js/servicios/reloj.js`, un asiento de módulo del mismo patrón que
+`almacenDelNavegador()` en `servicios/memoria.js` (decisión del autor, 2026-09-18). En el
+navegador ese asiento devuelve el reloj de verdad; un guion lo cambia por uno de mentira y
+juega un intento de una hora en milisegundos.
+
+**`components/transicion-de-carga.js` queda fuera del asiento, y es deliberado.** Su piso de
+400 ms existe para que el estudiante no vea un parpadeo, y eso se mide contra el reloj del
+mundo. Los bloques `8f-2` (iteración 35) y `10f` (iteración 41) de
+`scripts/probar-filtrado.mjs` lo cronometran con `Date.now()` real y una holgura de 700 ms;
+colgarlo de un reloj que otra prueba adelanta los dejaría pasando en verde sin medir nada.
+
+**Dos verbos, porque son dos casos distintos.** `avanzar(ms)` deja vencer los temporizadores a
+su hora; `saltar(ms)` mueve el reloj **sin vencer ninguno**, que es lo que hace el navegador
+con una pestaña oculta. Solo el segundo distingue un cronómetro que resta instantes de uno que
+cuenta pulsos: el que cuenta pulsos sobrevive a `avanzar()` y se queda corto con `saltar()`.
+
+**Y dos pestañas de mentira que se ven por `storage`**, con la regla que es fácil equivocar
+escrita donde se implementa: **el evento nunca llega a quien escribió**. Si llegara a las dos,
+una pestaña reaccionaría a la renovación de su propio arriendo y se bloquearía sola, y una
+implementación con ese defecto pasaría la prueba en verde.
+
+**Corre en `npm run verificar`,** como noveno comprobador
+(`scripts/probar-cronometros.mjs`), porque no necesita servidor: arma el intento escribiéndolo
+en el almacén de mentira y lo retoma, que es el mismo camino de una recarga. `probar:filtrado`
+y `probar:memoria` siguen fuera, que es donde la épica 40 los dejó, y por la razón de siempre:
+esos sí piden `datos:dev`.
+
+---
+
 ### Lo que esta ADR no puede afirmar
 
 - **Que un intento no se pueda inspeccionar.** Las respuestas correctas viajan al

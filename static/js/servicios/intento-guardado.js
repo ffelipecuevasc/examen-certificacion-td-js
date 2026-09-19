@@ -55,6 +55,7 @@
  * resumen conservando el intento terminado, no un numero aparte.
  */
 import { almacenDelNavegador } from './memoria.js';
+import { reloj } from './reloj.js';
 
 /**
  * Version del formato. Va DENTRO del dato, no en el nombre de la clave.
@@ -94,9 +95,15 @@ export const estadoDelGuardado = () => estado;
  * es permitir comprobar que la copia congelada y las respuestas son del MISMO
  * intento. Sin `crypto.randomUUID()` a proposito: la iteracion 42 pide funcionar en
  * navegadores moviles antiguos, y esto no necesita calidad criptografica.
+ *
+ * La hora sale del reloj del simulacro y no de `Date.now()`, aunque esto sea un dato
+ * y no una medicion. En el navegador es exactamente lo mismo —el asiento devuelve el
+ * reloj de verdad—, y a cambio la regla queda sin excepciones que recordar: en este
+ * archivo no hay ni un `Date.now()`, y eso se comprueba con un `grep` en vez de
+ * leyendo las cinco llamadas para ver cual era la que no contaba.
  */
 const nuevoIdDeIntento = () =>
-  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  `${reloj().ahora().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 
 /**
  * Escribe una clave. Devuelve si se pudo.
@@ -139,7 +146,7 @@ function borrar(donde, clave) {
  * que `leerIntentoGuardado()` va a descartar al recargar: escribirlo seria gastar la
  * cuota que falta en fabricar basura.
  */
-export function guardarIntentoNuevo(preguntas, empezadoEn = Date.now()) {
+export function guardarIntentoNuevo(preguntas, empezadoEn = reloj().ahora()) {
   const donde = almacenDelNavegador();
 
   if (!donde) {
@@ -152,7 +159,7 @@ export function guardarIntentoNuevo(preguntas, empezadoEn = Date.now()) {
   const cabe = escribir(donde, CLAVE_PREGUNTAS, {
     v: VERSION,
     intento_id: intentoId,
-    guardado_en: Date.now(),
+    guardado_en: reloj().ahora(),
     preguntas,
   });
 

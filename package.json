@@ -33,6 +33,7 @@
     "verificar:cifra": "node scripts/comprobar-cifra.mjs",
     "verificar:copias": "node scripts/comprobar-copias.mjs",
     "probar:escapado": "node scripts/probar-escapado.mjs",
+    "probar:cronometros": "node scripts/probar-cronometros.mjs",
     "probar:filtrado": "node scripts/probar-filtrado.mjs",
     "probar:identidad": "node scripts/probar-identidad-visual.mjs",
     "probar:restricciones": "node scripts/probar-restricciones.mjs",

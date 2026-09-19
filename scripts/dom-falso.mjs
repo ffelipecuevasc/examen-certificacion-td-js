@@ -43,6 +43,28 @@
  * perdido, que es el defecto que la auditoria de la iteracion 32 encontro en tres
  * sitios a la vez. Lo que se mide es a QUE elemento fue a parar el foco; que se
  * vea el anillo amarillo alrededor sigue siendo cosa del navegador.
+ *
+ * EL TIEMPO Y LAS DOS PESTANAS, DESDE LA ITERACION 42
+ *
+ * Aparecen dos piezas nuevas, las dos OPCIONALES: `relojDeMentira()`, que solo avanza
+ * cuando la prueba se lo pide, y `dosPestanas()`, que son dos entornos completos
+ * mirando un solo almacen y viendose por el evento `storage`.
+ *
+ * La regla que las gobierna a las dos, y que es lo primero que hay que mirar al
+ * auditar este archivo: **nunca se toca el reloj del proceso**. No se asigna
+ * `globalThis.Date`, ni `Date.now`, ni `performance`, y `window.setTimeout` y
+ * `window.clearTimeout` siguen siendo los de Node, siempre y para todos. El reloj de
+ * mentira no se instala en ningun sitio: se le pasa al sitio por `usarReloj()`, y el
+ * sitio lo consulta en vez de consultar al proceso.
+ *
+ * El motivo esta medido y no es una precaucion abstracta. `scripts/probar-filtrado.mjs`
+ * cronometra la transicion de carga con `Date.now()` real en `8f-2` (iteracion 35) y
+ * en `10f` (iteracion 41), contra un piso de 400 ms con 700 de holgura. Un reloj de
+ * mentira instalado en el proceso las dejaria a las dos midiendo un tiempo que otra
+ * prueba controla, y pasarian en verde sin probar el parpadeo que existen para cazar.
+ *
+ * `prepararDomFalso()` sin las opciones nuevas se comporta exactamente como antes de
+ * la iteracion 42.
  */
 
 /** Un nodo de mentira, con lo justo para que los componentes lo usen. */
@@ -157,9 +179,16 @@ export function almacenDeMentira({
   // «nunca media copia» no la vigila nadie: se descubrio mutandola el 2026-09-18 y
   // no dio rojo.
   cupo = Infinity,
+  // Los bytes. Por omision los suyos y de nadie mas, que es lo que veian todos los
+  // que ya llamaban a esta funcion. `dosPestanas()` le pasa un Map compartido: dos
+  // pestañas del mismo navegador miran UN solo almacen, y si cada una tuviera el
+  // suyo no habria nada que coordinar y la prueba pasaria en verde sobre un mundo
+  // que no existe.
+  datos = new Map(),
+  // Aviso de que algo cambio, para el evento `storage`. Recibe la clave y el valor
+  // nuevo —`null` si se borro—. Por omision no avisa a nadie.
+  alCambiar = null,
 } = {}) {
-  const datos = new Map();
-
   const ocupado = () => {
     let total = 0;
     for (const [clave, valor] of datos) total += clave.length + valor.length;
@@ -190,10 +219,16 @@ export function almacenDeMentira({
       }
 
       datos.set(clave, texto);
+      alCambiar?.(clave, texto);
     },
     removeItem(clave) {
       if (noDejaEscribir) throw new Error('escritura denegada por el navegador de mentira');
+
+      // Solo se avisa si de verdad habia algo. Borrar lo que no existe no cambia el
+      // almacen, y el navegador tampoco dispara `storage` por eso.
+      const habia = datos.has(clave);
       datos.delete(clave);
+      if (habia) alCambiar?.(clave, null);
     },
     /**
      * El almacen se llena A MITAD DE CAMINO (iteracion 41, etapa C).
@@ -212,6 +247,222 @@ export function almacenDeMentira({
     },
     /** Lo guardado, para poder mirarlo desde la prueba. No es parte de la API real. */
     datos,
+  };
+}
+
+/**
+ * Un reloj de mentira, que solo avanza cuando la prueba se lo pide (iteracion 42).
+ *
+ * POR QUE NO SE PARCHEA `Date.now()`
+ *
+ * Seria mas corto reemplazar `Date.now` en `globalThis` y no tocar el sitio. No se
+ * hace, y la razon esta medida: `scripts/probar-filtrado.mjs` cronometra la
+ * transicion de carga con `Date.now()` de verdad en dos sitios —`8f-2`, de la
+ * iteracion 35, y `10f`, de la 41—, comparando contra un piso de 400 ms con una
+ * holgura de 700. Con el reloj del proceso bajo el control de otra prueba, esas dos
+ * dejarian de medir el parpadeo y pasarian en verde sin probar nada.
+ *
+ * Asi que este archivo **nunca** asigna `globalThis.Date`, `Date.now` ni
+ * `performance`, y **nunca** reemplaza `window.setTimeout` ni `window.clearTimeout`.
+ * Es una regla que se comprueba con un `grep`, igual que la barrera de ADR-015.
+ *
+ * LOS DOS VERBOS, Y POR QUE SON DOS Y NO UNO
+ *
+ *   avanzar(ms)  el tiempo pasa Y los temporizadores vencen a su hora.
+ *   saltar(ms)   el tiempo pasa y NO vence nada.
+ *
+ * `saltar()` es el telefono bloqueado y la pestana en segundo plano: el navegador
+ * estrangula los temporizadores, asi que el tiempo corre y los avisos no llegan.
+ * Es el unico que prueba de verdad la decision 5 de la iteracion 42 —la cifra sale
+ * de restar instantes, no de contar pulsos—, porque un cronometro que contara
+ * pulsos sobrevive a `avanzar()` y se queda corto con `saltar()`. Despues de un
+ * salto, `avanzar(0)` vence de golpe todo lo que quedo atrasado, en orden.
+ */
+export function relojDeMentira({ desde = 1767225600000 } = {}) {
+  let ahora = desde;
+  let siguientePase = 1;
+  let oculta = false;
+
+  /** pase -> { vence, quehacer }. Un Map porque hay que poder cancelar por pase. */
+  const pendientes = new Map();
+  const deVisibilidad = [];
+
+  /**
+   * El que vence antes, y a igualdad el que se programo antes.
+   *
+   * El desempate por pase no es cosmetico: dos preguntas agotadas en el mismo
+   * instante simulado tienen que resolverse en el orden en que se programaron, que
+   * es el orden del intento. Sin desempate, el orden lo decidiria el Map y la
+   * decision 3 —«en orden»— no se podria afirmar.
+   */
+  const elPrimero = () => {
+    let elegido = null;
+
+    for (const [pase, tarea] of pendientes) {
+      const antes =
+        !elegido ||
+        tarea.vence < elegido.tarea.vence ||
+        (tarea.vence === elegido.tarea.vence && pase < elegido.pase);
+
+      if (antes) elegido = { pase, tarea };
+    }
+
+    return elegido;
+  };
+
+  const avisarDeLaVisibilidad = () => {
+    // Sobre una copia: un oyente que se registre mientras se reparte no debe recibir
+    // el aviso que ya estaba en curso.
+    for (const quehacer of [...deVisibilidad]) quehacer();
+  };
+
+  return {
+    // --- La cara que ve el sitio. La misma forma que crearRelojDelNavegador() ---
+    ahora: () => ahora,
+    alCabo(ms, quehacer) {
+      const pase = siguientePase++;
+      pendientes.set(pase, { vence: ahora + Math.max(0, ms), quehacer });
+      return pase;
+    },
+    cancelar(pase) {
+      pendientes.delete(pase);
+    },
+    oculta: () => oculta,
+    alCambiarLaVisibilidad(quehacer) {
+      deVisibilidad.push(quehacer);
+    },
+
+    // --- La cara que solo ve la prueba -------------------------------------
+    /**
+     * El tiempo pasa y los temporizadores vencen A SU HORA.
+     *
+     * El reloj queda en el instante de CADA vencimiento mientras corre su tarea, y
+     * no en el destino del salto. Importa, y mucho: una tarea que al vencer lea
+     * `ahora()` para anotar cuando quedo resuelta la pregunta escribiria el instante
+     * del final del salto, y el criterio de que las preguntas agotadas en segundo
+     * plano quedan resueltas «en orden» se cerraria en verde sobre instantes falsos.
+     *
+     * Una tarea puede programar otra —el cronometro de la pregunta siguiente— y se
+     * atiende igual, mientras caiga dentro del salto.
+     */
+    avanzar(ms) {
+      const destino = ahora + Math.max(0, ms);
+
+      for (;;) {
+        const elegido = elPrimero();
+        if (!elegido || elegido.tarea.vence > destino) break;
+
+        pendientes.delete(elegido.pase);
+        ahora = elegido.tarea.vence;
+        elegido.tarea.quehacer();
+      }
+
+      ahora = destino;
+    },
+    /** El tiempo pasa y no vence nada: el telefono bloqueado. */
+    saltar(ms) {
+      ahora += Math.max(0, ms);
+    },
+    /** La pagina se va a segundo plano. Reparte `visibilitychange` por los dos caminos. */
+    ocultar() {
+      if (oculta) return;
+      oculta = true;
+      avisarDeLaVisibilidad();
+    },
+    /** La pagina vuelve. */
+    mostrar() {
+      if (!oculta) return;
+      oculta = false;
+      avisarDeLaVisibilidad();
+    },
+    /** Cuantos temporizadores hay puestos. Uno de mas es una fuga. */
+    pendientes: () => pendientes.size,
+  };
+}
+
+/**
+ * Dos pestanas del mismo navegador, mirando un solo almacen (iteracion 42).
+ *
+ * LA REGLA QUE ES FACIL EQUIVOCAR, Y QUE ES LA MITAD DEL VALOR DE ESTO
+ *
+ * El evento `storage` **nunca llega a la pestana que escribio**. Solo a las otras.
+ * Si el almacen de mentira se lo entregara a las dos, una pestana reaccionaria a la
+ * renovacion de su propio arriendo —cada 5 segundos— y se bloquearia a si misma; y
+ * una implementacion con ese defecto pasaria esta prueba en verde. El navegador no
+ * lo hace, y este tampoco.
+ *
+ * COMO SE ENTREGA, SI `globalThis` SOLO ADMITE UN ENTORNO
+ *
+ * Cada pestana es un `prepararDomFalso()` entero. Entregar el evento es **activar la
+ * que recibe, correr sus oyentes y devolver el sitio a quien lo tenia**. Es explicito
+ * y se puede auditar; no pretende ser el navegador. Lo que reproduce es la DECISION
+ * que la pestana toma al enterarse, que es la mitad que se puede comprobar sin
+ * navegador, igual que el resto de este archivo.
+ *
+ * Y CADA PESTANA IMPORTA LOS MODULOS DEL SITIO CON SU PROPIO ESPECIFICADOR
+ * —`?pestana=a` y `?pestana=b`—. Sin eso compartirian el `almacenRecordado` de
+ * `servicios/memoria.js`, el asiento de `servicios/reloj.js` y el `elIntento` de
+ * `components/simulacro.js`, que son variables de modulo: no habria dos pestanas,
+ * habria una con dos nombres. Es el mismo recurso que `probar-filtrado.mjs` ya usa
+ * con `?medicion=1`.
+ */
+export function dosPestanas({ cupo = Infinity } = {}) {
+  /** Los bytes, una sola vez. Es el «disco» del navegador. */
+  const disco = new Map();
+
+  /** nombre -> el lector de `prepararDomFalso()` de esa pestana. */
+  const domsPorNombre = new Map();
+
+  /** Lo entregado, para poder contarlo desde la prueba. */
+  const entregas = [];
+
+  const repartir = (quienEscribio, clave, valorNuevo) => {
+    for (const [nombre, dom] of domsPorNombre) {
+      if (nombre === quienEscribio) continue;
+
+      entregas.push({ de: quienEscribio, a: nombre, clave });
+
+      // Activar, correr, y devolver el sitio a quien lo tenia. El `finally` no es
+      // decorativo: si un oyente lanza, dejar el `globalThis` de la otra pestana
+      // puesto convertiria un fallo en una cascada imposible de leer.
+      const quienEstaba = domsPorNombre.get(quienEscribio);
+
+      try {
+        dom.activar();
+        dom.dispararEnLaVentana('storage', { key: clave, newValue: valorNuevo });
+      } finally {
+        quienEstaba?.activar();
+      }
+    }
+  };
+
+  const crear = (nombre) => {
+    const almacen = almacenDeMentira({
+      cupo,
+      datos: disco,
+      alCambiar: (clave, valorNuevo) => repartir(nombre, clave, valorNuevo),
+    });
+
+    almacen.nombre = nombre;
+    return almacen;
+  };
+
+  return {
+    a: crear('a'),
+    b: crear('b'),
+    /**
+     * Ata el DOM de una pestana a su almacen, para poder entregarle el evento.
+     *
+     * Se llama despues de `prepararDomFalso({ almacen: pestanas.a })`, porque hasta
+     * entonces la pestana no tiene DOM al que entregarle nada.
+     */
+    atar(almacen, dom) {
+      domsPorNombre.set(almacen.nombre, dom);
+    },
+    /** Lo guardado, compartido. Para poder mirarlo desde la prueba. */
+    disco,
+    /** Que evento `storage` se entrego a quien. Cero entregas a uno mismo, siempre. */
+    entregas,
   };
 }
 
@@ -243,8 +494,15 @@ export function almacenDeMentira({
  * los desplazamientos con `auto` en vez de `smooth`. **No prueba que no se vea
  * movimiento**, porque aqui no se pinta nada; eso sigue siendo del navegador y de
  * la regla de src/input.css, que es la otra mitad y la que de verdad apaga.
+ *
+ * `reloj` es de la iteracion 42 y es **opcional**. Con uno de `relojDeMentira()`,
+ * `document.hidden` pasa a salir de el y `visibilitychange` se puede provocar. Sin
+ * el —que es como lo llaman los ocho sitios anteriores a esta iteracion— no cambia
+ * absolutamente nada: `hidden` contesta `false` y nadie dispara esa clase de evento.
+ * Pasar el reloj **no** reemplaza `window.setTimeout`: los temporizadores de este
+ * archivo siguen siendo los de Node, siempre.
  */
-export function prepararDomFalso({ almacen, movimientoReducido = false } = {}) {
+export function prepararDomFalso({ almacen, movimientoReducido = false, reloj } = {}) {
   const nodos = new Map();
 
   /**
@@ -280,15 +538,49 @@ export function prepararDomFalso({ almacen, movimientoReducido = false } = {}) {
 
   const body = crearNodo('body', registrar, foco);
 
-  globalThis.document = {
+  /**
+   * Los oyentes que alguien registro en `document` y en `window`.
+   *
+   * Desde la iteracion 42. Hasta ahora los oyentes vivian por nodo, y con eso bastaba
+   * para los clics: se pulsa SOBRE algo. Los dos eventos que el simulacro necesita no
+   * son de ningun elemento —`visibilitychange` es del documento y `storage` es de la
+   * ventana—, y sin estos dos registros no habia forma de provocarlos desde Node.
+   */
+  const oyentesDelDocumento = new Map();
+  const oyentesDeLaVentana = new Map();
+
+  const anotar = (donde, tipo, oyente) => {
+    if (!donde.has(tipo)) donde.set(tipo, []);
+    donde.get(tipo).push(oyente);
+  };
+
+  const correr = (donde, tipo, evento) => {
+    const lista = donde.get(tipo) ?? [];
+    for (const oyente of lista) oyente(evento);
+    return lista.length;
+  };
+
+  const elDocumento = {
     querySelector: registrar,
     querySelectorAll: () => [],
     get activeElement() {
       return foco.actual ?? body;
     },
+    /**
+     * Si la pagina esta en segundo plano.
+     *
+     * Sale del reloj de mentira cuando hay uno, y es un solo estado y no dos: con un
+     * `hidden` propio aqui y otro alla, el dia que se desincronizaran el sitio leeria
+     * una cosa y el guion afirmaria otra. Sin reloj de mentira contesta `false`, que
+     * es lo que veian todos los que ya llamaban a esta funcion.
+     */
+    get hidden() {
+      return reloj ? reloj.oculta() : false;
+    },
+    addEventListener: (tipo, oyente) => anotar(oyentesDelDocumento, tipo, oyente),
   };
 
-  globalThis.window = {
+  const laVentana = {
     // Se mira la consulta y no se contesta que si a todo: `prefersReducedMotion()`
     // pregunta por `(prefers-reduced-motion: reduce)`, y si algun dia el sitio
     // preguntara por otra cosa —el ancho, el modo oscuro— contestarle que si por
@@ -297,23 +589,67 @@ export function prepararDomFalso({ almacen, movimientoReducido = false } = {}) {
       matches: movimientoReducido && String(consulta).includes('prefers-reduced-motion'),
     }),
     scrollTo() {},
+    // LOS TEMPORIZADORES SIGUEN SIENDO LOS DE NODE, Y ESO NO CAMBIA NUNCA.
+    //
+    // El reloj de mentira no se instala aqui: se le pasa al sitio por
+    // `usarReloj()`, y el sitio lo consulta en vez de consultar a la ventana. Si
+    // estos dos se reemplazaran por temporizadores de mentira, el piso de la
+    // transicion de carga —que los usa, y que `8f-2` y `10f` cronometran con
+    // `Date.now()` real— dejaria de esperar de verdad y esas mediciones pasarian en
+    // verde sin medir nada.
     setTimeout: (...argumentos) => setTimeout(...argumentos),
     clearTimeout: (...argumentos) => clearTimeout(...argumentos),
+    addEventListener: (tipo, oyente) => anotar(oyentesDeLaVentana, tipo, oyente),
   };
 
-  // El almacen se reinstala en cada arranque, incluso el mismo objeto: lo que se
-  // rehace es el entorno, no lo guardado. Se borra primero para que un arranque sin
-  // almacen no herede el del anterior, que es justo el caso que hay que poder
-  // provocar.
-  delete globalThis.localStorage;
+  /**
+   * Instala ESTE entorno en `globalThis`.
+   *
+   * Vive en una funcion y no suelto en el cuerpo porque desde la iteracion 42 hay que
+   * poder volver a instalarlo: dos pestañas simuladas son dos entornos completos, y
+   * `globalThis` solo admite uno a la vez. Entregar el evento `storage` a la otra
+   * pestaña es activarla, correr sus oyentes y devolver el sitio a quien lo tenia.
+   */
+  const instalar = () => {
+    globalThis.document = elDocumento;
+    globalThis.window = laVentana;
 
-  if (typeof almacen === 'function') {
-    Object.defineProperty(globalThis, 'localStorage', { get: almacen, configurable: true });
-  } else if (almacen) {
-    Object.defineProperty(globalThis, 'localStorage', { value: almacen, configurable: true, writable: true });
+    // El almacen se reinstala en cada arranque, incluso el mismo objeto: lo que se
+    // rehace es el entorno, no lo guardado. Se borra primero para que un arranque sin
+    // almacen no herede el del anterior, que es justo el caso que hay que poder
+    // provocar.
+    delete globalThis.localStorage;
+
+    if (typeof almacen === 'function') {
+      Object.defineProperty(globalThis, 'localStorage', { get: almacen, configurable: true });
+    } else if (almacen) {
+      Object.defineProperty(globalThis, 'localStorage', { value: almacen, configurable: true, writable: true });
+    }
+  };
+
+  instalar();
+
+  // El reloj de mentira reparte `visibilitychange` por dos caminos, igual que el
+  // navegador: el sitio lo pide por `alCambiarLaVisibilidad()`, y quien escuchara en
+  // `document` lo recibe por aqui. Un solo `ocultar()` alcanza a los dos.
+  if (reloj?.alCambiarLaVisibilidad) {
+    reloj.alCambiarLaVisibilidad(() => correr(oyentesDelDocumento, 'visibilitychange', {}));
   }
 
   return {
+    /** Vuelve a poner este entorno en `globalThis`. Lo usa `dosPestanas()`. */
+    activar: instalar,
+    /**
+     * Dispara un oyente de `window`. Es el hermano de `disparar()`, para los eventos
+     * que no son de ningun elemento: hoy, `storage`.
+     */
+    dispararEnLaVentana(tipo, evento = {}) {
+      return correr(oyentesDeLaVentana, tipo, evento);
+    },
+    /** Dispara un oyente de `document`, como `visibilitychange`. */
+    dispararEnElDocumento(tipo, evento = {}) {
+      return correr(oyentesDelDocumento, tipo, evento);
+    },
     /**
      * El selector del elemento que tiene el foco, o 'body' si no lo tiene nadie.
      *

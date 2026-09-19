@@ -78,6 +78,9 @@ import {
   leerIntentoGuardado,
   olvidarElIntento,
 } from '../servicios/intento-guardado.js';
+import { reloj } from '../servicios/reloj.js';
+import { crearDuenoDelIntento } from '../servicios/dueno-del-intento.js';
+import { crearCronometros } from './cronometros.js';
 import { crearTransicionDeCarga } from './transicion-de-carga.js';
 import { BORDE_DEL_SIMULACRO } from './simulacro-maqueta.js';
 import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
@@ -117,6 +120,35 @@ const origen = { resumen: null, preguntas: null };
  * lo que sobrevive es lo guardado.
  */
 let elIntento = null;
+
+/**
+ * Los dos cronometros del intento en curso, y el arriendo de esta pestana.
+ *
+ * Nulos mientras no haya intento. Viven aqui y no dentro de cada funcion porque hay
+ * que poder pararlos desde otro sitio del que los encendio: «Empezar otro intento»
+ * apaga los del intento viejo antes de armar el nuevo, y la pestana que pierde el
+ * intento apaga los suyos sin haberlos arrancado ella.
+ */
+let losCronometros = null;
+let elDueno = null;
+
+/**
+ * Cual alternativa esta marcada en la pregunta que se esta respondiendo.
+ *
+ * Hoy no hay ninguna, y no es un hueco olvidado: la 42 construye el reloj y la 43 el
+ * recorrido, asi que todavia no existe ninguna tarjeta donde marcar. Por la regla de
+ * la decision 2, no marcada significa que al agotarse la pregunta queda **omitida**,
+ * que es lo que este `null` produce y lo que de verdad pasa hoy si nadie responde.
+ *
+ * La 43 reemplaza esta funcion por una que lea la tarjeta, y no tiene que tocar ni
+ * `components/cronometros.js` ni el resto de este archivo.
+ */
+let laAlternativaMarcada = () => null;
+
+/** Para que la iteracion 43 enchufe la tarjeta de la pregunta sin tocar esto. */
+export function conectarLaAlternativaMarcada(comoLeerla) {
+  laAlternativaMarcada = comoLeerla;
+}
 
 /**
  * Los dos bancos de los que puede salir un intento, cada uno con sus dos lecturas.
@@ -513,7 +545,18 @@ export async function comenzarElIntento() {
   // El instante del clic, no el de despues de la carga. Es lo que la iteracion 42 va
   // a usar como origen del tiempo transcurrido, y tomarlo al terminar de cargar le
   // regalaria al estudiante los segundos que tardo el banco en contestar.
-  const empezadoEn = Date.now();
+  const empezadoEn = reloj().ahora();
+
+  // Lo primero: apagar el intento anterior. «Empezar otro intento» llega por aqui, y
+  // un cronometro del intento viejo que siguiera vivo escribiria respuestas sobre el
+  // nuevo en cuanto venciera su plazo.
+  //
+  // Y se suelta el arriendo ANTES de apagar, porque apagar tira el objeto que sabe si
+  // era nuestro. Va junto a `olvidarElIntento()` de aqui abajo y por el mismo motivo:
+  // si el intento siguiente no se puede armar, lo que no puede quedar es una clave del
+  // simulacro suelta en el almacen sin ningun intento detras.
+  elDueno?.soltar();
+  pararElIntento();
 
   // Y se olvida lo guardado ANTES de pedir nada. Si el estudiante pulsa «Empezar otro
   // intento» y la carga falla, lo que no puede quedar es el intento anterior en el
@@ -570,6 +613,8 @@ export async function comenzarElIntento() {
       preguntas: resultado.preguntas,
       respuestas: [],
       posicion: 0,
+      // El intento y su primera pregunta empiezan en el mismo instante: el del clic.
+      empezado_en: empezadoEn,
       comenzada_en: empezadoEn,
     };
 
@@ -588,6 +633,16 @@ export async function comenzarElIntento() {
 
   if (resultado.ok) dibujarIntentoListo(resultado.preguntas);
   else dibujarNoSePudo(resultado.explicacion);
+
+  // Y el reloj empieza a correr. Despues de dibujar, para que la franja se pinte sobre
+  // una pantalla que ya existe; el instante de origen es el del clic y no el de ahora,
+  // asi que lo que tardo la carga ya esta descontado y no se regala.
+  //
+  // El intento se juega igual aunque no se haya podido guardar (decision 7 de la 41);
+  // lo que cambia es que entonces no hay arriendo que escribir.
+  if (resultado.ok) {
+    ponerEnMarchaElIntento({ hayIntentoGuardado: estadoDelGuardado() === 'guardando' });
+  }
 }
 
 /**
@@ -624,7 +679,15 @@ export const preguntasDelIntento = () => (elIntento ? [...elIntento.preguntas] :
 export function anotarEnElIntento(entrada) {
   if (!elIntento) return false;
 
-  const resueltaEn = entrada.resuelta_en ?? Date.now();
+  // UN INTENTO COMPLETO NO ADMITE UNA RESPUESTA MAS, y la guarda no es teorica: se
+  // llego a ella. Con el avance automatico de la iteracion 42, una respuesta que
+  // entrara despues de la 120 dejaria `respuestas` mas larga que `preguntas`, y eso es
+  // exactamente lo que `leerIntentoGuardado()` descarta al recargar —«un intento de
+  // 121 no es un intento largo, es un intento roto»—. O sea que la respuesta 121 no
+  // se pierde sola: se lleva por delante el intento entero.
+  if (elIntento.respuestas.length >= elIntento.preguntas.length) return false;
+
+  const resueltaEn = entrada.resuelta_en ?? reloj().ahora();
 
   elIntento.respuestas.push({
     pregunta_id: entrada.pregunta_id,
@@ -652,6 +715,16 @@ export function anotarEnElIntento(entrada) {
   });
 
   mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+
+  // Y la franja se repinta EN EL ACTO, con la pregunta nueva y sus 30 segundos
+  // enteros. Sin esto la cifra se queda hasta un segundo mostrando lo que le quedaba
+  // a la pregunta anterior —se vio: responder a los 5 s dejaba la siguiente
+  // empezando en 25—, y de paso el cronometro se vuelve a citar para el plazo nuevo
+  // en vez de seguir esperando el viejo.
+  //
+  // El motor ignora esta llamada cuando viene de su propio bucle de ponerse al dia:
+  // ahi ya esta latiendo, y volver a entrar serian 120 niveles de recursion.
+  losCronometros?.latir();
 
   return pudo;
 }
@@ -681,6 +754,13 @@ export function retomarElIntento() {
     preguntas: guardado.preguntas,
     respuestas: guardado.respuestas,
     posicion: guardado.posicion,
+    // `empezado_en` se retoma desde la iteracion 42, y antes se descartaba. Es el
+    // origen del tiempo transcurrido: sin el, al volver de una recarga el intento
+    // sabia cuando empezo la pregunta actual pero no cuando empezo el intento, y la
+    // cifra de la derecha de la franja no se podia calcular con la regla de la
+    // decision 5 —«ahora menos el instante guardado»—. `leerIntentoGuardado()` ya lo
+    // devolvia y lo validaba; lo que faltaba era recogerlo.
+    empezado_en: guardado.empezado_en,
     comenzada_en: guardado.comenzada_en,
   };
 
@@ -690,6 +770,103 @@ export function retomarElIntento() {
   // entre una visita y la otra, y el estado de la visita anterior no se guarda en
   // ninguna parte —ni debe—.
   mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+
+  // Y el reloj sigue donde estaba. Lo primero que hacen los cronometros al arrancar es
+  // ponerse al dia, asi que un intento que estuvo dos minutos cerrado vuelve con sus
+  // preguntas agotadas ya resueltas (decision 3).
+  //
+  // Aqui `hayIntentoGuardado` es que si por definicion: se acaba de leer del almacen.
+  ponerEnMarchaElIntento({ hayIntentoGuardado: true });
+}
+
+/**
+ * Pone en marcha el intento: los dos cronometros y el arriendo de la pestana.
+ *
+ * Se llama en los dos sitios donde aparece un intento jugable —al armarlo y al
+ * retomarlo tras una recarga— y no dentro de uno solo de ellos, porque un intento
+ * retomado tiene exactamente el mismo reloj corriendo que uno recien armado: la
+ * decision 3 dice que el tiempo sigue, y retomar sin arrancar el cronometro seria
+ * regalarle al estudiante todo el rato que estuvo fuera.
+ *
+ * EL ORDEN IMPORTA: PRIMERO EL ARRIENDO, DESPUES LOS CRONOMETROS. Si los cronometros
+ * arrancaran antes, una pestana que va a quedar bloqueada alcanzaria a ponerse al dia
+ * y a escribir en el almacen las preguntas agotadas mientras no miraba, que es
+ * justamente la escritura que la decision 4 existe para impedir.
+ */
+function ponerEnMarchaElIntento({ hayIntentoGuardado } = {}) {
+  pararElIntento();
+
+  elDueno = crearDuenoDelIntento({
+    alPerderElIntento: bloquearEstaPestana,
+    alRecuperarElIntento: () => {
+      // El arriendo de la otra vencio. Se retoma lo guardado —que es de ella, y por
+      // eso hay que volver a leerlo— y se sigue desde ahi.
+      retomarElIntento();
+    },
+  });
+
+  // Si el intento no se pudo guardar, no hay nada que dos pestanas puedan estropear y
+  // no se escribe el arriendo: bajo `examen-td-js.simulacro.` nunca queda media cosa.
+  elDueno.tomar({ hayIntentoGuardado });
+
+  if (!elDueno.soyElDueno()) return;
+
+  losCronometros = crearCronometros({
+    estado: () => ({
+      empezado_en: elIntento.empezado_en,
+      comenzada_en: elIntento.comenzada_en,
+      posicion: elIntento.posicion,
+      total: elIntento.preguntas.length,
+    }),
+    alternativaMarcada: () => laAlternativaMarcada(),
+    resolverLaPregunta: ({ posicion, alternativa_id, estado, agotada, resuelta_en }) => {
+      anotarEnElIntento({
+        pregunta_id: elIntento.preguntas[posicion].id,
+        alternativa_id,
+        estado,
+        agotada,
+        resuelta_en,
+      });
+    },
+  });
+
+  losCronometros.arrancar();
+}
+
+/** Apaga lo que estuviera corriendo. Vale llamarlo sin que haya nada encendido. */
+function pararElIntento() {
+  losCronometros?.detener();
+  losCronometros = null;
+
+  elDueno?.detener();
+  elDueno = null;
+}
+
+/**
+ * Otra pestana tomo el intento, y esta se bloquea (decision 4).
+ *
+ * LO PRIMERO ES PARAR, Y DESPUES DIBUJAR. Mientras los cronometros de esta pestana
+ * sigan vivos, cada plazo que venza escribe una respuesta en el almacen que la OTRA
+ * pestana esta usando, y dos pestanas escribiendo `…respuestas` con posiciones
+ * distintas es el destrozo entero que esto evita. El aviso puede esperar un
+ * milisegundo; la escritura no.
+ *
+ * Y NO SE BORRA NADA. Esta pestana deja de tocar el almacen, pero lo que hay guardado
+ * es del intento que la otra esta jugando.
+ */
+function bloquearEstaPestana() {
+  losCronometros?.detener();
+  losCronometros = null;
+
+  const franja = $('#franja-del-simulacro');
+  if (franja) franja.innerHTML = '';
+
+  dibujarRecuadro({
+    titulo: 'Tu simulacro sigue en la otra pestaña',
+    cuerpo: `
+        <p class="mt-3 text-sm text-muted leading-relaxed">Abriste el simulacro en otra pestaña y el intento se fue con ella, para que las dos no se pisen. Esta pestaña ya no está contando ni guardando nada.</p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">Sigue en la otra pestaña. Si la cerraste, espera unos segundos y esta retoma el intento sola.</p>`,
+  });
 }
 
 /**
