@@ -9,17 +9,30 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | **42 · Cronómetros** — abierta el 2026-09-18                                                                                                       |
+| **Iteración** | Ninguna en curso                                                                                                                                   |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
 | **Estado**    | 🔵 En curso                                                                                                                                        |
-| **Siguiente** | **Iteración 42 · Cronómetros.** La **41 y la 45 cerraron el 2026-09-18**: `simulacro.html` existe, elige y guarda un intento de 120 preguntas, y la dirección visual ya está fijada con el marcado estático del intento y del resumen construido. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**. Los números de las iteraciones no cambian. |
+| **Siguiente** | **Iteración 43 · Recorrido de una pregunta a la vez.** La **41, la 45 y la 42 cerraron el 2026-09-18**: `simulacro.html` arma y guarda un intento de 120 preguntas, la dirección visual está fijada con su marcado estático, y los dos cronómetros ya cuentan sobre un reloj que los guiones pueden adelantar. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**. Los números de las iteraciones no cambian. |
 
-> **Antes de abrir la iteración 42.** El simulacro sigue **sin recorrido, sin cronómetros que cuenten, sin resumen
-> calculado y sin enlazar desde ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es
-> la presentación, el botón «Comenzar el simulacro», la carga bajo una sola transición, el aviso «Intento listo» que
-> sobrevive a una recarga, y el **marcado estático** del intento y del resumen que dejó la 45, que se mira con
-> `simulacro.html?maqueta=intento` y `?maqueta=resumen`. La 42 escribe dentro de los huecos que ese marcado ya tiene
-> marcados con `data-papel`; no tiene que dibujar la franja de nuevo.
+> **Antes de abrir la iteración 43.** El simulacro sigue **sin recorrido, sin resumen calculado y sin enlazar desde
+> ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es la presentación, el botón
+> «Comenzar el simulacro», la carga bajo una sola transición, el intento guardado que sobrevive a una recarga, **los dos
+> cronómetros contando** dentro de la franja de la 45, y el **marcado estático** del intento y del resumen, que se mira
+> con `simulacro.html?maqueta=intento` y `?maqueta=resumen`. La 43 llama a `dibujarPantallaDelIntento()` con la pregunta
+> de verdad; no tiene que dibujar la tarjeta de nuevo.
+>
+> **La 42 dejó la infraestructura de tiempo, y la 43 la usa sin construir nada.** `static/js/servicios/reloj.js` es el
+> asiento de módulo del que el simulacro saca la hora; `relojDeMentira()` y `dosPestanas()`, en `scripts/dom-falso.mjs`,
+> permiten adelantar el reloj —`avanzar(ms)` vence los temporizadores a su hora, `saltar(ms)` no vence ninguno— y
+> simular dos pestañas que se ven por `storage`, **sin tocar el `Date.now()` del proceso**. Cada visita simulada corre
+> sobre su propia copia de `static/js/`, porque un `?pestana=a` en el import **no aísla** los módulos que ese módulo
+> importa por dentro. Está en `scripts/probar-cronometros.mjs`, el noveno comprobador de `npm run verificar`.
+>
+> **Lo que la 43 tiene que enchufar, y es una sola función.** Hoy el motor recibe `alternativaMarcada()` devolviendo
+> siempre `null`, así que —por la decisión 2, no marcar es omitir— **un intento abandonado se consume solo**. Está
+> escrito como limitación conocida y transitoria en el archivo de la 42. Desaparece conectando la tarjeta con
+> `conectarLaAlternativaMarcada()` de `static/js/components/simulacro.js`, sin tocar
+> `static/js/components/cronometros.js`.
 >
 > **La 41 dejó escrita ADR-035**, que reúne todo lo que el simulacro decidió: el navegador elige y el extremo solo
 > sirve, la forma del extremo por ids con el límite de 100 parámetros ligados de D1, por qué ese extremo no se puede
@@ -55,6 +68,7 @@ decisiones vale tanto como el código que las implementa.
 | 35 - Transición de carga               | 30 - Cuestionario           | 2026-09-16 | 🟢 Completada |
 | 41 - Presentación, selección y protec. | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | 45 - Dirección visual del simulacro    | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
+| 42 - Cronómetros                       | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

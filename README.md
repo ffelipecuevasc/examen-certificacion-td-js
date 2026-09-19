@@ -16,7 +16,7 @@ Este repositorio no reemplaza las clases ni el material oficial del programa: su
 
 Tu avance se guarda **en tu propio navegador**, sin cuentas ni registro: no se comparte entre dispositivos y se pierde si borras los datos del sitio. Si el navegador no permite guardar, el cuestionario funciona igual y te lo dice.
 
-> **El simulacro de examen todavía no se puede usar.** El archivo `simulacro.html` ya está en el repositorio y arma un intento de 120 preguntas, pero **no se puede responder** —le faltan el recorrido, los cronómetros y el resumen de resultados— y por eso **no está enlazado desde ninguna parte del sitio**. Los enlaces se agregan cuando esté completo. Hasta entonces, lo que hay para practicar es el cuestionario.
+> **El simulacro de examen todavía no se puede usar.** El archivo `simulacro.html` ya está en el repositorio, arma un intento de 120 preguntas y sus dos cronómetros ya cuentan, pero **todavía no se puede responder** —le faltan el recorrido de una pregunta a la vez y el resumen de resultados— y por eso **no está enlazado desde ninguna parte del sitio**. Los enlaces se agregan cuando esté completo. Hasta entonces, lo que hay para practicar es el cuestionario.
 
 ## Estructura del proyecto
 

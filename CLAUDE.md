@@ -87,6 +87,11 @@ se serviría como archivo descargable en vez de ejecutarse. El build lo comprueb
   compilado **se versiona**, aunque el despliegue lo recompile igual: el sitio publicado sale de `dist/`, no del archivo
   versionado (ADR-010).
 - Las páginas usan módulos ES: se prueban con un servidor local, nunca abriendo el archivo con doble clic.
+- **Primero el build, después el servidor. Nunca al revés.** `npm run build` reescribe `dist/`, que es lo que
+  `wrangler pages dev` está sirviendo: construir con el servidor arriba **lo tumba**, y entonces los comprobadores que
+  usan la red terminan en **código 2, «no se pudo probar»**, que parece un fallo y no lo es. `npm run datos:dev` ya hace
+  las dos cosas en orden; el riesgo está en correr `build` por separado. Si hay que reconstruir, se levanta el servidor
+  otra vez antes de repetir las pruebas. Detalle en `_planmaestro/90-manual/capa-de-datos-y-base-d1.md`.
 - **Claude Code no hace commits ni push.** El repositorio es público y el control de versiones lo lleva el autor. Cuando
   redacte un mensaje de commit: **una línea, máximo 200 caracteres**. El porqué va íntegro a `_planmaestro/99-bitacora/`
   y a `_planmaestro/00_producto/registro_log.md`, nunca al mensaje (ADR-030). Si el mensaje corto deja algo sin

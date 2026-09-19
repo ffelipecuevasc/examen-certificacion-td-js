@@ -1,7 +1,7 @@
 # Iteración 42 · Cronómetros
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · trabajo de Claude Code terminado el 2026-09-18, a la espera de la pasada del autor en el navegador
+**Estado:** 🟢 **Cerrada el 2026-09-18**
 **Depende de:** iteraciones 41 y 45.
 
 > **2026-09-16:** recibe de la iteración 41 «una sola pestaña escribe el intento».
@@ -12,10 +12,43 @@ Conectar los dos cronómetros al marcado de la 45: 30 segundos por pregunta con 
 del intento, calculados desde instantes guardados y no contando pulsos, y dejar un reloj controlable para probar un
 intento completo sin esperarlo.
 
+## Limitación conocida, transitoria hasta que cierre la 43
+
+> **Escrita el 2026-09-18, por decisión del autor. No es un defecto: es el estado esperado de la página mientras la
+> iteración 43 no exista.**
+>
+> **El cronómetro arranca aunque todavía no haya dónde marcar una alternativa.** El recorrido —la tarjeta de la
+> pregunta, sus alternativas, «Siguiente» y «Omitir»— lo construye la iteración 43. La 42 dejó el motor con el enganche
+> puesto: recibe `alternativaMarcada()` y la llama al vencer cada plazo, pero hoy se le pasa una función que devuelve
+> siempre `null`, porque no hay tarjeta que leer.
+>
+> **Consecuencia, y es la correcta según la decisión 2:** no marcar nada significa omitir, así que un intento abierto y
+> abandonado **se consume solo**, a una pregunta cada 30 segundos, hasta quedar con las 120 omitidas. Quien abra
+> `simulacro.html` hoy, pulse «Comenzar el simulacro» y se vaya a almorzar, vuelve a un intento terminado y en cero.
+>
+> **Eso es lo que la regla manda, no un error que haya que arreglar aquí.** El simulacro mide bajo presión de tiempo, y
+> el reloj no se detiene porque el estudiante deje de mirar (decisión 3). Lo que falta no es una regla distinta: es la
+> pantalla donde responder, y esa es la 43.
+>
+> **Cuando la 43 enchufe el recorrido, esta limitación desaparece sola** y sin tocar
+> `static/js/components/cronometros.js`: lo único que cambia es qué devuelve `alternativaMarcada()`, que se conecta con
+> `conectarLaAlternativaMarcada()` desde `static/js/components/simulacro.js`.
+
 ## Historial de este archivo
 
 - **2026-09-16 · reescrita dos veces.** El autor resolvió el tiempo sobrante, el segundo plano y qué cuenta al agotarse el
   tiempo. La lectura de alcance mostró que los guiones no pueden controlar el reloj hoy.
+- **2026-09-18 · lectura de alcance y cinco decisiones.** La lectura comprobó las afirmaciones del archivo contra el
+  código, encontró que la Parte 8 de ADR-035 ya explicaba lo que la decisión 4 daba por escribir, y enumeró doce huecos.
+  El autor cerró la decisión 6 con cinco decisiones: urgencia a los **10 segundos**, arriendo de **5 s / 15 s**, el reloj
+  como **asiento de módulo**, `transicion-de-carga.js` **fuera** del asiento, y la prueba nueva **dentro de
+  `npm run verificar`**.
+- **2026-09-18 · cerrada.** Los dos cronómetros cuentan desde instantes guardados, una sola pestaña escribe el intento, y
+  entró la infraestructura de reloj controlable que heredan la 43 y la 44. **Cuatro defectos los encontraron las pruebas
+  y no el razonamiento**, uno de ellos capaz de costarle un intento entero a un estudiante sin que se notara. El autor
+  hizo su pasada de navegador el mismo día: **los siete criterios salieron bien, sin hallazgos**. Queda escrita una
+  **limitación conocida y transitoria** —el intento avanza solo porque el recorrido es de la 43—, que se conserva a
+  propósito hasta que la 43 cierre.
 
 ## Lo que hereda
 
@@ -187,19 +220,41 @@ en blanco.
 
 ### Los comprueba el autor en el navegador
 
-- [ ] **Los dos cronómetros se entienden a la primera**, en teléfono.
-- [ ] **Bloquear el teléfono un par de minutos a mitad de una pregunta** deja el tiempo real al volver, con las preguntas
-  agotadas resueltas.
-- [ ] **Cambiar de pestaña un par de minutos** da el mismo resultado.
-- [ ] **Abrir el simulacro en una segunda pestaña** bloquea la primera con un aviso claro, y cerrar la dueña no deja la otra
-  bloqueada para siempre.
-- [ ] **Con movimiento reducido activado**, el cronómetro sigue siendo comprensible.
-- [ ] **Sin errores de consola.**
-- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
+> **Antes de empezar: la pasada hay que hacerla sin pausas largas, y conviene saber por qué.**
+>
+> - **Qué hacer:** ten decidido el recorrido antes de pulsar «Comenzar el simulacro», y hazlo de corrido. Las dos
+>   comprobaciones que sí piden esperar —bloquear el teléfono y cambiar de pestaña— son de **un par de minutos**, que es
+>   lo que piden sus criterios; para cualquier pausa más larga, deja el intento, vuelve y pulsa «Empezar otro intento».
+> - **Qué deberías ver:** el intento avanza solo, a una pregunta cada 30 segundos, estés mirando o no. Tras una pausa de
+>   dos minutos vuelves cuatro preguntas más adelante, y eso **es el comportamiento correcto** (decisión 3): es
+>   exactamente lo que el criterio de bloquear el teléfono va a comprobar.
+> - **Qué cuenta como falla:** que al volver el tiempo **no** sea el real, que las preguntas vencidas **no** hayan
+>   quedado resueltas, o que queden resueltas fuera de orden. Que el intento haya avanzado **no** es la falla.
+> - **Lo que no hay que confundir con un defecto:** que un intento abandonado media hora quede con las 120 omitidas. Es
+>   la limitación conocida de más arriba —sin la 43 no hay dónde marcar, y no marcar es omitir—, y por eso una pausa
+>   larga a mitad de la pasada gasta el intento y obliga a empezar otro.
+
+Todos comprobados por **Felipe Cuevas el 2026-09-18**. La pasada salió **exitosa en los siete puntos, sin hallazgos**:
+no hubo correcciones que pedir ni puntos que repetir.
+
+- [x] **Los dos cronómetros se entienden a la primera**, en teléfono. — *Felipe Cuevas, 2026-09-18.*
+- [x] **Bloquear el teléfono un par de minutos a mitad de una pregunta** deja el tiempo real al volver, con las preguntas
+  agotadas resueltas. — *Felipe Cuevas, 2026-09-18.* Es el criterio que confirma en un navegador de verdad lo que el
+  guion provoca con `saltar()`: que el estrangulamiento real de los temporizadores se comporte como el simulado.
+- [x] **Cambiar de pestaña un par de minutos** da el mismo resultado. — *Felipe Cuevas, 2026-09-18.*
+- [x] **Abrir el simulacro en una segunda pestaña** bloquea la primera con un aviso claro, y cerrar la dueña no deja la otra
+  bloqueada para siempre. — *Felipe Cuevas, 2026-09-18.* Confirma en un navegador las dos mitades que el guion prueba por
+  separado: la entrega real del evento `storage` entre pestañas, y el vencimiento del arriendo a los 15 segundos.
+- [x] **Con movimiento reducido activado**, el cronómetro sigue siendo comprensible. — *Felipe Cuevas, 2026-09-18.*
+- [x] **Sin errores de consola.** — *Felipe Cuevas, 2026-09-18.*
+- [x] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado. — *Felipe Cuevas, 2026-09-18*, y
+  confirmado por Claude Code en la pasada final: **VERIFICADO, código 0**, las nueve comprobaciones en OK.
 
 ## Lo que esta iteración no puede afirmar
 
 - **Que el estudiante no manipule el reloj** del dispositivo: el sitio es estático.
+- **Que un intento abandonado no se consuma solo.** Hoy se consume, y está escrito arriba como limitación conocida: sin
+  el recorrido de la 43 no hay dónde marcar, y por la decisión 2 no marcar es omitir. Desaparece al cerrar la 43.
 
 ## Notas de la iteración
 
@@ -227,10 +282,18 @@ restantes; arriendo renovado cada **5 s** y vencido a los **15 s**; el reloj com
 reescribe esa zona entera, y una franja que viviera dentro se borraría sola al armar el intento. Y **sin `aria-live`**:
 un cronómetro que se anuncia cada segundo deja al lector de pantalla hablando encima del enunciado durante una hora.
 
-**Un apunte sobre lo que hoy se ve en el navegador.** El recorrido es de la 43, así que todavía no hay tarjeta donde
-marcar una alternativa. El motor recibe `alternativaMarcada()` y la 42 se la pasa devolviendo siempre `null`; por la
-regla de la decisión 2 eso significa que, hoy, una pregunta que se agota queda **omitida**. Es el comportamiento
-correcto —no responder es omitir—, y la 43 enchufa la tarjeta sin tocar `components/cronometros.js`.
+#### La limitación transitoria, y por qué se deja así
+
+El recorrido es de la 43, así que todavía no hay tarjeta donde marcar una alternativa: el motor recibe
+`alternativaMarcada()` y la 42 se la pasa devolviendo siempre `null`. Por la decisión 2, no marcar es omitir, así que
+**un intento abandonado se consume solo** hasta quedar con las 120 omitidas.
+
+**El autor decidió el 2026-09-18 dejarlo así**, y el motivo es que no hay nada que arreglar: el reloj no se detiene
+porque el estudiante deje de mirar (decisión 3), y lo que falta no es una regla distinta sino la pantalla donde
+responder. Queda escrito arriba como **limitación conocida con fecha**, en su propia sección y en «Lo que esta
+iteración no puede afirmar», para que entre hoy y el cierre de la 43 nadie lo lea como un defecto. Desaparece sola al
+enchufar el recorrido, cambiando qué devuelve `alternativaMarcada()` vía `conectarLaAlternativaMarcada()`, sin tocar
+`components/cronometros.js`.
 
 #### Cuatro defectos que las pruebas encontraron, y no el razonamiento
 
@@ -290,8 +353,12 @@ Todos dentro de la misma holgura de 700 ms de siempre, contra el mismo piso de 4
 `d1/respaldo-banco.sql`. Tampoco `static/css/style.css`: esta iteración no introdujo ni una clase de Tailwind nueva
 —la franja la dibuja el marcado de la 45—, y por eso `verificar:css` sigue en OK.
 
-**Una nota de operación, para la próxima vez.** `npm run build` reescribe `dist/`, que es lo que `wrangler pages dev`
-está sirviendo, y eso **tumba el servidor**. Pasó dos veces durante esta iteración, y la segunda dejó un
-`probar:escapado` en código 2 que no era un fallo del escapado. El orden que funciona es **build primero, servidor
-después**; si hay que reconstruir con el servidor arriba, hay que levantarlo de nuevo antes de las pruebas que usan la
-red. Conviene que quede escrito en `90-manual/` cuando alguien pase por ahí.
+**Una nota de operación, que el 2026-09-18 pasó a ser regla.** `npm run build` reescribe `dist/`, que es lo que
+`wrangler pages dev` está sirviendo, y eso **tumba el servidor**. Pasó dos veces durante esta iteración, y la segunda
+dejó un `probar:escapado` en código 2 que no era un fallo del escapado: el síntoma despista, porque un «no se pudo
+probar» se lee como un fallo de lo que se estaba probando. El orden que funciona es **build primero, servidor
+después**; si hay que reconstruir, se levanta el servidor de nuevo antes de repetir las pruebas que usan la red.
+
+**Por decisión del autor ya no es una nota, es regla del ciclo de trabajo:** está escrita en `CLAUDE.md`, en «Flujo de
+trabajo», que es donde se lee antes de empezar, y el detalle operativo quedó junto a `npm run datos:dev` en
+`_planmaestro/90-manual/capa-de-datos-y-base-d1.md`.

@@ -143,8 +143,8 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 |---|---|---|
 | 41 | Presentación, selección y protección del intento | 🟢 Cerrada el 2026-09-18 · en tres etapas |
 | 45 | Dirección visual del simulacro | 🟢 Cerrada el 2026-09-18 |
-| 42 | Cronómetros | 🔵 En curso · construida el 2026-09-18, falta la pasada del autor en el navegador |
-| 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada |
+| 42 | Cronómetros | 🟢 Cerrada el 2026-09-18 |
+| 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada · **es la siguiente** |
 | 44 | Resumen de resultados | ⚪ No iniciada |
 
 ## Forma de los criterios en toda la épica

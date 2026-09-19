@@ -147,6 +147,13 @@ npm run datos:esquema     # crea la tabla de juguete en la base LOCAL
 npm run datos:dev         # construye el sitio y lo sirve con sus funciones
 ```
 
+> **Si ya tienes el servidor arriba, no ejecutes `npm run build` en otra terminal.** `build` reescribe `dist/`, que
+> es lo que este servidor está sirviendo, y se cae. `npm run datos:dev` hace las dos cosas en el orden correcto —
+> construye y después sirve—, así que el problema solo aparece al construir por separado. Cuando pase, el síntoma
+> despista: `probar:escapado`, `probar:filtrado`, `probar:memoria` y `verificar` terminan en **código 2, «no se pudo
+> probar»**, que no es un fallo de lo que estaban probando sino la falta del servidor. Se levanta de nuevo y se
+> repiten. *(Anotado el 2026-09-18, en la iteración 42. La regla vive en `CLAUDE.md`.)*
+
 Al arrancar, el registro tiene que mostrar el enlace en modo local:
 
 ```
