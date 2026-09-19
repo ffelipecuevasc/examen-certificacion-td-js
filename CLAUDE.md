@@ -92,6 +92,12 @@ se serviría como archivo descargable en vez de ejecutarse. El build lo comprueb
   usan la red terminan en **código 2, «no se pudo probar»**, que parece un fallo y no lo es. `npm run datos:dev` ya hace
   las dos cosas en orden; el riesgo está en correr `build` por separado. Si hay que reconstruir, se levanta el servidor
   otra vez antes de repetir las pruebas. Detalle en `_planmaestro/90-manual/capa-de-datos-y-base-d1.md`.
+- **Claude Code puede matar los procesos que lanzó él mismo, sin pedir permiso**, cuando el servidor local se cuelgue a
+  mitad de una corrida. **Los que no lanzó él, no los toca.** El síntoma que lo identifica: el registro dice `Ready on
+  http://127.0.0.1:8788` y **todo cuelga igual, incluidos los archivos estáticos**, porque un `workerd` zombi retiene el
+  puerto 8788 y la instancia nueva no puede servir aunque diga que arrancó. Se detiene ese grupo de procesos, se
+  comprueba que el puerto quedó libre y se levanta uno limpio. *(Decisión del autor, 2026-09-18, tras colgarse durante
+  el cierre de la iteración 42.)*
 - **Claude Code no hace commits ni push.** El repositorio es público y el control de versiones lo lleva el autor. Cuando
   redacte un mensaje de commit: **una línea, máximo 200 caracteres**. El porqué va íntegro a `_planmaestro/99-bitacora/`
   y a `_planmaestro/00_producto/registro_log.md`, nunca al mensaje (ADR-030). Si el mensaje corto deja algo sin
