@@ -176,6 +176,29 @@ function respuestasGuardadas(almacen) {
   return crudo ? JSON.parse(crudo) : null;
 }
 
+/**
+ * Pulsa un control del recorrido, por el camino que recorre el estudiante.
+ *
+ * Los oyentes de la 43 viven sobre `#zona-del-intento` POR DELEGACION, asi que se
+ * dispara ahi y se le da al evento un `target` que sabe contestar `closest()`. Es el
+ * mismo recurso que ya usan `probar-filtrado.mjs` y `probar-memoria.mjs` para pulsar
+ * «Comenzar»: llamar a la funcion interna en vez de pulsar probaria la funcion y no
+ * el camino, y un oyente desconectado seguiria dando verde.
+ *
+ * Devuelve cuantos oyentes corrieron: cero significa que la zona no tiene quien la
+ * escuche, que es un fallo distinto de que el control no haga lo que debia.
+ */
+function pulsar(dom, papel, { alternativa } = {}) {
+  const selector = `[data-papel="${papel}"]`;
+  const nodo = {
+    dataset: alternativa === undefined ? {} : { alternativa: String(alternativa) },
+  };
+
+  return dom.disparar('#zona-del-intento', 'click', {
+    target: { closest: (s) => (s === selector ? nodo : null) },
+  });
+}
+
 // ===========================================================================
 // 1 · El cronometro de la pregunta, en varios puntos de la misma pregunta
 // ===========================================================================
@@ -957,6 +980,248 @@ function respuestasGuardadas(almacen) {
       `Al retomar: una sola tarjeta con un enunciado y ${alternativas} alternativas, la primera pregunta ` +
       `del intento, sin pantalla intermedia, y los dos indicadores de posicion diciendo «${franja.avance}» ` +
       'por caminos distintos —el del cronometro y el del recorrido—.'
+  );
+}
+
+// ===========================================================================
+// 14 · Marcar, cambiar de alternativa y los dos botones (iteracion 43)
+// ===========================================================================
+//
+// Lo que se mira aqui es el HTML dibujado y el almacen, no las variables del modulo.
+// La decision 1 dice que marcar NO registra: lo que cuenta es lo ultimo marcado al
+// avanzar o al agotarse, asi que una marca que llegara al almacen antes de tiempo
+// dejaria escrita una respuesta que el estudiante todavia podia cambiar.
+
+{
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+
+  const { dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'm1' });
+  simulacro.conectarElRecorrido();
+  simulacro.retomarElIntento();
+
+  const primera = preguntas[0];
+  const segunda = preguntas[1];
+
+  const html = () => dom.html('#zona-del-intento');
+  const cuantas = (trozo) => html().split(trozo).length - 1;
+
+  // Sin nada marcado: «Siguiente» apagado, «Omitir» encendido, ninguna alternativa
+  // con `aria-checked="true"`.
+  const sinMarcar = {
+    siguienteApagado: html().includes('data-papel="siguiente" disabled'),
+    omitirApagado: html().includes('data-papel="omitir" disabled'),
+    marcadas: cuantas('aria-checked="true"'),
+  };
+
+  const oyentes = pulsar(dom, 'alternativa', { alternativa: primera.alternativas[1].id });
+
+  const trasMarcar = {
+    siguienteApagado: html().includes('data-papel="siguiente" disabled'),
+    omitirApagado: html().includes('data-papel="omitir" disabled'),
+    marcadas: cuantas('data-marcada="true"'),
+    esLaSegunda: html().includes(`data-alternativa="${primera.alternativas[1].id}" data-marcada="true"`),
+    // El foco vuelve a la alternativa marcada. Reescribir la zona tira el nodo que lo
+    // tenia, asi que sin reponerlo un estudiante con teclado queda en el `body`.
+    foco: dom.nodo('[data-papel="alternativa"][data-marcada="true"]').focos,
+  };
+
+  // Cambiar de alternativa dentro de la misma pregunta.
+  pulsar(dom, 'alternativa', { alternativa: primera.alternativas[3].id });
+
+  const trasCambiar = {
+    marcadas: cuantas('data-marcada="true"'),
+    esLaCuarta: html().includes(`data-alternativa="${primera.alternativas[3].id}" data-marcada="true"`),
+  };
+
+  // UNA ALTERNATIVA QUE NO ES DE ESTA PREGUNTA NO MARCA NADA. Es el clic viejo: un
+  // evento que se reenvia despues de que la pregunta ya cambio. Si marcara, la
+  // respuesta que se registre al avanzar seria de otra pregunta.
+  pulsar(dom, 'alternativa', { alternativa: segunda.alternativas[0].id });
+
+  // Se compara contra lo que habia JUSTO ANTES del clic ajeno, y no contra un valor
+  // escrito a mano: asi esta comprobacion no se contagia de lo que haya pasado antes
+  // en el bloque. Un clic que no es de esta pregunta no debe mover ni un caracter.
+  const antesDeLaAjena = html();
+
+  pulsar(dom, 'alternativa', { alternativa: segunda.alternativas[0].id });
+
+  const trasLaAjena = {
+    igual: html() === antesDeLaAjena,
+    marcadas: cuantas('data-marcada="true"'),
+  };
+
+  // Y NADA DE ESTO SE ESCRIBIO. Tres marcas y un clic ajeno, y el intento guardado
+  // sigue igual que al sembrarlo.
+  const guardado = respuestasGuardadas(almacen);
+
+  if (oyentes === 0) {
+    problemas.push('marcar: la zona del intento no tiene ningun oyente de clic');
+  }
+  if (!sinMarcar.siguienteApagado) {
+    problemas.push('marcar: sin alternativa marcada, «Siguiente» quedo habilitado');
+  }
+  if (sinMarcar.omitirApagado) {
+    problemas.push('marcar: sin alternativa marcada, «Omitir» quedo deshabilitado');
+  }
+  if (sinMarcar.marcadas !== 0) {
+    problemas.push(`marcar: al retomar habia ${sinMarcar.marcadas} alternativas marcadas y tenian que ser 0`);
+  }
+  if (trasMarcar.siguienteApagado) {
+    problemas.push('marcar: con una alternativa marcada, «Siguiente» siguio deshabilitado');
+  }
+  if (!trasMarcar.omitirApagado) {
+    problemas.push('marcar: con una alternativa marcada, «Omitir» siguio habilitado (regla 5 de la epica)');
+  }
+  if (trasMarcar.marcadas !== 1 || !trasMarcar.esLaSegunda) {
+    problemas.push(
+        `marcar: quedaron ${trasMarcar.marcadas} marcadas y la pulsada no era la que quedo marcada`
+    );
+  }
+  if (trasMarcar.foco === 0) {
+    problemas.push('marcar: tras redibujar, el foco no volvio a la alternativa marcada');
+  }
+  if (trasCambiar.marcadas !== 1 || !trasCambiar.esLaCuarta) {
+    problemas.push(
+        `cambiar: quedaron ${trasCambiar.marcadas} marcadas y la ultima pulsada no era la marcada`
+    );
+  }
+  if (!trasLaAjena.igual || trasLaAjena.marcadas !== 1) {
+    problemas.push(
+        'clic viejo: una alternativa de otra pregunta cambio lo dibujado en la pregunta en curso'
+    );
+  }
+  if ((guardado?.respuestas ?? []).length !== 0 || guardado?.posicion !== 0) {
+    problemas.push(
+        `marcar: marcar escribio en el almacen (${(guardado?.respuestas ?? []).length} respuesta(s), ` +
+        `posicion ${guardado?.posicion}) y no tenia que escribir nada`
+    );
+  }
+
+  notas.push(
+      'Marcar y cambiar: sin nada marcado «Siguiente» sale apagado y «Omitir» encendido; al marcar se ' +
+      'invierten y queda UNA sola alternativa con `data-marcada`, con el foco puesto en ella; cambiarla ' +
+      'deja solo la ultima; una alternativa de otra pregunta no toca nada; y el almacen sigue con 0 ' +
+      'respuestas en la posicion 0, porque marcar no registra.'
+  );
+}
+
+// ===========================================================================
+// 15 · Avanzar registra, dibuja la siguiente y no reescribe lo anterior
+//      (iteracion 43)
+// ===========================================================================
+//
+// Aqui se cruza la frontera: hasta el bloque 14 nada se escribia. «Siguiente» es lo
+// que convierte una marca en una respuesta guardada, y una vez escrita no vuelve a
+// cambiar —es la mitad de la invariante de la iteracion: la posicion solo sube, de a
+// uno, y ninguna entrada cambia despues de escrita—.
+
+{
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+
+  const { reloj, dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'av' });
+  simulacro.conectarElRecorrido();
+  simulacro.retomarElIntento();
+
+  const html = () => dom.html('#zona-del-intento');
+  const cuantas = (trozo) => html().split(trozo).length - 1;
+
+  const laElegida = preguntas[0].alternativas[2];
+
+  // Se responde a los 8 s, para que el instante guardado se pueda distinguir de T0 y
+  // de los 30 s del agotamiento: una respuesta escrita con el instante equivocado
+  // pasaria desapercibida si todo ocurriera en el mismo milisegundo.
+  reloj.avanzar(8000);
+  pulsar(dom, 'alternativa', { alternativa: laElegida.id });
+  pulsar(dom, 'siguiente');
+
+  const trasAvanzar = respuestasGuardadas(almacen);
+  const laEscrita = trasAvanzar?.respuestas?.[0];
+
+  const pantalla = {
+    esLaSegunda: html().includes('Pregunta de juguete 2'),
+    quedaLaPrimera: html().includes('Pregunta de juguete 1'),
+    marcadas: cuantas('data-marcada="true"'),
+    siguienteApagado: html().includes('data-papel="siguiente" disabled'),
+    omitirApagado: html().includes('data-papel="omitir" disabled'),
+    numero: html().match(/Pregunta (\d+) de (\d+)/)?.[0],
+    avance: loQueDiceLaFranja(dom).avance,
+    // El foco se mueve a la tarjeta nueva: es como se anuncia el cambio de pregunta
+    // (decision 4), en vez de una region `aria-live` que interrumpiria la lectura.
+    foco: dom.nodo('[data-papel="tarjeta-de-la-pregunta"]').focos,
+  };
+
+  // «Siguiente» sin nada marcado no hace nada. Es la segunda embestida: martillear el
+  // boton apagado. En el DOM falso no existe el apagado del navegador, asi que el
+  // clic llega igual que si alguien lo forzara desde la consola.
+  pulsar(dom, 'siguiente');
+  pulsar(dom, 'siguiente');
+
+  const trasMartillear = respuestasGuardadas(almacen);
+
+  // Y se responde la segunda, para comprobar que la primera no se toco.
+  pulsar(dom, 'alternativa', { alternativa: preguntas[1].alternativas[0].id });
+  pulsar(dom, 'siguiente');
+
+  const alFinal = respuestasGuardadas(almacen);
+
+  if (!laEscrita || laEscrita.pregunta_id !== preguntas[0].id) {
+    problemas.push(`avanzar: quedo escrito ${JSON.stringify(laEscrita)} y no la pregunta en curso`);
+  }
+  if (laEscrita?.alternativa_id !== laElegida.id || laEscrita?.estado !== 'respondida') {
+    problemas.push(
+        `avanzar: se registro ${JSON.stringify(laEscrita)} y tenia que ser respondida con la ${laElegida.id}`
+    );
+  }
+  if (laEscrita?.agotada !== false || laEscrita?.resuelta_en !== T0 + 8000) {
+    problemas.push(
+        `avanzar: la respuesta quedo con agotada=${laEscrita?.agotada} y resuelta_en=${laEscrita?.resuelta_en}`
+    );
+  }
+  if (trasAvanzar?.posicion !== 1) {
+    problemas.push(`avanzar: la posicion quedo en ${trasAvanzar?.posicion} y tenia que ser 1`);
+  }
+  if (!pantalla.esLaSegunda || pantalla.quedaLaPrimera) {
+    problemas.push('avanzar: tras responder no se dibujo la segunda pregunta sola');
+  }
+  if (pantalla.marcadas !== 0) {
+    problemas.push(`avanzar: la pregunta nueva salio con ${pantalla.marcadas} alternativas ya marcadas`);
+  }
+  if (!pantalla.siguienteApagado || pantalla.omitirApagado) {
+    problemas.push('avanzar: la pregunta nueva no salio con «Siguiente» apagado y «Omitir» encendido');
+  }
+  if (pantalla.numero !== 'Pregunta 2 de 120' || pantalla.avance !== '2/120') {
+    problemas.push(
+        `avanzar: los indicadores quedaron en «${pantalla.numero}» y «${pantalla.avance}»`
+    );
+  }
+  if (pantalla.foco === 0) {
+    problemas.push('avanzar: el foco no se movio a la tarjeta de la pregunta nueva (decision 4)');
+  }
+  if ((trasMartillear?.respuestas ?? []).length !== 1 || trasMartillear?.posicion !== 1) {
+    problemas.push(
+        `avanzar: martillear «Siguiente» sin alternativa marcada escribio ` +
+        `${(trasMartillear?.respuestas ?? []).length} respuesta(s) y dejo la posicion en ${trasMartillear?.posicion}`
+    );
+  }
+  if (JSON.stringify(alFinal?.respuestas?.[0]) !== JSON.stringify(laEscrita)) {
+    problemas.push(
+        `invariante: la respuesta ya escrita cambio, de ${JSON.stringify(laEscrita)} a ` +
+        `${JSON.stringify(alFinal?.respuestas?.[0])}`
+    );
+  }
+  if (alFinal?.posicion !== 2) {
+    problemas.push(`avanzar: tras dos respuestas la posicion quedo en ${alFinal?.posicion} y tenia que ser 2`);
+  }
+
+  notas.push(
+      'Avanzar: marcar y pulsar «Siguiente» a los 8 s dejo UNA respuesta escrita —respondida, con su ' +
+      'alternativa, agotada=false y su instante— y dibujo la pregunta 2 sola, limpia, con los botones ' +
+      'de vuelta a su estado inicial, los dos indicadores en 2/120 y el foco en la tarjeta nueva. ' +
+      'Martillear «Siguiente» sin marcar no escribio nada, y responder la segunda no toco la primera.'
   );
 }
 

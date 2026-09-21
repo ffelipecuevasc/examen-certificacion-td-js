@@ -62,40 +62,40 @@
  * de camino. El algoritmo sigue sin enterarse de nada: lo unico que cambia es de
  * donde salen los ids que recibe.
  */
-import { $, esc } from '../utils/dom.js';
+import {$, esc} from '../utils/dom.js';
 import {
-  leerPreguntasPorIds,
-  leerPreguntasPorIdsDelRespaldo,
-  leerResumen,
-  leerResumenDelRespaldo,
+    leerPreguntasPorIds,
+    leerPreguntasPorIdsDelRespaldo,
+    leerResumen,
+    leerResumenDelRespaldo,
 } from '../servicios/datos.js';
 import {
-  FALTA_MODULO,
-  MODULOS_DEL_EXAMEN,
-  PREGUNTAS_DEL_INTENTO,
-  SIN_CANDIDATOS,
-  elegirIntento,
-  reponerDelModulo,
+    FALTA_MODULO,
+    MODULOS_DEL_EXAMEN,
+    PREGUNTAS_DEL_INTENTO,
+    SIN_CANDIDATOS,
+    elegirIntento,
+    reponerDelModulo,
 } from '../servicios/eleccion-del-intento.js';
 import {
-  estadoDelGuardado,
-  guardarAvance,
-  guardarIntentoNuevo,
-  leerIntentoGuardado,
-  olvidarElIntento,
+    estadoDelGuardado,
+    guardarAvance,
+    guardarIntentoNuevo,
+    leerIntentoGuardado,
+    olvidarElIntento,
 } from '../servicios/intento-guardado.js';
-import { reloj } from '../servicios/reloj.js';
-import { crearDuenoDelIntento } from '../servicios/dueno-del-intento.js';
-import { crearCronometros } from './cronometros.js';
-import { crearTransicionDeCarga } from './transicion-de-carga.js';
+import {reloj} from '../servicios/reloj.js';
+import {crearDuenoDelIntento} from '../servicios/dueno-del-intento.js';
+import {crearCronometros} from './cronometros.js';
+import {crearTransicionDeCarga} from './transicion-de-carga.js';
 import {
-  BORDE_DEL_SIMULACRO,
-  dibujarBotonesDelIntento,
-  dibujarColumnaDelIntento,
-  dibujarTarjetaDeLaPregunta,
+    BORDE_DEL_SIMULACRO,
+    dibujarBotonesDelIntento,
+    dibujarColumnaDelIntento,
+    dibujarTarjetaDeLaPregunta,
 } from './simulacro-maqueta.js';
-import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
-import { mostrarAvisoDeGuardado } from './aviso-de-guardado.js';
+import {mostrarAvisoDeRespaldo} from './aviso-de-respaldo.js';
+import {mostrarAvisoDeGuardado} from './aviso-de-guardado.js';
 
 /**
  * Cuantas veces se sale a reponer antes de rendirse (decision 4).
@@ -116,7 +116,7 @@ const RONDAS_DE_RESERVA = 3;
  * cuenta. Es lo mismo que hace `components/cuestionario.js` y por el mismo motivo:
  * el aviso tiene que aparecer si **alguna** lo hizo.
  */
-const origen = { resumen: null, preguntas: null };
+const origen = {resumen: null, preguntas: null};
 
 /**
  * El intento que se esta jugando ahora, en memoria.
@@ -184,7 +184,7 @@ let laAlternativaMarcada = () => laMarcada;
 
 /** Para que un guion pueda sustituir la lectura de la tarjeta sin tocar esto. */
 export function conectarLaAlternativaMarcada(comoLeerla) {
-  laAlternativaMarcada = comoLeerla;
+    laAlternativaMarcada = comoLeerla;
 }
 
 /**
@@ -198,10 +198,10 @@ export function conectarLaAlternativaMarcada(comoLeerla) {
  * eso no se toca, es ADR-008. Lo que se agrega es que despues de esa caida el
  * intento se rehace entero desde `DESDE_LA_COPIA`.
  */
-const DESDE_LA_CAPA = { resumen: leerResumen, preguntas: leerPreguntasPorIds };
+const DESDE_LA_CAPA = {resumen: leerResumen, preguntas: leerPreguntasPorIds};
 const DESDE_LA_COPIA = {
-  resumen: leerResumenDelRespaldo,
-  preguntas: leerPreguntasPorIdsDelRespaldo,
+    resumen: leerResumenDelRespaldo,
+    preguntas: leerPreguntasPorIdsDelRespaldo,
 };
 
 /**
@@ -222,7 +222,7 @@ const seMezclaronLosBancos = () => Boolean(origen.preguntas) && !origen.resumen;
  * se dibujara por descuido, la pantalla quedaria sin frase y se veria; con una frase
  * puesta, se veria un mensaje de error donde en realidad no hubo ninguno.
  */
-const HAY_MEZCLA = { ok: false, mezcla: true };
+const HAY_MEZCLA = {ok: false, mezcla: true};
 
 /**
  * La transicion de esta pagina.
@@ -236,20 +236,20 @@ const HAY_MEZCLA = { ok: false, mezcla: true };
  * pulsarlo dos veces pediria dos intentos.
  */
 const transicion = crearTransicionDeCarga({
-  contenedor: '#zona-del-intento',
-  controles: ['#comenzar-simulacro'],
-  idDelMensaje: 'mensaje-simulacro',
-  idDelAvisoLento: 'carga-lenta-simulacro',
-  // La UNICA diferencia de aspecto entre la transicion de las dos paginas, y entra
-  // por parametro justamente para que el cuestionario siga dibujando lo suyo: la
-  // pieza es una sola y la comparten (decision 9 de la iteracion 41, decision 8 de
-  // la 45).
-  borde: BORDE_DEL_SIMULACRO,
-  textos: {
-    titulo: () => 'Preparando tu simulacro…',
-    detalle: 'Eligiendo tus 120 preguntas y pidiéndolas al banco.',
-    lento: 'Está tardando más de lo normal. La página sigue esperando la respuesta.',
-  },
+    contenedor: '#zona-del-intento',
+    controles: ['#comenzar-simulacro'],
+    idDelMensaje: 'mensaje-simulacro',
+    idDelAvisoLento: 'carga-lenta-simulacro',
+    // La UNICA diferencia de aspecto entre la transicion de las dos paginas, y entra
+    // por parametro justamente para que el cuestionario siga dibujando lo suyo: la
+    // pieza es una sola y la comparten (decision 9 de la iteracion 41, decision 8 de
+    // la 45).
+    borde: BORDE_DEL_SIMULACRO,
+    textos: {
+        titulo: () => 'Preparando tu simulacro…',
+        detalle: 'Eligiendo tus 120 preguntas y pidiéndolas al banco.',
+        lento: 'Está tardando más de lo normal. La página sigue esperando la respuesta.',
+    },
 });
 
 /**
@@ -260,7 +260,7 @@ const transicion = crearTransicionDeCarga({
  * abajo; sin mover el foco, se queda en un boton que ya no existe.
  */
 function irAlMensaje() {
-  $('#mensaje-simulacro')?.focus();
+    $('#mensaje-simulacro')?.focus();
 }
 
 /**
@@ -271,22 +271,22 @@ function irAlMensaje() {
  * como HTML ya armado por quien llama, y quien llama solo pone texto del sitio o
  * numeros: por aqui no pasa nada del banco.
  */
-function dibujarRecuadro({ titulo, cuerpo }) {
-  const zona = $('#zona-del-intento');
-  if (!zona) return;
+function dibujarRecuadro({titulo, cuerpo}) {
+    const zona = $('#zona-del-intento');
+    if (!zona) return;
 
-  // `data-papel` dice QUE ES cada nodo, no como se ve. Los guiones leen el HTML
-  // dibujado por esta marca y no por sus clases: una prueba no puede dictar la
-  // apariencia, porque entonces cambiar un tamano de letra da rojo sin que nada se
-  // haya roto, y se aprende a editar la prueba hasta que pase. La iteracion 45
-  // reescribe estas clases enteras; el papel del nodo sigue siendo el mismo.
-  zona.innerHTML = `
+    // `data-papel` dice QUE ES cada nodo, no como se ve. Los guiones leen el HTML
+    // dibujado por esta marca y no por sus clases: una prueba no puede dictar la
+    // apariencia, porque entonces cambiar un tamano de letra da rojo sin que nada se
+    // haya roto, y se aprende a editar la prueba hasta que pase. La iteracion 45
+    // reescribe estas clases enteras; el papel del nodo sigue siendo el mismo.
+    zona.innerHTML = `
       <div id="mensaje-simulacro" tabindex="-1" class="bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-8 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
         <p data-papel="titulo-del-recuadro" class="font-display font-bold text-xl text-paper">${titulo}</p>
         ${cuerpo}
       </div>`;
 
-  irAlMensaje();
+    irAlMensaje();
 }
 
 // ---------------------------------------------------------------------------
@@ -314,8 +314,8 @@ function dibujarRecuadro({ titulo, cuerpo }) {
 
 /** La pregunta que se esta respondiendo, o `null` si ya no queda ninguna. */
 function laPreguntaEnCurso() {
-  if (!elIntento) return null;
-  return elIntento.preguntas[elIntento.posicion] ?? null;
+    if (!elIntento) return null;
+    return elIntento.preguntas[elIntento.posicion] ?? null;
 }
 
 /**
@@ -336,13 +336,13 @@ const laPosicionQueSeMuestra = () => (elIntento ? elIntento.posicion + 1 : 0);
  * pero tampoco tiene nada dentro.
  */
 function hayAvisoALaVista() {
-  const encendido = (selector) => {
-    const nodo = $(selector);
-    if (!nodo) return false;
-    return nodo.innerHTML !== '' && !nodo.classList.contains('hidden');
-  };
+    const encendido = (selector) => {
+        const nodo = $(selector);
+        if (!nodo) return false;
+        return nodo.innerHTML !== '' && !nodo.classList.contains('hidden');
+    };
 
-  return encendido('#aviso-respaldo') || encendido('#aviso-guardado');
+    return encendido('#aviso-respaldo') || encendido('#aviso-guardado');
 }
 
 /**
@@ -374,19 +374,19 @@ function hayAvisoALaVista() {
  *   'omitir'    el boton de omitir tras el primer toque, para que el lector lea su
  *               `aria-describedby`, que es donde esta la confirmacion.
  */
-function dibujarElRecorrido({ enfocar = 'pregunta' } = {}) {
-  const zona = $('#zona-del-intento');
-  if (!zona) return;
+function dibujarElRecorrido({enfocar = 'pregunta'} = {}) {
+    const zona = $('#zona-del-intento');
+    if (!zona) return;
 
-  const pregunta = laPreguntaEnCurso();
+    const pregunta = laPreguntaEnCurso();
 
-  // Sin pregunta que dibujar, el intento se acabo. Se atiende aqui y no solo en
-  // `alTerminarElIntento` porque a esta funcion se puede llegar sin cronometros
-  // encendidos —un intento sin arriendo, o uno terminado que se retoma—.
-  if (!pregunta) {
-    dibujarIntentoTerminado();
-    return;
-  }
+    // Sin pregunta que dibujar, el intento se acabo. Se atiende aqui y no solo en
+    // `alTerminarElIntento` porque a esta funcion se puede llegar sin cronometros
+    // encendidos —un intento sin arriendo, o uno terminado que se retoma—.
+    if (!pregunta) {
+        dibujarIntentoTerminado();
+        return;
+    }
 
   const dentro =
       dibujarTarjetaDeLaPregunta({
@@ -396,13 +396,13 @@ function dibujarElRecorrido({ enfocar = 'pregunta' } = {}) {
         marcada: laMarcada,
       }) + dibujarBotonesDelIntento({ hayMarcada: laMarcada !== null, confirmandoOmitir });
 
-  zona.innerHTML = dibujarColumnaDelIntento(dentro, {
-    pegadaAlEncabezado: !hayAvisoALaVista(),
-  });
+    zona.innerHTML = dibujarColumnaDelIntento(dentro, {
+        pegadaAlEncabezado: !hayAvisoALaVista(),
+    });
 
-  if (enfocar === 'marcada') $('[data-papel="alternativa"][data-marcada="true"]')?.focus();
-  else if (enfocar === 'omitir') $('[data-papel="omitir"]')?.focus();
-  else $('[data-papel="tarjeta-de-la-pregunta"]')?.focus();
+    if (enfocar === 'marcada') $('[data-papel="alternativa"][data-marcada="true"]')?.focus();
+    else if (enfocar === 'omitir') $('[data-papel="omitir"]')?.focus();
+    else $('[data-papel="tarjeta-de-la-pregunta"]')?.focus();
 }
 
 /**
@@ -420,19 +420,19 @@ function dibujarElRecorrido({ enfocar = 'pregunta' } = {}) {
  * el oyente vive en la zona y no en el boton.
  */
 function dibujarIntentoTerminado() {
-  laMarcada = null;
-  confirmandoOmitir = false;
+    laMarcada = null;
+    confirmandoOmitir = false;
 
-  const cuantas = elIntento?.preguntas.length ?? PREGUNTAS_DEL_INTENTO;
+    const cuantas = elIntento?.preguntas.length ?? PREGUNTAS_DEL_INTENTO;
 
-  dibujarRecuadro({
-    titulo: 'Intento terminado',
-    cuerpo: `
+    dibujarRecuadro({
+        titulo: 'Intento terminado',
+        cuerpo: `
         <p class="mt-3 text-sm text-muted leading-relaxed">Llegaste al final de las <strong class="font-semibold text-paper">${esc(cuantas)} preguntas</strong>. El resumen con tu resultado —cuántas correctas, cómo te fue en cada módulo y la revisión de lo que respondiste— llega en una versión próxima.</p>
         <div class="mt-6">
           <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
         </div>`,
-  });
+    });
 }
 
 /**
@@ -451,20 +451,20 @@ function dibujarIntentoTerminado() {
  * fuera la respuesta de la pregunta 4.
  */
 function marcarLaAlternativa(cual) {
-  const pregunta = laPreguntaEnCurso();
-  if (!pregunta) return;
+    const pregunta = laPreguntaEnCurso();
+    if (!pregunta) return;
 
-  const elegida = pregunta.alternativas.find((a) => String(a.id) === String(cual));
-  if (!elegida) return;
+    const elegida = pregunta.alternativas.find((a) => String(a.id) === String(cual));
+    if (!elegida) return;
 
-  laMarcada = elegida.id;
+    laMarcada = elegida.id;
 
-  // Marcar retira la confirmacion de omitir (decision 1). Se retira aunque ya
-  // estuviera retirada: es una linea, y preguntar antes seria mas codigo para el
-  // mismo resultado.
-  confirmandoOmitir = false;
+    // Marcar retira la confirmacion de omitir (decision 1). Se retira aunque ya
+    // estuviera retirada: es una linea, y preguntar antes seria mas codigo para el
+    // mismo resultado.
+    confirmandoOmitir = false;
 
-  dibujarElRecorrido({ enfocar: 'marcada' });
+    dibujarElRecorrido({enfocar: 'marcada'});
 }
 
 /**
@@ -478,10 +478,10 @@ function marcarLaAlternativa(cual) {
  * navegador, no una regla del programa.
  */
 function avanzarRegistrando() {
-  if (!laPreguntaEnCurso()) return;
-  if (laMarcada === null) return;
+    if (!laPreguntaEnCurso()) return;
+    if (laMarcada === null) return;
 
-  resolverLaPreguntaEnCurso({ alternativa_id: laMarcada, estado: 'respondida' });
+    resolverLaPreguntaEnCurso({alternativa_id: laMarcada, estado: 'respondida'});
 }
 
 /**
@@ -492,16 +492,16 @@ function avanzarRegistrando() {
  * misma mitad comprobable que la de «Siguiente».
  */
 function tocarOmitir() {
-  if (!laPreguntaEnCurso()) return;
-  if (laMarcada !== null) return;
+    if (!laPreguntaEnCurso()) return;
+    if (laMarcada !== null) return;
 
-  if (!confirmandoOmitir) {
-    confirmandoOmitir = true;
-    dibujarElRecorrido({ enfocar: 'omitir' });
-    return;
-  }
+    if (!confirmandoOmitir) {
+        confirmandoOmitir = true;
+        dibujarElRecorrido({enfocar: 'omitir'});
+        return;
+    }
 
-  resolverLaPreguntaEnCurso({ alternativa_id: null, estado: 'omitida' });
+    resolverLaPreguntaEnCurso({alternativa_id: null, estado: 'omitida'});
 }
 
 /**
@@ -511,11 +511,11 @@ function tocarOmitir() {
  * resuelve solo al vencer el plazo entra por `components/cronometros.js`, que anota
  * `agotada: true` y el instante del vencimiento.
  */
-function resolverLaPreguntaEnCurso({ alternativa_id, estado }) {
-  const pregunta = laPreguntaEnCurso();
-  if (!pregunta) return;
+function resolverLaPreguntaEnCurso({alternativa_id, estado}) {
+    const pregunta = laPreguntaEnCurso();
+    if (!pregunta) return;
 
-  anotarEnElIntento({ pregunta_id: pregunta.id, alternativa_id, estado, agotada: false });
+    anotarEnElIntento({pregunta_id: pregunta.id, alternativa_id, estado, agotada: false});
 }
 
 /**
@@ -531,24 +531,24 @@ function resolverLaPreguntaEnCurso({ alternativa_id, estado }) {
  * es el clic frecuente, y los dos botones se excluyen entre si.
  */
 export function conectarElRecorrido() {
-  const zona = $('#zona-del-intento');
-  if (!zona) return;
+    const zona = $('#zona-del-intento');
+    if (!zona) return;
 
-  zona.addEventListener('click', (evento) => {
-    const alternativa = evento.target.closest?.('[data-papel="alternativa"]');
+    zona.addEventListener('click', (evento) => {
+        const alternativa = evento.target.closest?.('[data-papel="alternativa"]');
 
-    if (alternativa) {
-      marcarLaAlternativa(alternativa.dataset?.alternativa);
-      return;
-    }
+        if (alternativa) {
+            marcarLaAlternativa(alternativa.dataset?.alternativa);
+            return;
+        }
 
-    if (evento.target.closest?.('[data-papel="siguiente"]')) {
-      avanzarRegistrando();
-      return;
-    }
+        if (evento.target.closest?.('[data-papel="siguiente"]')) {
+            avanzarRegistrando();
+            return;
+        }
 
-    if (evento.target.closest?.('[data-papel="omitir"]')) tocarOmitir();
-  });
+        if (evento.target.closest?.('[data-papel="omitir"]')) tocarOmitir();
+    });
 }
 
 /**
@@ -564,15 +564,15 @@ export function conectarElRecorrido() {
  * significaria nada y nada en la pantalla lo diria.
  */
 function dibujarNoSePudo(explicacion) {
-  dibujarRecuadro({
-    titulo: 'No se pudo armar el simulacro',
-    cuerpo: `
+    dibujarRecuadro({
+        titulo: 'No se pudo armar el simulacro',
+        cuerpo: `
         <p class="mt-3 text-sm text-muted leading-relaxed">${explicacion}</p>
         <div class="mt-6 flex flex-wrap items-center gap-3">
           <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3 rounded hover:bg-jsyellowdim transition-colors">Volver a intentarlo</button>
           <a href="cuestionario.html" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Practicar sin reloj</a>
         </div>`,
-  });
+    });
 }
 
 /**
@@ -583,14 +583,14 @@ function dibujarNoSePudo(explicacion) {
  * nada; lo segundo es lo que las reservas existen para tapar.
  */
 async function traer(ids, pedir) {
-  const respuesta = await pedir(ids);
-  if (!respuesta.ok) return null;
+    const respuesta = await pedir(ids);
+    if (!respuesta.ok) return null;
 
-  // Cualquiera de las dos peticiones puede caer a la copia por su cuenta, asi que se
-  // anota el sello de esta sin pisar el de la otra.
-  origen.preguntas = respuesta.meta?.respaldo ?? origen.preguntas;
+    // Cualquiera de las dos peticiones puede caer a la copia por su cuenta, asi que se
+    // anota el sello de esta sin pisar el de la otra.
+    origen.preguntas = respuesta.meta?.respaldo ?? origen.preguntas;
 
-  return new Map((respuesta.datos ?? []).map((pregunta) => [pregunta.id, pregunta]));
+    return new Map((respuesta.datos ?? []).map((pregunta) => [pregunta.id, pregunta]));
 }
 
 /**
@@ -613,113 +613,113 @@ async function traer(ids, pedir) {
  * no vuelve deja su sitio vacio y la reserva entra en ese mismo sitio. Ver el bucle.
  */
 async function armarElIntento(idsPorModulo, pedir) {
-  const eleccion = elegirIntento({ idsPorModulo });
+    const eleccion = elegirIntento({idsPorModulo});
 
-  // Los dos motivos se separan porque al estudiante le dicen cosas distintas: uno es
-  // «el banco contesto incompleto» y el otro «el banco contesto y no alcanza». La
-  // rama final no es defensiva de adorno: si algun dia apareciera un motivo nuevo y
-  // esto siguiera de largo, se pediria `eleccion.ids` sin que exista.
-  if (!eleccion.ok) {
-    if (eleccion.motivo === FALTA_MODULO) {
-      return {
-        ok: false,
-        explicacion: `El banco no entregó preguntas del módulo ${esc(eleccion.modulo)}, así que no se puede armar un simulacro completo. Vuelve a intentarlo en un rato.`,
-      };
+    // Los dos motivos se separan porque al estudiante le dicen cosas distintas: uno es
+    // «el banco contesto incompleto» y el otro «el banco contesto y no alcanza». La
+    // rama final no es defensiva de adorno: si algun dia apareciera un motivo nuevo y
+    // esto siguiera de largo, se pediria `eleccion.ids` sin que exista.
+    if (!eleccion.ok) {
+        if (eleccion.motivo === FALTA_MODULO) {
+            return {
+                ok: false,
+                explicacion: `El banco no entregó preguntas del módulo ${esc(eleccion.modulo)}, así que no se puede armar un simulacro completo. Vuelve a intentarlo en un rato.`,
+            };
+        }
+
+        return {
+            ok: false,
+            explicacion:
+                eleccion.motivo === SIN_CANDIDATOS
+                    ? `Ahora mismo no hay suficientes preguntas disponibles en el módulo ${esc(eleccion.modulo)} para armar un simulacro completo de ${esc(PREGUNTAS_DEL_INTENTO)} preguntas. Vuelve a intentarlo en un rato.`
+                    : 'No se pudo armar un simulacro completo con las preguntas disponibles. Vuelve a intentarlo en un rato.',
+        };
     }
 
-    return {
-      ok: false,
-      explicacion:
-        eleccion.motivo === SIN_CANDIDATOS
-          ? `Ahora mismo no hay suficientes preguntas disponibles en el módulo ${esc(eleccion.modulo)} para armar un simulacro completo de ${esc(PREGUNTAS_DEL_INTENTO)} preguntas. Vuelve a intentarlo en un rato.`
-          : 'No se pudo armar un simulacro completo con las preguntas disponibles. Vuelve a intentarlo en un rato.',
-    };
-  }
+    const traidas = await traer(eleccion.ids, pedir);
 
-  const traidas = await traer(eleccion.ids, pedir);
-
-  // Se corta AQUI y no al final. Seguir seria gastar las tres rondas de reserva
-  // —tres viajes mas, con el estudiante mirando la transicion— reponiendo sobre
-  // ids que ya se sabe que salieron del banco equivocado, para tirar el resultado
-  // igual. Provocado el 2026-09-17: cortando al final, las tres rondas se gastaban
-  // enteras antes de rehacer el intento.
-  if (seMezclaronLosBancos()) return HAY_MEZCLA;
-
-  if (!traidas) {
-    return {
-      ok: false,
-      explicacion:
-        'No se pudieron traer las preguntas del simulacro. Revisa tu conexión y vuelve a intentarlo.',
-    };
-  }
-
-  // LAS 120 RANURAS, EN EL ORDEN DEL INTENTO.
-  //
-  // `eleccion.ids` ya viene barajado entre modulos, y ese es el orden en que el
-  // estudiante va a responder. Reponer no lo puede alterar: una pregunta que no
-  // volvio deja su ranura vacia, y la reserva **entra en esa misma ranura**. Si las
-  // reservas se agregaran al final, un intento con nueve descartes traeria las nueve
-  // reposiciones juntas al terminar, que es justo el agrupamiento que barajar viene a
-  // evitar.
-  const moduloDe = new Map();
-  for (const modulo of MODULOS_DEL_EXAMEN) {
-    for (const id of eleccion.porModulo[modulo]) moduloDe.set(id, modulo);
-  }
-
-  const ranuras = eleccion.ids.map((id) => ({
-    modulo: moduloDe.get(id),
-    pregunta: traidas.get(id) ?? null,
-  }));
-
-  // Las rondas de reposicion. En el camino sano no entra ninguna: no hay ranuras
-  // vacias y el bucle termina en la primera vuelta.
-  for (let ronda = 0; ronda < RONDAS_DE_RESERVA; ronda += 1) {
-    const vacias = ranuras.filter((ranura) => ranura.pregunta === null);
-    if (vacias.length === 0) break;
-
-    // Se pide POR MODULO y no en monton porque lo que hay que reponer es la CUOTA de
-    // cada modulo, no el total: reponer seis preguntas de donde sea dejaria 120 en
-    // total y 14 de un modulo. Los ids de todas las reservas de una ronda si viajan
-    // juntos, en una sola peticion.
-    const pedidos = [];
-
-    for (const modulo of MODULOS_DEL_EXAMEN) {
-      const suyas = vacias.filter((ranura) => ranura.modulo === modulo);
-      if (suyas.length === 0) continue;
-
-      const repuestos = reponerDelModulo(eleccion.reservas, modulo, suyas.length);
-      repuestos.forEach((id, i) => pedidos.push({ ranura: suyas[i], id }));
-    }
-
-    if (pedidos.length === 0) break;
-
-    const masTraidas = await traer(pedidos.map((p) => p.id), pedir);
-
-    // Una ronda de reserva que cae a la copia mezcla igual que la primera peticion:
-    // las 111 que ya llegaron son de D1 y estas nueve serian de la copia. Misma
-    // regla, mismo corte.
+    // Se corta AQUI y no al final. Seguir seria gastar las tres rondas de reserva
+    // —tres viajes mas, con el estudiante mirando la transicion— reponiendo sobre
+    // ids que ya se sabe que salieron del banco equivocado, para tirar el resultado
+    // igual. Provocado el 2026-09-17: cortando al final, las tres rondas se gastaban
+    // enteras antes de rehacer el intento.
     if (seMezclaronLosBancos()) return HAY_MEZCLA;
 
-    if (!masTraidas) break;
-
-    for (const { ranura, id } of pedidos) {
-      const pregunta = masTraidas.get(id);
-      if (pregunta) ranura.pregunta = pregunta;
+    if (!traidas) {
+        return {
+            ok: false,
+            explicacion:
+                'No se pudieron traer las preguntas del simulacro. Revisa tu conexión y vuelve a intentarlo.',
+        };
     }
-  }
 
-  const preguntas = ranuras
-    .filter((ranura) => ranura.pregunta !== null)
-    .map((ranura) => ranura.pregunta);
+    // LAS 120 RANURAS, EN EL ORDEN DEL INTENTO.
+    //
+    // `eleccion.ids` ya viene barajado entre modulos, y ese es el orden en que el
+    // estudiante va a responder. Reponer no lo puede alterar: una pregunta que no
+    // volvio deja su ranura vacia, y la reserva **entra en esa misma ranura**. Si las
+    // reservas se agregaran al final, un intento con nueve descartes traeria las nueve
+    // reposiciones juntas al terminar, que es justo el agrupamiento que barajar viene a
+    // evitar.
+    const moduloDe = new Map();
+    for (const modulo of MODULOS_DEL_EXAMEN) {
+        for (const id of eleccion.porModulo[modulo]) moduloDe.set(id, modulo);
+    }
 
-  if (preguntas.length < PREGUNTAS_DEL_INTENTO) {
-    return {
-      ok: false,
-      explicacion: `Solo se pudieron reunir ${esc(preguntas.length)} preguntas de las ${esc(PREGUNTAS_DEL_INTENTO)} que necesita un simulacro, así que no tiene sentido empezarlo a medias. Vuelve a intentarlo en un rato.`,
-    };
-  }
+    const ranuras = eleccion.ids.map((id) => ({
+        modulo: moduloDe.get(id),
+        pregunta: traidas.get(id) ?? null,
+    }));
 
-  return { ok: true, preguntas };
+    // Las rondas de reposicion. En el camino sano no entra ninguna: no hay ranuras
+    // vacias y el bucle termina en la primera vuelta.
+    for (let ronda = 0; ronda < RONDAS_DE_RESERVA; ronda += 1) {
+        const vacias = ranuras.filter((ranura) => ranura.pregunta === null);
+        if (vacias.length === 0) break;
+
+        // Se pide POR MODULO y no en monton porque lo que hay que reponer es la CUOTA de
+        // cada modulo, no el total: reponer seis preguntas de donde sea dejaria 120 en
+        // total y 14 de un modulo. Los ids de todas las reservas de una ronda si viajan
+        // juntos, en una sola peticion.
+        const pedidos = [];
+
+        for (const modulo of MODULOS_DEL_EXAMEN) {
+            const suyas = vacias.filter((ranura) => ranura.modulo === modulo);
+            if (suyas.length === 0) continue;
+
+            const repuestos = reponerDelModulo(eleccion.reservas, modulo, suyas.length);
+            repuestos.forEach((id, i) => pedidos.push({ranura: suyas[i], id}));
+        }
+
+        if (pedidos.length === 0) break;
+
+        const masTraidas = await traer(pedidos.map((p) => p.id), pedir);
+
+        // Una ronda de reserva que cae a la copia mezcla igual que la primera peticion:
+        // las 111 que ya llegaron son de D1 y estas nueve serian de la copia. Misma
+        // regla, mismo corte.
+        if (seMezclaronLosBancos()) return HAY_MEZCLA;
+
+        if (!masTraidas) break;
+
+        for (const {ranura, id} of pedidos) {
+            const pregunta = masTraidas.get(id);
+            if (pregunta) ranura.pregunta = pregunta;
+        }
+    }
+
+    const preguntas = ranuras
+        .filter((ranura) => ranura.pregunta !== null)
+        .map((ranura) => ranura.pregunta);
+
+    if (preguntas.length < PREGUNTAS_DEL_INTENTO) {
+        return {
+            ok: false,
+            explicacion: `Solo se pudieron reunir ${esc(preguntas.length)} preguntas de las ${esc(PREGUNTAS_DEL_INTENTO)} que necesita un simulacro, así que no tiene sentido empezarlo a medias. Vuelve a intentarlo en un rato.`,
+        };
+    }
+
+    return {ok: true, preguntas};
 }
 
 /**
@@ -736,28 +736,28 @@ async function armarElIntento(idsPorModulo, pedir) {
  * seria justo la mezcla al reves: ids elegidos sobre la copia pedidos a D1—.
  */
 async function unIntentoDe(fuente) {
-  origen.resumen = null;
-  origen.preguntas = null;
+    origen.resumen = null;
+    origen.preguntas = null;
 
-  const resumen = await fuente.resumen();
-  origen.resumen = resumen.meta?.respaldo ?? null;
+    const resumen = await fuente.resumen();
+    origen.resumen = resumen.meta?.respaldo ?? null;
 
-  if (!resumen.ok) {
-    return {
-      ok: false,
-      explicacion:
-        'No se pudo consultar el banco de preguntas. Revisa tu conexión y vuelve a intentarlo.',
-    };
-  }
+    if (!resumen.ok) {
+        return {
+            ok: false,
+            explicacion:
+                'No se pudo consultar el banco de preguntas. Revisa tu conexión y vuelve a intentarlo.',
+        };
+    }
 
-  const pedir = origen.resumen ? DESDE_LA_COPIA.preguntas : fuente.preguntas;
+    const pedir = origen.resumen ? DESDE_LA_COPIA.preguntas : fuente.preguntas;
 
-  return armarElIntento(
-    Object.fromEntries(
-      (resumen.datos ?? []).map((fila) => [fila.modulo, fila.preguntas_ids ?? []])
-    ),
-    pedir
-  );
+    return armarElIntento(
+        Object.fromEntries(
+            (resumen.datos ?? []).map((fila) => [fila.modulo, fila.preguntas_ids ?? []])
+        ),
+        pedir
+    );
 }
 
 /**
@@ -788,125 +788,125 @@ async function unIntentoDe(fuente) {
  * ve una transicion y no dos encadenadas.
  */
 export async function comenzarElIntento() {
-  // Pulsar durante la carga no hace nada. `disabled` ya lo impide en el navegador;
-  // esta guarda es la mitad que se puede provocar desde un guion, porque el DOM
-  // falso ejecuta los oyentes aunque el nodo este deshabilitado.
-  if (transicion.enCurso()) return;
+    // Pulsar durante la carga no hace nada. `disabled` ya lo impide en el navegador;
+    // esta guarda es la mitad que se puede provocar desde un guion, porque el DOM
+    // falso ejecuta los oyentes aunque el nodo este deshabilitado.
+    if (transicion.enCurso()) return;
 
-  // El instante del clic, no el de despues de la carga. Es lo que la iteracion 42 va
-  // a usar como origen del tiempo transcurrido, y tomarlo al terminar de cargar le
-  // regalaria al estudiante los segundos que tardo el banco en contestar.
-  const empezadoEn = reloj().ahora();
+    // El instante del clic, no el de despues de la carga. Es lo que la iteracion 42 va
+    // a usar como origen del tiempo transcurrido, y tomarlo al terminar de cargar le
+    // regalaria al estudiante los segundos que tardo el banco en contestar.
+    const empezadoEn = reloj().ahora();
 
-  // Lo primero: apagar el intento anterior. «Empezar otro intento» llega por aqui, y
-  // un cronometro del intento viejo que siguiera vivo escribiria respuestas sobre el
-  // nuevo en cuanto venciera su plazo.
-  //
-  // Y se suelta el arriendo ANTES de apagar, porque apagar tira el objeto que sabe si
-  // era nuestro. Va junto a `olvidarElIntento()` de aqui abajo y por el mismo motivo:
-  // si el intento siguiente no se puede armar, lo que no puede quedar es una clave del
-  // simulacro suelta en el almacen sin ningun intento detras.
-  elDueno?.soltar();
-  pararElIntento();
+    // Lo primero: apagar el intento anterior. «Empezar otro intento» llega por aqui, y
+    // un cronometro del intento viejo que siguiera vivo escribiria respuestas sobre el
+    // nuevo en cuanto venciera su plazo.
+    //
+    // Y se suelta el arriendo ANTES de apagar, porque apagar tira el objeto que sabe si
+    // era nuestro. Va junto a `olvidarElIntento()` de aqui abajo y por el mismo motivo:
+    // si el intento siguiente no se puede armar, lo que no puede quedar es una clave del
+    // simulacro suelta en el almacen sin ningun intento detras.
+    elDueno?.soltar();
+    pararElIntento();
 
-  // Y se olvida lo guardado ANTES de pedir nada. Si el estudiante pulsa «Empezar otro
-  // intento» y la carga falla, lo que no puede quedar es el intento anterior en el
-  // almacen y la pantalla diciendo que no se pudo armar ninguno: al recargar volveria
-  // uno que la pantalla ya habia dado por perdido.
-  olvidarElIntento();
+    // Y se olvida lo guardado ANTES de pedir nada. Si el estudiante pulsa «Empezar otro
+    // intento» y la carga falla, lo que no puede quedar es el intento anterior en el
+    // almacen y la pantalla diciendo que no se pudo armar ninguno: al recargar volveria
+    // uno que la pantalla ya habia dado por perdido.
+    olvidarElIntento();
 
-  const miPeticion = transicion.abrir('el intento');
-  transicion.dibujar('');
+    const miPeticion = transicion.abrir('el intento');
+    transicion.dibujar('');
 
-  // Primera pasada, contra la capa de datos.
-  let resultado = await unIntentoDe(DESDE_LA_CAPA);
+    // Primera pasada, contra la capa de datos.
+    let resultado = await unIntentoDe(DESDE_LA_CAPA);
 
-  // LA REGLA DEL MISMO BANCO.
-  //
-  // `armarElIntento()` corto al ver que las preguntas venian de la copia y el
-  // resumen no: los ids se eligieron sobre D1 y se pidieron a la instantanea. Da
-  // igual en que momento se detecto —en la primera peticion o en una ronda de
-  // reserva a mitad de camino—: la marca es la misma y se atiende igual.
-  //
-  // Lo que se hace NO es completar lo que falta: es **volver a elegir el intento
-  // entero** desde la copia. Completar dejaria dentro las preguntas que ya habian
-  // llegado de D1, y un intento con dos bancos adentro es exactamente lo que esto
-  // existe para impedir. Elegir de nuevo cuesta una eleccion mas —trabajo de
-  // milisegundos, sin red— y devuelve un intento entero de un solo origen.
-  if (resultado.mezcla) {
-    resultado = await unIntentoDe(DESDE_LA_COPIA);
-  }
+    // LA REGLA DEL MISMO BANCO.
+    //
+    // `armarElIntento()` corto al ver que las preguntas venian de la copia y el
+    // resumen no: los ids se eligieron sobre D1 y se pidieron a la instantanea. Da
+    // igual en que momento se detecto —en la primera peticion o en una ronda de
+    // reserva a mitad de camino—: la marca es la misma y se atiende igual.
+    //
+    // Lo que se hace NO es completar lo que falta: es **volver a elegir el intento
+    // entero** desde la copia. Completar dejaria dentro las preguntas que ya habian
+    // llegado de D1, y un intento con dos bancos adentro es exactamente lo que esto
+    // existe para impedir. Elegir de nuevo cuesta una eleccion mas —trabajo de
+    // milisegundos, sin red— y devuelve un intento entero de un solo origen.
+    if (resultado.mezcla) {
+        resultado = await unIntentoDe(DESDE_LA_COPIA);
+    }
 
-  if (!transicion.esLaUltima(miPeticion)) {
+    if (!transicion.esLaUltima(miPeticion)) {
+        transicion.cerrar(miPeticion);
+        return;
+    }
+
+    await transicion.esperarElPiso();
+
+    if (!transicion.esLaUltima(miPeticion)) {
+        transicion.cerrar(miPeticion);
+        return;
+    }
+
     transicion.cerrar(miPeticion);
-    return;
-  }
 
-  await transicion.esperarElPiso();
+    // SE GUARDA ANTES DE DIBUJAR, y ese orden importa. El aviso de que el intento no se
+    // esta guardando tiene que poder salir junto con la primera pregunta y no un
+    // instante despues: quien lee la pantalla de arriba abajo se entera de que esto no
+    // sobrevive a una recarga antes de ponerse a responder, que es cuando sirve saberlo.
+    // Y desde la 43 hay un segundo motivo para que el aviso este puesto ANTES de
+    // dibujar: la columna del intento mira si hay un aviso encendido para decidir si
+    // compensa el relleno de la seccion o no (ver `hayAvisoALaVista()`).
+    //
+    // Se guarda al OCURRIR y no al salir (decision 6): no hay `beforeunload` ni
+    // `pagehide` en este sitio, y la memoria de un intento de una hora no puede depender
+    // de que el estudiante salga por una puerta concreta.
+    if (resultado.ok) {
+        // La pregunta 1 empieza sin nada marcado y sin confirmacion pendiente. Se borran
+        // aqui y no solo al cambiar de pregunta porque «Empezar otro intento» llega por
+        // esta funcion: lo que quedara marcado del intento anterior se marcaria sobre la
+        // primera pregunta del nuevo.
+        laMarcada = null;
+        confirmandoOmitir = false;
 
-  if (!transicion.esLaUltima(miPeticion)) {
-    transicion.cerrar(miPeticion);
-    return;
-  }
+        elIntento = {
+            preguntas: resultado.preguntas,
+            respuestas: [],
+            posicion: 0,
+            // El intento y su primera pregunta empiezan en el mismo instante: el del clic.
+            empezado_en: empezadoEn,
+            comenzada_en: empezadoEn,
+        };
 
-  transicion.cerrar(miPeticion);
+        guardarIntentoNuevo(resultado.preguntas, empezadoEn);
+    }
 
-  // SE GUARDA ANTES DE DIBUJAR, y ese orden importa. El aviso de que el intento no se
-  // esta guardando tiene que poder salir junto con la primera pregunta y no un
-  // instante despues: quien lee la pantalla de arriba abajo se entera de que esto no
-  // sobrevive a una recarga antes de ponerse a responder, que es cuando sirve saberlo.
-  // Y desde la 43 hay un segundo motivo para que el aviso este puesto ANTES de
-  // dibujar: la columna del intento mira si hay un aviso encendido para decidir si
-  // compensa el relleno de la seccion o no (ver `hayAvisoALaVista()`).
-  //
-  // Se guarda al OCURRIR y no al salir (decision 6): no hay `beforeunload` ni
-  // `pagehide` en este sitio, y la memoria de un intento de una hora no puede depender
-  // de que el estudiante salga por una puerta concreta.
-  if (resultado.ok) {
-    // La pregunta 1 empieza sin nada marcado y sin confirmacion pendiente. Se borran
-    // aqui y no solo al cambiar de pregunta porque «Empezar otro intento» llega por
-    // esta funcion: lo que quedara marcado del intento anterior se marcaria sobre la
-    // primera pregunta del nuevo.
-    laMarcada = null;
-    confirmandoOmitir = false;
+    // El aviso del respaldo se enciende ANTES de dibujar el resultado, para que quien
+    // lea la pantalla de arriba abajo se entere de que esto sale de una copia antes de
+    // leer lo que la copia dio.
+    mostrarAvisoDeRespaldo({
+        sello: origen.resumen ?? origen.preguntas,
+        loQueSeCargo: 'el simulacro',
+    });
 
-    elIntento = {
-      preguntas: resultado.preguntas,
-      respuestas: [],
-      posicion: 0,
-      // El intento y su primera pregunta empiezan en el mismo instante: el del clic.
-      empezado_en: empezadoEn,
-      comenzada_en: empezadoEn,
-    };
+    mostrarAvisoDeGuardado({estado: estadoDelGuardado()});
 
-    guardarIntentoNuevo(resultado.preguntas, empezadoEn);
-  }
+    // Y aqui aparece la primera pregunta, no un aviso de que el intento quedo listo. El
+    // recuadro «Intento listo» de la decision 11 de la 41 era el final provisional de
+    // esta carga «mientras no exista el recorrido (43)», y el recorrido ya existe.
+    if (resultado.ok) dibujarElRecorrido();
+    else dibujarNoSePudo(resultado.explicacion);
 
-  // El aviso del respaldo se enciende ANTES de dibujar el resultado, para que quien
-  // lea la pantalla de arriba abajo se entere de que esto sale de una copia antes de
-  // leer lo que la copia dio.
-  mostrarAvisoDeRespaldo({
-    sello: origen.resumen ?? origen.preguntas,
-    loQueSeCargo: 'el simulacro',
-  });
-
-  mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
-
-  // Y aqui aparece la primera pregunta, no un aviso de que el intento quedo listo. El
-  // recuadro «Intento listo» de la decision 11 de la 41 era el final provisional de
-  // esta carga «mientras no exista el recorrido (43)», y el recorrido ya existe.
-  if (resultado.ok) dibujarElRecorrido();
-  else dibujarNoSePudo(resultado.explicacion);
-
-  // Y el reloj empieza a correr. Despues de dibujar, para que la franja se pinte sobre
-  // una pantalla que ya existe; el instante de origen es el del clic y no el de ahora,
-  // asi que lo que tardo la carga ya esta descontado y no se regala.
-  //
-  // El intento se juega igual aunque no se haya podido guardar (decision 7 de la 41);
-  // lo que cambia es que entonces no hay arriendo que escribir.
-  if (resultado.ok) {
-    ponerEnMarchaElIntento({ hayIntentoGuardado: estadoDelGuardado() === 'guardando' });
-  }
+    // Y el reloj empieza a correr. Despues de dibujar, para que la franja se pinte sobre
+    // una pantalla que ya existe; el instante de origen es el del clic y no el de ahora,
+    // asi que lo que tardo la carga ya esta descontado y no se regala.
+    //
+    // El intento se juega igual aunque no se haya podido guardar (decision 7 de la 41);
+    // lo que cambia es que entonces no hay arriendo que escribir.
+    if (resultado.ok) {
+        ponerEnMarchaElIntento({hayIntentoGuardado: estadoDelGuardado() === 'guardando'});
+    }
 }
 
 /**
@@ -941,75 +941,75 @@ export const preguntasDelIntento = () => (elIntento ? [...elIntento.preguntas] :
  * dice, y eso lo hace el aviso de aqui abajo.
  */
 export function anotarEnElIntento(entrada) {
-  if (!elIntento) return false;
+    if (!elIntento) return false;
 
-  // UN INTENTO COMPLETO NO ADMITE UNA RESPUESTA MAS, y la guarda no es teorica: se
-  // llego a ella. Con el avance automatico de la iteracion 42, una respuesta que
-  // entrara despues de la 120 dejaria `respuestas` mas larga que `preguntas`, y eso es
-  // exactamente lo que `leerIntentoGuardado()` descarta al recargar —«un intento de
-  // 121 no es un intento largo, es un intento roto»—. O sea que la respuesta 121 no
-  // se pierde sola: se lleva por delante el intento entero.
-  if (elIntento.respuestas.length >= elIntento.preguntas.length) return false;
+    // UN INTENTO COMPLETO NO ADMITE UNA RESPUESTA MAS, y la guarda no es teorica: se
+    // llego a ella. Con el avance automatico de la iteracion 42, una respuesta que
+    // entrara despues de la 120 dejaria `respuestas` mas larga que `preguntas`, y eso es
+    // exactamente lo que `leerIntentoGuardado()` descarta al recargar —«un intento de
+    // 121 no es un intento largo, es un intento roto»—. O sea que la respuesta 121 no
+    // se pierde sola: se lleva por delante el intento entero.
+    if (elIntento.respuestas.length >= elIntento.preguntas.length) return false;
 
-  const resueltaEn = entrada.resuelta_en ?? reloj().ahora();
+    const resueltaEn = entrada.resuelta_en ?? reloj().ahora();
 
-  elIntento.respuestas.push({
-    pregunta_id: entrada.pregunta_id,
-    alternativa_id: entrada.alternativa_id ?? null,
-    estado: entrada.estado,
-    agotada: Boolean(entrada.agotada),
-    resuelta_en: resueltaEn,
-  });
+    elIntento.respuestas.push({
+        pregunta_id: entrada.pregunta_id,
+        alternativa_id: entrada.alternativa_id ?? null,
+        estado: entrada.estado,
+        agotada: Boolean(entrada.agotada),
+        resuelta_en: resueltaEn,
+    });
 
-  // La posicion sale de contar lo resuelto, no de un contador aparte. Con dos
-  // numeros que dicen lo mismo, el dia que se desincronicen no habria forma de saber
-  // cual manda —es el mismo motivo por el que el resultado no se guarda—.
-  elIntento.posicion = elIntento.respuestas.length;
+    // La posicion sale de contar lo resuelto, no de un contador aparte. Con dos
+    // numeros que dicen lo mismo, el dia que se desincronicen no habria forma de saber
+    // cual manda —es el mismo motivo por el que el resultado no se guarda—.
+    elIntento.posicion = elIntento.respuestas.length;
 
-  // Y la siguiente pregunta empieza cuando termina esta. El instante es de la 42;
-  // acá se deja puesto para que lo guardado sea coherente desde el primer dia.
-  elIntento.comenzada_en = resueltaEn;
+    // Y la siguiente pregunta empieza cuando termina esta. El instante es de la 42;
+    // acá se deja puesto para que lo guardado sea coherente desde el primer dia.
+    elIntento.comenzada_en = resueltaEn;
 
-  const pudo = guardarAvance({
-    posicion: elIntento.posicion,
-    comenzada_en: elIntento.comenzada_en,
-    terminado_en:
-      elIntento.posicion === elIntento.preguntas.length ? resueltaEn : null,
-    respuestas: elIntento.respuestas,
-  });
+    const pudo = guardarAvance({
+        posicion: elIntento.posicion,
+        comenzada_en: elIntento.comenzada_en,
+        terminado_en:
+            elIntento.posicion === elIntento.preguntas.length ? resueltaEn : null,
+        respuestas: elIntento.respuestas,
+    });
 
-  mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+    mostrarAvisoDeGuardado({estado: estadoDelGuardado()});
 
-  // Y la franja se repinta EN EL ACTO, con la pregunta nueva y sus 30 segundos
-  // enteros. Sin esto la cifra se queda hasta un segundo mostrando lo que le quedaba
-  // a la pregunta anterior —se vio: responder a los 5 s dejaba la siguiente
-  // empezando en 25—, y de paso el cronometro se vuelve a citar para el plazo nuevo
-  // en vez de seguir esperando el viejo.
-  //
-  // El motor ignora esta llamada cuando viene de su propio bucle de ponerse al dia:
-  // ahi ya esta latiendo, y volver a entrar serian 120 niveles de recursion.
-  losCronometros?.latir();
+    // Y la franja se repinta EN EL ACTO, con la pregunta nueva y sus 30 segundos
+    // enteros. Sin esto la cifra se queda hasta un segundo mostrando lo que le quedaba
+    // a la pregunta anterior —se vio: responder a los 5 s dejaba la siguiente
+    // empezando en 25—, y de paso el cronometro se vuelve a citar para el plazo nuevo
+    // en vez de seguir esperando el viejo.
+    //
+    // El motor ignora esta llamada cuando viene de su propio bucle de ponerse al dia:
+    // ahi ya esta latiendo, y volver a entrar serian 120 niveles de recursion.
+    losCronometros?.latir();
 
-  // Y LA TARJETA SE REDIBUJA AQUI, en el unico sitio por el que pasa toda pregunta
-  // resuelta. Era la costura que faltaba: hasta hoy, al vencer el plazo se repintaba
-  // la franja y nadie repintaba la pregunta, asi que la pantalla se quedaba con el
-  // enunciado anterior mientras el cronometro ya contaba el siguiente.
-  //
-  // Se borra lo marcado ANTES de dibujar: la pregunta nueva empieza limpia, y la
-  // confirmacion de omitir no sobrevive al cambio de pregunta (ver `laMarcada`).
-  //
-  // SE REDIBUJA UNA VEZ POR PREGUNTA RESUELTA, tambien cuando el motor resuelve
-  // cuatro seguidas al volver de segundo plano: son cuatro escrituras de la zona en
-  // el mismo instante, todas menos la ultima invisibles. No se agrupan porque
-  // agruparlas exigiria que este archivo supiera que el motor esta en mitad de un
-  // bucle, y el tope es el propio intento: 120 escrituras como maximo en la vida de
-  // una pagina, no un bucle sin fondo.
-  laMarcada = null;
-  confirmandoOmitir = false;
+    // Y LA TARJETA SE REDIBUJA AQUI, en el unico sitio por el que pasa toda pregunta
+    // resuelta. Era la costura que faltaba: hasta hoy, al vencer el plazo se repintaba
+    // la franja y nadie repintaba la pregunta, asi que la pantalla se quedaba con el
+    // enunciado anterior mientras el cronometro ya contaba el siguiente.
+    //
+    // Se borra lo marcado ANTES de dibujar: la pregunta nueva empieza limpia, y la
+    // confirmacion de omitir no sobrevive al cambio de pregunta (ver `laMarcada`).
+    //
+    // SE REDIBUJA UNA VEZ POR PREGUNTA RESUELTA, tambien cuando el motor resuelve
+    // cuatro seguidas al volver de segundo plano: son cuatro escrituras de la zona en
+    // el mismo instante, todas menos la ultima invisibles. No se agrupan porque
+    // agruparlas exigiria que este archivo supiera que el motor esta en mitad de un
+    // bucle, y el tope es el propio intento: 120 escrituras como maximo en la vida de
+    // una pagina, no un bucle sin fondo.
+    laMarcada = null;
+    confirmandoOmitir = false;
 
-  dibujarElRecorrido();
+    dibujarElRecorrido();
 
-  return pudo;
+    return pudo;
 }
 
 /**
@@ -1030,50 +1030,50 @@ export function anotarEnElIntento(entrada) {
  * presentacion se queda como estaba. En silencio, como manda ADR-034.
  */
 export function retomarElIntento() {
-  const guardado = leerIntentoGuardado();
-  if (!guardado) return;
+    const guardado = leerIntentoGuardado();
+    if (!guardado) return;
 
-  // Lo marcado NO se guarda y NO se retoma, y es a proposito: una alternativa marcada
-  // y no registrada es una intencion a medias, y el tiempo siguio corriendo mientras
-  // la pagina no estaba. Volver con ella marcada seria prometer que la eleccion se
-  // conservo cuando lo que puede haber pasado es que la pregunta entera se agotara.
-  laMarcada = null;
-  confirmandoOmitir = false;
+    // Lo marcado NO se guarda y NO se retoma, y es a proposito: una alternativa marcada
+    // y no registrada es una intencion a medias, y el tiempo siguio corriendo mientras
+    // la pagina no estaba. Volver con ella marcada seria prometer que la eleccion se
+    // conservo cuando lo que puede haber pasado es que la pregunta entera se agotara.
+    laMarcada = null;
+    confirmandoOmitir = false;
 
-  elIntento = {
-    preguntas: guardado.preguntas,
-    respuestas: guardado.respuestas,
-    posicion: guardado.posicion,
-    // `empezado_en` se retoma desde la iteracion 42, y antes se descartaba. Es el
-    // origen del tiempo transcurrido: sin el, al volver de una recarga el intento
-    // sabia cuando empezo la pregunta actual pero no cuando empezo el intento, y la
-    // cifra de la derecha de la franja no se podia calcular con la regla de la
-    // decision 5 —«ahora menos el instante guardado»—. `leerIntentoGuardado()` ya lo
-    // devolvia y lo validaba; lo que faltaba era recogerlo.
-    empezado_en: guardado.empezado_en,
-    comenzada_en: guardado.comenzada_en,
-  };
+    elIntento = {
+        preguntas: guardado.preguntas,
+        respuestas: guardado.respuestas,
+        posicion: guardado.posicion,
+        // `empezado_en` se retoma desde la iteracion 42, y antes se descartaba. Es el
+        // origen del tiempo transcurrido: sin el, al volver de una recarga el intento
+        // sabia cuando empezo la pregunta actual pero no cuando empezo el intento, y la
+        // cifra de la derecha de la franja no se podia calcular con la regla de la
+        // decision 5 —«ahora menos el instante guardado»—. `leerIntentoGuardado()` ya lo
+        // devolvia y lo validaba; lo que faltaba era recogerlo.
+        empezado_en: guardado.empezado_en,
+        comenzada_en: guardado.comenzada_en,
+    };
 
-  // El aviso se recalcula al retomar y no se hereda: el navegador pudo llenarse
-  // entre una visita y la otra, y el estado de la visita anterior no se guarda en
-  // ninguna parte —ni debe—.
-  //
-  // VA ANTES DE DIBUJAR, como en la carga y por los dos mismos motivos: se lee primero
-  // lo que va a pasar con lo que respondas, y la columna del intento necesita saber si
-  // hay un aviso encendido para no dibujarse encima.
-  mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+    // El aviso se recalcula al retomar y no se hereda: el navegador pudo llenarse
+    // entre una visita y la otra, y el estado de la visita anterior no se guarda en
+    // ninguna parte —ni debe—.
+    //
+    // VA ANTES DE DIBUJAR, como en la carga y por los dos mismos motivos: se lee primero
+    // lo que va a pasar con lo que respondas, y la columna del intento necesita saber si
+    // hay un aviso encendido para no dibujarse encima.
+    mostrarAvisoDeGuardado({estado: estadoDelGuardado()});
 
-  // Se retoma DONDE IBA: la pregunta que marca la posicion guardada, no la primera y
-  // no un aviso. Si el intento ya estaba terminado, `dibujarElRecorrido()` lo detecta
-  // y dibuja la pantalla del final.
-  dibujarElRecorrido();
+    // Se retoma DONDE IBA: la pregunta que marca la posicion guardada, no la primera y
+    // no un aviso. Si el intento ya estaba terminado, `dibujarElRecorrido()` lo detecta
+    // y dibuja la pantalla del final.
+    dibujarElRecorrido();
 
-  // Y el reloj sigue donde estaba. Lo primero que hacen los cronometros al arrancar es
-  // ponerse al dia, asi que un intento que estuvo dos minutos cerrado vuelve con sus
-  // preguntas agotadas ya resueltas (decision 3).
-  //
-  // Aqui `hayIntentoGuardado` es que si por definicion: se acaba de leer del almacen.
-  ponerEnMarchaElIntento({ hayIntentoGuardado: true });
+    // Y el reloj sigue donde estaba. Lo primero que hacen los cronometros al arrancar es
+    // ponerse al dia, asi que un intento que estuvo dos minutos cerrado vuelve con sus
+    // preguntas agotadas ya resueltas (decision 3).
+    //
+    // Aqui `hayIntentoGuardado` es que si por definicion: se acaba de leer del almacen.
+    ponerEnMarchaElIntento({hayIntentoGuardado: true});
 }
 
 /**
@@ -1090,56 +1090,56 @@ export function retomarElIntento() {
  * y a escribir en el almacen las preguntas agotadas mientras no miraba, que es
  * justamente la escritura que la decision 4 existe para impedir.
  */
-function ponerEnMarchaElIntento({ hayIntentoGuardado } = {}) {
-  pararElIntento();
+function ponerEnMarchaElIntento({hayIntentoGuardado} = {}) {
+    pararElIntento();
 
-  elDueno = crearDuenoDelIntento({
-    alPerderElIntento: bloquearEstaPestana,
-    alRecuperarElIntento: () => {
-      // El arriendo de la otra vencio. Se retoma lo guardado —que es de ella, y por
-      // eso hay que volver a leerlo— y se sigue desde ahi.
-      retomarElIntento();
-    },
-  });
+    elDueno = crearDuenoDelIntento({
+        alPerderElIntento: bloquearEstaPestana,
+        alRecuperarElIntento: () => {
+            // El arriendo de la otra vencio. Se retoma lo guardado —que es de ella, y por
+            // eso hay que volver a leerlo— y se sigue desde ahi.
+            retomarElIntento();
+        },
+    });
 
-  // Si el intento no se pudo guardar, no hay nada que dos pestanas puedan estropear y
-  // no se escribe el arriendo: bajo `examen-td-js.simulacro.` nunca queda media cosa.
-  elDueno.tomar({ hayIntentoGuardado });
+    // Si el intento no se pudo guardar, no hay nada que dos pestanas puedan estropear y
+    // no se escribe el arriendo: bajo `examen-td-js.simulacro.` nunca queda media cosa.
+    elDueno.tomar({hayIntentoGuardado});
 
-  if (!elDueno.soyElDueno()) return;
+    if (!elDueno.soyElDueno()) return;
 
-  losCronometros = crearCronometros({
-    estado: () => ({
-      empezado_en: elIntento.empezado_en,
-      comenzada_en: elIntento.comenzada_en,
-      posicion: elIntento.posicion,
-      total: elIntento.preguntas.length,
-    }),
-    alternativaMarcada: () => laAlternativaMarcada(),
-    resolverLaPregunta: ({ posicion, alternativa_id, estado, agotada, resuelta_en }) => {
-      anotarEnElIntento({
-        pregunta_id: elIntento.preguntas[posicion].id,
-        alternativa_id,
-        estado,
-        agotada,
-        resuelta_en,
-      });
-    },
-    // El enganche que la 42 declaro y que hasta hoy no le pasaba nadie. Lo llama el
-    // motor cuando ya no quedan preguntas, despues de vaciar la franja y de pararse.
-    alTerminarElIntento: dibujarIntentoTerminado,
-  });
+    losCronometros = crearCronometros({
+        estado: () => ({
+            empezado_en: elIntento.empezado_en,
+            comenzada_en: elIntento.comenzada_en,
+            posicion: elIntento.posicion,
+            total: elIntento.preguntas.length,
+        }),
+        alternativaMarcada: () => laAlternativaMarcada(),
+        resolverLaPregunta: ({posicion, alternativa_id, estado, agotada, resuelta_en}) => {
+            anotarEnElIntento({
+                pregunta_id: elIntento.preguntas[posicion].id,
+                alternativa_id,
+                estado,
+                agotada,
+                resuelta_en,
+            });
+        },
+        // El enganche que la 42 declaro y que hasta hoy no le pasaba nadie. Lo llama el
+        // motor cuando ya no quedan preguntas, despues de vaciar la franja y de pararse.
+        alTerminarElIntento: dibujarIntentoTerminado,
+    });
 
-  losCronometros.arrancar();
+    losCronometros.arrancar();
 }
 
 /** Apaga lo que estuviera corriendo. Vale llamarlo sin que haya nada encendido. */
 function pararElIntento() {
-  losCronometros?.detener();
-  losCronometros = null;
+    losCronometros?.detener();
+    losCronometros = null;
 
-  elDueno?.detener();
-  elDueno = null;
+    elDueno?.detener();
+    elDueno = null;
 }
 
 /**
@@ -1155,18 +1155,18 @@ function pararElIntento() {
  * es del intento que la otra esta jugando.
  */
 function bloquearEstaPestana() {
-  losCronometros?.detener();
-  losCronometros = null;
+    losCronometros?.detener();
+    losCronometros = null;
 
-  const franja = $('#franja-del-simulacro');
-  if (franja) franja.innerHTML = '';
+    const franja = $('#franja-del-simulacro');
+    if (franja) franja.innerHTML = '';
 
-  dibujarRecuadro({
-    titulo: 'Tu simulacro sigue en la otra pestaña',
-    cuerpo: `
+    dibujarRecuadro({
+        titulo: 'Tu simulacro sigue en la otra pestaña',
+        cuerpo: `
         <p class="mt-3 text-sm text-muted leading-relaxed">Abriste el simulacro en otra pestaña y el intento se fue con ella, para que las dos no se pisen. Esta pestaña ya no está contando ni guardando nada.</p>
         <p class="mt-3 text-sm text-muted leading-relaxed">Sigue en la otra pestaña. Si la cerraste, espera unos segundos y esta retoma el intento sola.</p>`,
-  });
+    });
 }
 
 /**
@@ -1178,13 +1178,13 @@ function bloquearEstaPestana() {
  * zona, y los dos serian botones que mienten.
  */
 export function conectarComienzo() {
-  const zona = $('#zona-del-intento');
-  if (!zona) return;
+    const zona = $('#zona-del-intento');
+    if (!zona) return;
 
-  zona.addEventListener('click', (evento) => {
-    const boton = evento.target.closest?.('#comenzar-simulacro');
-    if (!boton) return;
+    zona.addEventListener('click', (evento) => {
+        const boton = evento.target.closest?.('#comenzar-simulacro');
+        if (!boton) return;
 
-    comenzarElIntento();
-  });
+        comenzarElIntento();
+    });
 }
