@@ -1,7 +1,7 @@
 # Iteración 43 · Recorrido de una pregunta a la vez
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · tanda 1 cerrada por guion, falta la pasada del autor · tanda 2 pendiente
+**Estado:** 🔵 En curso · tanda 1 cerrada, con guion y pasada del autor · tanda 2 pendiente
 **Depende de:** iteración 42.
 
 ## Objetivo
@@ -29,7 +29,8 @@ no se corrige durante el intento, porque el objetivo es medir: saber que fallast
   rojo **rompiendo a propósito la línea que vigila**, porque una prueba que nace en verde no demuestra que mire nada.
 - **2026-09-21 · tanda 1 cerrada por guion.** Seis bloques nuevos en `probar-cronometros.mjs` (13 a 18), cada criterio
   con su rojo por mutación. `probar:filtrado` se puso al día con la decisión 8 (decisión 10), y el bloque del simulacro
-  de `probar:escapado` se adelantó desde la tanda 2 (decisión 9). Queda la pasada del autor en el navegador.
+  de `probar:escapado` se adelantó desde la tanda 2 (decisión 9). La pasada del autor en el navegador salió bien en sus
+  cinco puntos.
 
 ## Decisiones tomadas
 
@@ -151,7 +152,7 @@ ninguna pantalla.
   `probar-filtrado.mjs` 10g)
 - [x] Anunciar el cambio de pregunta moviendo el foco (decisión 4). (15)
 - [x] Alternativas como grupo de radio (decisión 3), con `probar:identidad` en verde después. (17)
-- [ ] Revisar el margen negativo de la columna del intento con los dos avisos encendidos. Lo cierra la pasada del autor.
+- [x] Revisar el margen negativo de la columna del intento con los dos avisos encendidos. Cerrada en la pasada del autor.
 - [x] Corregir la frase del `README.md` del plan maestro que manda llamar a `dibujarPantallaDelIntento()`.
 - [x] Corregir el comentario de `probar-memoria.mjs` que decía haber anotado en `registro_log.md` el abandono de un
   intento a medias.
@@ -212,11 +213,11 @@ en rojo por mutación.
 
 ### Tanda 1 · Los comprueba el autor en un navegador
 
-- [ ] **Con los dos avisos encendidos, la columna del intento no se dibuja encima de ellos**, en 375 px y en escritorio.
-- [ ] **Se entiende la diferencia entre avanzar y omitir**, y no se omite por error con el pulgar.
-- [ ] **Con un lector de pantalla, el cambio de pregunta lee el enunciado nuevo** sin que la franja lo interrumpa.
-- [ ] **El botón «atrás» del navegador no lleva a una pregunta anterior** ni rompe el intento (decisión 6).
-- [ ] **Un intento real completo, de principio a fin**, llega a «Intento terminado» sin errores de consola.
+- [x] **Con los dos avisos encendidos, la columna del intento no se dibuja encima de ellos**, en 375 px y en escritorio.
+- [x] **Se entiende la diferencia entre avanzar y omitir**, y no se omite por error con el pulgar.
+- [x] **Con un lector de pantalla, el cambio de pregunta lee el enunciado nuevo** sin que la franja lo interrumpa.
+- [x] **El botón «atrás» del navegador no lleva a una pregunta anterior** ni rompe el intento (decisión 6).
+- [x] **Un intento real completo, de principio a fin**, llega a «Intento terminado» sin errores de consola.
 
 ### No-regresión, ya cerrados en otras iteraciones
 
