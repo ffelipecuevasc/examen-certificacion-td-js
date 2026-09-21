@@ -1,6 +1,6 @@
 # Épica 40 · Simulacro de examen
 
-**Estado:** 🔵 En curso · **iteraciones 41 y 45 cerradas el 2026-09-18**; lo siguiente en el orden de trabajo es la **42**
+**Estado:** 🔵 En curso · **41, 45 y 42 cerradas el 2026-09-18**; la **43** en curso, con su tanda 1 cerrada el 2026-09-21
 **Depende de:** épica 20 (banco en D1) y épica 30 cerrada (capa de datos con modo degradado, escapado, justificación
 dibujada, transición de carga, memoria en el navegador y guiones de prueba con intercepción).
 
@@ -8,6 +8,9 @@ La entrega más grande del proyecto.
 
 ## Historial de este archivo
 
+- **2026-09-21 · cerrada la tanda 1 de la iteración 43.** El intento se responde de principio a fin: una pregunta a la
+  vez, marcar y cambiar, avanzar, omitir con dos toques, sin vuelta atrás y con «Intento terminado» al final. El
+  escapado del simulacro se probó en esta tanda. Queda la tanda 2: teclado y vocabulario de ADR-022.
 - **2026-09-16 · primera reescritura**, tras cerrar la épica 30.
 - **2026-09-18 · cerrada la iteración 45**, la dirección visual. Se eligió el tratamiento «Sala de examen» entre tres, se
   escribió la guía visual del simulacro, se construyó el marcado estático del intento y del resumen con el peor caso del
@@ -30,14 +33,14 @@ La entrega más grande del proyecto.
 encabezado y el pie, y un intento de 120 preguntas que el navegador elige, viene a buscar por id y guarda congelado en
 el propio navegador, retomándolo tras una recarga. Todo lo que decide se escribió en **ADR-035**.
 
-**Lo que todavía NO hace, y conviene tenerlo presente al leer lo de abajo:** no se puede responder —el recorrido es la
-iteración 43 y los cronómetros la 42—, no hay resumen de resultados —la 44— y **la página no está enlazada desde
-ninguna parte**: los enlaces desde los menús, el pie y la portada se agregan en la **iteración 44**, a propósito, para
-no llevar a nadie a una pantalla donde después de «Comenzar» no hay nada que hacer.
+**Lo que todavía NO hace, y conviene tenerlo presente al leer lo de abajo:** no hay resumen de resultados —es la 44;
+al resolverse la pregunta 120 se muestra una pantalla transitoria «Intento terminado»— y **la página no está enlazada
+desde ninguna parte**: los enlaces desde los menús, el pie y la portada se agregan en la **iteración 44**, a propósito,
+para no llevar a nadie a un intento que termina sin resumen.
 
-**Lo siguiente en el orden de trabajo es la iteración 42**, los cronómetros. La **45 cerró el 2026-09-18** y dejó la
-dirección visual fijada y el marcado estático construido: la 42 conecta el cronómetro de 30 segundos dentro de la franja
-que la 45 dibujó, escribiendo en los huecos que ya tienen su `data-papel`.
+**Lo siguiente en el orden de trabajo es terminar la iteración 43**, el recorrido. Su tanda 1 cerró el 2026-09-21: el
+intento ya se responde de principio a fin, una pregunta a la vez, con los dos cronómetros de la 42 y el marcado de la 45.
+Queda su tanda 2 —el teclado fino y la comprobación del vocabulario de ADR-022—, y después la 44.
 
 ## Problema
 
@@ -144,7 +147,7 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 | 41 | Presentación, selección y protección del intento | 🟢 Cerrada el 2026-09-18 · en tres etapas |
 | 45 | Dirección visual del simulacro | 🟢 Cerrada el 2026-09-18 |
 | 42 | Cronómetros | 🟢 Cerrada el 2026-09-18 |
-| 43 | Recorrido de una pregunta a la vez | ⚪ No iniciada · **es la siguiente** |
+| 43 | Recorrido de una pregunta a la vez | 🔵 En curso · tanda 1 cerrada el 2026-09-21 · tanda 2 en curso |
 | 44 | Resumen de resultados | ⚪ No iniciada |
 
 ## Forma de los criterios en toda la épica

@@ -1,7 +1,7 @@
 # Iteración 43 · Recorrido de una pregunta a la vez
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · tanda 1 cerrada, con guion y pasada del autor · tanda 2 pendiente
+**Estado:** 🔵 En curso · tanda 1 cerrada, con guion y pasada del autor · tanda 2 en curso
 **Depende de:** iteración 42.
 
 ## Objetivo
@@ -31,6 +31,8 @@ no se corrige durante el intento, porque el objetivo es medir: saber que fallast
   con su rojo por mutación. `probar:filtrado` se puso al día con la decisión 8 (decisión 10), y el bloque del simulacro
   de `probar:escapado` se adelantó desde la tanda 2 (decisión 9). La pasada del autor en el navegador salió bien en sus
   cinco puntos.
+- **2026-09-21 · decisiones de la tanda 2.** El autor aprobó el patrón de teclado del grupo de radio (decisión 11) y
+  cómo se comprueba el vocabulario de ADR-022 (decisión 12). Tareas y criterios de la tanda 2 escritos.
 
 ## Decisiones tomadas
 
@@ -131,6 +133,41 @@ porque al terminar la carga se dibuja la primera pregunta. En `probar-filtrado.m
 dibujado sea **esa pregunta y solo esa**, y la cuenta por módulo se lee del intento armado, porque ya no la muestra
 ninguna pantalla.
 
+### 11 · El teclado sigue el patrón del grupo de radio
+
+Del autor, 2026-09-21, aprobando la recomendación completa:
+
+1. **El grupo es una sola parada de tabulador.** Tab entra a la alternativa marcada o, si no hay ninguna, a la primera;
+   el siguiente Tab sale del grupo.
+2. **Las flechas mueven y marcan a la vez**, y dan la vuelta en los extremos. No tiene riesgo porque marcar no registra
+   nada hasta avanzar (decisión 1).
+3. **Espacio marca la alternativa enfocada.**
+4. **Enter sobre una alternativa no avanza.** Para avanzar hay que pulsar «Siguiente». Un Enter que registrara desde la
+   alternativa sería el toque accidental que el doble toque de «Omitir» existe para evitar.
+5. **Sin atajos de una sola tecla** (WCAG 2.1.4): chocan con los lectores de pantalla y el patrón estándar ya basta.
+6. **«Omitir» funciona igual que con el dedo:** la primera pulsación pide confirmación y deja el foco en el botón; la
+   segunda omite.
+7. **«Siguiente» sigue siendo `disabled`** mientras no haya alternativa marcada. La otra alternativa era dejarlo
+   enfocable con `aria-disabled`; se descartó por simple y porque su contraste ya está medido.
+
+Los puntos 3 y 4 ya se cumplen sin código nuevo: cada alternativa es un `<button>`, y el navegador convierte Espacio y
+Enter en un clic, que solo marca.
+
+### 12 · El vocabulario de ADR-022 se comprueba con guion
+
+Del autor, 2026-09-21:
+
+- **Dónde:** como sección 17 de `probar-identidad-visual.mjs`, junto a la de la advertencia repetida, que ya barre las
+  páginas excluyendo el pie y ya corre en `npm run verificar`.
+- **Qué:** el cuerpo de `simulacro.html` sin el pie, y todas las pantallas que dibuja el simulacro: la del intento, las
+  del resumen aprobado y reprobado, y los recuadros «Intento terminado», «No se pudo armar el simulacro» y «Tu simulacro
+  sigue en la otra pestaña».
+- **Cómo:** por palabra completa y sin distinguir mayúsculas. «aprob…» y «reprob…» solo dentro de las tres frases exactas
+  de ADR-022, y la tercera solo en la presentación; «nota», «calificación», «puntaje oficial» y «certificación», en
+  ningún lado.
+- **Lo que no cubre:** «cualquier fórmula que sugiera validez de certificación» no se puede mecanizar. Queda como
+  criterio del autor en el navegador, dicho así, en vez de fingir que un guion lo cubre.
+
 ## Tareas
 
 > **Reescritas el 2026-09-20 y marcadas el 2026-09-21.** Una tarea se marca hecha solo cuando su prueba existe y se vio
@@ -160,10 +197,12 @@ ninguna pantalla.
 - [x] Agregar a `probar:escapado` el bloque del simulacro (decisión 9): la fila hostil se cuela interceptando `?ids=` y
   se revisan su enunciado y sus alternativas en el dibujo real. (`probar-escapado.mjs` 5c)
 
-### Tanda 2 · Sin decisiones tomadas, no empezar sin que el autor la pida
+### Tanda 2 · El teclado y el vocabulario (decisiones 11 y 12)
 
-- [ ] Navegación por teclado fina: elegir y cambiar alternativa, avanzar y omitir sin ratón.
-- [ ] Comprobación automática del vocabulario de ADR-022 en los textos del simulacro.
+- [ ] Una sola parada de tabulador en el grupo: `tabindex="0"` en la alternativa marcada, o en la primera si no hay
+  ninguna, y `tabindex="-1"` en las demás.
+- [ ] Las flechas mueven y marcan, dan la vuelta en los extremos y no desplazan la página.
+- [ ] Sección 17 de `probar-identidad-visual.mjs`: el vocabulario de ADR-022 en todo lo que dibuja el simulacro.
 
 ## Criterios de aceptación
 
@@ -228,7 +267,32 @@ en rojo por mutación.
 
 ### Tanda 2
 
-- [ ] Los criterios de teclado y del vocabulario de ADR-022 se escriben cuando el autor tome sus decisiones.
+#### Se provocan con guion
+
+- [ ] **En cada estado dibujado de la pregunta hay una sola parada de tabulador en el grupo:** exactamente una
+  alternativa con `tabindex="0"` —la marcada si la hay; si no, la primera— y las otras tres con `tabindex="-1"`.
+- [ ] **Flecha abajo y flecha derecha marcan la siguiente alternativa; flecha arriba y flecha izquierda, la anterior**;
+  desde la última se pasa a la primera y al revés, y el foco queda en la recién marcada.
+- [ ] **Cada flecha atendida llama a `preventDefault()`**, para que la página no se desplace; una tecla que no es flecha
+  no marca nada ni lo llama.
+- [ ] **Las flechas no registran nada:** el intento guardado no cambia hasta avanzar o agotarse.
+- [ ] **Una flecha que llega desde una alternativa de otra pregunta no mueve nada** (el evento viejo).
+- [ ] **Vocabulario de ADR-022:** en el cuerpo de `simulacro.html` sin el pie y en todas las pantallas que dibuja el
+  simulacro, «aprob…» y «reprob…» solo aparecen dentro de las tres frases exactas, la tercera solo en la presentación, y
+  «nota», «calificación», «puntaje oficial» y «certificación» no aparecen. La comprobación da rojo si se siembra una
+  palabra prohibida.
+- [ ] **Los siete guiones, `build` y `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql`
+  siguen sin cambios.
+
+#### Los comprueba el autor en un navegador
+
+- [ ] **Solo con teclado se hace una pregunta entera:** Tab entra al grupo, las flechas recorren y marcan, Tab sale a
+  «Siguiente» y Enter avanza. «Omitir» funciona con dos Enter.
+- [ ] **Enter sobre una alternativa la marca y no avanza.** Es el comportamiento nativo del botón, y el DOM falso no lo
+  puede simular.
+- [ ] **Con lector de pantalla, el grupo se anuncia como grupo de radio de cuatro**, y la marcada como seleccionada.
+- [ ] **Ninguna pantalla del simulacro sugiere validez de certificación.** Es la parte de ADR-022 que no se puede
+  mecanizar (decisión 12).
 
 ## Notas de la iteración
 
@@ -260,3 +324,6 @@ _Escritas el 2026-09-21, al cerrar por guion la tanda 1._
   commit que parecía de siete líneas. Se devolvió en un commit solo de formato, y el autor dejó de usar `Ctrl + Alt + L`
   en este repositorio.
 - **«Martillear el teclado» se probó martillando los botones apagados.** El teclado de verdad es de la tanda 2.
+- **Tres mensajes de commit de la tanda 1 pasaron de los 200 caracteres de ADR-030** (204, 205 y 206). El tope que se
+  usó en la conversación era 250, y no se contrastó con la ADR. Ya estaban empujados y no se reescribieron; desde la
+  tanda 2 se respeta ADR-030.
