@@ -1226,6 +1226,160 @@ function pulsar(dom, papel, { alternativa } = {}) {
 }
 
 // ===========================================================================
+// 16 · Omitir pide dos toques, y la confirmacion se retira al marcar y al
+//      cambiar de pregunta (iteracion 43)
+// ===========================================================================
+//
+// El hueco del texto de confirmacion se dibuja SIEMPRE, vacio o lleno, para que
+// aparecer no mueva nada bajo el dedo (`probar:identidad` lo mide en los tres
+// estados). Por eso aqui se lee su TEXTO y no se pregunta si el elemento existe:
+// preguntar por el elemento daria verde siempre.
+
+{
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+
+  const { reloj, dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'om' });
+  simulacro.conectarElRecorrido();
+  simulacro.retomarElIntento();
+
+  const html = () => dom.html('#zona-del-intento');
+
+  /** El texto del hueco de confirmacion, o '' si esta vacio. */
+  const confirmacion = () =>
+      (html().match(/data-papel="confirmacion-de-omitir"[^>]*>([^<]*)<\/p>/)?.[1] ?? '').trim();
+
+  const cuantasEscritas = () => (respuestasGuardadas(almacen)?.respuestas ?? []).length;
+
+  // --- Pregunta 1: un toque no omite, el segundo si -------------------------
+
+  const alEmpezar = confirmacion();
+
+  pulsar(dom, 'omitir');
+
+  const trasUnToque = {
+    texto: confirmacion(),
+    escritas: cuantasEscritas(),
+    sigueLaPrimera: html().includes('Pregunta de juguete 1'),
+    // La zona se reescribe al pedir la confirmacion. Sin devolver el foco a
+    // «Omitir», quien usa teclado no podria dar el segundo toque sin volver a
+    // tabular desde el principio de la pagina.
+    foco: dom.nodo('[data-papel="omitir"]').focos,
+  };
+
+  pulsar(dom, 'omitir');
+
+  const trasDosToques = respuestasGuardadas(almacen);
+  const laOmitida = trasDosToques?.respuestas?.[0];
+
+  const enLaSegunda = {
+    esLaSegunda: html().includes('Pregunta de juguete 2'),
+    texto: confirmacion(),
+  };
+
+  // --- Pregunta 2: marcar retira la confirmacion -----------------------------
+
+  pulsar(dom, 'omitir');
+  const antesDeMarcar = confirmacion();
+
+  pulsar(dom, 'alternativa', { alternativa: preguntas[1].alternativas[0].id });
+  const trasMarcar = confirmacion();
+
+  // Con algo marcado «Omitir» esta apagado. Forzarlo dos veces no omite nada.
+  pulsar(dom, 'omitir');
+  pulsar(dom, 'omitir');
+  const escritasTrasForzar = cuantasEscritas();
+
+  // --- Pregunta 3: la confirmacion no sobrevive a que el reloj cambie de pregunta
+
+  pulsar(dom, 'siguiente');
+  pulsar(dom, 'omitir');
+  const enLaTercera = confirmacion();
+
+  // La tercera empezo al responder la segunda, sin mover el reloj: se agota a los 30 s.
+  reloj.avanzar(MS);
+
+  const trasAgotarse = {
+    esLaCuarta: html().includes('Pregunta de juguete 4'),
+    texto: confirmacion(),
+    escritas: cuantasEscritas(),
+    laTercera: respuestasGuardadas(almacen)?.respuestas?.[2],
+  };
+
+  // LO QUE DE VERDAD IMPORTA: en la cuarta, UN toque vuelve a no omitir. Si la
+  // confirmacion hubiera sobrevivido por dentro aunque no se viera, este toque
+  // omitiria la cuarta pregunta sin haberlo pedido dos veces.
+  pulsar(dom, 'omitir');
+  const escritasTrasUnToqueEnLaCuarta = cuantasEscritas();
+
+  if (alEmpezar !== '') {
+    problemas.push(`omitir: al retomar, el hueco de confirmacion ya decia «${alEmpezar}»`);
+  }
+  if (!trasUnToque.texto.includes('otra vez')) {
+    problemas.push('omitir: tras el primer toque no aparecio el texto de confirmacion');
+  }
+  if (trasUnToque.escritas !== 0 || !trasUnToque.sigueLaPrimera) {
+    problemas.push('omitir: UN solo toque omitio la pregunta, sin pedir confirmacion');
+  }
+  if (trasUnToque.foco === 0) {
+    problemas.push('omitir: tras el primer toque el foco no volvio a «Omitir»');
+  }
+  if (
+      laOmitida?.pregunta_id !== preguntas[0].id ||
+      laOmitida?.alternativa_id !== null ||
+      laOmitida?.estado !== 'omitida' ||
+      laOmitida?.agotada !== false
+  ) {
+    problemas.push(`omitir: el segundo toque registro ${JSON.stringify(laOmitida)} y no una omitida`);
+  }
+  if (trasDosToques?.posicion !== 1 || !enLaSegunda.esLaSegunda) {
+    problemas.push('omitir: tras el segundo toque no se paso a la pregunta 2');
+  }
+  if (enLaSegunda.texto !== '') {
+    problemas.push('omitir: la confirmacion paso a la pregunta siguiente');
+  }
+  if (!antesDeMarcar.includes('otra vez')) {
+    problemas.push('omitir: en la pregunta 2 el primer toque no pidio confirmacion');
+  }
+  if (trasMarcar !== '') {
+    problemas.push('omitir: marcar una alternativa no retiro la confirmacion');
+  }
+  if (escritasTrasForzar !== 1) {
+    problemas.push(
+        `omitir: forzar «Omitir» con una alternativa marcada dejo ${escritasTrasForzar} respuestas y tenia que dejar 1`
+    );
+  }
+  if (!enLaTercera.includes('otra vez')) {
+    problemas.push('omitir: en la pregunta 3 el primer toque no pidio confirmacion');
+  }
+  if (!trasAgotarse.esLaCuarta || trasAgotarse.escritas !== 3) {
+    problemas.push('omitir: al agotarse la tercera no se paso a la cuarta con 3 respuestas escritas');
+  }
+  if (trasAgotarse.laTercera?.estado !== 'omitida' || trasAgotarse.laTercera?.agotada !== true) {
+    problemas.push(
+        `omitir: la tercera se agoto sin nada marcado y quedo ${JSON.stringify(trasAgotarse.laTercera)}`
+    );
+  }
+  if (trasAgotarse.texto !== '') {
+    problemas.push('omitir: la confirmacion sobrevivio a que el reloj cambiara de pregunta');
+  }
+  if (escritasTrasUnToqueEnLaCuarta !== 3) {
+    problemas.push(
+        'omitir: la confirmacion sobrevivio POR DENTRO al cambio de pregunta: un solo toque omitio la cuarta'
+    );
+  }
+
+  notas.push(
+      'Omitir: el primer toque no omite, escribe «Toca Omitir otra vez» en su hueco y devuelve el foco ' +
+      'al boton; el segundo registra la omitida (sin alternativa, agotada=false) y pasa a la 2 con el ' +
+      'hueco vacio. Marcar retira la confirmacion, y forzar «Omitir» con algo marcado no escribe nada. ' +
+      'Cuando el reloj agota una pregunta con la confirmacion pedida, la siguiente empieza de cero: un ' +
+      'solo toque vuelve a no omitir.'
+  );
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 
