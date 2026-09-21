@@ -468,6 +468,37 @@ function marcarLaAlternativa(cual) {
 }
 
 /**
+ * Cuanto se mueve la marca con cada flecha (decision 11 de la 43). Abajo y derecha
+ * avanzan, arriba e izquierda retroceden, como en cualquier grupo de radio. Una tecla
+ * que no esta aqui no es asunto del grupo.
+ */
+const PASOS_DE_LAS_FLECHAS = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
+
+/**
+ * Mueve la marca desde la alternativa que tiene el foco, dando la vuelta en los extremos.
+ *
+ * SE MUEVE DESDE LA ENFOCADA, NO DESDE LA MARCADA. Sin nada marcado, Tab deja el foco
+ * en la primera (bloque 19), y la flecha abajo tiene que llevar a la segunda.
+ *
+ * Y SE BUSCA EN LA PREGUNTA EN CURSO. Si la alternativa de origen no es de esta
+ * pregunta, es un evento viejo y no se mueve nada: es la misma guarda del clic.
+ *
+ * Marcar pasa por `marcarLaAlternativa()`, que retira la confirmacion de omitir y deja
+ * el foco en la recien marcada. Nada se registra hasta avanzar o agotarse.
+ */
+function moverLaMarca(desde, paso) {
+  const pregunta = laPreguntaEnCurso();
+  if (!pregunta) return;
+
+  const lista = pregunta.alternativas;
+  const aqui = lista.findIndex((a) => String(a.id) === String(desde));
+  if (aqui === -1) return;
+
+  const destino = lista[(aqui + paso + lista.length) % lista.length];
+  marcarLaAlternativa(destino.id);
+}
+
+/**
  * «Siguiente»: registra lo marcado y pasa a la pregunta siguiente.
  *
  * LA GUARDA DE `laMarcada === null` NO SOBRA AUNQUE EL BOTON ESTE `disabled`. El
@@ -529,6 +560,9 @@ function resolverLaPreguntaEnCurso({ alternativa_id, estado }) {
  *
  * El orden de las tres preguntas no es indiferente: la alternativa va primera porque
  * es el clic frecuente, y los dos botones se excluyen entre si.
+ *
+ * Desde la tanda 2 hay un segundo oyente, de teclado, para las flechas del grupo de
+ * radio (decision 11). Espacio y Enter no lo necesitan: el boton los convierte en clic.
  */
 export function conectarElRecorrido() {
   const zona = $('#zona-del-intento');
@@ -548,6 +582,23 @@ export function conectarElRecorrido() {
     }
 
     if (evento.target.closest?.('[data-papel="omitir"]')) tocarOmitir();
+  });
+
+  // LAS FLECHAS DEL GRUPO DE RADIO (decision 11 de la 43). Por delegacion, igual que
+  // el clic y por el mismo motivo: la zona se reescribe en cada marca. Solo se atienden
+  // las cuatro flechas con el foco en una alternativa; todo lo demas se deja pasar sin
+  // tocarlo, y Espacio y Enter los convierte en clic el propio boton.
+  zona.addEventListener('keydown', (evento) => {
+    const desde = evento.target.closest?.('[data-papel="alternativa"]');
+    if (!desde) return;
+
+    const paso = PASOS_DE_LAS_FLECHAS[evento.key];
+    if (paso === undefined) return;
+
+    // Se ataja aunque despues no se mueva nada: la flecha cayo dentro del grupo, y
+    // dejarla pasar desplazaria la pagina.
+    evento.preventDefault?.();
+    moverLaMarca(desde.dataset?.alternativa, paso);
   });
 }
 

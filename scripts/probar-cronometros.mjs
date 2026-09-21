@@ -1854,6 +1854,135 @@ function pulsar(dom, papel, { alternativa } = {}) {
 }
 
 // ===========================================================================
+// 20 · Las flechas mueven y marcan (iteracion 43, tanda 2)
+// ===========================================================================
+//
+// Decision 11, punto 2. Flecha abajo y derecha llevan a la siguiente alternativa, y
+// arriba e izquierda a la anterior; dan la vuelta en los extremos, y MARCAN al llegar.
+// Marcar no registra nada (decision 1), asi que moverse con las flechas no tiene
+// riesgo. Cada flecha atendida llama a `preventDefault()` para que la pagina no se
+// desplace, y cualquier otra tecla se deja pasar sin tocarla: Espacio y Enter los
+// convierte en clic el propio boton, y eso ya lo prueban los bloques 14 a 16.
+
+{
+  const problemasAntes = problemas.length;
+
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+
+  const { dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'fl' });
+  simulacro.conectarElRecorrido();
+  simulacro.retomarElIntento();
+
+  const html = () => dom.html('#zona-del-intento');
+
+  /** Que alternativa esta marcada, leida de la etiqueta entera (bloque 14). */
+  const laMarcadaDibujada = () => {
+    const boton = html().match(/<button[^>]*data-marcada="true"[^>]*>/)?.[0] ?? '';
+    return boton.match(/data-alternativa="([^"]*)"/)?.[1] ?? null;
+  };
+
+  /**
+   * Pulsa una tecla con el foco en una alternativa, por el mismo camino que el clic:
+   * por delegacion sobre la zona. Devuelve cuantos oyentes corrieron y si alguno
+   * llamo a `preventDefault()`.
+   */
+  const teclear = (tecla, desde) => {
+    let atajada = false;
+    const selector = '[data-papel="alternativa"]';
+    const nodo = { dataset: { alternativa: String(desde) } };
+
+    const oyentes = dom.disparar('#zona-del-intento', 'keydown', {
+      key: tecla,
+      target: { closest: (s) => (s === selector ? nodo : null) },
+      preventDefault: () => {
+        atajada = true;
+      },
+    });
+
+    return { oyentes, atajada };
+  };
+
+  const alt = preguntas[0].alternativas.map((a) => String(a.id));
+  const focosEnLaMarcada = () => dom.nodo('[data-papel="alternativa"][data-marcada="true"]').focos;
+
+  // Cada paso: desde donde, que tecla, a donde tiene que quedar la marca.
+  const pasos = [
+    { desde: alt[0], tecla: 'ArrowDown', queda: alt[1], nombre: 'abajo desde la primera, sin nada marcado' },
+    { desde: alt[1], tecla: 'ArrowRight', queda: alt[2], nombre: 'derecha desde la segunda' },
+    { desde: alt[2], tecla: 'ArrowDown', queda: alt[3], nombre: 'abajo desde la tercera' },
+    { desde: alt[3], tecla: 'ArrowDown', queda: alt[0], nombre: 'abajo desde la ultima: vuelve a la primera' },
+    { desde: alt[0], tecla: 'ArrowUp', queda: alt[3], nombre: 'arriba desde la primera: vuelve a la ultima' },
+    { desde: alt[3], tecla: 'ArrowLeft', queda: alt[2], nombre: 'izquierda desde la ultima' },
+  ];
+
+  let sinOyente = false;
+
+  for (const { desde, tecla, queda, nombre } of pasos) {
+    const focosAntes = focosEnLaMarcada();
+    const { oyentes, atajada } = teclear(tecla, desde);
+
+    if (oyentes === 0) sinOyente = true;
+
+    if (laMarcadaDibujada() !== queda) {
+      problemas.push(`flechas (${nombre}): quedo marcada la ${laMarcadaDibujada()} y tenia que ser la ${queda}`);
+    }
+    if (!atajada) {
+      problemas.push(`flechas (${nombre}): la flecha no llamo a preventDefault(), y la pagina se desplazaria`);
+    }
+    if (focosEnLaMarcada() <= focosAntes) {
+      problemas.push(`flechas (${nombre}): el foco no fue a la alternativa recien marcada`);
+    }
+  }
+
+  if (sinOyente) {
+    problemas.push('flechas: la zona del intento no tiene ningun oyente de teclado');
+  }
+
+  // Otras teclas: ni marcan ni se atajan. Enter y Espacio los convierte en clic el
+  // propio boton; aqui solo se comprueba que el oyente de teclado no se meta.
+  for (const tecla of ['a', 'Enter', ' ', 'Tab']) {
+    const antes = html();
+    const { atajada } = teclear(tecla, alt[2]);
+
+    if (html() !== antes) {
+      problemas.push(`flechas: la tecla «${tecla}» cambio lo dibujado, y solo las flechas mueven la marca`);
+    }
+    if (atajada) {
+      problemas.push(`flechas: la tecla «${tecla}» se atajo con preventDefault(), y no le corresponde`);
+    }
+  }
+
+  // El evento viejo: una flecha que llega desde una alternativa de OTRA pregunta.
+  const antesDeLaAjena = html();
+  teclear('ArrowDown', preguntas[1].alternativas[0].id);
+
+  if (html() !== antesDeLaAjena) {
+    problemas.push('flechas: una flecha desde una alternativa de otra pregunta movio la marca');
+  }
+
+  // Y nada de esto registro: seis flechas, cuatro teclas y un evento viejo.
+  const guardado = respuestasGuardadas(almacen);
+
+  if ((guardado?.respuestas ?? []).length !== 0 || guardado?.posicion !== 0) {
+    problemas.push(
+        `flechas: moverse con el teclado escribio en el almacen (${(guardado?.respuestas ?? []).length} ` +
+        `respuesta(s), posicion ${guardado?.posicion})`
+    );
+  }
+
+  if (problemas.length === problemasAntes) {
+    notas.push(
+        `Flechas: ${pasos.length} pasos por las cuatro direcciones, con la vuelta en los dos extremos; cada uno ` +
+        'marco donde debia, llamo a preventDefault() y dejo el foco en la recien marcada. «a», Enter, ' +
+        'Espacio y Tab no tocaron nada, una flecha desde otra pregunta no movio la marca, y el almacen ' +
+        'siguio vacio.'
+    );
+  }
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 
