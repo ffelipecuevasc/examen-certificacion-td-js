@@ -1128,7 +1128,132 @@ notas.push(
 );
 
 // ---------------------------------------------------------------------------
-// 17 · Veredicto
+// 17 · El vocabulario de ADR-022 (iteracion 43, decision 12)
+// ---------------------------------------------------------------------------
+//
+// ADR-022 prohibe «aprobado» y «reprobado» sin «el simulacro», «nota», «calificacion»,
+// «puntaje oficial» y «certificacion», y autoriza tres frases exactas; la tercera, solo
+// en la presentacion. Y deja escrito por que la lista es mecanica: quien redacta una
+// pantalla puede no haber leido la ADR. Por eso se comprueba con guion.
+//
+// QUE SE BARRE (decision del autor, 2026-09-21): el `<main>` de `simulacro.html`
+// —encabezado y pie son el marco compartido del sitio, y el encabezado nombra el examen
+// real, no el resultado del simulacro—; las pantallas dibujadas de la seccion 4; y los
+// literales de `simulacro.js` y `simulacro-maqueta.js`, que es donde viven los recuadros
+// que ninguna funcion exportada dibuja («Intento terminado», «No se pudo armar el
+// simulacro», «Tu simulacro sigue en la otra pestaña»).
+//
+// COMO: se BORRAN las frases autorizadas y se busca lo que quede. La tercera solo se
+// borra en la presentacion, asi que fuera de ahi cuenta como indebida. «Cualquier
+// formula que sugiera validez de certificacion» no se puede mecanizar: la mira el autor.
+//
+// El texto del banco no se barre: el enunciado de una pregunta de JavaScript puede
+// decir «notas» con todo derecho, y no es el simulacro hablando de su resultado.
+
+const FRASES_AUTORIZADAS = ['Aprobaste el simulacro', 'Reprobaste el simulacro'];
+const FRASE_DE_LA_PRESENTACION = 'Se aprueba el simulacro con al menos el 60 %';
+
+const RAIZ_DE_APROBAR = /\b(?:aprob|aprueb|reprob|reprueb)\w*/gi;
+const PALABRAS_PROHIBIDAS =
+    /\b(?:notas?|calificaci[oó]n(?:es)?|puntaje oficial|certificaci[oó]n(?:es)?)\b/gi;
+
+/** Lo que se lee: sin etiquetas, y con lo que dicen `aria-label`, `title` y `alt`. */
+const textoVisible = (html) => {
+  const atributos = [...html.matchAll(/\b(?:aria-label|title|alt)="([^"]*)"/g)].map((m) => m[1]);
+  return [html.replace(/<[^>]*>/g, ' '), ...atributos]
+      .join(' ')
+      .replace(/&nbsp;|\u00a0/g, ' ')
+      .replace(/\s+/g, ' ');
+};
+
+/** Los textos que un componente puede dibujar: sus literales, sin comentarios ni `${}`. */
+const literalesDe = (fuente) =>
+    [
+      ...sinComentariosJs(fuente).matchAll(
+          /`((?:\\[\s\S]|[^`\\])*)`|'((?:\\.|[^'\\\n])*)'|"((?:\\.|[^"\\\n])*)"/g
+      ),
+    ]
+        .map((m) => textoVisible((m[1] ?? m[2] ?? m[3] ?? '').replace(/\$\{[^}]*\}/g, ' ')))
+        .join(' | ');
+
+/** Lo que queda de indebido en un texto despues de borrar las frases autorizadas. */
+const vocabularioIndebido = (texto, { conLaDePresentacion }) => {
+  const autorizadas = conLaDePresentacion
+      ? [...FRASES_AUTORIZADAS, FRASE_DE_LA_PRESENTACION]
+      : FRASES_AUTORIZADAS;
+
+  let resto = texto;
+  for (const frase of autorizadas) resto = resto.split(frase).join(' ');
+
+  return [...(resto.match(RAIZ_DE_APROBAR) ?? []), ...(resto.match(PALABRAS_PROHIBIDAS) ?? [])];
+};
+
+// LA COMPROBACION SABE VER. Sobre un texto sembrado con tres palabras prohibidas y una
+// frase autorizada, tiene que encontrar exactamente las tres. Si no, un verde de abajo
+// no significaria nada.
+const sembradas = vocabularioIndebido(
+    'Tu nota final: aprobado. Certificación lista. Aprobaste el simulacro.',
+    { conLaDePresentacion: false }
+);
+
+if (sembradas.length !== 3) {
+  problemas.push(
+      `vocabulario de ADR-022: sobre un texto sembrado con 3 palabras prohibidas encontro ` +
+      `${sembradas.length} (${sembradas.join(', ')}), asi que no sabe ver lo que busca`
+  );
+}
+
+const htmlDelSimulacro = sinComentariosHtml(readFileSync(join(RAIZ, 'simulacro.html'), 'utf8'));
+const principalDelSimulacro = htmlDelSimulacro.match(/<main\b[\s\S]*?<\/main>/)?.[0] ?? '';
+
+if (!principalDelSimulacro) {
+  problemas.push('vocabulario de ADR-022: simulacro.html no tiene <main>, y no habria nada que barrer');
+}
+
+const barridos = [
+  {
+    nombre: 'simulacro.html (<main>)',
+    texto: textoVisible(principalDelSimulacro),
+    conLaDePresentacion: true,
+  },
+  ...Object.entries(PANTALLAS).map(([nombre, html]) => ({
+    nombre: `la pantalla «${nombre}»`,
+    texto: textoVisible(html),
+    conLaDePresentacion: false,
+  })),
+  ...['simulacro.js', 'simulacro-maqueta.js'].map((nombre) => ({
+    nombre: `components/${nombre}`,
+    texto: literalesDe(readFileSync(join(SITIO, 'components', nombre), 'utf8')),
+    conLaDePresentacion: false,
+  })),
+];
+
+for (const { nombre, texto, conLaDePresentacion } of barridos) {
+  const indebidas = vocabularioIndebido(texto, { conLaDePresentacion });
+
+  if (indebidas.length > 0) {
+    problemas.push(
+        `vocabulario de ADR-022: ${nombre} dice ` +
+        `${[...new Set(indebidas.map((p) => `«${p}»`))].join(', ')}, que no esta autorizado`
+    );
+  }
+}
+
+// La tercera frase tiene que seguir donde esta autorizada. Si desapareciera de la
+// presentacion, el borrado de arriba estaria autorizando algo que ya no existe.
+if (!textoVisible(principalDelSimulacro).includes(FRASE_DE_LA_PRESENTACION)) {
+  problemas.push('vocabulario de ADR-022: la presentacion ya no dice «Se aprueba el simulacro con al menos el 60 %»');
+}
+
+notas.push(
+    `Vocabulario de ADR-022: ${barridos.length} textos barridos —el <main> de simulacro.html, ` +
+    `${Object.keys(PANTALLAS).length} pantallas dibujadas y los literales de 2 componentes— sin ` +
+    'ninguna palabra fuera de las tres frases autorizadas, y la comprobacion encontro las 3 que se ' +
+    'le sembraron.'
+);
+
+// ---------------------------------------------------------------------------
+// 18 · Veredicto
 // ---------------------------------------------------------------------------
 
 const anchoColumna = {

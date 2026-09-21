@@ -619,8 +619,8 @@ export function dibujarPantallaDelResumen({ aprobado = true } = {}) {
   const veredicto = aprobado ? 'Aprobaste el simulacro' : 'No alcanzaste el 60 %';
 
   const explicacion = aprobado
-    ? 'Son 72 correctas de 120, el 60 % justo. Para aprobar el simulacro hacen falta 72.'
-    : 'Son 61 correctas de 120. Para aprobar el simulacro hacen falta 72, que es el 60 %.';
+    ? 'Son 72 correctas de 120, justo el mínimo del 60 %.'
+    : 'Son 61 correctas de 120. El mínimo es 72, que es el 60 %.';
 
   const revision = [
     {
