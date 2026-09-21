@@ -1767,6 +1767,93 @@ function pulsar(dom, papel, { alternativa } = {}) {
 }
 
 // ===========================================================================
+// 19 · Una sola parada de tabulador en el grupo (iteracion 43, tanda 2)
+// ===========================================================================
+//
+// Decision 11, punto 1. Un grupo de radio es UNA parada del tabulador: Tab entra a la
+// alternativa marcada o, si no hay, a la primera, y el siguiente Tab sale del grupo.
+// Eso se escribe en el marcado con `tabindex`: "0" en la que recibe el Tab y "-1" en
+// las otras tres, que siguen siendo enfocables por programa (las flechas del bloque
+// 20 las alcanzan). Se lee la etiqueta ENTERA de cada alternativa, no dos atributos
+// pegados, por lo que enseno el bloque 14.
+//
+// Se revisa en seis estados de la pantalla, porque la parada cambia de dueno: pasa a
+// la marcada al marcar, sigue a la marcada al cambiar, y vuelve a la primera en cada
+// pregunta nueva, llegue por «Siguiente» o por el reloj.
+
+{
+  const problemasAntes = problemas.length;
+
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+
+  const { reloj, dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'tb' });
+  simulacro.conectarElRecorrido();
+  simulacro.retomarElIntento();
+
+  const html = () => dom.html('#zona-del-intento');
+
+  /** Cada alternativa dibujada, con su id y el tabindex que trae su etiqueta. */
+  const paradas = () =>
+      [...html().matchAll(/<button[^>]*data-papel="alternativa"[^>]*>/g)].map(([etiqueta]) => ({
+        id: etiqueta.match(/data-alternativa="([^"]*)"/)?.[1],
+        tabindex: etiqueta.match(/tabindex="([^"]*)"/)?.[1] ?? null,
+      }));
+
+  const revisados = [];
+
+  const revisar = (estado, laQueDebe) => {
+    revisados.push(estado);
+    const lista = paradas();
+    const enCero = lista.filter((a) => a.tabindex === '0');
+    const fuera = lista.filter((a) => a.tabindex === '-1');
+
+    if (lista.length !== 4 || enCero.length !== 1 || fuera.length !== 3) {
+      problemas.push(
+          `tabulador (${estado}): ${enCero.length} alternativa(s) con tabindex="0" y ` +
+          `${fuera.length} con "-1", de ${lista.length}; tenian que ser 1 y 3`
+      );
+      return;
+    }
+    if (enCero[0].id !== String(laQueDebe)) {
+      problemas.push(
+          `tabulador (${estado}): la parada del grupo es la ${enCero[0].id} y tenia que ser la ${laQueDebe}`
+      );
+    }
+  };
+
+  const primera = preguntas[0].alternativas;
+  const segunda = preguntas[1].alternativas;
+  const tercera = preguntas[2].alternativas;
+
+  revisar('recien retomada, sin marcar', primera[0].id);
+
+  pulsar(dom, 'alternativa', { alternativa: primera[2].id });
+  revisar('con la tercera marcada', primera[2].id);
+
+  pulsar(dom, 'alternativa', { alternativa: primera[3].id });
+  revisar('tras cambiar a la cuarta', primera[3].id);
+
+  pulsar(dom, 'siguiente');
+  revisar('en la pregunta siguiente', segunda[0].id);
+
+  pulsar(dom, 'omitir');
+  revisar('pidiendo confirmacion de omitir', segunda[0].id);
+
+  // La segunda empezo al avanzar, sin mover el reloj: se agota a los 30 s.
+  reloj.avanzar(MS);
+  revisar('tras agotarse la pregunta', tercera[0].id);
+
+  if (problemas.length === problemasAntes) {
+    notas.push(
+        `Tabulador: en ${revisados.length} estados (${revisados.join(', ')}) el grupo tiene una sola ` +
+        'parada —tabindex="0" en la marcada o, sin marcar, en la primera— y las otras tres en "-1".'
+    );
+  }
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 

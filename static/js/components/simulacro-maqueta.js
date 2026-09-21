@@ -243,8 +243,13 @@ export function dibujarFranjaDelIntento({
  * Por eso `role="radio"` con `aria-checked`, dentro del `role="radiogroup"` de la
  * lista. Los `<li>` pasan a `role="none"`: un `radiogroup` solo admite `radio` entre
  * sus hijos, y un `listitem` en medio rompe la relacion que el lector anuncia.
+ *
+ * Y ES UNA SOLA PARADA DEL TABULADOR (decision 11 de la 43). `parada` dice cual de las
+ * cuatro recibe el Tab: `tabindex="0"` en esa y `"-1"` en las demas, que siguen siendo
+ * enfocables por programa. Sin esto eran cuatro paradas, y el grupo de radio que el
+ * lector anuncia no se comportaba como tal.
  */
-function dibujarAlternativaDelIntento(alternativa, marcada) {
+function dibujarAlternativaDelIntento(alternativa, marcada, parada) {
   const piel = marcada
     ? 'border-paper bg-panel2'
     : `${BORDE_DEL_SIMULACRO} bg-panel hover:border-paper`;
@@ -257,7 +262,7 @@ function dibujarAlternativaDelIntento(alternativa, marcada) {
 
   return `
           <li role="none">
-            <button type="button" role="radio" data-papel="alternativa" data-alternativa="${esc(alternativa.id)}"${marcada ? ' data-marcada="true" aria-checked="true"' : ' aria-checked="false"'}
+            <button type="button" role="radio" tabindex="${parada ? '0' : '-1'}" data-papel="alternativa" data-alternativa="${esc(alternativa.id)}"${marcada ? ' data-marcada="true" aria-checked="true"' : ' aria-checked="false"'}
                     class="flex items-start gap-3 text-left w-full border ${piel} rounded-lg px-4 py-3.5 text-base text-paper leading-normal break-words transition-colors">
               ${marca}<span class="min-w-0">${esc(alternativa.texto)}</span>
             </button>
@@ -295,9 +300,16 @@ export const ID_DEL_ENUNCIADO = 'enunciado-de-la-pregunta';
 export const ID_DE_LA_CONFIRMACION = 'confirmacion-de-omitir';
 
 export function dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada = null }) {
+  // LA PARADA DEL TABULADOR ES UNA SOLA (decision 11 de la 43): la marcada o, si no
+  // hay, la primera. Se pregunta si la marcada es DE ESTA pregunta y no solo si hay
+  // una: un id que no esta aqui no puede quedarse con la parada.
+  const hayMarcada = pregunta.alternativas.some((a) => a.id === marcada);
+
   const alternativas = pregunta.alternativas
-    .map((a) => dibujarAlternativaDelIntento(a, marcada === a.id))
-    .join('');
+      .map((a, i) =>
+          dibujarAlternativaDelIntento(a, marcada === a.id, hayMarcada ? marcada === a.id : i === 0)
+      )
+      .join('');
 
   return `
       <article data-papel="tarjeta-de-la-pregunta" tabindex="-1" class="bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-6 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
