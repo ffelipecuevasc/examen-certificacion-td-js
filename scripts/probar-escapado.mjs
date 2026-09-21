@@ -59,7 +59,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { almacenDeMentira, prepararDomFalso } from './dom-falso.mjs';
+import { almacenDeMentira, prepararDomFalso, relojDeMentira } from './dom-falso.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
@@ -681,6 +681,104 @@ try {
 
   for (const p of problemasDelBanco) problemas.push(p);
 
+  // --- 5c · EL SIMULACRO (iteracion 43, adelantado de la tanda 2) ---------
+  //
+  // Hasta la 43 el simulacro no dibujaba ningun texto del banco (decision 11 de la
+  // 41), y aqui no habia nada que mirar. Desde la 43 dibuja la pregunta en curso, y
+  // el autor decidio el 2026-09-20 adelantar esta prueba a la tanda 1: el hueco lo
+  // abrio esta tanda, y en ella se cierra. Por la decision 7 de la 43 se revisan el
+  // enunciado y las alternativas; la tarjeta no dibuja el icono del modulo.
+  //
+  // LA FILA HOSTIL SE CUELA POR INTERCEPCION. El intento se elige al azar entre las
+  // preguntas del banco y la 900 casi nunca saldria, asi que a la respuesta de
+  // `?ids=` se le reemplazan los textos de TODAS las preguntas por los de la fila
+  // hostil, conservando sus ids y su forma. La primera que se dibuje, sea cual sea,
+  // trae el ataque. `esc` y `problemas` son los de la seccion 5, en este mismo ambito.
+
+  const domSimulacro = prepararDomFalso();
+
+  // Un reloj quieto, como en `probar-filtrado.mjs`: el intento arranca sus
+  // cronometros, y ninguno tiene por que vencer mientras se mira lo dibujado.
+  const { usarReloj } = await import(pathToFileURL(join(SITIO, 'servicios', 'reloj.js')).href);
+  usarReloj(relojDeMentira());
+
+  let respuestasEnvenenadas = 0;
+
+  globalThis.fetch = async (ruta, opciones) => {
+    const respuesta = await fetchReal(DIRECCION + ruta, opciones);
+    if (!String(ruta).includes('ids=')) return respuesta;
+
+    const cuerpo = await respuesta.json();
+    cuerpo.datos = (cuerpo.datos ?? []).map((pregunta) => ({
+      ...pregunta,
+      enunciado: hostil.enunciado,
+      alternativas: pregunta.alternativas.map((alternativa, k) => ({
+        ...alternativa,
+        texto: hostil.alternativas[k % hostil.alternativas.length].texto,
+      })),
+    }));
+    respuestasEnvenenadas += 1;
+
+    return new Response(JSON.stringify(cuerpo), {
+      status: respuesta.status,
+      headers: { 'content-type': 'application/json' },
+    });
+  };
+
+  const { conectarComienzo, comenzarElIntento } = await import(
+      pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href
+      );
+
+  conectarComienzo();
+  await comenzarElIntento();
+
+  const htmlSimulacro = domSimulacro.html('#zona-del-intento');
+
+  // Sin ataque colado o sin pregunta dibujada, esto no probaria nada: no aprueba,
+  // dice que no pudo (H-013).
+  if (respuestasEnvenenadas === 0) {
+    sinVeredicto('El simulacro no pidio preguntas por ids: no hubo donde colar la fila hostil.');
+  }
+  if (!htmlSimulacro.includes('data-papel="tarjeta-de-la-pregunta"')) {
+    sinVeredicto('El simulacro no llego a dibujar ninguna pregunta.', htmlSimulacro.slice(0, 400));
+  }
+
+  const textosDelSimulacro = [
+    ['simulacro, enunciado', hostil.enunciado],
+    ...hostil.alternativas.map((a) => [`simulacro, alternativa ${a.letra}`, a.texto]),
+  ];
+
+  for (const [nombre, texto] of textosDelSimulacro) {
+    const escapado = esc(texto);
+
+    if (escapado !== texto && htmlSimulacro.includes(texto)) {
+      problemas.push(`${nombre}: su forma CRUDA aparece en el HTML, sin escapar`);
+    }
+    if (!htmlSimulacro.includes(escapado)) {
+      problemas.push(`${nombre}: su forma escapada NO aparece, asi que se perdio texto`);
+    }
+  }
+
+  // Las etiquetas que la zona del intento emite de verdad, sacadas del marcado de
+  // `simulacro-maqueta.js`. Cualquier otra solo puede venir de un texto colado.
+  const PROPIAS_DEL_SIMULACRO = new Set([
+    'section', 'div', 'article', 'p', 'h2', 'ul', 'li', 'button', 'span',
+  ]);
+  const presentesEnElSimulacro = [
+    ...new Set(
+        [...htmlSimulacro.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)].map((m) => m[1].toLowerCase())
+    ),
+  ];
+  const intrusasEnElSimulacro = presentesEnElSimulacro.filter(
+      (etiqueta) => !PROPIAS_DEL_SIMULACRO.has(etiqueta)
+  );
+
+  if (intrusasEnElSimulacro.length > 0) {
+    problemas.push(
+        `simulacro: etiquetas que la tarjeta no emite: ${intrusasEnElSimulacro.join(', ')}`
+    );
+  }
+
   // La busqueda de etiquetas ajenas mira los SIETE modulos dibujados, no uno: una
   // etiqueta colada en el modulo 6 no aparece en el HTML del 2.
   const PROPIAS = new Set(['section', 'header', 'ul', 'li', 'div', 'p', 'span', 'button']);
@@ -733,6 +831,10 @@ try {
       '',
       `Etiquetas en el HTML: ${presentes.sort().join(', ')}`,
       'Ninguna ajena al componente.',
+      '',
+      'EL SIMULACRO (iteracion 43): los textos de la fila hostil se colaron en el',
+      'intento interceptando `?ids=`, y la primera pregunta dibujada los trajo como',
+      `texto, enteros. Etiquetas en su HTML: ${presentesEnElSimulacro.sort().join(', ')}.`,
       '',
       'Lo que esto NO prueba: que el banco que hay en PRODUCCION sea el que',
       'se acaba de revisar. Esta prueba corre contra la base LOCAL, y solo vale',
