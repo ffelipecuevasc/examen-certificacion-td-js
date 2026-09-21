@@ -791,7 +791,7 @@ haya como mucho una por pregunta lo garantiza un índice único parcial:
 es_correcta INTEGER NOT NULL DEFAULT 0 CHECK (es_correcta IN (0, 1))
 
 CREATE UNIQUE INDEX alternativa_una_correcta
-    ON alternativa (pregunta_id) WHERE es_correcta = 1;
+   ON alternativa (pregunta_id) WHERE es_correcta = 1;
 ```
 
 **Motivo.** ADR-006 obliga a barajar, y el sesgo de posición se corrige barajando
@@ -2855,3 +2855,29 @@ esos sí piden `datos:dev`.
   dispositivo. Es la misma consecuencia que ADR-034 ya declara para el avance.
 - **Que dos intentos seguidos no repitan preguntas.** No hay historial: cada intento
   se elige sin saber del anterior.
+
+---
+
+### Actualización · 2026-09-21 · el extremo por ids sirve también las justificaciones, si se le piden
+
+*Decisión del autor, tomada al preparar la iteración 44.* Esta ADR dice que `?ids=` **no devuelve justificaciones** —son
+el campo más pesado del banco y durante el intento no se corrige— y que las pide la 44 al llegar al resumen. **Lo que no
+decía es cómo**, y con la regla de más arriba no había forma: combinar `?ids=` con cualquier otro parámetro se rechaza
+con `PETICION_INVALIDA`.
+
+**Se amplía, sin cambiar lo que ya existe:**
+
+- `/api/preguntas?ids=…&con=justificacion` devuelve **lo mismo que `?ids=…`** más la justificación de cada pregunta.
+- `con` solo acepta el valor `justificacion`, y solo junto a `ids`. Cualquier otro valor, `con` sin `ids`, o `con` junto a
+  `modulo` o `resumen`, sigue siendo `PETICION_INVALIDA`. Es la **única** combinación nueva que se permite.
+- `?ids=…` a secas **sigue sin justificaciones**, así que el intento pesa lo mismo al empezar: el motivo original de esta
+  ADR queda en pie.
+- Los límites de `ids` no cambian: 120 como máximo, troceados por dentro por los 100 parámetros ligados de D1.
+
+**Por qué una petición y no dos.** El resumen necesita dos cosas del banco vigente: la justificación, y la versión actual
+de cada pregunta para compararla con la copia congelada (la actualización de más arriba, «Cómo se cubre lo que ADR-034
+protegía»). `?ids=` ya trae la segunda; sumarle la primera con un parámetro deja todo en **una sola petición, un solo
+extremo y una sola validación**. Un extremo aparte habría obligado a dos peticiones por resumen y a una forma nueva de
+pedir mal que validar desde cero.
+
+**Se construye en la etapa A de la iteración 44**, con su prueba antes que su código.
