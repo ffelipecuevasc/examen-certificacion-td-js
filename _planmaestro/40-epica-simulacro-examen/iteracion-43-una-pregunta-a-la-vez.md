@@ -1,7 +1,7 @@
 # Iteración 43 · Recorrido de una pregunta a la vez
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · tanda 1 cerrada, con guion y pasada del autor · tanda 2 en curso
+**Estado:** 🟢 Cerrada el 2026-09-21 · en dos tandas, las dos con guion y pasada del autor
 **Depende de:** iteración 42.
 
 ## Objetivo
@@ -33,6 +33,11 @@ no se corrige durante el intento, porque el objetivo es medir: saber que fallast
   cinco puntos.
 - **2026-09-21 · decisiones de la tanda 2.** El autor aprobó el patrón de teclado del grupo de radio (decisión 11) y
   cómo se comprueba el vocabulario de ADR-022 (decisión 12). Tareas y criterios de la tanda 2 escritos.
+- **2026-09-21 · tanda 2 e iteración cerradas.** Tres bloques nuevos: el 19 y el 20 en `probar-cronometros.mjs` —la
+  parada única del tabulador y las flechas—, con su prueba escrita **antes** del código y vista en rojo por el motivo
+  correcto, sin mutaciones; y la sección 17 de `probar-identidad-visual.mjs`, el vocabulario de ADR-022, que nació en rojo
+  por una infracción real del resumen (decisión 13). `npm run verificar` en nueve de nueve, `probar:filtrado` y
+  `probar:memoria` en verde, y la pasada del autor con teclado y lector de pantalla salió bien en sus cinco puntos.
 
 ## Decisiones tomadas
 
@@ -168,6 +173,20 @@ Del autor, 2026-09-21:
 - **Lo que no cubre:** «cualquier fórmula que sugiera validez de certificación» no se puede mecanizar. Queda como
   criterio del autor en el navegador, dicho así, en vez de fingir que un guion lo cubre.
 
+> **Corregida el 2026-09-21, antes de escribir la prueba.** Donde dice «el cuerpo de `simulacro.html` sin el pie», se barre
+> **solo el `<main>`**. Un borrador de la comprobación corrido contra los archivos reales mostró que el encabezado dice
+> «Certificación FullStack JS»: es el nombre del sitio, nombra el examen real y no el resultado del simulacro, y es la
+> copia compartida que vigila `comprobar-copias.mjs`. Encabezado y pie son el marco del sitio; lo que ADR-022 vigila vive
+> en el `<main>` y en las pantallas dibujadas. Decisión del autor.
+
+### 13 · El resumen deja de decir «aprobar el simulacro»
+
+Del autor, 2026-09-21. La maqueta del resumen de la 45 decía «Para aprobar el simulacro hacen falta 72», y «aprobar el
+simulacro» no es ninguna de las tres frases autorizadas por ADR-022, que exige autorizar una frase nueva **antes** de
+escribirla en pantalla. Entre autorizar una cuarta frase y reescribir, se reescribió: «Son 72 correctas de 120, justo el
+mínimo del 60 %.» y «Son 61 correctas de 120. El mínimo es 72, que es el 60 %.». La tarjeta ya dice «Aprobaste el
+simulacro» arriba, así que no se pierde nada, y el resumen definitivo lo escribe la 44.
+
 ## Tareas
 
 > **Reescritas el 2026-09-20 y marcadas el 2026-09-21.** Una tarea se marca hecha solo cuando su prueba existe y se vio
@@ -199,10 +218,11 @@ Del autor, 2026-09-21:
 
 ### Tanda 2 · El teclado y el vocabulario (decisiones 11 y 12)
 
-- [ ] Una sola parada de tabulador en el grupo: `tabindex="0"` en la alternativa marcada, o en la primera si no hay
-  ninguna, y `tabindex="-1"` en las demás.
-- [ ] Las flechas mueven y marcan, dan la vuelta en los extremos y no desplazan la página.
-- [ ] Sección 17 de `probar-identidad-visual.mjs`: el vocabulario de ADR-022 en todo lo que dibuja el simulacro.
+- [x] Una sola parada de tabulador en el grupo: `tabindex="0"` en la alternativa marcada, o en la primera si no hay
+  ninguna, y `tabindex="-1"` en las demás. (19)
+- [x] Las flechas mueven y marcan, dan la vuelta en los extremos y no desplazan la página. (20)
+- [x] Sección 17 de `probar-identidad-visual.mjs`: el vocabulario de ADR-022 en todo lo que dibuja el simulacro.
+- [x] Reescribir las dos líneas del resumen de la maqueta que decían «aprobar el simulacro» (decisión 13).
 
 ## Criterios de aceptación
 
@@ -269,30 +289,38 @@ en rojo por mutación.
 
 #### Se provocan con guion
 
-- [ ] **En cada estado dibujado de la pregunta hay una sola parada de tabulador en el grupo:** exactamente una
-  alternativa con `tabindex="0"` —la marcada si la hay; si no, la primera— y las otras tres con `tabindex="-1"`.
-- [ ] **Flecha abajo y flecha derecha marcan la siguiente alternativa; flecha arriba y flecha izquierda, la anterior**;
-  desde la última se pasa a la primera y al revés, y el foco queda en la recién marcada.
-- [ ] **Cada flecha atendida llama a `preventDefault()`**, para que la página no se desplace; una tecla que no es flecha
-  no marca nada ni lo llama.
-- [ ] **Las flechas no registran nada:** el intento guardado no cambia hasta avanzar o agotarse.
-- [ ] **Una flecha que llega desde una alternativa de otra pregunta no mueve nada** (el evento viejo).
-- [ ] **Vocabulario de ADR-022:** en el cuerpo de `simulacro.html` sin el pie y en todas las pantallas que dibuja el
-  simulacro, «aprob…» y «reprob…» solo aparecen dentro de las tres frases exactas, la tercera solo en la presentación, y
-  «nota», «calificación», «puntaje oficial» y «certificación» no aparecen. La comprobación da rojo si se siembra una
-  palabra prohibida.
-- [ ] **Los siete guiones, `build` y `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql`
-  siguen sin cambios.
+Entre paréntesis, el bloque de `probar-cronometros.mjs` o la sección del guion que lo prueba. Todos nacieron en rojo por
+el motivo correcto, **antes** de escribir el código, sin mutaciones.
+
+- [x] **En cada estado dibujado de la pregunta hay una sola parada de tabulador en el grupo:** exactamente una
+  alternativa con `tabindex="0"` —la marcada si la hay; si no, la primera— y las otras tres con `tabindex="-1"`. (19,
+  en seis estados)
+- [x] **Flecha abajo y flecha derecha marcan la siguiente alternativa; flecha arriba y flecha izquierda, la anterior**;
+  desde la última se pasa a la primera y al revés, y el foco queda en la recién marcada. (20)
+- [x] **Cada flecha atendida llama a `preventDefault()`**, para que la página no se desplace; una tecla que no es flecha
+  no marca nada ni lo llama. (20: «a», Enter, Espacio y Tab)
+- [x] **Las flechas no registran nada:** el intento guardado no cambia hasta avanzar o agotarse. (20)
+- [x] **Una flecha que llega desde una alternativa de otra pregunta no mueve nada** (el evento viejo). (20)
+- [x] **Vocabulario de ADR-022:** en el `<main>` de `simulacro.html` (decisión 12, corregida) y en todas las pantallas
+  que dibuja el simulacro, «aprob…» y «reprob…» solo aparecen dentro de las tres frases exactas, la tercera solo en la
+  presentación, y «nota», «calificación», «puntaje oficial» y «certificación» no aparecen. La comprobación da rojo si se
+  siembra una palabra prohibida. (`probar-identidad-visual.mjs`, sección 17: nació en rojo por la infracción real del
+  resumen, y se prueba a sí misma sobre un texto sembrado)
+- [x] **Los siete guiones, `build` y `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql`
+  siguen sin cambios. (`verificar` en nueve de nueve, `probar:filtrado` y `probar:memoria` en verde, `git status`
+  limpio)
 
 #### Los comprueba el autor en un navegador
 
-- [ ] **Solo con teclado se hace una pregunta entera:** Tab entra al grupo, las flechas recorren y marcan, Tab sale a
+- [x] **Solo con teclado se hace una pregunta entera:** Tab entra al grupo, las flechas recorren y marcan, Tab sale a
   «Siguiente» y Enter avanza. «Omitir» funciona con dos Enter.
-- [ ] **Enter sobre una alternativa la marca y no avanza.** Es el comportamiento nativo del botón, y el DOM falso no lo
+- [x] **Enter sobre una alternativa la marca y no avanza.** Es el comportamiento nativo del botón, y el DOM falso no lo
   puede simular.
-- [ ] **Con lector de pantalla, el grupo se anuncia como grupo de radio de cuatro**, y la marcada como seleccionada.
-- [ ] **Ninguna pantalla del simulacro sugiere validez de certificación.** Es la parte de ADR-022 que no se puede
-  mecanizar (decisión 12).
+- [x] **El foco se ve en todo momento** sobre la alternativa que lo tiene, con el anillo que dibuja el navegador.
+- [x] **Con lector de pantalla, el grupo se anuncia como grupo de radio de cuatro**, y la marcada como seleccionada.
+- [x] **Ninguna pantalla del simulacro sugiere validez de certificación.** Es la parte de ADR-022 que no se puede
+  mecanizar (decisión 12). Leídas la presentación, una pregunta, «Intento terminado», las dos maquetas del resumen y
+  «Tu simulacro sigue en la otra pestaña».
 
 ## Notas de la iteración
 
@@ -327,3 +355,23 @@ _Escritas el 2026-09-21, al cerrar por guion la tanda 1._
 - **Tres mensajes de commit de la tanda 1 pasaron de los 200 caracteres de ADR-030** (204, 205 y 206). El tope que se
   usó en la conversación era 250, y no se contrastó con la ADR. Ya estaban empujados y no se reescribieron; desde la
   tanda 2 se respeta ADR-030.
+
+### La tanda 2
+
+_Escritas el 2026-09-21, al cerrar la iteración._
+
+- **Es la primera tanda de la épica escrita con la disciplina completa.** En la tanda 1 el código existía y cada prueba
+  se vio en rojo rompiéndolo a mano; aquí no existía, y las tres pruebas nacieron en rojo por el motivo correcto: seis
+  estados sin ninguna parada de tabulador, diecinueve problemas de flechas sin un solo oyente de teclado, y tres
+  apariciones de «aprobar».
+- **La comprobación del vocabulario encontró una infracción real antes de existir.** «Para aprobar el simulacro» llevaba
+  en la maqueta del resumen desde la 45, y ninguna comprobación la miraba. Es la razón por la que ADR-022 pide una lista
+  mecánica: la redacción la escribió alguien que tenía la ADR a mano y aun así se le pasó.
+- **El borrador de la comprobación se corrió contra los archivos reales antes de dárselo al autor**, y eso destapó las
+  dos decisiones que la regla escrita no resolvía: el nombre del sitio en el encabezado y la frase del resumen. Sin esa
+  corrida, la prueba habría nacido en rojo por un motivo que nadie quería que fuera un error.
+- **Espacio y Enter no necesitaron código.** Cada alternativa es un `<button>`, y el navegador convierte las dos teclas
+  en un clic, que solo marca. Dos de los siete puntos de la decisión 11 se cumplieron por haber elegido bien el
+  elemento en la 45.
+- **La tarjeta del reprobado dice «No alcanzaste el 60 %» y no «Reprobaste el simulacro».** No usa ninguna palabra
+  prohibida, así que la comprobación no la marca. Cuál de las dos va es una decisión de la 44.

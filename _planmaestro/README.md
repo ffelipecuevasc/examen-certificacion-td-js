@@ -9,43 +9,36 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | **43 · Recorrido de una pregunta a la vez** · tanda 1 de 2, en curso                                                                                |
+| **Iteración** | Ninguna en curso                                                                                                                                   |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
-| **Estado**    | 🔵 En curso                                                                                                                                        |
-| **Siguiente** | **Iteración 43 · Recorrido de una pregunta a la vez.** La **41, la 45 y la 42 cerraron el 2026-09-18**: `simulacro.html` arma y guarda un intento de 120 preguntas, la dirección visual está fijada con su marcado estático, y los dos cronómetros ya cuentan sobre un reloj que los guiones pueden adelantar. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**. Los números de las iteraciones no cambian. |
+| **Estado**    | ⚪ Por abrir                                                                                                                                       |
+| **Siguiente** | **Iteración 44 · Resumen de resultados.** La **43 cerró el 2026-09-21**, en dos tandas: el intento se responde de principio a fin, una pregunta a la vez, con ratón, dedo o teclado, y termina en una pantalla transitoria «Intento terminado». El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**, y la 44 es la última. |
 
-> **Antes de abrir la iteración 43.** El simulacro sigue **sin recorrido, sin resumen calculado y sin enlazar desde
-> ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es la presentación, el botón
-> «Comenzar el simulacro», la carga bajo una sola transición, el intento guardado que sobrevive a una recarga, **los dos
-> cronómetros contando** dentro de la franja de la 45, y el **marcado estático** del intento y del resumen, que se mira
-> con `simulacro.html?maqueta=intento` y `?maqueta=resumen`. La 43 reutiliza `dibujarTarjetaDeLaPregunta()` y
-> `dibujarBotonesDelIntento()` con la pregunta de verdad, y **no** `dibujarPantallaDelIntento()`: esa devuelve además la
-> franja, que vive fuera de `#zona-del-intento` y la escribe el cronómetro, así que dibujaría una segunda superpuesta.
-> La tarjeta no se vuelve a escribir.
+> **Antes de abrir la iteración 44.** El simulacro **se juega entero y todavía no dice cómo le fue a nadie**: al resolverse
+> la pregunta 120 aparece «Intento terminado», marcada como transitoria en el código, y ese es el hueco de la 44. La
+> página **sigue sin enlazar desde ninguna parte**, y los enlaces desde los menús, el pie y la portada son de la 44.
 >
-> **La 42 dejó la infraestructura de tiempo, y la 43 la usa sin construir nada.** `static/js/servicios/reloj.js` es el
-> asiento de módulo del que el simulacro saca la hora; `relojDeMentira()` y `dosPestanas()`, en `scripts/dom-falso.mjs`,
-> permiten adelantar el reloj —`avanzar(ms)` vence los temporizadores a su hora, `saltar(ms)` no vence ninguno— y
-> simular dos pestañas que se ven por `storage`, **sin tocar el `Date.now()` del proceso**. Cada visita simulada corre
-> sobre su propia copia de `static/js/`, porque un `?pestana=a` en el import **no aísla** los módulos que ese módulo
-> importa por dentro. Está en `scripts/probar-cronometros.mjs`, el noveno comprobador de `npm run verificar`.
+> **Lo que la 44 recibe hecho.** El intento guardado —las 120 preguntas congeladas con su correcta, y cada respuesta con
+> su alternativa, su estado, si se agotó y su instante— es todo lo que el resumen necesita, y ADR-035 fija que el
+> resultado se **calcula** desde ahí y no se guarda aparte. El marcado del resumen existe desde la 45, en
+> `dibujarPantallaDelResumen()` de `static/js/components/simulacro-maqueta.js`, y se mira con
+> `simulacro.html?maqueta=resumen` y `&reprobado=1`. Las justificaciones no viajan con el intento: el resumen las pide por
+> los mismos ids, con la instantánea como respaldo.
 >
-> **Lo que la 43 tiene que enchufar, y es una sola función.** Hoy el motor recibe `alternativaMarcada()` devolviendo
-> siempre `null`, así que —por la decisión 2, no marcar es omitir— **un intento abandonado se consume solo**. Está
-> escrito como limitación conocida y transitoria en el archivo de la 42. Desaparece conectando la tarjeta con
-> `conectarLaAlternativaMarcada()` de `static/js/components/simulacro.js`, sin tocar
-> `static/js/components/cronometros.js`.
+> **Lo que la 44 tiene que decidir, y la 43 dejó anotado.** La tarjeta del reprobado dice «No alcanzaste el 60 %» y no
+> «Reprobaste el simulacro», la frase autorizada; las dos pasan la comprobación. El reparto por módulo que mostraba
+> «Intento listo» se perdió con la decisión 8 de la 43, y el resumen es su lugar natural. Y «Intento terminado» se dibuja
+> hoy por dos caminos —`alTerminarElIntento` y `dibujarElRecorrido()` sin pregunta—, así que el enganche no se puede
+> probar: al reemplazar esa pantalla conviene dejar uno solo.
 >
-> **La 41 dejó escrita ADR-035**, que reúne todo lo que el simulacro decidió: el navegador elige y el extremo solo
-> sirve, la forma del extremo por ids con el límite de 100 parámetros ligados de D1, por qué ese extremo no se puede
-> cachear nunca, el costo medido —3 902 filas leídas por intento—, la regla de no mezclar bancos de H-024, por qué las
-> preguntas del intento se guardan congeladas apartándose de ADR-034, y por qué aquí sí se coordinan las pestañas.
+> **El vocabulario del resultado ya se vigila con guion.** La sección 17 de `scripts/probar-identidad-visual.mjs` barre
+> el `<main>` de `simulacro.html`, las pantallas dibujadas y los literales de `simulacro.js` y `simulacro-maqueta.js`: fuera
+> de las tres frases exactas de ADR-022, «aprob…» y «reprob…» dan rojo, igual que «nota», «calificación», «puntaje
+> oficial» y «certificación». Si el resumen necesita una frase nueva, se autoriza en ADR-022 **antes** de escribirla.
 >
 > **Las cifras y las reglas del simulacro —120 preguntas, 30 segundos por pregunta, el sobrante perdido, omitida cuenta
 > como incorrecta, 72 de 120 para aprobar— son decisiones de diseño del autor, no datos del examen real**, y viven en
-> `40-epica-simulacro-examen/README.md`. No se cotejan contra `00_producto/contexto-del-examen.md`: ese documento
-> describe el examen real —120 minutos, alternativas y programación mezcladas— y desde el 2026-09-16 dice
-> explícitamente que el simulacro no toma de él ninguna cifra.
+> `40-epica-simulacro-examen/README.md`. No se cotejan contra `00_producto/contexto-del-examen.md`.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -71,6 +64,7 @@ decisiones vale tanto como el código que las implementa.
 | 41 - Presentación, selección y protec. | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | 45 - Dirección visual del simulacro    | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | 42 - Cronómetros                       | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
+| 43 - Recorrido de una pregunta         | 40 - Simulacro de examen    | 2026-09-21 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas

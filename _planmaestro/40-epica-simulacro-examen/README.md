@@ -1,6 +1,6 @@
 # Épica 40 · Simulacro de examen
 
-**Estado:** 🔵 En curso · **41, 45 y 42 cerradas el 2026-09-18**; la **43** en curso, con su tanda 1 cerrada el 2026-09-21
+**Estado:** 🔵 En curso · **41, 45 y 42 cerradas el 2026-09-18**, y la **43** el 2026-09-21; lo siguiente es la **44**
 **Depende de:** épica 20 (banco en D1) y épica 30 cerrada (capa de datos con modo degradado, escapado, justificación
 dibujada, transición de carga, memoria en el navegador y guiones de prueba con intercepción).
 
@@ -8,6 +8,9 @@ La entrega más grande del proyecto.
 
 ## Historial de este archivo
 
+- **2026-09-21 · cerrada la iteración 43**, en dos tandas. La segunda agregó el teclado del grupo de radio —una sola
+  parada de tabulador y las flechas— y la comprobación automática del vocabulario de ADR-022, que encontró una infracción
+  real en la maqueta del resumen y la corrigió.
 - **2026-09-21 · cerrada la tanda 1 de la iteración 43.** El intento se responde de principio a fin: una pregunta a la
   vez, marcar y cambiar, avanzar, omitir con dos toques, sin vuelta atrás y con «Intento terminado» al final. El
   escapado del simulacro se probó en esta tanda. Queda la tanda 2: teclado y vocabulario de ADR-022.
@@ -38,9 +41,9 @@ al resolverse la pregunta 120 se muestra una pantalla transitoria «Intento term
 desde ninguna parte**: los enlaces desde los menús, el pie y la portada se agregan en la **iteración 44**, a propósito,
 para no llevar a nadie a un intento que termina sin resumen.
 
-**Lo siguiente en el orden de trabajo es terminar la iteración 43**, el recorrido. Su tanda 1 cerró el 2026-09-21: el
-intento ya se responde de principio a fin, una pregunta a la vez, con los dos cronómetros de la 42 y el marcado de la 45.
-Queda su tanda 2 —el teclado fino y la comprobación del vocabulario de ADR-022—, y después la 44.
+**Lo siguiente en el orden de trabajo es la iteración 44**, el resumen de resultados. La **43 cerró el 2026-09-21**: el
+intento se responde de principio a fin, una pregunta a la vez, con ratón, dedo o teclado, con los dos cronómetros de la
+42 y el marcado de la 45, y termina en una pantalla transitoria «Intento terminado» que la 44 reemplaza por el resumen.
 
 ## Problema
 
@@ -147,8 +150,8 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 | 41 | Presentación, selección y protección del intento | 🟢 Cerrada el 2026-09-18 · en tres etapas |
 | 45 | Dirección visual del simulacro | 🟢 Cerrada el 2026-09-18 |
 | 42 | Cronómetros | 🟢 Cerrada el 2026-09-18 |
-| 43 | Recorrido de una pregunta a la vez | 🔵 En curso · tanda 1 cerrada el 2026-09-21 · tanda 2 en curso |
-| 44 | Resumen de resultados | ⚪ No iniciada |
+| 43 | Recorrido de una pregunta a la vez | 🟢 Cerrada el 2026-09-21 · en dos tandas |
+| 44 | Resumen de resultados | ⚪ No iniciada · **es la siguiente** |
 
 ## Forma de los criterios en toda la épica
 
