@@ -9,10 +9,22 @@
  * dibujan, y datos de ejemplo con los que llamarlas.
  *
  * **Se dibuja con funciones y no con HTML pegado en la pagina** por un motivo
- * concreto: lo que la 43 tiene que hacer para conectar el intento es llamar a
- * `dibujarPantallaDelIntento()` con la pregunta de verdad en vez de la de ejemplo. Si
- * la maqueta fuera HTML suelto, conectarla significaria volver a escribirla, que es
- * exactamente lo que esta iteracion existe para evitar.
+ * concreto: lo que la 43 hace para conectar el intento es llamar a
+ * `dibujarTarjetaDeLaPregunta()` y `dibujarBotonesDelIntento()` con la pregunta de
+ * verdad en vez de la de ejemplo. Si la maqueta fuera HTML suelto, conectarla
+ * significaria volver a escribirla, que es exactamente lo que esta iteracion existe
+ * para evitar.
+ *
+ * `dibujarPantallaDelIntento()` NO la usa el recorrido, y solo la llama la rama de la
+ * maqueta en `simulacro-main.js`: devuelve tambien la franja, que en la pagina de
+ * verdad vive fuera de `#zona-del-intento` y la escribe el cronometro. Llamarla desde
+ * el recorrido dibujaria una segunda franja superpuesta (corregido en la 43).
+ *
+ * Lo que la 43 llama son las tres piezas de dentro —`dibujarTarjetaDeLaPregunta()`,
+ * `dibujarBotonesDelIntento()` y `dibujarColumnaDelIntento()`—, que es para lo que
+ * estan sueltas. `dibujarPantallaDelIntento()` se queda como lo que siempre fue: **la
+ * pantalla entera para mirarla**, que usan `?maqueta=intento` y la tabla de contraste
+ * de `probar-identidad-visual.mjs`.
  *
  * COMO SE MIRA
  *
@@ -211,8 +223,26 @@ export function dibujarFranjaDelIntento({
  * que el criterio de la iteracion prohibe. El icono es ademas lo que la distingue en
  * escala de grises.
  *
+ * EL ICONO ES `check-circle` Y NO SIGNIFICA «CORRECTA». Va en `text-paper`, el mismo
+ * color que el texto de la alternativa, y el unico sitio donde ese icono significa
+ * acierto es el resumen, donde va en `text-esmeralda`. Durante el intento no hay ni un
+ * `esmeralda` ni un `ruby` dibujado, y eso es lo que el guion comprueba: no la forma
+ * del icono, que aqui solo dice «esta es la que marcaste».
+ *
  * `break-words` no es decorativo: 111 preguntas del banco traen un token de 16
  * caracteres o mas, el mayor tiene 40, y hasta hoy nada declaraba el corte.
+ *
+ * ES UN BOTON DE RADIO, Y NO UN INTERRUPTOR (decision del autor, 2026-09-18, hueco 7
+ * de la lectura de la 43). La iteracion 45 las dejo con `aria-pressed`, que es lo que
+ * le corresponde a un boton que se queda hundido y se puede soltar. Aqui no: las
+ * cuatro son **una sola eleccion entre cuatro**, marcar una desmarca la anterior y no
+ * existe el estado «ninguna marcada» una vez que se marco algo. Eso es un grupo de
+ * radio, y decirlo con `aria-pressed` obligaba a quien usa lector de pantalla a
+ * deducir la exclusion escuchando cuatro botones sueltos.
+ *
+ * Por eso `role="radio"` con `aria-checked`, dentro del `role="radiogroup"` de la
+ * lista. Los `<li>` pasan a `role="none"`: un `radiogroup` solo admite `radio` entre
+ * sus hijos, y un `listitem` en medio rompe la relacion que el lector anuncia.
  */
 function dibujarAlternativaDelIntento(alternativa, marcada) {
   const piel = marcada
@@ -226,8 +256,8 @@ function dibujarAlternativaDelIntento(alternativa, marcada) {
     : '<span class="w-5 shrink-0" aria-hidden="true"></span>';
 
   return `
-          <li>
-            <button type="button" data-papel="alternativa" data-alternativa="${esc(alternativa.id)}"${marcada ? ' data-marcada="true" aria-pressed="true"' : ' aria-pressed="false"'}
+          <li role="none">
+            <button type="button" role="radio" data-papel="alternativa" data-alternativa="${esc(alternativa.id)}"${marcada ? ' data-marcada="true" aria-checked="true"' : ' aria-checked="false"'}
                     class="flex items-start gap-3 text-left w-full border ${piel} rounded-lg px-4 py-3.5 text-base text-paper leading-normal break-words transition-colors">
               ${marca}<span class="min-w-0">${esc(alternativa.texto)}</span>
             </button>
@@ -248,20 +278,35 @@ function dibujarAlternativaDelIntento(alternativa, marcada) {
  * porque hay sesenta y hace de indice; aqui hay una, y lo que el numero dice -«12 de
  * 120»- es avance, no identidad. Puesto al costado, robaria ancho al enunciado justo
  * en 375 px, que es donde no sobra.
+ *
+ * LA TARJETA LLEVA `tabindex="-1"`, Y NO ES DECORACION (decision del autor, 2026-09-18,
+ * hueco 8 de la lectura de la 43). Es el asidero al que la iteracion 43 lleva el foco
+ * cada vez que cambia la pregunta, que es COMO se anuncia el cambio. El motivo de
+ * elegir el foco y no una region viva esta escrito entero en
+ * `components/simulacro.js`, junto a la funcion que lo hace.
+ *
+ * `ID_DEL_ENUNCIADO` existe porque el `radiogroup` de las alternativas tiene que decir
+ * de que pregunta es. Sin `aria-labelledby`, un lector de pantalla anuncia «grupo de
+ * botones de radio» a secas y el enunciado queda arriba, suelto.
  */
+export const ID_DEL_ENUNCIADO = 'enunciado-de-la-pregunta';
+
+/** El hueco reservado del texto de confirmacion de «Omitir». Ver los botones. */
+export const ID_DE_LA_CONFIRMACION = 'confirmacion-de-omitir';
+
 export function dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada = null }) {
   const alternativas = pregunta.alternativas
     .map((a) => dibujarAlternativaDelIntento(a, marcada === a.id))
     .join('');
 
   return `
-      <article data-papel="tarjeta-de-la-pregunta" class="bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-6">
+      <article data-papel="tarjeta-de-la-pregunta" tabindex="-1" class="bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-6 focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
 
         <p data-papel="numero-de-pregunta" class="font-mono text-xs text-muted">Pregunta ${esc(posicion)} de ${esc(total)} · Módulo ${esc(pregunta.modulo)}</p>
 
-        <h2 data-papel="enunciado" class="mt-3 font-display font-bold text-xl text-paper leading-snug break-words">${esc(pregunta.enunciado)}</h2>
+        <h2 id="${ID_DEL_ENUNCIADO}" data-papel="enunciado" class="mt-3 font-display font-bold text-xl text-paper leading-snug break-words">${esc(pregunta.enunciado)}</h2>
 
-        <ul data-papel="alternativas" class="mt-5 grid gap-2.5">${alternativas}
+        <ul data-papel="alternativas" role="radiogroup" aria-labelledby="${ID_DEL_ENUNCIADO}" class="mt-5 grid gap-2.5">${alternativas}
         </ul>
 
       </article>`;
@@ -291,13 +336,64 @@ export function dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada 
  * «OMITIR» PIDE UN SEGUNDO TOQUE (regla 5 del simulacro), y eso lo conecta la 43. Lo
  * que la maqueta deja puesto es el sitio y el icono; el texto de confirmacion lo
  * escribe esa iteracion.
+ *
+ * ---------------------------------------------------------------------------
+ * LOS DOS BOTONES ESTAN SIEMPRE, Y SE APAGAN (decision del autor, 2026-09-18)
+ * ---------------------------------------------------------------------------
+ *
+ * La decision 1 del archivo de la 43 —escrita el 2026-09-16, ANTES de que existiera
+ * este marcado— describia **un solo boton que cambiaba de texto**: «Siguiente» con una
+ * alternativa marcada, «Omitir» sin ella. El marcado de la 45 dibujo dos, y el autor
+ * resolvio el 2026-09-18 que mandan los dos: la decision vieja quedo corregida en su
+ * archivo, con constancia de lo que decia antes.
+ *
+ * Y se apagan en vez de desaparecer:
+ *
+ *   «Siguiente» deshabilitado mientras no haya alternativa marcada. Avanzar sin nada
+ *   marcado no es avanzar: es omitir, y omitir tiene su propio boton y su confirmacion.
+ *
+ *   «Omitir» deshabilitado en cuanto hay una marcada, por la regla 5 de la epica: se
+ *   omite **sin alternativa marcada**. Con una marcada no queda nada que saltarse.
+ *
+ * NINGUNO CAMBIA DE TEXTO NI DE ANCHO. Un boton que se renombra bajo el dedo es como
+ * se pulsa lo que no se queria pulsar, y un boton que crece al confirmar mueve el otro.
+ *
+ * DONDE VA EL TEXTO DE LA CONFIRMACION (hueco 2 de la lectura de la 43). En una linea
+ * propia **debajo** de los dos botones, con su alto reservado SIEMPRE, este o no la
+ * confirmacion puesta. Reservarlo es lo que hace que aparecer no empuje el pie ni
+ * desplace la tarjeta: el hueco ya estaba ahi, vacio. La otra salida —meter el texto
+ * dentro del boton— es justo la que cambia el ancho bajo el dedo.
+ *
+ * El boton la nombra con `aria-describedby`, asi que cuando la 43 devuelve el foco a
+ * «Omitir» tras el primer toque, el lector de pantalla lee el boton y su descripcion.
+ *
+ * LOS ESTADOS APAGADOS SE PINTAN CON VARIANTES `disabled:`, que la tabla de contraste
+ * de `probar-identidad-visual.mjs` no mira: solo lee la clase en reposo. No es un
+ * descuido de ese guion. WCAG 1.4.3 exime expresamente a los componentes inactivos, y
+ * lo que si se comprueba —que el estado apagado se diga ademas del color— lo garantiza
+ * el propio `disabled`, que el navegador anuncia y que impide el foco.
  */
-export function dibujarBotonesDelIntento() {
+export function dibujarBotonesDelIntento({
+  hayMarcada = false,
+  confirmandoOmitir = false,
+} = {}) {
+  const apagarSiguiente = hayMarcada ? '' : ' disabled';
+  const apagarOmitir = hayMarcada ? ' disabled' : '';
+
+  // Dos lineas a 375 px, una sola desde ahi hacia arriba. El hueco de abajo reserva
+  // las dos SIEMPRE, asi que ni aparecer ni retirarse mueve un pixel de lo que hay
+  // alrededor. Por eso la frase es corta: lo que cuesta una omitida ya lo dice la
+  // regla 7 de la presentacion, y repetirlo aqui pediria una tercera linea reservada.
+  const confirmacion = confirmandoOmitir
+    ? 'Toca «Omitir» otra vez para saltarte esta pregunta.'
+    : '';
+
   return `
       <div data-papel="botones-del-intento" class="mt-6 flex items-center gap-3">
-        <button type="button" data-papel="siguiente" class="inline-flex items-center justify-center gap-2 grow bg-jsyellow text-ink font-display font-bold text-base px-6 py-4 rounded hover:bg-jsyellowdim transition-colors">Siguiente${icon('next', 'text-xl')}</button>
-        <button type="button" data-papel="omitir" class="inline-flex items-center justify-center gap-2 shrink-0 border border-jsyellow text-paper font-display font-bold text-base px-5 py-4 rounded hover:bg-panel2 transition-colors">${icon('skip', 'text-xl text-jsyellow')}Omitir</button>
-      </div>`;
+        <button type="button" data-papel="siguiente"${apagarSiguiente} class="group inline-flex items-center justify-center gap-2 grow bg-jsyellow text-ink font-display font-bold text-base px-6 py-4 rounded hover:bg-jsyellowdim transition-colors disabled:bg-panel2 disabled:text-mutedink disabled:hover:bg-panel2 disabled:cursor-not-allowed">Siguiente${icon('next', 'text-xl')}</button>
+        <button type="button" data-papel="omitir"${apagarOmitir} aria-describedby="${ID_DE_LA_CONFIRMACION}" class="group inline-flex items-center justify-center gap-2 shrink-0 border border-jsyellow text-paper font-display font-bold text-base px-5 py-4 rounded hover:bg-panel2 transition-colors disabled:border-muted/60 disabled:text-mutedink disabled:hover:bg-transparent disabled:cursor-not-allowed">${icon('skip', 'text-xl text-jsyellow group-disabled:text-mutedink')}Omitir</button>
+      </div>
+      <p id="${ID_DE_LA_CONFIRMACION}" data-papel="confirmacion-de-omitir" class="mt-3 min-h-[2.75rem] text-sm text-muted leading-normal break-words">${esc(confirmacion)}</p>`;
 }
 
 /**
@@ -319,7 +415,35 @@ export function dibujarBotonesDelIntento() {
  * Con eso la tarjeta empieza a **145 px** del borde de la ventana: 64 del encabezado
  * fijo, 57 de la franja y 24 de aire. Si se quitara el `-mt-`, empezaria a 201 px y se
  * perderian 56 px del presupuesto vertical sin que nada los ocupara.
+ *
+ * Y POR ESO EL MARGEN NEGATIVO ES CONDICIONAL (hallazgo 16 de la lectura de la 43,
+ * provocado el 2026-09-18). Los dos avisos de la decision 6 viven **encima** de
+ * `#zona-del-intento` y dentro de la misma seccion. El margen negativo del primer hijo
+ * de la zona colapsa hacia arriba y se lleva por delante el `mb-8` del aviso de abajo
+ * —32 px— y **24 px del aviso mismo**: la tarjeta se dibuja encima del texto que avisa
+ * de que el intento no se esta guardando. En la 45 ese estado solo se veia escribiendo
+ * `?maqueta=intento&avisos=1`; en la 43, con el recorrido dibujado de verdad, pasa a
+ * ser el estado normal de cualquiera cuyo almacen no acepte escrituras.
+ *
+ * Con un aviso encendido, entonces, la columna **no compensa nada**: el relleno de la
+ * seccion vuelve a hacer su trabajo, el aviso se lee entero y la tarjeta baja lo que
+ * mide el aviso. Se pierden los 56 px del presupuesto vertical, y esa es exactamente
+ * la decision: 56 px de desplazamiento valen menos que un aviso tapado.
+ *
+ * LO QUE ESTO NO ARREGLA, y queda anotado: con un aviso encendido, el aviso nace a
+ * 120 px del borde de la ventana y la franja fija termina en 121. O sea que el aviso
+ * queda pegado al canto de la franja, sin aire. Viene del marcado de la 45 —los avisos
+ * son hermanos de `#zona-del-intento` y esta funcion no los alcanza— y se resuelve
+ * dandole aire a los avisos, no a la columna.
  */
+export function dibujarColumnaDelIntento(dentro, { pegadaAlEncabezado = true } = {}) {
+  const compensacion = pegadaAlEncabezado ? '-mt-14 sm:-mt-20 pt-[81px]' : 'pt-6';
+
+  return `
+    <div data-papel="columna-del-intento" class="${compensacion}">${dentro}
+    </div>`;
+}
+
 export function dibujarPantallaDelIntento({
   pregunta = PREGUNTA_DE_EJEMPLO,
   posicion = 12,
@@ -328,10 +452,14 @@ export function dibujarPantallaDelIntento({
   segundos = 30,
   urgente = false,
   marcada = null,
+  confirmandoOmitir = false,
+  pegadaAlEncabezado = true,
 } = {}) {
-  return `${dibujarFranjaDelIntento({ segundos, posicion, total, transcurrido, urgente })}
-    <div data-papel="columna-del-intento" class="-mt-14 sm:-mt-20 pt-[81px]">${dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada })}${dibujarBotonesDelIntento()}
-    </div>`;
+  const dentro =
+    dibujarTarjetaDeLaPregunta({ pregunta, posicion, total, marcada }) +
+    dibujarBotonesDelIntento({ hayMarcada: marcada !== null, confirmandoOmitir });
+
+  return `${dibujarFranjaDelIntento({ segundos, posicion, total, transcurrido, urgente })}${dibujarColumnaDelIntento(dentro, { pegadaAlEncabezado })}`;
 }
 
 // ---------------------------------------------------------------------------

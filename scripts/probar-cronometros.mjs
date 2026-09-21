@@ -895,6 +895,72 @@ function respuestasGuardadas(almacen) {
 }
 
 // ===========================================================================
+// 13 · Al retomar se dibuja UNA pregunta, la primera, y los dos indicadores
+//      dicen lo mismo (iteracion 43)
+// ===========================================================================
+//
+// El primer cimiento del recorrido. Antes de la 43, retomar dibujaba el recuadro
+// «Intento listo» y ninguna pregunta; ahora lleva directo a la pregunta donde iba
+// (decision 8). Se cuenta sobre el HTML realmente dibujado y no sobre una variable:
+// dos tarjetas superpuestas o un numero que discrepa solo se ven ahi.
+
+{
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  sembrarIntento(almacen, { empezadoEn: T0 });
+
+  const { dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'r1' });
+  simulacro.retomarElIntento();
+
+  const html = dom.html('#zona-del-intento');
+
+  /** Cuantas veces aparece un trozo en el HTML. */
+  const cuantas = (trozo) => html.split(trozo).length - 1;
+
+  const tarjetas = cuantas('data-papel="tarjeta-de-la-pregunta"');
+  const enunciados = cuantas('data-papel="enunciado"');
+  const alternativas = cuantas('data-papel="alternativa"');
+  const franja = loQueDiceLaFranja(dom);
+
+  // El numero que dice la tarjeta, leido del HTML igual que el de la franja.
+  const numeroDeLaTarjeta = html.match(/Pregunta (\d+) de (\d+)/);
+
+  if (tarjetas !== 1) {
+    problemas.push(`al retomar quedaron ${tarjetas} tarjetas de pregunta dibujadas y tenia que ser 1`);
+  }
+  if (enunciados !== 1) {
+    problemas.push(`al retomar quedaron ${enunciados} enunciados dibujados y tenia que ser 1`);
+  }
+  if (alternativas !== 4) {
+    problemas.push(`la pregunta dibujada trae ${alternativas} alternativas y tenia que traer 4`);
+  }
+  if (!html.includes('Pregunta de juguete 1')) {
+    problemas.push('al retomar en la posicion 0 no se dibujo el enunciado de la primera pregunta');
+  }
+  if (html.includes('Intento listo')) {
+    problemas.push('al retomar aparecio «Intento listo» en vez de la pregunta (decision 8)');
+  }
+
+  // LOS DOS INDICADORES, QUE SE CALCULAN POR CAMINOS DISTINTOS: el de la franja lo
+  // escribe el cronometro en cada latido, y el de la tarjeta lo escribe el recorrido
+  // al redibujar. Que coincidan no se puede dar por supuesto; se mira.
+  if (`${numeroDeLaTarjeta?.[1]}/${numeroDeLaTarjeta?.[2]}` !== franja.avance) {
+    problemas.push(
+        `los dos indicadores discrepan: la tarjeta dice «${numeroDeLaTarjeta?.[0]}» y la franja «${franja.avance}»`
+    );
+  }
+  if (franja.avance !== '1/120') {
+    problemas.push(`al retomar en la posicion 0 la franja dice «${franja.avance}» y tenia que decir «1/120»`);
+  }
+
+  notas.push(
+      `Al retomar: una sola tarjeta con un enunciado y ${alternativas} alternativas, la primera pregunta ` +
+      `del intento, sin pantalla intermedia, y los dos indicadores de posicion diciendo «${franja.avance}» ` +
+      'por caminos distintos —el del cronometro y el del recorrido—.'
+  );
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 

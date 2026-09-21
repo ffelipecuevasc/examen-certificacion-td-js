@@ -802,20 +802,45 @@ function retratoDelSimulacro(dom, paso, simulacro) {
 
   return {
     paso,
-    // El titulo del recuadro: «Intento listo», «Intento retomado» o «No se pudo…».
+    // El titulo del recuadro: «No se pudo…» o «Intento terminado».
     //
     // SE LEE POR `data-papel` Y NO POR LAS CLASES. Hasta la iteracion 45 esto
     // buscaba «font-display font-bold text-xl text-paper», o sea que la prueba
     // dictaba el tamano de la letra del titulo: cambiarlo daba rojo sin que nada se
-    // hubiera roto. Lo que aqui hay que vigilar es CUAL de los tres recuadros se
-    // dibujo —«Intento listo», «Intento retomado», «No se pudo…»—, y eso no depende
-    // de como se vea. Sigue dando rojo si el titulo cambia, desaparece o se dibuja
-    // el recuadro equivocado.
+    // hubiera roto. Lo que aqui hay que vigilar es CUAL recuadro se dibujo, y eso no
+    // depende de como se vea. Sigue dando rojo si el titulo cambia, desaparece o se
+    // dibuja el recuadro equivocado.
     titulo: zona.match(/data-papel="titulo-del-recuadro"[^>]*>([^<]*)</)?.[1] ?? '',
-    // Igual con las cuentas por modulo: la marca dice que el numero ES la cuenta de
-    // un modulo, no de que color se pinta.
-    cuentasPorModulo: [...zona.matchAll(/data-cuenta-del-modulo="\d+"[^>]*>(\d+)</g)].map((m) =>
-      Number(m[1])
+    /**
+     * QUE PANTALLA QUEDO PUESTA, desde la iteracion 43.
+     *
+     * Hasta la 42, la carga terminaba en el recuadro «Intento listo» y la retoma en
+     * «Intento retomado», asi que el titulo del recuadro alcanzaba para distinguir
+     * los tres finales posibles. La 43 retira esos dos recuadros: al terminar de
+     * cargar aparece **la primera pregunta**, y al retomar, la pregunta donde iba.
+     *
+     * Por eso ahora se pregunta primero si se dibujo la tarjeta del recorrido, y solo
+     * si no, cual recuadro quedo. `''` sigue significando lo mismo que antes: no se
+     * dibujo nada y la presentacion se quedo como estaba.
+     */
+    pantalla: zona.includes('data-papel="tarjeta-de-la-pregunta"')
+      ? 'pregunta'
+      : zona.match(/data-papel="titulo-del-recuadro"[^>]*>([^<]*)</)?.[1] ?? '',
+    /** Que numero de pregunta dice la tarjeta dibujada, o 0 si no hay tarjeta. */
+    posicionDibujada: Number(
+      zona.match(/data-papel="numero-de-pregunta"[^>]*>Pregunta (\d+) de/)?.[1] ?? 0
+    ),
+    /**
+     * Cuantas preguntas del intento trae cada modulo, del 2 al 8.
+     *
+     * SALE DEL INTENTO Y NO DEL HTML, desde la iteracion 43. Antes se leia del
+     * recuadro «Intento listo», que dibujaba una cuenta por modulo; ese recuadro ya
+     * no existe. Se cuenta sobre `preguntasDelIntento()`, que es el intento de
+     * verdad: mejor sitio que un resumen dibujado de el, porque el resumen podia
+     * mentir y esto no.
+     */
+    cuentasPorModulo: [2, 3, 4, 5, 6, 7, 8].map(
+      (modulo) => preguntas.filter((p) => p.modulo === modulo).length
     ),
     tieneBoton: zona.includes('id="comenzar-simulacro"'),
     rotuloDelBoton: (
@@ -3120,11 +3145,17 @@ const s1 = visitar({
   pasos: [{ tipo: 'comenzar' }],
 });
 
-if (s1.final.titulo !== 'Intento listo') {
+if (s1.final.pantalla !== 'pregunta') {
   problemas.push(
-    `al pulsar «Comenzar» el simulacro no armo el intento: dijo «${s1.final.titulo}»`
+    `al pulsar «Comenzar» el simulacro no arranco el recorrido: quedo «${s1.final.pantalla}»`
   );
   veredictoRoto();
+}
+
+if (s1.final.posicionDibujada !== 1) {
+  problemas.push(
+    `al empezar, la tarjeta dibujada dice «Pregunta ${s1.final.posicionDibujada}» y tenia que ser la 1`
+  );
 }
 
 const guardadoTrasEmpezar = leerDisco(discoSimulacro);
@@ -3314,11 +3345,21 @@ const s3 = visitar({ disco: discoSimulacro, pagina: 'simulacro', pasos: [] });
 
 const alAbrir = s3.pasos[0];
 
-if (alAbrir.titulo !== 'Intento retomado') {
+if (alAbrir.pantalla !== 'pregunta') {
   problemas.push(
-    `al volver con un intento a medias, la pagina no lo retomo: dijo «${alAbrir.titulo}»`
+    `al volver con un intento a medias, la pagina no lo retomo: quedo «${alAbrir.pantalla}»`
   );
   veredictoRoto();
+}
+
+// Y SE RETOMA DONDE IBA, no en la primera. El intento de 12b quedo con 3 respuestas
+// anotadas, asi que la tarjeta que se dibuja al volver es la cuarta pregunta. Sin
+// esto, un retomado que siempre volviera al principio pasaria la comprobacion de
+// arriba y perderia el avance de quien recargo.
+if (alAbrir.posicionDibujada !== 4) {
+  problemas.push(
+    `al retomar, la tarjeta dibujada dice «Pregunta ${alAbrir.posicionDibujada}» y tenia que ser la 4`
+  );
 }
 
 // LAS MISMAS 120, EN EL MISMO ORDEN. Se compara la secuencia entera y no el conjunto:
@@ -3356,16 +3397,24 @@ if (cambiosDeModulo < 80) {
   );
 }
 
-if (alAbrir.rotuloDelBoton !== 'Empezar otro intento') {
+// DESDE LA ITERACION 43 NO HAY «EMPEZAR OTRO INTENTO» A MITAD DEL RECORRIDO, y aqui
+// se afirma lo contrario de lo que se afirmaba: la pantalla de un intento en curso no
+// ofrece ningun control que lo abandone. Mientras no existia el recorrido, ese boton
+// era la unica salida de un recuadro sin nada que hacer; ahora la salida es responder.
+// Que un intento a medias NO se pueda abandonar desde la pagina es decision del autor
+// del 2026-09-20 (decision 8 de la iteracion 43), tomada adoptando lo que el borrador
+// ya hacia. No es un descuido ni un pendiente.
+if (alAbrir.tieneBoton) {
   problemas.push(
-    `tras retomar no hay forma de empezar otro intento: el boton dice «${alAbrir.rotuloDelBoton}»`
+    'la pantalla de un intento en curso trae un boton con el id de «Comenzar»: se puede ' +
+      'rearmar el intento desde dentro del recorrido'
   );
 }
 
 notas.push(
-  `Retoma: al volver, la pagina dijo «Intento retomado» con las mismas 120 preguntas en el mismo ` +
-    `orden —${cambiosDeModulo} cambios de modulo, o sea mezclado—, sin salir a la red ni una vez, ` +
-    'y con un boton para empezar otro.'
+  `Retoma: al volver, la pagina dibujo la pregunta ${alAbrir.posicionDibujada} —la que seguia— con ` +
+    `las mismas 120 preguntas en el mismo orden —${cambiosDeModulo} cambios de modulo, o sea ` +
+    'mezclado—, sin salir a la red ni una vez, y sin ningun control que abandone el intento.'
 );
 
 // --- 12d · Con el banco cambiado entre la carga y la recarga --------------
@@ -3475,10 +3524,10 @@ for (const [comoEsta, contenido] of datosRotos) {
 
   visitasRotas.push(visita);
 
-  if (visita.pasos[0].titulo !== '') {
+  if (visita.pasos[0].pantalla !== '') {
     problemas.push(
       `con ${comoEsta}, la pagina dibujo un intento en vez de quedarse en la presentacion: ` +
-        `«${visita.pasos[0].titulo}»`
+        `«${visita.pasos[0].pantalla}»`
     );
   }
 
@@ -3523,9 +3572,9 @@ for (const [comoEs, cual] of sinAlmacen) {
 
   // El intento EMPIEZA igual. Es la mitad que se olvida: avisar y no dejar estudiar
   // seria peor que no avisar.
-  if (visita.pasos[1].titulo !== 'Intento listo') {
+  if (visita.pasos[1].pantalla !== 'pregunta') {
     problemas.push(
-      `${comoEs}, el simulacro no pudo armar el intento: dijo «${visita.pasos[1].titulo}»`
+      `${comoEs}, el simulacro no pudo empezar el recorrido: quedo «${visita.pasos[1].pantalla}»`
     );
     continue;
   }
@@ -3588,9 +3637,9 @@ const s7 = visitar({
   pasos: [{ tipo: 'comenzar' }, { tipo: 'responder', cuantas: 2 }],
 });
 
-if (s7.pasos[1].titulo !== 'Intento listo') {
+if (s7.pasos[1].pantalla !== 'pregunta') {
   problemas.push(
-    `con el almacen sin sitio para la copia congelada, el intento no se armo: «${s7.pasos[1].titulo}»`
+    `con el almacen sin sitio para la copia congelada, el intento no se armo: «${s7.pasos[1].pantalla}»`
   );
 }
 
@@ -3653,9 +3702,9 @@ if (despuesDeLlenarse.some((a) => a.guardada)) {
 
 // EL INTENTO SIGUE. Es la mitad de la decision 7 que importa mas: se avisa y se
 // sigue, no se avisa y se para.
-if (s5.final.titulo !== 'Intento listo') {
+if (s5.final.pantalla !== 'pregunta') {
   problemas.push(
-    `al llenarse el almacen a mitad, el intento dejo de estar en pie: «${s5.final.titulo}»`
+    `al llenarse el almacen a mitad, el intento dejo de estar en pie: «${s5.final.pantalla}»`
   );
 }
 
@@ -3707,12 +3756,15 @@ const nuevoGuardado = leerDisco(discoSimulacro);
 const nuevasPreguntas = claveDelDisco(nuevoGuardado, CLAVE_PREGUNTAS, 'tras empezar otro intento');
 const nuevasRespuestas = claveDelDisco(nuevoGuardado, CLAVE_RESPUESTAS, 'tras empezar otro intento');
 
-if (s6.pasos[0].titulo !== 'Intento retomado') {
+if (s6.pasos[0].pantalla !== 'pregunta') {
   problemas.push('la visita que empieza otro intento no partio de uno retomado');
 }
 
-if (s6.final.titulo !== 'Intento listo') {
-  problemas.push(`«Empezar otro intento» no armo uno nuevo: dijo «${s6.final.titulo}»`);
+if (s6.final.pantalla !== 'pregunta' || s6.final.posicionDibujada !== 1) {
+  problemas.push(
+    `«Empezar otro intento» no armo uno nuevo: quedo «${s6.final.pantalla}» en la pregunta ` +
+      `${s6.final.posicionDibujada}, y tenia que quedar en la 1 del intento nuevo`
+  );
 }
 
 if (nuevasPreguntas.intento_id === preguntasGuardadas.intento_id) {
@@ -3751,7 +3803,7 @@ const s8 = visitar({
   pasos: [{ tipo: 'comenzar' }],
 });
 
-if (s8.pasos[0].titulo !== 'Intento retomado') {
+if (s8.pasos[0].pantalla !== 'pregunta') {
   problemas.push('la visita que falla al empezar otro intento no partio de uno retomado');
 }
 
@@ -3773,9 +3825,9 @@ if (trasFallarElNuevo.length > 0) {
 // Y al volver a abrir, la presentacion: no hay nada que retomar.
 const s9 = visitar({ disco: discoSimulacro, pagina: 'simulacro', pasos: [] });
 
-if (s9.pasos[0].titulo !== '') {
+if (s9.pasos[0].pantalla !== '') {
   problemas.push(
-    `tras fallar «Empezar otro intento», al recargar volvio un intento: «${s9.pasos[0].titulo}»`
+    `tras fallar «Empezar otro intento», al recargar volvio un intento: «${s9.pasos[0].pantalla}»`
   );
 }
 

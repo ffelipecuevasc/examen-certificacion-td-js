@@ -1,19 +1,25 @@
 /**
- * El intento del simulacro: elegir, traer y decir que quedo listo.
+ * El intento del simulacro: elegir, traer, guardar y recorrer.
  *
  * QUE HACE ESTE ARCHIVO, Y QUE NO
  *
- * Son las etapas B y C de la iteracion 41. Conecta «Comenzar el simulacro» con la
- * maquina que la iteracion deja montada: pide la lista de ids, elige las 120 en el
- * navegador, las viene a buscar, repone lo que falte, **las guarda congeladas** y
- * termina en un aviso **«Intento listo»** (decision 11). Al abrir la pagina con un
- * intento a medias, lo retoma desde lo guardado.
+ * Son las etapas B y C de la iteracion 41 mas el recorrido de la 43. Conecta
+ * «Comenzar el simulacro» con la maquina que la 41 dejo montada: pide la lista de ids,
+ * elige las 120 en el navegador, las viene a buscar, repone lo que falte y **las
+ * guarda congeladas**. Desde la iteracion 43, al terminar de cargar **aparece la
+ * primera pregunta** y el recorrido empieza. Al abrir la pagina con un intento a
+ * medias, lo retoma en la pregunta donde iba.
  *
- * **Todavia no dibuja ni una pregunta.** El recorrido —una pregunta a la vez, con
- * su reloj— es de las iteraciones 42 y 43, y adelantarlo aqui significaria escribir
- * dos veces el dibujo de una pregunta. Por eso el aviso dice cuantas trajo y de que
- * modulos, y **ningun texto del banco**: lo que se puede comprobar hoy es que el
- * intento se armo, no como se ve.
+ * EL RECORRIDO ES DE ESTE ARCHIVO; EL RELOJ, DE `components/cronometros.js`; EL
+ * MARCADO, DE `components/simulacro-maqueta.js`. Aqui no hay ni una clase escrita a
+ * mano para la tarjeta ni una cuenta de segundos: se piden las piezas y se decide
+ * cuando dibujarlas y que se escribe en el intento. El bloque «EL RECORRIDO» de mas
+ * abajo lo explica entero.
+ *
+ * DURANTE EL INTENTO NO SE REVELA NADA. La copia congelada trae `es_correcta` de cada
+ * alternativa —hace falta para el resumen de la 44—, y ni ese campo ni ninguna marca
+ * de acierto llegan al HTML: la tarjeta dibuja el enunciado, las cuatro alternativas y
+ * cual esta marcada, y nada mas.
  *
  * QUE SE GUARDA, Y QUIEN LO GUARDA
  *
@@ -82,7 +88,12 @@ import { reloj } from '../servicios/reloj.js';
 import { crearDuenoDelIntento } from '../servicios/dueno-del-intento.js';
 import { crearCronometros } from './cronometros.js';
 import { crearTransicionDeCarga } from './transicion-de-carga.js';
-import { BORDE_DEL_SIMULACRO } from './simulacro-maqueta.js';
+import {
+  BORDE_DEL_SIMULACRO,
+  dibujarBotonesDelIntento,
+  dibujarColumnaDelIntento,
+  dibujarTarjetaDeLaPregunta,
+} from './simulacro-maqueta.js';
 import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
 import { mostrarAvisoDeGuardado } from './aviso-de-guardado.js';
 
@@ -133,19 +144,45 @@ let losCronometros = null;
 let elDueno = null;
 
 /**
- * Cual alternativa esta marcada en la pregunta que se esta respondiendo.
+ * Cual alternativa esta marcada en la pregunta que se esta respondiendo, y si el
+ * estudiante ya dio el primer toque de «Omitir».
  *
- * Hoy no hay ninguna, y no es un hueco olvidado: la 42 construye el reloj y la 43 el
- * recorrido, asi que todavia no existe ninguna tarjeta donde marcar. Por la regla de
- * la decision 2, no marcada significa que al agotarse la pregunta queda **omitida**,
- * que es lo que este `null` produce y lo que de verdad pasa hoy si nadie responde.
+ * LAS DOS SE BORRAN AL CAMBIAR DE PREGUNTA, y viven aqui —y no dentro del dibujo—
+ * porque el dibujo se rehace entero en cada toque: guardarlas en el HTML significaria
+ * leerlas de vuelta del HTML que uno mismo escribio.
  *
- * La 43 reemplaza esta funcion por una que lea la tarjeta, y no tiene que tocar ni
- * `components/cronometros.js` ni el resto de este archivo.
+ * `laMarcada` es un **id de alternativa dentro de la copia congelada**, no un indice.
+ * Es lo mismo que se anota en el intento guardado, asi que no hay traduccion en el
+ * camino: lo que se marca es lo que se escribe.
+ *
+ * CUANTO DURA LA CONFIRMACION DE OMITIR (hueco 3 de la lectura de la 43).
+ * **Propuesta de Claude Code, pendiente de confirmacion del autor**, no decision
+ * cerrada: se retira al marcar una alternativa —eso si lo fijo el autor en la
+ * decision 1— y ademas **al cambiar de pregunta**, que es automatico porque estas dos
+ * variables se borran ahi. Y nada mas: **sin plazo propio**.
+ *
+ * El motivo es que un plazo aqui solo puede hacer dano. La confirmacion no puede durar
+ * mas que su pregunta, porque la pregunta dura 30 segundos como maximo; y un plazo mas
+ * corto retiraria la confirmacion **bajo el dedo** de alguien que ya decidio omitir y
+ * esta bajando a pulsar, convirtiendo su segundo toque en un primer toque otra vez. En
+ * una pantalla con el reloj encima, eso es peor que dejarla puesta los segundos que le
+ * queden a la pregunta.
  */
-let laAlternativaMarcada = () => null;
+let laMarcada = null;
+let confirmandoOmitir = false;
 
-/** Para que la iteracion 43 enchufe la tarjeta de la pregunta sin tocar esto. */
+/**
+ * Como lee el motor de los cronometros cual alternativa esta marcada.
+ *
+ * Por omision, la de arriba: es el recorrido de verdad, conectado desde la iteracion
+ * 43. Sigue entrando por esta costura y no leyendose directo para que
+ * `scripts/probar-cronometros.mjs` pueda provocar «se agoto CON una alternativa
+ * marcada» sin fingir un clic, que es como la 42 la probo antes de que existiera la
+ * tarjeta.
+ */
+let laAlternativaMarcada = () => laMarcada;
+
+/** Para que un guion pueda sustituir la lectura de la tarjeta sin tocar esto. */
 export function conectarLaAlternativaMarcada(comoLeerla) {
   laAlternativaMarcada = comoLeerla;
 }
@@ -252,51 +289,265 @@ function dibujarRecuadro({ titulo, cuerpo }) {
   irAlMensaje();
 }
 
+// ---------------------------------------------------------------------------
+// EL RECORRIDO: UNA PREGUNTA A LA VEZ (iteracion 43, tanda 1)
+// ---------------------------------------------------------------------------
+//
+// AQUI DEJO DE DIBUJARSE «INTENTO LISTO», y esa pantalla se retiro entera. La
+// decision 11 de la iteracion 41 la creo diciendo textualmente «mientras no exista el
+// recorrido (43)»: era el final provisional de la carga, con la cuenta por modulo y la
+// frase «todavia no se puede responder». Existiendo el recorrido, dejarla puesta seria
+// darle al estudiante un recuadro sin salida **con el reloj de su primera pregunta ya
+// corriendo**, porque el cronometro arranca en el instante del clic.
+//
+// Lo que esa pantalla probaba —que el intento trae 120 repartidas entre los siete
+// modulos— no se pierde: se comprueba sobre `preguntasDelIntento()`, que es el intento
+// de verdad y no un resumen dibujado de el.
+//
+// LA POSICION SE DICE EN DOS SITIOS Y SALE DE UNO SOLO (hueco 12 de la lectura).
+// La franja la escribe `components/cronometros.js` y la tarjeta la escribe esta
+// funcion, por caminos que no se tocan. El unico hecho es `elIntento.posicion`, que a
+// su vez sale de contar `respuestas` en `anotarEnElIntento()`; los dos indicadores le
+// suman 1 para contarlas desde la primera y ninguno guarda un contador propio. Que no
+// puedan discrepar lo afirma un guion que lee LAS DOS CIFRAS DEL HTML dibujado y las
+// compara en todo el recorrido.
+
+/** La pregunta que se esta respondiendo, o `null` si ya no queda ninguna. */
+function laPreguntaEnCurso() {
+  if (!elIntento) return null;
+  return elIntento.preguntas[elIntento.posicion] ?? null;
+}
+
 /**
- * «Intento listo» (decision 11).
+ * El numero de pregunta que se muestra: la posicion contada desde 1.
  *
- * DICE UN NUMERO QUE SALE DE CONTAR, no de la cuota que se pidio. Es la misma regla
- * de la iteracion 31 —«sin numero hasta que sea cierto»—: si una reserva no hubiera
- * alcanzado, escribir 17 porque 17 es lo que tocaba seria exactamente el «105
- * preguntas» que ya mintio una vez. Aqui se cuenta lo que llego.
- *
- * NO DIBUJA NI UNA PALABRA DEL BANCO. Ni enunciados, ni alternativas, ni los
- * titulos de los modulos —que tambien salen de la base—. Solo numeros de modulo y
- * cuentas. Cuando la 43 dibuje las preguntas de verdad, ahi entra `probar:escapado`
- * a vigilar ese HTML; hoy no hay nada que vigilar, y decirlo es mas honesto que
- * dibujar media pregunta para tener algo que probar.
+ * Existe para que la tarjeta no escriba `+ 1` por su cuenta. Ver el bloque de arriba.
  */
-function dibujarIntentoListo(preguntas, { retomado = false } = {}) {
-  const cuantasDe = (modulo) => preguntas.filter((p) => p.modulo === modulo).length;
+const laPosicionQueSeMuestra = () => (elIntento ? elIntento.posicion + 1 : 0);
 
-  const filas = MODULOS_DEL_EXAMEN.map(
-    (modulo) => `
-          <li class="flex items-baseline justify-between gap-4 border-b ${BORDE_DEL_SIMULACRO} py-2 last:border-b-0">
-            <span class="font-display font-semibold text-paper text-sm">Módulo ${esc(modulo)}</span>
-            <span data-cuenta-del-modulo="${esc(modulo)}" class="font-mono text-sm text-jsyellow">${esc(cuantasDe(modulo))}</span>
-          </li>`
-  ).join('');
+/**
+ * Si hay algun aviso encendido encima de la zona del intento.
+ *
+ * Decide si la columna compensa el relleno de la seccion o no. El motivo entero —y el
+ * solape que provoca no hacerlo— esta escrito en `dibujarColumnaDelIntento()`.
+ *
+ * Se mira lo ESCRITO y ademas la clase `hidden`, por lo mismo que lo mira
+ * `probar-filtrado.mjs`: un nodo que nadie toco todavia no esta oculto para nadie,
+ * pero tampoco tiene nada dentro.
+ */
+function hayAvisoALaVista() {
+  const encendido = (selector) => {
+    const nodo = $(selector);
+    if (!nodo) return false;
+    return nodo.innerHTML !== '' && !nodo.classList.contains('hidden');
+  };
 
-  // El boton de abajo existe por una razon sencilla: sin recorrido todavia, un
-  // intento retomado seria un callejon sin salida. Lleva el mismo id que «Comenzar»
-  // porque hace lo mismo —armar un intento— y porque el oyente vive en la zona.
-  const pie = retomado
-    ? `
-        <div class="mt-6">
-          <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
-        </div>`
-    : '';
+  return encendido('#aviso-respaldo') || encendido('#aviso-guardado');
+}
 
-  const entrada = retomado
-    ? `Retomamos el intento que tenías a medias, con las mismas <strong class="font-semibold text-paper">${esc(preguntas.length)} preguntas</strong> y en el mismo orden. Todavía no se puede responder: el recorrido con el reloj llega en una versión próxima.`
-    : `Se eligieron <strong class="font-semibold text-paper">${esc(preguntas.length)} preguntas</strong> y ya están cargadas. Todavía no se puede responder: el recorrido con el reloj llega en una versión próxima.`;
+/**
+ * Dibuja la pregunta en curso con sus alternativas y sus dos botones.
+ *
+ * NO LLAMA A `dibujarPantallaDelIntento()`, y no es un detalle de estilo: esa funcion
+ * devuelve **tambien la franja**, y la franja ya vive fuera de `#zona-del-intento` y
+ * la escribe `components/cronometros.js` desde la iteracion 42. Llamarla dibujaria una
+ * segunda franja fija encima de la que cuenta. Se usan las tres piezas de dentro.
+ *
+ * EL CAMBIO DE PREGUNTA SE ANUNCIA MOVIENDO EL FOCO (decision del autor, 2026-09-18,
+ * hueco 8 de la lectura de la 43), a la tarjeta nueva, que por eso lleva
+ * `tabindex="-1"`. Es el mismo gesto que `irAlMensaje()` hace aqui arriba desde la
+ * iteracion 32.
+ *
+ * Y NO SE USA `aria-live` SOBRE LA TARJETA, que era la otra salida. Con el avance
+ * automatico de la iteracion 42, la pregunta cambia sola cada 30 segundos durante una
+ * hora: una region viva **interrumpiria la lectura del enunciado** cada vez, y encima
+ * en el peor momento, porque el enunciado es justo lo que el estudiante esta oyendo
+ * cuando se acaba el plazo. Es el mismo razonamiento por el que la franja no se
+ * anuncia, escrito en `simulacro.html` junto a `#franja-del-simulacro`. El foco dice
+ * lo mismo sin interrumpir: lleva a quien escucha al principio de la pregunta nueva.
+ *
+ * `enfocar` dice DONDE queda el foco, y cada valor tiene su motivo:
+ *
+ *   'pregunta'  la tarjeta. Es el cambio de pregunta.
+ *   'marcada'   la alternativa que se acaba de marcar. Sin esto, marcar con teclado
+ *               tiraria el foco al `body`: el redibujo destruye el boton pulsado.
+ *   'omitir'    el boton de omitir tras el primer toque, para que el lector lea su
+ *               `aria-describedby`, que es donde esta la confirmacion.
+ */
+function dibujarElRecorrido({ enfocar = 'pregunta' } = {}) {
+  const zona = $('#zona-del-intento');
+  if (!zona) return;
+
+  const pregunta = laPreguntaEnCurso();
+
+  // Sin pregunta que dibujar, el intento se acabo. Se atiende aqui y no solo en
+  // `alTerminarElIntento` porque a esta funcion se puede llegar sin cronometros
+  // encendidos —un intento sin arriendo, o uno terminado que se retoma—.
+  if (!pregunta) {
+    dibujarIntentoTerminado();
+    return;
+  }
+
+  const dentro =
+      dibujarTarjetaDeLaPregunta({
+        pregunta,
+        posicion: laPosicionQueSeMuestra(),
+        total: elIntento.preguntas.length,
+        marcada: laMarcada,
+      }) + dibujarBotonesDelIntento({ hayMarcada: laMarcada !== null, confirmandoOmitir });
+
+  zona.innerHTML = dibujarColumnaDelIntento(dentro, {
+    pegadaAlEncabezado: !hayAvisoALaVista(),
+  });
+
+  if (enfocar === 'marcada') $('[data-papel="alternativa"][data-marcada="true"]')?.focus();
+  else if (enfocar === 'omitir') $('[data-papel="omitir"]')?.focus();
+  else $('[data-papel="tarjeta-de-la-pregunta"]')?.focus();
+}
+
+/**
+ * PANTALLA TRANSITORIA, PUESTA EL 2026-09-18 Y CON FECHA DE SALIDA: la 44.
+ *
+ * Al resolverse la pregunta 120 el intento se acaba, y el resumen —resultado, desglose
+ * por modulo y revision— es de la iteracion 44. Hasta entonces esto dice que termino y
+ * deja una salida, que es lo que un callejon sin salida no tiene. La 44 lo reemplaza
+ * por `dibujarPantallaDelResumen()` con las cifras calculadas.
+ *
+ * Se marca como transitoria igual que se marco la limitacion que dejo escrita la 42:
+ * una pantalla provisional sin fecha ni sucesor es la que se queda diez meses.
+ *
+ * El boton lleva el id de «Comenzar» porque hace lo mismo —armar un intento— y porque
+ * el oyente vive en la zona y no en el boton.
+ */
+function dibujarIntentoTerminado() {
+  laMarcada = null;
+  confirmandoOmitir = false;
+
+  const cuantas = elIntento?.preguntas.length ?? PREGUNTAS_DEL_INTENTO;
 
   dibujarRecuadro({
-    titulo: retomado ? 'Intento retomado' : 'Intento listo',
+    titulo: 'Intento terminado',
     cuerpo: `
-        <p class="mt-3 text-sm text-muted leading-relaxed">${entrada}</p>
-        <ul class="mt-5">${filas}
-        </ul>${pie}`,
+        <p class="mt-3 text-sm text-muted leading-relaxed">Llegaste al final de las <strong class="font-semibold text-paper">${esc(cuantas)} preguntas</strong>. El resumen con tu resultado —cuántas correctas, cómo te fue en cada módulo y la revisión de lo que respondiste— llega en una versión próxima.</p>
+        <div class="mt-6">
+          <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
+        </div>`,
+  });
+}
+
+/**
+ * Marca una alternativa, o cambia la que estaba marcada.
+ *
+ * NO REGISTRA NADA. Lo marcado vive en memoria hasta que se avanza o se agota el
+ * plazo, que es la decision 1 del archivo de la iteracion: se puede cambiar de opinion
+ * las veces que se quiera mientras la pregunta siga abierta, y lo que queda escrito es
+ * la ultima.
+ *
+ * SOLO SE ACEPTA UNA ALTERNATIVA DE LA PREGUNTA EN CURSO, y esa guarda es la que
+ * sostiene el «sin vuelta atras» contra un clic viejo. Un evento de clic guardado de
+ * la pregunta 3 y vuelto a lanzar en la 4 trae el id de una alternativa que la 4 no
+ * tiene: aqui no se encuentra y no pasa nada. Sin esta comprobacion, `laMarcada`
+ * quedaria apuntando a una alternativa ajena y se escribiria en el intento como si
+ * fuera la respuesta de la pregunta 4.
+ */
+function marcarLaAlternativa(cual) {
+  const pregunta = laPreguntaEnCurso();
+  if (!pregunta) return;
+
+  const elegida = pregunta.alternativas.find((a) => String(a.id) === String(cual));
+  if (!elegida) return;
+
+  laMarcada = elegida.id;
+
+  // Marcar retira la confirmacion de omitir (decision 1). Se retira aunque ya
+  // estuviera retirada: es una linea, y preguntar antes seria mas codigo para el
+  // mismo resultado.
+  confirmandoOmitir = false;
+
+  dibujarElRecorrido({ enfocar: 'marcada' });
+}
+
+/**
+ * «Siguiente»: registra lo marcado y pasa a la pregunta siguiente.
+ *
+ * LA GUARDA DE `laMarcada === null` NO SOBRA AUNQUE EL BOTON ESTE `disabled`. El
+ * oyente vive en la zona por delegacion, asi que llega igual todo clic que caiga
+ * dentro; y el DOM falso de `scripts/dom-falso.mjs` ejecuta los oyentes **aunque el
+ * nodo este deshabilitado**, que es justamente como se provoca desde un guion el
+ * martilleo de teclado sobre un boton apagado. Un `disabled` es una comodidad del
+ * navegador, no una regla del programa.
+ */
+function avanzarRegistrando() {
+  if (!laPreguntaEnCurso()) return;
+  if (laMarcada === null) return;
+
+  resolverLaPreguntaEnCurso({ alternativa_id: laMarcada, estado: 'respondida' });
+}
+
+/**
+ * «Omitir»: el primer toque pide confirmacion, el segundo omite (regla 5).
+ *
+ * Con una alternativa marcada no se omite, y por eso el boton esta apagado: la regla 5
+ * de la epica dice que se omite **sin alternativa marcada**. La guarda de aqui es la
+ * misma mitad comprobable que la de «Siguiente».
+ */
+function tocarOmitir() {
+  if (!laPreguntaEnCurso()) return;
+  if (laMarcada !== null) return;
+
+  if (!confirmandoOmitir) {
+    confirmandoOmitir = true;
+    dibujarElRecorrido({ enfocar: 'omitir' });
+    return;
+  }
+
+  resolverLaPreguntaEnCurso({ alternativa_id: null, estado: 'omitida' });
+}
+
+/**
+ * Cierra la pregunta en curso y sigue. El unico camino que escribe desde la pantalla.
+ *
+ * `agotada: false` siempre: por aqui se pasa cuando el estudiante decide, y lo que se
+ * resuelve solo al vencer el plazo entra por `components/cronometros.js`, que anota
+ * `agotada: true` y el instante del vencimiento.
+ */
+function resolverLaPreguntaEnCurso({ alternativa_id, estado }) {
+  const pregunta = laPreguntaEnCurso();
+  if (!pregunta) return;
+
+  anotarEnElIntento({ pregunta_id: pregunta.id, alternativa_id, estado, agotada: false });
+}
+
+/**
+ * Ata el recorrido entero a `#zona-del-intento`, POR DELEGACION.
+ *
+ * Es la misma forma que `conectarComienzo()` de mas abajo y por un motivo mas fuerte:
+ * aqui la zona se reescribe **en cada toque**, asi que un oyente por alternativa
+ * moriria con el primer redibujo. Y es lo unico que un guion puede provocar: el DOM
+ * falso devuelve `querySelectorAll: () => []`, o sea que atar los oyentes recorriendo
+ * las alternativas con `$$()` dejaria el recorrido sin una sola prueba posible.
+ *
+ * El orden de las tres preguntas no es indiferente: la alternativa va primera porque
+ * es el clic frecuente, y los dos botones se excluyen entre si.
+ */
+export function conectarElRecorrido() {
+  const zona = $('#zona-del-intento');
+  if (!zona) return;
+
+  zona.addEventListener('click', (evento) => {
+    const alternativa = evento.target.closest?.('[data-papel="alternativa"]');
+
+    if (alternativa) {
+      marcarLaAlternativa(alternativa.dataset?.alternativa);
+      return;
+    }
+
+    if (evento.target.closest?.('[data-papel="siguiente"]')) {
+      avanzarRegistrando();
+      return;
+    }
+
+    if (evento.target.closest?.('[data-papel="omitir"]')) tocarOmitir();
   });
 }
 
@@ -601,14 +852,24 @@ export async function comenzarElIntento() {
   transicion.cerrar(miPeticion);
 
   // SE GUARDA ANTES DE DIBUJAR, y ese orden importa. El aviso de que el intento no se
-  // esta guardando tiene que poder salir junto con «Intento listo» y no un instante
-  // despues: quien lee la pantalla de arriba abajo se entera de que esto no sobrevive
-  // a una recarga antes de ponerse a responder, que es cuando todavia sirve saberlo.
+  // esta guardando tiene que poder salir junto con la primera pregunta y no un
+  // instante despues: quien lee la pantalla de arriba abajo se entera de que esto no
+  // sobrevive a una recarga antes de ponerse a responder, que es cuando sirve saberlo.
+  // Y desde la 43 hay un segundo motivo para que el aviso este puesto ANTES de
+  // dibujar: la columna del intento mira si hay un aviso encendido para decidir si
+  // compensa el relleno de la seccion o no (ver `hayAvisoALaVista()`).
   //
   // Se guarda al OCURRIR y no al salir (decision 6): no hay `beforeunload` ni
   // `pagehide` en este sitio, y la memoria de un intento de una hora no puede depender
   // de que el estudiante salga por una puerta concreta.
   if (resultado.ok) {
+    // La pregunta 1 empieza sin nada marcado y sin confirmacion pendiente. Se borran
+    // aqui y no solo al cambiar de pregunta porque «Empezar otro intento» llega por
+    // esta funcion: lo que quedara marcado del intento anterior se marcaria sobre la
+    // primera pregunta del nuevo.
+    laMarcada = null;
+    confirmandoOmitir = false;
+
     elIntento = {
       preguntas: resultado.preguntas,
       respuestas: [],
@@ -631,7 +892,10 @@ export async function comenzarElIntento() {
 
   mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
 
-  if (resultado.ok) dibujarIntentoListo(resultado.preguntas);
+  // Y aqui aparece la primera pregunta, no un aviso de que el intento quedo listo. El
+  // recuadro «Intento listo» de la decision 11 de la 41 era el final provisional de
+  // esta carga «mientras no exista el recorrido (43)», y el recorrido ya existe.
+  if (resultado.ok) dibujarElRecorrido();
   else dibujarNoSePudo(resultado.explicacion);
 
   // Y el reloj empieza a correr. Despues de dibujar, para que la franja se pinte sobre
@@ -726,6 +990,25 @@ export function anotarEnElIntento(entrada) {
   // ahi ya esta latiendo, y volver a entrar serian 120 niveles de recursion.
   losCronometros?.latir();
 
+  // Y LA TARJETA SE REDIBUJA AQUI, en el unico sitio por el que pasa toda pregunta
+  // resuelta. Era la costura que faltaba: hasta hoy, al vencer el plazo se repintaba
+  // la franja y nadie repintaba la pregunta, asi que la pantalla se quedaba con el
+  // enunciado anterior mientras el cronometro ya contaba el siguiente.
+  //
+  // Se borra lo marcado ANTES de dibujar: la pregunta nueva empieza limpia, y la
+  // confirmacion de omitir no sobrevive al cambio de pregunta (ver `laMarcada`).
+  //
+  // SE REDIBUJA UNA VEZ POR PREGUNTA RESUELTA, tambien cuando el motor resuelve
+  // cuatro seguidas al volver de segundo plano: son cuatro escrituras de la zona en
+  // el mismo instante, todas menos la ultima invisibles. No se agrupan porque
+  // agruparlas exigiria que este archivo supiera que el motor esta en mitad de un
+  // bucle, y el tope es el propio intento: 120 escrituras como maximo en la vida de
+  // una pagina, no un bucle sin fondo.
+  laMarcada = null;
+  confirmandoOmitir = false;
+
+  dibujarElRecorrido();
+
   return pudo;
 }
 
@@ -750,6 +1033,13 @@ export function retomarElIntento() {
   const guardado = leerIntentoGuardado();
   if (!guardado) return;
 
+  // Lo marcado NO se guarda y NO se retoma, y es a proposito: una alternativa marcada
+  // y no registrada es una intencion a medias, y el tiempo siguio corriendo mientras
+  // la pagina no estaba. Volver con ella marcada seria prometer que la eleccion se
+  // conservo cuando lo que puede haber pasado es que la pregunta entera se agotara.
+  laMarcada = null;
+  confirmandoOmitir = false;
+
   elIntento = {
     preguntas: guardado.preguntas,
     respuestas: guardado.respuestas,
@@ -764,12 +1054,19 @@ export function retomarElIntento() {
     comenzada_en: guardado.comenzada_en,
   };
 
-  dibujarIntentoListo(guardado.preguntas, { retomado: true });
-
   // El aviso se recalcula al retomar y no se hereda: el navegador pudo llenarse
   // entre una visita y la otra, y el estado de la visita anterior no se guarda en
   // ninguna parte —ni debe—.
+  //
+  // VA ANTES DE DIBUJAR, como en la carga y por los dos mismos motivos: se lee primero
+  // lo que va a pasar con lo que respondas, y la columna del intento necesita saber si
+  // hay un aviso encendido para no dibujarse encima.
   mostrarAvisoDeGuardado({ estado: estadoDelGuardado() });
+
+  // Se retoma DONDE IBA: la pregunta que marca la posicion guardada, no la primera y
+  // no un aviso. Si el intento ya estaba terminado, `dibujarElRecorrido()` lo detecta
+  // y dibuja la pantalla del final.
+  dibujarElRecorrido();
 
   // Y el reloj sigue donde estaba. Lo primero que hacen los cronometros al arrancar es
   // ponerse al dia, asi que un intento que estuvo dos minutos cerrado vuelve con sus
@@ -828,6 +1125,9 @@ function ponerEnMarchaElIntento({ hayIntentoGuardado } = {}) {
         resuelta_en,
       });
     },
+    // El enganche que la 42 declaro y que hasta hoy no le pasaba nadie. Lo llama el
+    // motor cuando ya no quedan preguntas, despues de vaciar la franja y de pararse.
+    alTerminarElIntento: dibujarIntentoTerminado,
   });
 
   losCronometros.arrancar();

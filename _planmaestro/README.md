@@ -9,7 +9,7 @@ decisiones vale tanto como el código que las implementa.
 
 | Campo         | Valor                                                                                                                                              |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | Ninguna en curso                                                                                                                                   |
+| **Iteración** | **43 · Recorrido de una pregunta a la vez** · tanda 1 de 2, en curso                                                                                |
 | **Épica**     | 40 - Simulacro de examen                                                                                                                           |
 | **Estado**    | 🔵 En curso                                                                                                                                        |
 | **Siguiente** | **Iteración 43 · Recorrido de una pregunta a la vez.** La **41, la 45 y la 42 cerraron el 2026-09-18**: `simulacro.html` arma y guarda un intento de 120 preguntas, la dirección visual está fijada con su marcado estático, y los dos cronómetros ya cuentan sobre un reloj que los guiones pueden adelantar. El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**. Los números de las iteraciones no cambian. |
@@ -18,8 +18,10 @@ decisiones vale tanto como el código que las implementa.
 > ninguna parte**: los enlaces se agregan en la iteración 44, a propósito. Lo que hay hoy es la presentación, el botón
 > «Comenzar el simulacro», la carga bajo una sola transición, el intento guardado que sobrevive a una recarga, **los dos
 > cronómetros contando** dentro de la franja de la 45, y el **marcado estático** del intento y del resumen, que se mira
-> con `simulacro.html?maqueta=intento` y `?maqueta=resumen`. La 43 llama a `dibujarPantallaDelIntento()` con la pregunta
-> de verdad; no tiene que dibujar la tarjeta de nuevo.
+> con `simulacro.html?maqueta=intento` y `?maqueta=resumen`. La 43 reutiliza `dibujarTarjetaDeLaPregunta()` y
+> `dibujarBotonesDelIntento()` con la pregunta de verdad, y **no** `dibujarPantallaDelIntento()`: esa devuelve además la
+> franja, que vive fuera de `#zona-del-intento` y la escribe el cronómetro, así que dibujaría una segunda superpuesta.
+> La tarjeta no se vuelve a escribir.
 >
 > **La 42 dejó la infraestructura de tiempo, y la 43 la usa sin construir nada.** `static/js/servicios/reloj.js` es el
 > asiento de módulo del que el simulacro saca la hora; `relojDeMentira()` y `dosPestanas()`, en `scripts/dom-falso.mjs`,

@@ -1,12 +1,12 @@
 /**
  * Punto de entrada de la página del simulacro de examen.
  *
- * En la etapa C de la iteración 41 esta página arma un intento y lo guarda:
- * presenta las reglas, y al pulsar «Comenzar el simulacro» pide la lista de ids,
- * elige las 120 preguntas en el navegador, las trae, las guarda congeladas en el
- * navegador y avisa que el intento quedó listo. Al volver con un intento a medias,
- * lo retoma. Todavía no se responde: el recorrido con el reloj es de las
- * iteraciones 42 y 43.
+ * Presenta las reglas, y al pulsar «Comenzar el simulacro» pide la lista de ids,
+ * elige las 120 preguntas en el navegador, las trae, las guarda congeladas y
+ * **empieza el recorrido**: una pregunta a la vez, con sus 30 segundos corriendo en la
+ * franja de arriba. Al volver con un intento a medias, lo retoma en la pregunta donde
+ * iba. Lo que falta para cerrar la página es el resumen del final, que es de la
+ * iteración 44.
  *
  * Lo que trae la copia del encabezado y del pie —el menú de teléfono y el año del
  * pie— se pone a andar acá igual que en las otras dos páginas: sin esto quedarían
@@ -30,7 +30,7 @@
  * no es la suya.
  */
 import { setupMobileMenu, setCurrentYear } from './components/nav.js';
-import { conectarComienzo, retomarElIntento } from './components/simulacro.js';
+import { conectarComienzo, conectarElRecorrido, retomarElIntento } from './components/simulacro.js';
 import { dibujarPantallaDelIntento, dibujarPantallaDelResumen } from './components/simulacro-maqueta.js';
 import { mostrarAvisoDeRespaldo } from './components/aviso-de-respaldo.js';
 import { mostrarAvisoDeGuardado } from './components/aviso-de-guardado.js';
@@ -74,9 +74,20 @@ if (maqueta) {
     // aprieta —`ink` sobre `ruby` da 4,41:1—, así que tiene que poder mirarse.
     const reprobado = parametros.get('reprobado') === '1';
 
+    // `avisos=1` se lee ANTES de dibujar porque la columna del intento lo necesita:
+    // con un aviso encendido encima, el margen negativo que compensa el relleno de la
+    // sección se dibujaría sobre el aviso. Lo explica entero
+    // `dibujarColumnaDelIntento()`; acá la maqueta tiene que enseñar lo mismo que hace
+    // la página de verdad, o deja de servir para mirarlo.
+    const conAvisos = parametros.get('avisos') === '1';
+
     zona.innerHTML =
       maqueta === 'intento'
-        ? dibujarPantallaDelIntento(urgente ? { segundos: 5, urgente: true, marcada: 374 } : {})
+        ? dibujarPantallaDelIntento(
+            urgente
+              ? { segundos: 5, urgente: true, marcada: 374, pegadaAlEncabezado: !conAvisos }
+              : { pegadaAlEncabezado: !conAvisos }
+          )
         : dibujarPantallaDelResumen({ aprobado: !reprobado });
 
     // `avisos=1` enciende los dos avisos, para poder mirar la decisión 6: **en una
@@ -86,7 +97,7 @@ if (maqueta) {
     // se llenó—, y dejarlos encendidos por omisión sumaría su alto al presupuesto
     // vertical que la decisión 1 reparte, con lo que el número calculado dejaría de
     // ser el de la pantalla normal.
-    if (parametros.get('avisos') === '1') {
+    if (conAvisos) {
       const compacto = maqueta === 'intento';
 
       mostrarAvisoDeRespaldo({
@@ -101,7 +112,13 @@ if (maqueta) {
 } else {
   conectarComienzo();
 
-  // Se conecta primero y se retoma despues, a proposito: la retoma reescribe la zona
-  // del intento, y el boton que deja dibujado necesita que el oyente ya este puesto.
+  // El recorrido de la iteración 43. Los dos oyentes viven sobre `#zona-del-intento`
+  // y no se estorban: cada uno mira si el clic cayó en lo suyo y, si no, se aparta.
+  // Van los dos por delegación porque la zona se reescribe entera en cada toque.
+  conectarElRecorrido();
+
+  // Se conecta primero y se retoma despues, a propósito: la retoma reescribe la zona
+  // del intento, y lo que deja dibujado —la pregunta donde iba, con sus alternativas y
+  // sus botones— necesita que los oyentes ya estén puestos.
   retomarElIntento();
 }
