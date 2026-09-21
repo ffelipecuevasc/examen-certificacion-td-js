@@ -170,7 +170,7 @@ const COMPROBADORES = [
     nombre: 'cronometros',
     guion: 'probar-cronometros.mjs',
     codigos: {
-      0: [OK, 'los dos cronometros cuentan bien, y una sola pestana escribe el intento'],
+      0: [OK, 'los dos cronometros cuentan bien, una sola pestana escribe el intento y el recorrido se sostiene'],
       1: [FALLO, 'CRONOMETRO ROTO: una cifra, un agotamiento o el arriendo de la pestana no cuadra'],
       2: [AVISO, 'no se pudo comprobar: no se dejaron cargar los componentes del simulacro'],
     },

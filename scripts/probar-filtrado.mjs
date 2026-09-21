@@ -49,7 +49,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { prepararDomFalso } from './dom-falso.mjs';
+import { prepararDomFalso, relojDeMentira } from './dom-falso.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
@@ -153,20 +153,30 @@ const idsDibujados = (html) =>
   [...html.matchAll(/data-pregunta="q(\d+)"/g)].map((m) => Number(m[1]));
 
 /**
- * Lo que «Intento listo» dice que trajo cada modulo, en el orden en que se dibujo.
+ * Cuantas preguntas trae el intento de cada modulo, sin importar el orden.
  *
- * SE LEE POR `data-cuenta-del-modulo` Y NO POR LAS CLASES. Hasta la iteracion 45
- * esto buscaba `text-jsyellow">`, copiado en cuatro sitios de este archivo: la
- * prueba decia de que color tenia que ser el numero, y repintarlo daba cuatro rojos
- * sin que nada se hubiera roto. Lo que hay que vigilar es que el aviso diga una
- * cuenta por cada modulo y que sumen las del intento, y eso no depende del color.
- *
- * Esta escrito una sola vez a proposito: cuatro copias de la misma lectura se
- * arreglan en cuatro sitios, y el dia que alguien olvide uno esa comprobacion deja
- * de mirar lo que cree que mira.
+ * SE LEE DEL INTENTO ARMADO, NO DEL HTML, desde la iteracion 43. Hasta entonces el
+ * recuadro «Intento listo» dibujaba una cuenta por modulo y esto la leia de ahi; la
+ * decision 8 de la 43 retiro ese recuadro y ya no hay ninguna pantalla que la
+ * muestre. El reparto sigue siendo lo que hay que vigilar, asi que se mira donde
+ * esta: en las preguntas que `preguntasDelIntento()` devuelve.
  */
-const cuentasDelIntento = (html) =>
-  [...html.matchAll(/data-cuenta-del-modulo="\d+"[^>]*>(\d+)</g)].map((m) => Number(m[1]));
+const cuentasDelIntento = (preguntas) => {
+  const porModulo = new Map();
+  for (const pregunta of preguntas) {
+    porModulo.set(pregunta.modulo, (porModulo.get(pregunta.modulo) ?? 0) + 1);
+  }
+  return [...porModulo.values()];
+};
+
+/**
+ * Si al terminar la carga quedo dibujada la primera pregunta de un intento de 120.
+ *
+ * Es lo que reemplaza a buscar «Intento listo»: desde la decision 8 de la 43, un
+ * intento armado se nota en que su recorrido empezo.
+ */
+const empezoElRecorrido = (html) =>
+    html.includes('data-papel="tarjeta-de-la-pregunta"') && html.includes('Pregunta 1 de 120');
 
 /** El bloque de una pregunta dentro del HTML dibujado, o '' si no esta. */
 function bloqueDePregunta(html, id) {
@@ -2074,13 +2084,25 @@ try {
   //
   // QUE SE PRUEBA AQUI Y QUE NO
   //
-  // El simulacro todavia no dibuja preguntas —eso es de las iteraciones 42 y 43—,
-  // asi que no hay nada que filtrar. Lo que hay es una maquina de elegir, y de una
-  // maquina de elegir lo que importa es si reparte bien, si excluye lo que dice
-  // excluir y si se niega a empezar cuando no puede cumplir lo que promete.
+  // Desde la iteracion 43 el simulacro dibuja UNA pregunta al terminar la carga, pero
+  // lo que este bloque prueba sigue siendo la maquina de elegir: si reparte bien, si
+  // excluye lo que dice excluir y si se niega a empezar cuando no puede cumplir lo que
+  // promete. El recorrido se prueba en `probar-cronometros.mjs`.
   // ------------------------------------------------------------------------
 
   globalThis.fetch = fetchLimpio;
+
+  // UN RELOJ QUIETO PARA TODOS LOS INTENTOS DE ESTE BLOQUE (iteracion 43). Cada
+  // intento que se arma aqui arranca sus cronometros, y desde la 43 un plazo vencido
+  // REESCRIBE la zona de la pregunta —la del DOM que este activo en ese momento, que
+  // puede ser el de otro bloque—. Con el reloj real, un intento de 10d podria pintar
+  // su pregunta sobre lo que 10k esta mirando si entre los dos pasan 30 s. Todas las
+  // instancias de `simulacro.js` de este guion comparten `servicios/reloj.js` (es la
+  // trampa que encontro la 42), asi que un solo reloj de mentira que nunca avanza
+  // basta para que ninguno venza. La transicion de carga NO usa este reloj, a
+  // proposito, asi que la medicion de 10f sigue siendo de pared.
+  const { usarReloj } = await import(pathToFileURL(join(SITIO, 'servicios', 'reloj.js')).href);
+  usarReloj(relojDeMentira());
 
   const {
     MODULOS_DEL_EXAMEN,
@@ -2605,7 +2627,7 @@ try {
 
   const domSimulacro = prepararDomFalso();
 
-  const { conectarComienzo, comenzarElIntento } = await import(
+  const { conectarComienzo, comenzarElIntento, preguntasDelIntento } = await import(
     pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href
   );
 
@@ -2644,16 +2666,16 @@ try {
 
   const conReservas = domSimulacro.html('#zona-del-intento');
 
-  if (!conReservas.includes('Intento listo')) {
+  if (!empezoElRecorrido(conReservas)) {
     problemas.push(
       `con ${PREGUNTAS_QUE_NO_VUELVEN} preguntas que no vuelven, el intento no se completo con reservas`
     );
   }
 
-  const cuentasConReservas = cuentasDelIntento(conReservas);
+  const cuentasConReservas = cuentasDelIntento(preguntasDelIntento());
 
   if (cuentasConReservas.length !== MODULOS_DEL_EXAMEN.length) {
-    problemas.push('el aviso «Intento listo» no dijo la cuenta de los siete modulos');
+    problemas.push('el intento armado no trae preguntas de los siete modulos');
   } else if (cuentasConReservas.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
     problemas.push(
       `tras reponer, el intento quedo con ${cuentasConReservas.reduce((a, b) => a + b, 0)} ` +
@@ -2692,10 +2714,8 @@ try {
 
   const noSePudoHtml = domSimulacro.html('#zona-del-intento');
 
-  if (noSePudoHtml.includes('Intento listo')) {
-    problemas.push(
-      'con descartes que impiden reunir 120, el simulacro dijo «Intento listo» igual'
-    );
+  if (empezoElRecorrido(noSePudoHtml)) {
+    problemas.push('con descartes que impiden reunir 120, el recorrido empezo igual');
   }
   if (!noSePudoHtml.includes('No se pudo armar el simulacro')) {
     problemas.push('con descartes que impiden reunir 120, la pantalla no lo explico');
@@ -2718,7 +2738,7 @@ try {
 
   await esperar(PISO + 900);
 
-  if (!domSimulacro.html('#zona-del-intento').includes('Intento listo')) {
+  if (!empezoElRecorrido(domSimulacro.html('#zona-del-intento'))) {
     problemas.push('el reintento tras un fracaso no llego a armar el intento');
   }
 
@@ -2742,7 +2762,11 @@ try {
     return fetchLimpio(ruta, opciones);
   };
 
-  const { conectarComienzo: conectarMedido, comenzarElIntento: comenzarMedido } =
+  const {
+    conectarComienzo: conectarMedido,
+    comenzarElIntento: comenzarMedido,
+    preguntasDelIntento: preguntasMedido,
+  } =
     await import(
       `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?medicion=1`
     );
@@ -2810,57 +2834,63 @@ try {
       `${duroElIntento} ms desde el clic, con el piso en ${PISO} ms.`
   );
 
-  // --- 10g · «Intento listo» no dibuja texto del banco --------------------
+  // --- 10g · Lo dibujado es la primera pregunta, y solo ella ---------------
   //
-  // Es la decision 11, y es lo que hace que `probar:escapado` no tenga nada que
-  // vigilar todavia en esta pagina: no hay texto de la base en el HTML. Se
-  // comprueba contra las preguntas de verdad, no razonando sobre el codigo.
+  // Hasta la 43 esto era «Intento listo no dibuja texto del banco» (decision 11 de
+  // la 41), y era lo que dejaba a `probar:escapado` sin nada que vigilar en esta
+  // pagina. La decision 8 de la 43 lo reemplazo: al terminar la carga se dibuja la
+  // primera pregunta, que ES texto del banco. Lo que se exige ahora es que sea esa y
+  // solo esa: su enunciado y sus alternativas, y ninguno de los textos de las otras
+  // 119. Se compara contra el texto ESCAPADO, que es como aparece en el HTML.
+  // `esc` es el mismo que importa la seccion 3 (linea 529), en este mismo ambito.
 
   const listoHtml = domMedido.html('#zona-del-intento');
+  const delIntento = preguntasMedido();
+  const textosDe = (p) => [p.enunciado, ...(p.alternativas ?? []).map((a) => a.texto)];
+  const suyos = delIntento[0] ? textosDe(delIntento[0]) : [];
 
-  if (!listoHtml.includes('Intento listo')) {
-    problemas.push('la carga del simulacro no termino en el aviso «Intento listo»');
+  if (!empezoElRecorrido(listoHtml)) {
+    problemas.push('la carga del simulacro no termino en la primera pregunta del intento');
   }
 
-  const cuentasDelAviso = cuentasDelIntento(listoHtml);
+  // Sin intento no hay contra que comparar, y eso no puede dar verde callado (H-023).
+  if (delIntento.length === 0) {
+    problemas.push('no se pudo comprobar lo dibujado: el intento medido no trae preguntas');
+  }
 
-  if (cuentasDelAviso.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
+  const cuentasDelMedido = cuentasDelIntento(delIntento);
+  if (cuentasDelMedido.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
     problemas.push(
-      '«Intento listo» no dice la cantidad por modulo, o las cantidades no suman ' +
+        `el intento armado trae ${cuentasDelMedido.reduce((a, b) => a + b, 0)} preguntas y no ` +
         PREGUNTAS_DEL_INTENTO
     );
   }
 
-  // Los textos contra los que se compara salen del extremo, no de una lista escrita
-  // aqui. Si el extremo no contesto —que ya es un problema anotado mas arriba—, esto
-  // no puede dar verde callado: se dice que no se pudo mirar. Es la mitad de H-023
-  // que se olvida, la de la comprobacion que deja de comprobar sin avisar.
-  const textosDelBanco = (porIds.cuerpo?.datos ?? []).flatMap((p) => [
-    p.enunciado,
-    ...(p.alternativas ?? []).map((a) => a.texto),
-  ]);
-
-  if (textosDelBanco.length === 0) {
+  const faltan = suyos.filter((texto) => !listoHtml.includes(esc(texto)));
+  if (faltan.length > 0) {
     problemas.push(
-      'no se pudo comprobar que «Intento listo» no dibuje texto del banco: el extremo no ' +
-        'entrego preguntas contra las que comparar'
+        `la primera pregunta se dibujo sin ${faltan.length} de sus ${suyos.length} textos`
     );
   }
 
-  const coladas = textosDelBanco.filter(
-    (texto) => typeof texto === 'string' && texto.length > 12 && listoHtml.includes(texto)
-  );
+  // Los textos cortos o compartidos se descartan: «true» o «Ninguna de las anteriores»
+  // pueden ser alternativas de la primera Y de otra, y no serian una fuga.
+  const coladas = delIntento
+      .slice(1)
+      .flatMap(textosDe)
+      .filter((texto) => typeof texto === 'string' && texto.length > 12 && !suyos.includes(texto))
+      .filter((texto) => listoHtml.includes(esc(texto)) || listoHtml.includes(texto));
 
   if (coladas.length > 0) {
     problemas.push(
-      `«Intento listo» dibujo ${coladas.length} texto(s) del banco, y no tiene que dibujar ninguno ` +
-        '(decision 11)'
+        `ademas de la primera pregunta se dibujaron ${coladas.length} texto(s) de otras preguntas del intento`
     );
   }
 
   notas.push(
-    `«Intento listo»: dice la cuenta de los siete modulos, suma ${PREGUNTAS_DEL_INTENTO}, y ` +
-      `ninguno de los ${textosDelBanco.length} textos del banco del intento aparece en su HTML.`
+      `Al terminar la carga: se dibuja la primera pregunta del intento con sus ${suyos.length} textos, ` +
+      `y ninguno de los de las otras ${Math.max(delIntento.length - 1, 0)} (decision 8 de la 43, que ` +
+      'reemplaza a la 11 de la 41).'
   );
 
   // --- 10h · Modo degradado: se elige desde la instantanea -----------------
@@ -2872,7 +2902,11 @@ try {
 
   const domDegradado = prepararDomFalso();
 
-  const { conectarComienzo: conectarDegradado, comenzarElIntento: comenzarDegradado } =
+  const {
+    conectarComienzo: conectarDegradado,
+    comenzarElIntento: comenzarDegradado,
+    preguntasDelIntento: preguntasDegradado,
+  } =
     await import(
       `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?degradado=1`
     );
@@ -2902,11 +2936,11 @@ try {
 
   const degradadoHtml = domDegradado.html('#zona-del-intento');
 
-  if (!degradadoHtml.includes('Intento listo')) {
+  if (!empezoElRecorrido(degradadoHtml)) {
     problemas.push('con la capa de datos caida, el simulacro no pudo armar el intento');
   }
 
-  const cuentasDegradadas = cuentasDelIntento(degradadoHtml);
+  const cuentasDegradadas = cuentasDelIntento(preguntasDegradado());
 
   if (cuentasDegradadas.reduce((a, b) => a + b, 0) !== PREGUNTAS_DEL_INTENTO) {
     problemas.push(
@@ -3165,18 +3199,18 @@ try {
   };
 
   /**
-   * Las tres cosas que un intento bien armado tiene que cumplir, miradas en el HTML.
+   * Las tres cosas que un intento bien armado tiene que cumplir, miradas en el HTML y en el intento armado
    *
    * Se comparte entre los dos casos a proposito: son la misma promesa, y escrita dos
    * veces se arregla en una sola el dia que cambie.
    */
-  const revisarElIntento = (html, deQuien) => {
-    if (!html.includes('Intento listo')) {
+  const revisarElIntento = (html, preguntas, deQuien) => {
+    if (!empezoElRecorrido(html)) {
       problemas.push(`${deQuien}: el intento no se armo`);
       return;
     }
 
-    const cuentas = cuentasDelIntento(html);
+    const cuentas = cuentasDelIntento(preguntas);
     const total = cuentas.reduce((a, b) => a + b, 0);
 
     if (total !== PREGUNTAS_DEL_INTENTO) {
@@ -3222,7 +3256,11 @@ try {
     return fetchLimpio(texto, opciones);
   };
 
-  const { conectarComienzo: conectarMezcla, comenzarElIntento: comenzarMezcla } =
+  const {
+    conectarComienzo: conectarMezcla,
+    comenzarElIntento: comenzarMezcla,
+    preguntasDelIntento: preguntasMezcla,
+  } =
     await import(
       `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?mezcla=1`
     );
@@ -3232,7 +3270,7 @@ try {
 
   const mezclaHtml = domMezcla.html('#zona-del-intento');
 
-  revisarElIntento(mezclaHtml, 'Con el resumen de D1 y el extremo caido');
+  revisarElIntento(mezclaHtml, preguntasMezcla(), 'Con el resumen de D1 y el extremo caido');
   revisarElAviso(domMezcla, 'Con el resumen de D1 y el extremo caido');
 
   // LA COMPROBACION QUE DA EL ROJO. Una sola peticion: la que cayo. Despues de ella
@@ -3283,7 +3321,11 @@ try {
     return fetchLimpio(texto, opciones);
   };
 
-  const { conectarComienzo: conectarReservas, comenzarElIntento: comenzarReservas } =
+  const {
+    conectarComienzo: conectarReservas,
+    comenzarElIntento: comenzarReservas,
+    preguntasDelIntento: preguntasReservas,
+  } =
     await import(
       `${pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href}?reservas=1`
     );
@@ -3300,7 +3342,7 @@ try {
     );
   }
 
-  revisarElIntento(reservasHtml, 'Con la capa caida a mitad de las reservas');
+  revisarElIntento(reservasHtml, preguntasReservas(), 'Con la capa caida a mitad de las reservas');
   revisarElAviso(domReservas, 'Con la capa caida a mitad de las reservas');
 
   // Dos: la que salio bien contra D1 y la que cayo. Despues de esa, el intento se

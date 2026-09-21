@@ -1,6 +1,16 @@
 /**
  * Los dos cronometros del simulacro, provocados con el reloj controlable.
  *
+ * Y DESDE LA ITERACION 43, EL RECORRIDO DE UNA PREGUNTA A LA VEZ (bloques 13 a 18):
+ * marcar, cambiar, avanzar, omitir con dos toques, lo que el marcado nunca contiene,
+ * y un intento completo de 120 con recarga y salto. Viven aqui y no en un guion
+ * aparte por decision del autor del 2026-09-20: el recorrido y el reloj son
+ * inseparables, y este guion ya tenia el reloj, el intento sembrado y la recarga.
+ *
+ * LAS NOTAS DE LOS BLOQUES 14 A 18 SOLO SE IMPRIMEN SI EL BLOQUE PASO. Son frases, no
+ * cifras medidas, y una frase que afirma «coincidieron» sobre una corrida con 72
+ * discrepancias es peor que ninguna (H-023).
+ *
  * POR QUE ESTE GUION NO NECESITA `datos:dev`
  *
  * Porque no prueba de donde salen las preguntas —eso es de `probar-filtrado.mjs`—
@@ -204,6 +214,7 @@ function pulsar(dom, papel, { alternativa } = {}) {
 // ===========================================================================
 
 {
+  const problemasAntes = problemas.length;
   const almacen = almacenDeMentira();
   const T0 = 1767225600000;
   sembrarIntento(almacen, { empezadoEn: T0 });
@@ -226,7 +237,7 @@ function pulsar(dom, papel, { alternativa } = {}) {
     }
   }
 
-  notas.push(
+  if (problemas.length === problemasAntes) notas.push(
     `Cronometro de la pregunta: ${puntos.map((p) => `${p.enMs} ms -> ${p.muestra} s`).join(' · ')}. ` +
       'Cada cifra se leyo del HTML dibujado, no de una variable.'
   );
@@ -1007,6 +1018,15 @@ function pulsar(dom, papel, { alternativa } = {}) {
   const html = () => dom.html('#zona-del-intento');
   const cuantas = (trozo) => html().split(trozo).length - 1;
 
+  // Que alternativa esta marcada, leida de la etiqueta entera y no de dos atributos
+  // pegados: si el marcado agrega un atributo entre medio, esta lectura sigue viendo
+  // lo mismo. Se descubrio con el rojo 2 del bloque 17, que metio `data-correcta`
+  // entre `data-alternativa` y `data-marcada` y tumbo este bloque por arrastre.
+  const laMarcadaDibujada = () => {
+    const boton = html().match(/<button[^>]*data-marcada="true"[^>]*>/)?.[0] ?? '';
+    return boton.match(/data-alternativa="([^"]*)"/)?.[1] ?? null;
+  };
+
   // Sin nada marcado: «Siguiente» apagado, «Omitir» encendido, ninguna alternativa
   // con `aria-checked="true"`.
   const sinMarcar = {
@@ -1021,7 +1041,7 @@ function pulsar(dom, papel, { alternativa } = {}) {
     siguienteApagado: html().includes('data-papel="siguiente" disabled'),
     omitirApagado: html().includes('data-papel="omitir" disabled'),
     marcadas: cuantas('data-marcada="true"'),
-    esLaSegunda: html().includes(`data-alternativa="${primera.alternativas[1].id}" data-marcada="true"`),
+    esLaSegunda: laMarcadaDibujada() === String(primera.alternativas[1].id),
     // El foco vuelve a la alternativa marcada. Reescribir la zona tira el nodo que lo
     // tenia, asi que sin reponerlo un estudiante con teclado queda en el `body`.
     foco: dom.nodo('[data-papel="alternativa"][data-marcada="true"]').focos,
@@ -1032,7 +1052,7 @@ function pulsar(dom, papel, { alternativa } = {}) {
 
   const trasCambiar = {
     marcadas: cuantas('data-marcada="true"'),
-    esLaCuarta: html().includes(`data-alternativa="${primera.alternativas[3].id}" data-marcada="true"`),
+    esLaCuarta: laMarcadaDibujada() === String(primera.alternativas[3].id),
   };
 
   // UNA ALTERNATIVA QUE NO ES DE ESTA PREGUNTA NO MARCA NADA. Es el clic viejo: un
@@ -1484,6 +1504,269 @@ function pulsar(dom, papel, { alternativa } = {}) {
 }
 
 // ===========================================================================
+// 18 · Un intento completo de 120 preguntas, con recarga a mitad y un salto
+//      de 90 segundos (iteracion 43)
+// ===========================================================================
+//
+// El bloque que junta todo. Se juega un intento entero con el reloj controlable,
+// repitiendo cinco maneras de resolver una pregunta —cambiar y avanzar, omitir con
+// dos toques, agotarse con algo marcado, agotarse sin nada, marcar y avanzar—, y se
+// le mete en medio una recarga con una alternativa marcada y un salto de 90 s sin
+// latidos. Despues de CADA accion se comprueba la invariante de la iteracion: la
+// posicion solo sube, de a uno, y ninguna entrada cambia despues de escrita. Y se
+// barre lo dibujado buscando cualquier camino hacia una pregunta anterior.
+//
+// Los bloques 13 a 17 prueban cada pieza en las primeras preguntas; este es el unico
+// que llega a la 120, y por eso el unico que veria un defecto que aparece tarde.
+
+{
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+  const preguntasSembradas = almacen.datos.get('examen-td-js.simulacro.preguntas');
+
+  // `v` es la visita en curso. Se reemplaza al recargar, y todo lo de abajo la lee en
+  // el momento, asi que despues de la recarga se mira la pagina nueva.
+  let v = await montarVisita({ almacen, desde: T0, etiqueta: 'i1' });
+  v.simulacro.conectarElRecorrido();
+  v.simulacro.retomarElIntento();
+
+  const html = () => v.dom.html('#zona-del-intento');
+  const guardado = () => respuestasGuardadas(almacen);
+  const agotar = () => v.reloj.avanzar(guardado().comenzada_en + MS - v.reloj.ahora());
+
+  /** Lo que el guion hizo, para compararlo al final con lo que quedo escrito. */
+  const esperado = [];
+  const anotar = (i, alternativa_id, estado, agotada) =>
+      esperado.push({ pregunta_id: preguntas[i].id, alternativa_id, estado, agotada });
+
+  const fallas = { invariante: [], indicadores: [], barrido: [], clicViejo: [] };
+  let anterior = guardado();
+
+  /** Se llama despues de cada accion. No corta: junta, y al final se informa. */
+  const revisar = (paso) => {
+    const actual = guardado();
+    const antes = anterior?.respuestas ?? [];
+    const despues = actual?.respuestas ?? [];
+
+    if ((actual?.posicion ?? 0) < (anterior?.posicion ?? 0)) {
+      fallas.invariante.push(`${paso}: la posicion bajo de ${anterior?.posicion} a ${actual?.posicion}`);
+    }
+
+    const cambiada = antes.findIndex((r, k) => JSON.stringify(despues[k]) !== JSON.stringify(r));
+    if (cambiada !== -1) {
+      fallas.invariante.push(`${paso}: cambio la respuesta ${cambiada + 1}, que ya estaba escrita`);
+    }
+
+    // DE A UNO: cada entrada es de la pregunta que le toca, sin saltos ni repeticiones.
+    const fueraDeOrden = despues.findIndex((r, k) => r.pregunta_id !== preguntas[k].id);
+    if (fueraDeOrden !== -1) {
+      fallas.invariante.push(
+          `${paso}: la respuesta ${fueraDeOrden + 1} es de la pregunta ${despues[fueraDeOrden].pregunta_id}`
+      );
+    }
+
+    anterior = actual;
+
+    const dibujado = html();
+    if (!dibujado.includes('data-papel="tarjeta-de-la-pregunta"')) return;
+
+    const numero = dibujado.match(/Pregunta (\d+) de (\d+)/);
+    const franja = loQueDiceLaFranja(v.dom).avance;
+
+    if (`${numero?.[1]}/${numero?.[2]}` !== franja) {
+      fallas.indicadores.push(`${paso}: la tarjeta dice «${numero?.[0]}» y la franja «${franja}»`);
+    }
+    if (Number(numero?.[1]) !== (actual?.posicion ?? 0) + 1) {
+      fallas.indicadores.push(
+          `${paso}: la tarjeta dice ${numero?.[1]} con la posicion guardada en ${actual?.posicion}`
+      );
+    }
+
+    // EL BARRIDO ESTRUCTURAL: lo unico pulsable son las 4 alternativas y los 2 botones.
+    // Un enlace, un septimo boton o un texto de vuelta atras serian un camino hacia una
+    // pregunta anterior, lo usen o no lo usen hoy.
+    const botones = dibujado.split('<button').length - 1;
+    if (botones !== 6 || dibujado.includes('<a ') || /anterior|atr[aá]s|volver/i.test(dibujado)) {
+      fallas.barrido.push(`${paso}: ${botones} botones, o un enlace o un texto de vuelta atras`);
+    }
+  };
+
+  /** Una embestida: el clic de una pregunta ya resuelta, reenviado despues. */
+  const clicViejo = (k) => {
+    const antes = html();
+    pulsar(v.dom, 'alternativa', { alternativa: preguntas[k].alternativas[0].id });
+    if (html() !== antes) {
+      fallas.clicViejo.push(`un clic de la pregunta ${k + 1} cambio lo dibujado despues`);
+    }
+  };
+
+  let recarga = null;
+  let salto = null;
+  let i = 0;
+
+  while (i < TOTAL) {
+    // --- Recarga a mitad de la pregunta 61, con una alternativa marcada -------
+    if (i === 60 && !recarga) {
+      v.reloj.avanzar(2000);
+      pulsar(v.dom, 'alternativa', { alternativa: preguntas[60].alternativas[1].id });
+      const respuestasAntes = JSON.stringify(guardado().respuestas);
+
+      v = await montarVisita({ almacen, desde: v.reloj.ahora(), etiqueta: 'i2' });
+      v.simulacro.conectarElRecorrido();
+      v.simulacro.retomarElIntento();
+
+      recarga = {
+        tarjeta: html().match(/Pregunta (\d+) de (\d+)/)?.[0],
+        esLa61: html().includes('Pregunta de juguete 61'),
+        marcadas: html().split('data-marcada="true"').length - 1,
+        mismasPreguntas: almacen.datos.get('examen-td-js.simulacro.preguntas') === preguntasSembradas,
+        mismasRespuestas: JSON.stringify(guardado().respuestas) === respuestasAntes,
+      };
+      revisar('recarga');
+    }
+
+    // --- Salto de 90 s sin un solo latido, al empezar la pregunta 91 -----------
+    if (i === 90) {
+      const empezo = guardado().comenzada_en;
+      v.reloj.saltar(90000);
+      v.reloj.avanzar(0);
+
+      for (let k = 90; k < 93; k += 1) anotar(k, null, 'omitida', true);
+
+      salto = {
+        instantes: guardado().respuestas.slice(90, 93).map((r) => r.resuelta_en - empezo),
+        tarjeta: html().match(/Pregunta (\d+) de (\d+)/)?.[0],
+      };
+      revisar('salto de 90 s');
+      clicViejo(92);
+      i = 93;
+      continue;
+    }
+
+    const alt = preguntas[i].alternativas;
+    v.reloj.avanzar(2000);
+
+    switch (i % 5) {
+      case 0: // marcar, cambiar de idea y avanzar
+        pulsar(v.dom, 'alternativa', { alternativa: alt[1].id });
+        revisar(`pregunta ${i + 1}, marcada`);
+        pulsar(v.dom, 'alternativa', { alternativa: alt[2].id });
+        revisar(`pregunta ${i + 1}, cambiada`);
+        pulsar(v.dom, 'siguiente');
+        anotar(i, alt[2].id, 'respondida', false);
+        break;
+      case 1: // omitir con dos toques
+        pulsar(v.dom, 'omitir');
+        revisar(`pregunta ${i + 1}, primer toque de omitir`);
+        pulsar(v.dom, 'omitir');
+        anotar(i, null, 'omitida', false);
+        break;
+      case 2: // marcar y dejar que se agote
+        pulsar(v.dom, 'alternativa', { alternativa: alt[3].id });
+        revisar(`pregunta ${i + 1}, marcada`);
+        agotar();
+        anotar(i, alt[3].id, 'respondida', true);
+        break;
+      case 3: // no hacer nada y dejar que se agote
+        agotar();
+        anotar(i, null, 'omitida', true);
+        break;
+      default: // marcar y avanzar
+        pulsar(v.dom, 'alternativa', { alternativa: alt[0].id });
+        pulsar(v.dom, 'siguiente');
+        anotar(i, alt[0].id, 'respondida', false);
+    }
+
+    revisar(`pregunta ${i + 1}, resuelta`);
+    clicViejo(i);
+    i += 1;
+  }
+
+  // --- El final ----------------------------------------------------------------
+
+  const final = guardado();
+  const pantallaFinal = html();
+
+  // Despues del final no hay nada que pulsar ni nada que se agote.
+  pulsar(v.dom, 'alternativa', { alternativa: preguntas[119].alternativas[0].id });
+  pulsar(v.dom, 'siguiente');
+  pulsar(v.dom, 'omitir');
+  pulsar(v.dom, 'omitir');
+  v.reloj.avanzar(10 * MS);
+  const trasElFinal = guardado();
+
+  const escrito = (final?.respuestas ?? []).map(({ pregunta_id, alternativa_id, estado, agotada }) => ({
+    pregunta_id,
+    alternativa_id,
+    estado,
+    agotada,
+  }));
+  const primeraDistinta = esperado.findIndex((e, k) => JSON.stringify(escrito[k]) !== JSON.stringify(e));
+  const instantes = (final?.respuestas ?? []).map((r) => r.resuelta_en);
+  const retrocede = instantes.findIndex((t, k) => k > 0 && t < instantes[k - 1]);
+
+  if (escrito.length !== TOTAL || final?.posicion !== TOTAL) {
+    problemas.push(
+        `intento completo: quedaron ${escrito.length} respuestas y la posicion en ${final?.posicion}; ` +
+        `tenian que ser ${TOTAL}`
+    );
+  }
+  if (primeraDistinta !== -1) {
+    problemas.push(
+        `intento completo: la respuesta ${primeraDistinta + 1} quedo ${JSON.stringify(escrito[primeraDistinta])} ` +
+        `y el guion hizo ${JSON.stringify(esperado[primeraDistinta])}`
+    );
+  }
+  if (retrocede !== -1) {
+    problemas.push(`intento completo: la respuesta ${retrocede + 1} tiene un instante anterior al de la ${retrocede}`);
+  }
+  if (!final?.terminado_en) {
+    problemas.push('intento completo: el intento no quedo marcado como terminado');
+  }
+  if (!pantallaFinal.includes('Intento terminado') || pantallaFinal.includes('data-papel="tarjeta-de-la-pregunta"')) {
+    problemas.push('intento completo: al resolver la 120 no se dibujo «Intento terminado» (decision 5)');
+  }
+  if (JSON.stringify(trasElFinal) !== JSON.stringify(final)) {
+    problemas.push('intento completo: despues del final, pulsar o dejar correr el reloj cambio lo guardado');
+  }
+  if (recarga?.tarjeta !== 'Pregunta 61 de 120' || !recarga?.esLa61) {
+    problemas.push(`recarga: al volver se dibujo «${recarga?.tarjeta}» y no la pregunta 61`);
+  }
+  if (recarga?.marcadas !== 0) {
+    problemas.push('recarga: la alternativa marcada y no registrada sobrevivio a la recarga');
+  }
+  if (!recarga?.mismasPreguntas || !recarga?.mismasRespuestas) {
+    problemas.push('recarga: cambiaron las preguntas guardadas o lo ya respondido');
+  }
+  if (JSON.stringify(salto?.instantes) !== JSON.stringify([30000, 60000, 90000]) || salto?.tarjeta !== 'Pregunta 94 de 120') {
+    problemas.push(
+        `salto de 90 s: se resolvieron con instantes ${JSON.stringify(salto?.instantes)} y quedo «${salto?.tarjeta}»`
+    );
+  }
+  for (const [tipo, lista] of Object.entries(fallas)) {
+    if (lista.length > 0) {
+      problemas.push(`intento completo, ${tipo}: ${lista.length} falla(s); la primera: ${lista[0]}`);
+    }
+  }
+
+  const cuenta = (condicion) => escrito.filter(condicion).length;
+
+  notas.push(
+      `Intento completo: ${escrito.length} preguntas con el reloj controlable —` +
+      `${cuenta((r) => r.estado === 'respondida' && !r.agotada)} respondidas avanzando, ` +
+      `${cuenta((r) => r.estado === 'respondida' && r.agotada)} agotadas con algo marcado, ` +
+      `${cuenta((r) => r.estado === 'omitida' && !r.agotada)} omitidas con dos toques y ` +
+      `${cuenta((r) => r.estado === 'omitida' && r.agotada)} agotadas sin nada—, con una recarga a mitad ` +
+      'de la 61 que perdio la marca sin registrar nada y un salto de 90 s que resolvio la 91, la 92 y la ' +
+      '93 cada una en su vencimiento. Despues de cada accion la posicion solo subio, de a uno, ninguna ' +
+      'entrada cambio, los dos indicadores coincidieron, un clic viejo no movio nada y lo dibujado no ' +
+      'tuvo ningun camino atras. El registro final coincide con lo provocado, y al terminar se dibujo ' +
+      '«Intento terminado».'
+  );
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 
@@ -1496,7 +1779,7 @@ for (const carpeta of arbolesTemporales) {
 }
 
 console.log('');
-console.log('CRONOMETROS DEL SIMULACRO (iteracion 42)');
+console.log('CRONOMETROS Y RECORRIDO DEL SIMULACRO (iteraciones 42 y 43)');
 console.log('');
 
 for (const nota of notas) console.log(`  · ${nota}`);
@@ -1513,7 +1796,9 @@ if (problemas.length > 0) {
 
 console.log('Lo que esto NO prueba, y comprueba el autor en un navegador: que el navegador');
 console.log('de verdad estrangule los temporizadores como los estrangula saltar(), que el');
-console.log('evento storage se entregue entre dos pestanas reales y cuando, y que los dos');
-console.log('cronometros se entiendan mirandolos en un telefono.');
+console.log('evento storage se entregue entre dos pestanas reales y cuando, que los dos');
+console.log('cronometros se entiendan mirandolos en un telefono, que un lector de pantalla');
+console.log('lea el enunciado nuevo al moverse el foco, y que los toques reales en un');
+console.log('telefono caigan donde el dedo apunta.');
 console.log('');
 console.log('codigo de salida: 0');
