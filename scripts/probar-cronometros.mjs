@@ -1380,6 +1380,110 @@ function pulsar(dom, papel, { alternativa } = {}) {
 }
 
 // ===========================================================================
+// 17 · Lo que el marcado del intento es, y lo que nunca contiene
+//      (iteracion 43)
+// ===========================================================================
+//
+// Se recorren cinco estados de la misma pantalla y en CADA uno se barre el HTML
+// entero. Un dato que se cuela solo en un estado raro —pidiendo confirmacion, justo
+// despues de agotarse— es exactamente el que una comprobacion de un solo estado no ve.
+
+{
+  const almacen = almacenDeMentira();
+  const T0 = 1767225600000;
+  const preguntas = sembrarIntento(almacen, { empezadoEn: T0 });
+
+  // La copia congelada trae `es_correcta` desde siempre. Se le agrega ademas una
+  // justificacion con una marca inconfundible, para poder buscarla en lo dibujado: la
+  // del banco real no se reconoceria a simple vista entre el resto del texto.
+  const SECRETO = 'JUSTIFICACION-QUE-NO-SE-DIBUJA';
+  const guardadas = JSON.parse(almacen.datos.get('examen-td-js.simulacro.preguntas'));
+  guardadas.preguntas = guardadas.preguntas.map((p) => ({
+    ...p,
+    justificacion: `${SECRETO} ${p.id}`,
+  }));
+  almacen.datos.set('examen-td-js.simulacro.preguntas', JSON.stringify(guardadas));
+
+  const { reloj, dom, simulacro } = await montarVisita({ almacen, desde: T0, etiqueta: 'mk' });
+  simulacro.conectarElRecorrido();
+  simulacro.retomarElIntento();
+
+  const estados = [];
+  const fotografiar = (nombre) => estados.push({ nombre, html: dom.html('#zona-del-intento') });
+
+  fotografiar('recien retomada');
+  pulsar(dom, 'alternativa', { alternativa: preguntas[0].alternativas[1].id });
+  fotografiar('con una alternativa marcada');
+  pulsar(dom, 'siguiente');
+  fotografiar('tras avanzar');
+  pulsar(dom, 'omitir');
+  fotografiar('pidiendo confirmacion de omitir');
+  reloj.avanzar(MS);
+  fotografiar('tras agotarse una pregunta');
+
+  // Lo que no puede aparecer en ningun estado del intento. `correct` atrapa
+  // `es_correcta`, `data-correcta`, `correcta`, `incorrecta` y los estados `correct`
+  // del cuestionario; los dos colores son los que la guia visual reserva al acierto
+  // y al error en el resumen.
+  const prohibidos = [
+    ['correct', 'una marca de acierto'],
+    [SECRETO, 'la justificacion'],
+    ['esmeralda', 'el color del acierto'],
+    ['ruby', 'el color del error'],
+    ['comenzar-simulacro', 'un control para rearmar el intento (decision 8)'],
+  ];
+
+  // Si la copia con la justificacion agregada no se hubiera podido retomar, todo lo de
+  // abajo daria verde sobre una pantalla vacia. Se descarta ese caso primero.
+  if (!estados[0].html.includes('data-papel="tarjeta-de-la-pregunta"')) {
+    problemas.push('marcado: el intento con justificaciones no se retomo, y el barrido no miraria nada');
+  }
+
+  for (const { nombre, html } of estados) {
+    const enMinusculas = html.toLowerCase();
+    const cuantas = (trozo) => html.split(trozo).length - 1;
+
+    for (const [trozo, que] of prohibidos) {
+      if (enMinusculas.includes(trozo.toLowerCase())) {
+        problemas.push(`marcado (${nombre}): lo dibujado contiene ${que} («${trozo}»)`);
+      }
+    }
+
+    const grupos = cuantas('role="radiogroup"');
+    const radios = cuantas('role="radio"');
+    const estadosDeRadio = cuantas('aria-checked=');
+
+    if (grupos !== 1 || radios !== 4 || estadosDeRadio !== 4) {
+      problemas.push(
+          `marcado (${nombre}): las alternativas no son un grupo de radio ` +
+          `(radiogroup ${grupos}, radio ${radios}, aria-checked ${estadosDeRadio})`
+      );
+    }
+    if (html.includes('aria-pressed')) {
+      problemas.push(`marcado (${nombre}): quedo un aria-pressed de los botones de alternancia de la 45`);
+    }
+    if (
+        !html.includes('aria-labelledby="enunciado-de-la-pregunta"') ||
+        !html.includes('id="enunciado-de-la-pregunta"')
+    ) {
+      problemas.push(`marcado (${nombre}): el grupo de radio no dice de que pregunta es`);
+    }
+  }
+
+  const conMarcada = estados.find((e) => e.nombre === 'con una alternativa marcada');
+  if (conMarcada.html.split('aria-checked="true"').length - 1 !== 1) {
+    problemas.push('marcado: con una alternativa marcada no hay exactamente un aria-checked="true"');
+  }
+
+  notas.push(
+      `Marcado: en ${estados.length} estados del intento (${estados.map((e) => e.nombre).join(', ')}) ` +
+      'lo dibujado no contiene ninguna marca de acierto, ni la justificacion sembrada, ni los colores ' +
+      'del resultado, ni un boton con el id de «Comenzar»; y las alternativas son siempre un ' +
+      'radiogroup con 4 radio y su aria-checked, sin aria-pressed, atado al enunciado.'
+  );
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 
