@@ -913,8 +913,8 @@ export async function comenzarElIntento() {
  * Las preguntas del intento que se esta jugando, en su orden.
  *
  * Se exporta por el mismo motivo que `comenzarElIntento()`: para que
- * `scripts/probar-memoria.mjs` pueda anotar respuestas sobre el intento REAL sin
- * reimplementar el recorrido que todavia no existe. Devuelve una copia del arreglo
+ * los guiones puedan mirar el intento REAL —`probar-memoria.mjs` anota sobre el, y
+ * `probar-filtrado.mjs` cuenta su reparto por modulo—. Devuelve una copia del arreglo
  * para que nadie de fuera pueda reordenarlo.
  */
 export const preguntasDelIntento = () => (elIntento ? [...elIntento.preguntas] : []);
@@ -922,11 +922,10 @@ export const preguntasDelIntento = () => (elIntento ? [...elIntento.preguntas] :
 /**
  * Anota una pregunta ya resuelta y la guarda.
  *
- * ES LA COSTURA QUE LA ITERACION 43 VA A USAR. Hoy no hay recorrido, asi que nadie
- * la llama desde la pantalla; existe porque el guardado es de esta etapa y sin ella
- * no habria forma de provocar una escritura a mitad del intento sobre el codigo de
- * verdad. La 43 le conectara el boton de avanzar y el de omitir, y la 42 el
- * agotamiento de los 30 segundos —de ahi `agotada`—.
+ * ES EL UNICO SITIO POR EL QUE PASA TODA PREGUNTA RESUELTA. La llaman los dos
+ * botones del recorrido de la 43 —«Siguiente» y el segundo toque de «Omitir»— y el
+ * agotamiento de los 30 segundos de la 42, de ahi `agotada`. Tambien la llaman los
+ * guiones, para provocar una escritura a mitad del intento sobre el codigo de verdad.
  *
  * @param {object} entrada
  * @param {number} entrada.pregunta_id     el id de la pregunta resuelta

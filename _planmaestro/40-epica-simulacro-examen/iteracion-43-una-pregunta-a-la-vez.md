@@ -1,7 +1,7 @@
 # Iteración 43 · Recorrido de una pregunta a la vez
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · tanda 1 de 2 · construida a mano sobre el borrador de Claude Code
+**Estado:** 🔵 En curso · tanda 1 cerrada por guion, falta la pasada del autor · tanda 2 pendiente
 **Depende de:** iteración 42.
 
 ## Objetivo
@@ -27,6 +27,9 @@ no se corrige durante el intento, porque el objetivo es medir: saber que fallast
   commit. El autor decidió conservar ese borrador y adoptar lo que eligió, incluidas tres decisiones que eran de la
   tanda 2 (decisión 8). La tanda se termina a mano: cada prueba nueva se escribe sobre el código ya existente y se ve en
   rojo **rompiendo a propósito la línea que vigila**, porque una prueba que nace en verde no demuestra que mire nada.
+- **2026-09-21 · tanda 1 cerrada por guion.** Seis bloques nuevos en `probar-cronometros.mjs` (13 a 18), cada criterio
+  con su rojo por mutación. `probar:filtrado` se puso al día con la decisión 8 (decisión 10), y el bloque del simulacro
+  de `probar:escapado` se adelantó desde la tanda 2 (decisión 9). Queda la pasada del autor en el navegador.
 
 ## Decisiones tomadas
 
@@ -63,6 +66,14 @@ funcione igual.** Usa el vocabulario de la actualización de ADR-022, incluida l
 > párrafo de entrada compara con el cuestionario de práctica en vez de afirmar algo del examen real, y el dato de los
 > 120 minutos lleva su origen. Se conservan escritos como historia.
 
+**Pendientes del texto provisional que dejó la etapa A de la 41** (anotados el 2026-09-16):
+
+- **El párrafo de entrada dice que el simulacro practica «lo más difícil del día del examen».** Es una afirmación sobre el
+  examen real sin fuente: se reescribe sin ella.
+- **El aviso «Estas reglas son del simulacro, no del examen real» afirma que el examen dura 120 minutos y mezcla
+  alternativas con programación.** El enlace a la fuente oficial de Talento Digital sigue pendiente. Antes de cerrar la 43,
+  o se cita la fuente junto al dato, como en el aviso de la iteración 36, o el dato se presenta con su origen declarado.
+
 ### 3 · Las alternativas son un grupo de radio
 
 Del autor, 2026-09-18. Las alternativas pasan a `role="radiogroup"`, cada una con `role="radio"` y `aria-checked`, en
@@ -90,7 +101,7 @@ que se bloquee el botón del navegador.
 ### 7 · `probar:escapado` revisa el enunciado y las alternativas, no el ícono
 
 Del autor, 2026-09-18. La tarjeta de la 45 no dibuja ningún ícono de módulo, y agregarlo tocaría una dirección visual
-ya cerrada por poco beneficio real de seguridad. El bloque sigue siendo de la tanda 2.
+ya cerrada por poco beneficio real de seguridad. El bloque se adelantó a la tanda 1 el 2026-09-21 (decisión 9).
 
 ### 8 · Tres decisiones de la tanda 2, cerradas por adopción
 
@@ -102,48 +113,55 @@ Del autor, 2026-09-20, adoptando lo que Claude Code implementó en su borrador:
 - **En consecuencia, un intento en curso no se puede abandonar desde la página.** Termina respondiendo, omitiendo o
   dejando que el reloj lo consuma.
 
-Con esto, la tanda 2 queda en la accesibilidad fina de teclado, el bloque de `probar:escapado` y la comprobación
-automática del vocabulario de ADR-022.
+Con esto, la tanda 2 queda en la accesibilidad fina de teclado y la comprobación automática del vocabulario de ADR-022.
+El bloque de `probar:escapado` pasó a la tanda 1 (decisión 9).
 
-**Pendientes del texto provisional que dejó la etapa A de la 41** (anotados el 2026-09-16):
+### 9 · El escapado del simulacro se prueba en la tanda 1
 
-- **El párrafo de entrada dice que el simulacro practica «lo más difícil del día del examen».** Es una afirmación sobre el
-  examen real sin fuente: se reescribe sin ella.
-- **El aviso «Estas reglas son del simulacro, no del examen real» afirma que el examen dura 120 minutos y mezcla
-  alternativas con programación.** El enlace a la fuente oficial de Talento Digital sigue pendiente. Antes de cerrar la 43,
-  o se cita la fuente junto al dato, como en el aviso de la iteración 36, o el dato se presenta con su origen declarado.
+Del autor, 2026-09-21. El bloque de `probar:escapado` para el simulacro se adelanta desde la tanda 2. Se había
+postergado porque el simulacro no dibujaba ningún texto del banco (decisión 11 de la 41), y la tanda 1 hizo que dibuje
+la pregunta en curso: el hueco lo abrió esta tanda, y en ella se cierra. La fila hostil se cuela interceptando la
+respuesta de `?ids=`, y se revisan su enunciado y sus alternativas (decisión 7).
+
+### 10 · La decisión 11 de la 41 queda reemplazada
+
+Consecuencia de la decisión 8, registrada el 2026-09-21. «Intento listo no dibuja texto del banco» deja de ser una regla,
+porque al terminar la carga se dibuja la primera pregunta. En `probar-filtrado.mjs`, el bloque 10g pasa a exigir que lo
+dibujado sea **esa pregunta y solo esa**, y la cuenta por módulo se lee del intento armado, porque ya no la muestra
+ninguna pantalla.
 
 ## Tareas
 
-> **Reescritas el 2026-09-20.** El código de las tareas de la tanda 1 ya existe en el borrador de Claude Code; **ninguna
-> se marca hecha hasta que su prueba exista y se haya visto en rojo por mutación.** La versión anterior pedía «impedir
-> volver atrás, también con el botón atrás del navegador» y «cerrar el texto de las reglas»: la primera cambió con la
-> decisión 6 y la segunda la cerró la iteración 45.
+> **Reescritas el 2026-09-20 y marcadas el 2026-09-21.** Una tarea se marca hecha solo cuando su prueba existe y se vio
+> en rojo por mutación. Entre paréntesis, el bloque de `probar-cronometros.mjs` que la prueba, salvo que se nombre otro
+> guion.
 
 ### Tanda 1 · El recorrido funcionando
 
-- [ ] Mostrar una pregunta a la vez, con su número y el total, reutilizando `dibujarTarjetaDeLaPregunta()` y
-  `dibujarBotonesDelIntento()` y **no** `dibujarPantallaDelIntento()`, que dibujaría una segunda franja.
-- [ ] Marcar y cambiar la alternativa sin registrarla hasta avanzar o agotarse.
-- [ ] Dos botones según la decisión 1, con la confirmación de «Omitir» y su retiro.
-- [ ] Registrar cada resultado (respondida con su alternativa u omitida) en el intento guardado, sin revelar si fue
-  correcta.
-- [ ] Redibujar la pregunta cuando el cronómetro resuelve una por agotamiento.
-- [ ] Pasar `alTerminarElIntento` a los cronómetros y dibujar la pantalla transitoria de la decisión 5.
-- [ ] Ir directo a la primera pregunta al terminar la carga, y retomar en la pregunta donde iba (decisión 8).
-- [ ] Anunciar el cambio de pregunta moviendo el foco (decisión 4).
-- [ ] Alternativas como grupo de radio (decisión 3), con `probar:identidad` en verde después.
-- [ ] Revisar el margen negativo de la columna del intento con los dos avisos encendidos, que en esta iteración pasa a ser
-  un estado real.
-- [ ] Corregir la frase del `README.md` del plan maestro que manda llamar a `dibujarPantallaDelIntento()`.
-- [ ] Corregir el comentario de `probar-memoria.mjs` que dice haber anotado en `registro_log.md` el abandono de un
-  intento a medias: esa anotación no existe, y la decisión 8 la vuelve innecesaria.
+- [x] Mostrar una pregunta a la vez, con su número y el total, reutilizando `dibujarTarjetaDeLaPregunta()` y
+  `dibujarBotonesDelIntento()` y **no** `dibujarPantallaDelIntento()`, que dibujaría una segunda franja. (13)
+- [x] Marcar y cambiar la alternativa sin registrarla hasta avanzar o agotarse. (14)
+- [x] Dos botones según la decisión 1, con la confirmación de «Omitir» y su retiro. (14 y 16)
+- [x] Registrar cada resultado (respondida con su alternativa u omitida) en el intento guardado, sin revelar si fue
+  correcta. (15, 17 y 18)
+- [x] Redibujar la pregunta cuando el cronómetro resuelve una por agotamiento. (16 y 18)
+- [x] Pasar `alTerminarElIntento` a los cronómetros y dibujar la pantalla transitoria de la decisión 5. La pantalla está
+  probada (18); que el enganche esté conectado no se puede probar (ver las notas).
+- [x] Ir directo a la primera pregunta al terminar la carga, y retomar en la pregunta donde iba (decisión 8). (13 y 18;
+  `probar-filtrado.mjs` 10g)
+- [x] Anunciar el cambio de pregunta moviendo el foco (decisión 4). (15)
+- [x] Alternativas como grupo de radio (decisión 3), con `probar:identidad` en verde después. (17)
+- [ ] Revisar el margen negativo de la columna del intento con los dos avisos encendidos. Lo cierra la pasada del autor.
+- [x] Corregir la frase del `README.md` del plan maestro que manda llamar a `dibujarPantallaDelIntento()`.
+- [x] Corregir el comentario de `probar-memoria.mjs` que decía haber anotado en `registro_log.md` el abandono de un
+  intento a medias.
+- [x] Poner `probar-filtrado.mjs` al día con la decisión 8 (decisión 10).
+- [x] Agregar a `probar:escapado` el bloque del simulacro (decisión 9): la fila hostil se cuela interceptando `?ids=` y
+  se revisan su enunciado y sus alternativas en el dibujo real. (`probar-escapado.mjs` 5c)
 
 ### Tanda 2 · Sin decisiones tomadas, no empezar sin que el autor la pida
 
 - [ ] Navegación por teclado fina: elegir y cambiar alternativa, avanzar y omitir sin ratón.
-- [ ] Agregar a `probar:escapado` el bloque del simulacro (decisión 7): la pregunta hostil se cuela interceptando la
-  petición `?ids=` y se revisan su enunciado y sus alternativas en el dibujo real.
 - [ ] Comprobación automática del vocabulario de ADR-022 en los textos del simulacro.
 
 ## Criterios de aceptación
@@ -158,38 +176,47 @@ automática del vocabulario de ADR-022.
 
 ### Tanda 1 · Se provocan con guion
 
-- [ ] **Solo hay una pregunta en el HTML dibujado en cada momento.**
-- [ ] **Al terminar la carga, lo dibujado es la primera pregunta del intento**, sin recuadro intermedio.
-- [ ] **«Siguiente» sale deshabilitado sin alternativa marcada y habilitado con ella; «Omitir», al revés.**
-- [ ] **Cambiar la alternativa antes de avanzar** deja registrada solo la última marcada.
-- [ ] **Avanzar con alternativa marcada** la registra y dibuja la siguiente pregunta.
-- [ ] **Un solo toque de «Omitir» no omite**; el segundo sí, y la pregunta queda omitida.
-- [ ] **Marcar una alternativa tras el primer toque de «Omitir»** retira la confirmación, y **cambiar de pregunta**
-  también.
-- [ ] **Sin vuelta atrás, como invariante:** la posición solo sube, y de a uno, y ninguna entrada de las respuestas
-  cambia después de escrita. Se sostiene contra cinco embestidas: reenviar un clic de una pregunta anterior, martillear
-  los botones deshabilitados, recargar a mitad, saltar 90 segundos con el reloj, y barrer el HTML realmente dibujado en
-  busca de cualquier control que lleve a una pregunta anterior.
-- [ ] **Durante el intento, ningún HTML dibujado contiene `es_correcta`, marca de acierto o error, ni la justificación.**
-- [ ] **El número de la tarjeta y el de la franja coinciden en todo el recorrido**, leídos los dos del HTML dibujado, y
-  la comprobación da rojo si se los hace discrepar.
-- [ ] **Al cambiar de pregunta, el foco queda en la tarjeta nueva.**
-- [ ] **Las alternativas se dibujan como `radiogroup` con `aria-checked`**, y ninguna conserva `aria-pressed`.
-- [ ] **Durante el recorrido no hay ningún control con el id de «Comenzar»** (decisión 8).
-- [ ] **Al resolverse la pregunta 120 se dibuja «Intento terminado»**, con «Empezar otro intento».
-- [ ] **Un intento completo de 120 preguntas se recorre con el reloj controlable**, mezclando respuestas, cambios de
-  alternativa, omisiones, agotamientos con y sin alternativa marcada y una recarga a mitad, y el registro final coincide
-  con lo provocado.
-- [ ] **Salir y volver a entrar retoma en la pregunta donde iba**, con las mismas 120 en el mismo orden.
-- [ ] **`probar:identidad` sigue en verde** con el marcado de radio y los estados deshabilitados.
-- [ ] **`probar:cronometros`, `probar:filtrado`, `probar:memoria`, `probar:identidad`, `probar:escapado`, `build` y
+Entre paréntesis, el bloque de `probar-cronometros.mjs` que lo prueba, salvo que se nombre otro guion. Todos se vieron
+en rojo por mutación.
+
+- [x] **Solo hay una pregunta en el HTML dibujado en cada momento.** (13)
+- [x] **Al terminar la carga, lo dibujado es la primera pregunta del intento**, sin recuadro intermedio. (13;
+  `probar-filtrado.mjs` 10g)
+- [x] **«Siguiente» sale deshabilitado sin alternativa marcada y habilitado con ella; «Omitir», al revés.** (14)
+- [x] **Cambiar la alternativa antes de avanzar** deja registrada solo la última marcada. (14)
+- [x] **Avanzar con alternativa marcada** la registra y dibuja la siguiente pregunta. (15)
+- [x] **Un solo toque de «Omitir» no omite**; el segundo sí, y la pregunta queda omitida. (16)
+- [x] **Marcar una alternativa tras el primer toque de «Omitir»** retira la confirmación, y **cambiar de pregunta**
+  también, incluso cuando la cambia el reloj. (16)
+- [x] **Sin vuelta atrás, como invariante:** la posición solo sube, y de a uno, y ninguna entrada de las respuestas
+  cambia después de escrita. Resiste el clic viejo (14 y 18), el martilleo de los botones apagados (15), la recarga a
+  mitad y el salto de 90 segundos (18), y el barrido del HTML dibujado en busca de un camino atrás (18).
+- [x] **Durante el intento, ningún HTML dibujado contiene `es_correcta`, marca de acierto o error, ni la justificación.**
+  (17)
+- [x] **El número de la tarjeta y el de la franja coinciden en todo el recorrido**, y la comprobación da rojo si se los
+  hace discrepar. (13 y 18)
+- [x] **Al cambiar de pregunta, el foco queda en la tarjeta nueva.** (15)
+- [x] **Las alternativas se dibujan como `radiogroup` con `aria-checked`**, y ninguna conserva `aria-pressed`. (17)
+- [x] **Durante el recorrido no hay ningún control con el id de «Comenzar»** (decisión 8). (17)
+- [x] **Al resolverse la pregunta 120 se dibuja «Intento terminado»**, con «Empezar otro intento». (18)
+- [x] **Un intento completo de 120 preguntas se recorre con el reloj controlable**, mezclando respuestas, cambios de
+  alternativa, omisiones, agotamientos con y sin alternativa marcada, una recarga a mitad y un salto de 90 segundos, y el
+  registro final coincide con lo provocado. (18)
+- [x] **Salir y volver a entrar retoma en la pregunta donde iba**, con las mismas 120 en el mismo orden. (18;
+  `probar-memoria.mjs`, «Retoma»)
+- [x] **`probar:identidad` sigue en verde** con el marcado de radio y los estados deshabilitados.
+- [x] **El texto del banco que dibuja el simulacro llega escapado:** el enunciado y las alternativas de la fila hostil,
+  colada por `?ids=`, llegan como texto y sin etiquetas ajenas (decisión 9). (`probar-escapado.mjs` 5c)
+- [x] **`probar:cronometros`, `probar:filtrado`, `probar:memoria`, `probar:identidad`, `probar:escapado`, `build` y
   `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql` siguen sin cambios.
 
 ### Tanda 1 · Los comprueba el autor en un navegador
 
 - [ ] **Con los dos avisos encendidos, la columna del intento no se dibuja encima de ellos**, en 375 px y en escritorio.
+- [ ] **Se entiende la diferencia entre avanzar y omitir**, y no se omite por error con el pulgar.
 - [ ] **Con un lector de pantalla, el cambio de pregunta lee el enunciado nuevo** sin que la franja lo interrumpa.
-- [ ] **Sin errores de consola** durante un recorrido de varias preguntas.
+- [ ] **El botón «atrás» del navegador no lleva a una pregunta anterior** ni rompe el intento (decisión 6).
+- [ ] **Un intento real completo, de principio a fin**, llega a «Intento terminado» sin errores de consola.
 
 ### No-regresión, ya cerrados en otras iteraciones
 
@@ -200,40 +227,35 @@ automática del vocabulario de ADR-022.
 
 ### Tanda 2
 
-- [ ] Los criterios de teclado, del bloque de `probar:escapado` y del vocabulario de ADR-022 se escriben cuando el autor
-  tome sus decisiones.
-
-### Los provoca Claude Code
-
-- [ ] **Solo hay una pregunta en el HTML dibujado en cada momento.**
-- [ ] **`probar:escapado` cubre el texto del banco dibujado en el simulacro**: enunciado, alternativas e ícono del módulo
-  de la pregunta hostil, colada por intercepción, llegan como texto.
-- [ ] **Cambiar la alternativa antes de avanzar** deja registrada solo la última marcada.
-- [ ] **Avanzar con alternativa marcada** la registra y dibuja la siguiente pregunta.
-- [ ] **Un solo toque de «Omitir» no omite**; el segundo sí, y la pregunta queda omitida.
-- [ ] **Marcar una alternativa tras el primer toque de «Omitir»** retira la confirmación.
-- [ ] **Una omitida no tiene ningún camino de vuelta** en el código: ningún control dibujado ni atajo de teclado lleva a una
-  pregunta anterior.
-- [ ] **Durante el intento, el HTML dibujado no contiene ninguna marca de acierto o error** ni la justificación.
-- [ ] **El indicador de posición coincide con la pregunta dibujada** en todo el recorrido.
-- [ ] **Un intento completo de 120 preguntas se recorre con el reloj controlable**, mezclando respuestas, cambios de
-  alternativa, omisiones, agotamientos con y sin alternativa marcada y una recarga a mitad, y el registro final coincide con
-  lo provocado.
-- [ ] **El párrafo de entrada no afirma nada del examen real sin fuente**, y el dato de los 120 minutos lleva su origen.
-- [ ] **El texto de las reglas en la presentación coincide con el README de la épica** y no contiene «examen real»
-  presentado como equivalente, ni palabras prohibidas por ADR-022.
-- [ ] **Los guiones del sitio siguen en verde** y `instantanea-banco.js` sin cambios.
-
-### Los comprueba el autor en el navegador
-
-- [ ] **Se entiende la diferencia entre avanzar y omitir**, y no se omite por error en el teléfono.
-- [ ] **El botón «atrás» del navegador no lleva a una pregunta anterior** ni rompe el intento.
-- [ ] **Un tramo del intento se realiza solo con teclado**, incluidos cambiar, avanzar y omitir.
-- [ ] **Al cambiar de pregunta, un lector de pantalla anuncia la nueva.**
-- [ ] **Un intento real completo, de principio a fin**, sin errores de consola.
-- [ ] **Las reglas de la presentación se entienden sin tecnicismos.**
-- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
+- [ ] Los criterios de teclado y del vocabulario de ADR-022 se escriben cuando el autor tome sus decisiones.
 
 ## Notas de la iteración
 
-_Pendiente._
+_Escritas el 2026-09-21, al cerrar por guion la tanda 1._
+
+### Hallazgos de las pruebas
+
+- **Dos pruebas miraban un detalle ajeno a lo que decían mirar.** El clic viejo del bloque 14 comparaba contra un valor
+  escrito a mano y se contagiaba del rojo anterior, y el mismo bloque buscaba dos atributos pegados, así que un atributo
+  nuevo entre medio lo tumbaba. Las dos se corrigieron: la primera compara con lo dibujado justo antes del clic, y la
+  segunda lee la etiqueta entera.
+- **Las notas de los bloques 14 a 18 afirmaban sin medir.** El rojo 1 del bloque 18 imprimió «los dos indicadores
+  coincidieron» junto a 72 discrepancias. Desde entonces esas notas solo se imprimen si su bloque pasó (H-023).
+- **`alTerminarElIntento` no se puede probar.** «Intento terminado» se dibuja por dos caminos: ese enganche y
+  `dibujarElRecorrido()` cuando no queda pregunta. Quitar el primero no pone nada en rojo. Está conectado, pero no
+  demostrado.
+- **`probar-filtrado.mjs` usa un reloj quieto en su bloque 10.** Desde la 43 un plazo vencido reescribe la zona de la
+  pregunta, y con el reloj real un intento de un bloque podría pintar sobre el DOM de otro. Es preventivo: el problema no
+  llegó a verse.
+- **Con la decisión 8 se pierde la cuenta por módulo que mostraba «Intento listo».** El estudiante ya no ve cuántas
+  preguntas trae de cada módulo antes de empezar. El reparto se sigue probando sobre el intento armado, y el resumen de
+  la 44 es el lugar natural para mostrarlo.
+
+### Sobre el método
+
+- **El borrador de Claude Code no traía ninguna prueba del recorrido.** Cada una se escribió después sobre código ya
+  existente, y se vio en rojo rompiendo a mano la línea que vigila.
+- **El formateo del IDE reescribió `simulacro.js` entero**, de 2 a 4 espacios y sin espacios dentro de las llaves, en un
+  commit que parecía de siete líneas. Se devolvió en un commit solo de formato, y el autor dejó de usar `Ctrl + Alt + L`
+  en este repositorio.
+- **«Martillear el teclado» se probó martillando los botones apagados.** El teclado de verdad es de la tanda 2.
