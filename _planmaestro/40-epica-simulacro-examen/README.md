@@ -169,3 +169,10 @@ las demoras y las caídas se simulan interceptando la respuesta del extremo, nun
   probar»), que no es un aprobado.
 - **`npm run verificar` no corre `probar:filtrado` ni `probar:memoria`** (pendiente de la épica 50): sus salidas se
   informan aparte en cada reporte.
+
+## Cómo se trabaja
+
+Desde la iteración 44, vuelve el reparto de las épicas 20 y 30: el autor dirige y
+autoriza, Claude ayuda a auditar el repositorio, revisar lo que propone Claude Code
+y decidir lo que quede abierto, y Claude Code implementa. Las iteraciones 41 a 43 se
+construyeron a mano por decisión del autor; no se reescriben con este reparto.

@@ -7,38 +7,25 @@ decisiones vale tanto como el código que las implementa.
 
 ## Iteración activa
 
-| Campo         | Valor                                                                                                                                              |
-|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Iteración** | Ninguna en curso                                                                                                                                   |
-| **Épica**     | 40 - Simulacro de examen                                                                                                                           |
-| **Estado**    | ⚪ Por abrir                                                                                                                                       |
-| **Siguiente** | **Iteración 44 · Resumen de resultados.** La **43 cerró el 2026-09-21**, en dos tandas: el intento se responde de principio a fin, una pregunta a la vez, con ratón, dedo o teclado, y termina en una pantalla transitoria «Intento terminado». El orden de trabajo dentro de la épica 40, fijado por el autor el 2026-09-16, es **41 → 45 → 42 → 43 → 44**, y la 44 es la última. |
+| Campo         | Valor                                                                          |
+|---------------|---------------------------------------------------------------------------------|
+| **Iteración** | 44 · Resumen de resultados                                                     |
+| **Épica**     | 40 · Simulacro de examen                                                       |
+| **Estado**    | 🔵 En curso · etapa A1 cerrada, quedan A2, A3, B y C                           |
+| **Archivo**   | `40-epica-simulacro-examen/iteracion-44-resumen-resultados.md`                 |
+| **Reanudada** | 2026-09-22 · vuelve el reparto de trabajo: autor dirige, Claude Code implementa |
 
-> **Antes de abrir la iteración 44.** El simulacro **se juega entero y todavía no dice cómo le fue a nadie**: al resolverse
-> la pregunta 120 aparece «Intento terminado», marcada como transitoria en el código, y ese es el hueco de la 44. La
-> página **sigue sin enlazar desde ninguna parte**, y los enlaces desde los menús, el pie y la portada son de la 44.
+> **Antes de seguir.** El simulacro se juega entero y todavía no dice cómo le fue a
+> nadie: al resolverse la pregunta 120 aparece «Intento terminado», marcada como
+> transitoria, y ese es el hueco de esta iteración. La página sigue sin enlazar
+> desde ninguna parte de momento: eso es la etapa C.
 >
-> **Lo que la 44 recibe hecho.** El intento guardado —las 120 preguntas congeladas con su correcta, y cada respuesta con
-> su alternativa, su estado, si se agotó y su instante— es todo lo que el resumen necesita, y ADR-035 fija que el
-> resultado se **calcula** desde ahí y no se guarda aparte. El marcado del resumen existe desde la 45, en
-> `dibujarPantallaDelResumen()` de `static/js/components/simulacro-maqueta.js`, y se mira con
-> `simulacro.html?maqueta=resumen` y `&reprobado=1`. Las justificaciones no viajan con el intento: el resumen las pide por
-> los mismos ids, con la instantánea como respaldo.
->
-> **Lo que la 44 tiene que decidir, y la 43 dejó anotado.** La tarjeta del reprobado dice «No alcanzaste el 60 %» y no
-> «Reprobaste el simulacro», la frase autorizada; las dos pasan la comprobación. El reparto por módulo que mostraba
-> «Intento listo» se perdió con la decisión 8 de la 43, y el resumen es su lugar natural. Y «Intento terminado» se dibuja
-> hoy por dos caminos —`alTerminarElIntento` y `dibujarElRecorrido()` sin pregunta—, así que el enganche no se puede
-> probar: al reemplazar esa pantalla conviene dejar uno solo.
->
-> **El vocabulario del resultado ya se vigila con guion.** La sección 17 de `scripts/probar-identidad-visual.mjs` barre
-> el `<main>` de `simulacro.html`, las pantallas dibujadas y los literales de `simulacro.js` y `simulacro-maqueta.js`: fuera
-> de las tres frases exactas de ADR-022, «aprob…» y «reprob…» dan rojo, igual que «nota», «calificación», «puntaje
-> oficial» y «certificación». Si el resumen necesita una frase nueva, se autoriza en ADR-022 **antes** de escribirla.
->
-> **Las cifras y las reglas del simulacro —120 preguntas, 30 segundos por pregunta, el sobrante perdido, omitida cuenta
-> como incorrecta, 72 de 120 para aprobar— son decisiones de diseño del autor, no datos del examen real**, y viven en
-> `40-epica-simulacro-examen/README.md`. No se cotejan contra `00_producto/contexto-del-examen.md`.
+> **Lo que ya está hecho de la etapa A.** El extremo `/api/preguntas` acepta
+> `&con=justificacion` junto a `ids`, y sólo junto a `ids`: cualquier otro uso se
+> rechaza con `PETICION_INVALIDA` (ADR-035, decisión 8). Probado en rojo con seis
+> problemas y en verde con 15 formas de pedir mal. Falta A2 —el servicio del
+> navegador `leerPreguntasPorIds(ids, { conJustificacion })`— y A3 —extraer
+> `tieneJustificacion()` y `justificacionDibujada()` a un módulo propio.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.

@@ -3,6 +3,7 @@
  * GET /api/preguntas?modulo=N    — solo un modulo
  * GET /api/preguntas?resumen=1   — cuantas preguntas tiene cada modulo, sin traerlas
  * GET /api/preguntas?ids=1,2,3   — exactamente esas, sin justificaciones
+ * GET /api/preguntas?ids=1,2,3&con=justificacion — las mismas, con su justificacion
  *
  * Es el extremo que sustituye a static/js/data/cuestionario.js como fuente del
  * cuestionario. De aca en adelante el contenido viene de fuera del repositorio,
@@ -326,6 +327,21 @@ function leerIds(url) {
   return { ids };
 }
 
+/**
+ * Interpreta el parametro `con` (iteracion 44, decision 8).
+ *
+ * Devuelve `null` si no vino, `'justificacion'` si vino bien, o `false` si vino con
+ * cualquier otro valor, vacio incluido. Por ahora hay una sola cosa que se le puede
+ * agregar a una lista de ids, y se dice con su nombre en vez de con un booleano:
+ * `con=1` no diria que es lo que se esta pidiendo.
+ */
+function leerCon(url) {
+  const crudo = url.searchParams.get('con');
+  if (crudo === null) return null;
+
+  return crudo === 'justificacion' ? 'justificacion' : false;
+}
+
 /** Parte una lista en trozos de `tamano` como mucho. */
 function trocear(lista, tamano) {
   const trozos = [];
@@ -383,7 +399,7 @@ function agruparAlternativas(filas) {
  * leidas para 120 ids, y las mismas 2912 con trozos de 60 o de 100, porque lo que
  * cuesta es la cantidad de trozos y no su tamano.
  */
-async function responderPorIds(base, ids) {
+async function responderPorIds(base, ids, { conJustificacion = false } = {}) {
   const trozos = trocear(ids, MAXIMO_DE_PARAMETROS_D1);
 
   const consultas = [
@@ -413,9 +429,14 @@ async function responderPorIds(base, ids) {
 
   const { validas, informe } = validarPreguntas(armadas);
 
-  const sinJustificacion = validas.map(({ justificacion, ...resto }) => resto);
+  // Sin `con`, la justificacion se quita: el intento no la lleva y es el campo mas
+  // pesado del banco (ADR-035). Con `con=justificacion` se deja, y es lo UNICO que
+  // cambia: mismas preguntas, mismo orden, mismo troceo.
+  const entregadas = conJustificacion
+      ? validas
+      : validas.map(({ justificacion, ...resto }) => resto);
 
-  return respuestaOk(sinJustificacion, {
+  return respuestaOk(entregadas, {
     ids_pedidos: ids.length,
     consultas: consultas.length,
     validacion: informe,
@@ -447,6 +468,23 @@ export const onRequest = soloLectura(async ({ base, request }) => {
     return respuestaError('PETICION_INVALIDA', pedido.error);
   }
 
+  // `con` solo acepta `justificacion`, y solo junto a `ids` (iteracion 44, decision 8;
+  // actualizacion de ADR-035 del 2026-09-21). Sin `ids` no hay una lista a la que
+  // agregarle nada, y un valor desconocido se rechaza por lo mismo que `resumen=si`:
+  // un parametro mal armado tiene que doler enseguida, no devolver otra cosa callado.
+  const con = leerCon(url);
+
+  if (con === false) {
+    return respuestaError(
+        'PETICION_INVALIDA',
+        'El parametro con solo acepta el valor justificacion.'
+    );
+  }
+
+  if (con && !pedido) {
+    return respuestaError('PETICION_INVALIDA', 'El parametro con solo se usa junto a ids.');
+  }
+
   const filtrandoPorModulo = modulo !== null;
 
   // `?ids` no se combina con nada, y eso NO es lo mismo que `?modulo=3&resumen=1`.
@@ -465,7 +503,11 @@ export const onRequest = soloLectura(async ({ base, request }) => {
     );
   }
 
-  if (pedido) return await responderPorIds(base, pedido.ids);
+  if (pedido) {
+    return await responderPorIds(base, pedido.ids, {
+      conJustificacion: con === 'justificacion',
+    });
+  }
 
   // El resumen se compone con el filtro: `?modulo=3&resumen=1` es la cuenta del
   // modulo 3, que es una pregunta coherente y negarse a contestarla costaria mas

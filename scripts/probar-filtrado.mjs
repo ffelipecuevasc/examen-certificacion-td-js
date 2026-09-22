@@ -2268,6 +2268,47 @@ try {
     );
   }
 
+  // `&con=justificacion`: las MISMAS preguntas que `?ids=`, mas su justificacion
+  // (iteracion 44, decision 8). Se compara contra la respuesta sin `con` que ya se
+  // tiene en la mano: si lo unico distinto no es la justificacion, el parametro
+  // cambio algo mas que lo que promete.
+  const conJustificacion = await pedirCrudo(
+      `/api/preguntas?ids=${intentoDeMuestra.ids.join(',')}&con=justificacion`
+  );
+
+  if (!conJustificacion.cuerpo?.ok) {
+    problemas.push(
+        `?ids=…&con=justificacion fue rechazado: ` +
+        `${conJustificacion.cuerpo?.error?.codigo ?? '(sin codigo)'}`
+    );
+  } else {
+    const datosCon = conJustificacion.cuerpo.datos;
+    const sinSuJustificacion = datosCon.filter(
+        (p) => typeof p.justificacion !== 'string' || p.justificacion.trim() === ''
+    );
+
+    if (sinSuJustificacion.length > 0) {
+      problemas.push(
+          `?ids=…&con=justificacion devolvio ${sinSuJustificacion.length} de ${datosCon.length} ` +
+          'pregunta(s) sin su justificacion'
+      );
+    }
+
+    const loDemas = JSON.stringify(datosCon.map(({ justificacion, ...resto }) => resto));
+    if (loDemas !== JSON.stringify(porIds.cuerpo?.datos ?? [])) {
+      problemas.push(
+          '?ids=…&con=justificacion cambio algo mas que la justificacion respecto de ?ids=…'
+      );
+    }
+
+    if (conJustificacion.cuerpo.meta?.consultas !== consultasDelExtremo) {
+      problemas.push(
+          `?ids=…&con=justificacion uso ${conJustificacion.cuerpo.meta?.consultas} consultas ` +
+          `y ?ids=… ${consultasDelExtremo}: pedir la justificacion no deberia cambiar el troceo`
+      );
+    }
+  }
+
   // Los rechazos. Cada uno es una forma distinta de escribir mal la lista, y las
   // seis tienen que doler igual: `PETICION_INVALIDA`, no una respuesta a medias.
   const rechazosEsperados = [
@@ -2281,6 +2322,13 @@ try {
     [`?ids=${Array.from({ length: 121 }, (_, i) => i + 1).join(',')}`, '121 ids'],
     ['?ids=25&modulo=2', 'ids junto a modulo'],
     ['?ids=25&resumen=1', 'ids junto a resumen'],
+    // `con` (iteracion 44, decision 8; actualizacion de ADR-035 del 2026-09-21): un
+    // solo valor, y solo junto a `ids`. Todo lo demas duele igual que un id mal escrito.
+    ['?ids=25&con=otra', 'con con un valor que no es justificacion'],
+    ['?ids=25&con=', 'con vacio'],
+    ['?con=justificacion', 'con sin ids'],
+    ['?modulo=2&con=justificacion', 'con junto a modulo, sin ids'],
+    ['?resumen=1&con=justificacion', 'con junto a resumen, sin ids'],
   ];
 
   for (const [consulta, queEs] of rechazosEsperados) {
@@ -2302,7 +2350,8 @@ try {
   notas.push(
     `Extremo por ids: ${intentoDeMuestra.ids.length} ids en UNA peticion, resueltos en ` +
       `${consultasDelExtremo} consultas de un solo batch —D1 admite 100 parametros ligados y ` +
-      `120 no cabe—, devolviendo exactamente las pedidas, sin justificaciones. ` +
+      `120 no cabe—, devolviendo exactamente las pedidas, sin justificaciones; y con ` +
+      '`&con=justificacion`, las mismas preguntas mas su justificacion. ' +
       `${rechazosEsperados.length} formas de pedir mal rechazadas con PETICION_INVALIDA y el ` +
       'POST parado por soloLectura().'
   );
