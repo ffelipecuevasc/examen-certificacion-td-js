@@ -1724,8 +1724,11 @@ function pulsar(dom, papel, { alternativa } = {}) {
   if (!final?.terminado_en) {
     problemas.push('intento completo: el intento no quedo marcado como terminado');
   }
-  if (!pantallaFinal.includes('Intento terminado') || pantallaFinal.includes('data-papel="tarjeta-de-la-pregunta"')) {
-    problemas.push('intento completo: al resolver la 120 no se dibujo «Intento terminado» (decision 5)');
+  // Desde la iteracion 44 lo que aparece al resolver la 120 es el resumen, que reemplaza
+  // a la pantalla transitoria «Intento terminado» (decision B4 de la 44). Lo que el resumen
+  // dice se prueba en `probar-resumen.mjs`; aqui basta con que sea el y no una pregunta.
+  if (!pantallaFinal.includes('data-papel="pantalla-del-resumen"') || pantallaFinal.includes('data-papel="tarjeta-de-la-pregunta"')) {
+    problemas.push('intento completo: al resolver la 120 no se dibujo el resumen (decision B4 de la iteracion 44)');
   }
   if (JSON.stringify(trasElFinal) !== JSON.stringify(final)) {
     problemas.push('intento completo: despues del final, pulsar o dejar correr el reloj cambio lo guardado');
@@ -1762,7 +1765,7 @@ function pulsar(dom, papel, { alternativa } = {}) {
       '93 cada una en su vencimiento. Despues de cada accion la posicion solo subio, de a uno, ninguna ' +
       'entrada cambio, los dos indicadores coincidieron, un clic viejo no movio nada y lo dibujado no ' +
       'tuvo ningun camino atras. El registro final coincide con lo provocado, y al terminar se dibujo ' +
-      '«Intento terminado».'
+      'el resumen.'
   );
 }
 

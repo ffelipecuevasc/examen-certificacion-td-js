@@ -65,6 +65,33 @@
  * de aqui no coincide con esa tabla, manda la tabla y esto es el error.
  */
 import { esc, icon } from '../utils/dom.js';
+import { justificacionDibujada, tieneJustificacion } from './justificacion.js';
+
+/**
+ * El tiempo transcurrido, en texto (decision 4 de la iteracion 45).
+ *
+ * `MM:SS` hasta la hora, `H:MM:SS` desde la hora. El caso de varias horas no es
+ * teorico: el reloj sigue corriendo fuera de la pagina (decision 3), asi que alguien
+ * que deje el intento abierto y vuelva al dia siguiente lo ve. Las horas no se
+ * rellenan con cero a la izquierda porque «1:04:09» se lee y «01:04:09» parece un
+ * codigo.
+ *
+ * Vive aqui desde la iteracion 44 (antes en `components/cronometros.js`), porque la usan
+ * dos pantallas —la franja y el resumen, con el mismo formato por la decision B1— y el
+ * resumen no puede importar el motor sin cerrar un ciclo: el motor ya importa esta
+ * maqueta.
+ */
+export function formatearTranscurrido(ms) {
+  const totalEnSegundos = Math.max(0, Math.floor(ms / 1000));
+
+  const horas = Math.floor(totalEnSegundos / 3600);
+  const minutos = Math.floor((totalEnSegundos % 3600) / 60);
+  const segundos = totalEnSegundos % 60;
+
+  const dos = (n) => String(n).padStart(2, '0');
+
+  return horas > 0 ? `${horas}:${dos(minutos)}:${dos(segundos)}` : `${dos(minutos)}:${dos(segundos)}`;
+}
 
 /**
  * El alto de la franja fija, en pixeles, segun las clases que declara.
@@ -518,7 +545,7 @@ export const ESTADOS_DE_LA_REVISION = {
  * poder leerse en escala de grises, y tres numeros seguidos sin marca son tres
  * numeros.
  */
-function dibujarFilaDelModulo({ modulo, correctas, incorrectas, omitidas }) {
+function dibujarFilaDelModulo({ modulo, modulo_titulo, correctas, incorrectas, omitidas }) {
   const celda = (estado, valor) => {
     const { icono, color, palabra } = ESTADOS_DE_LA_REVISION[estado];
 
@@ -526,9 +553,18 @@ function dibujarFilaDelModulo({ modulo, correctas, incorrectas, omitidas }) {
               <span class="flex items-center gap-1"><span class="sr-only">${esc(palabra)}: </span>${icon(icono, `text-base ${color}`)}<span class="font-mono text-sm text-paper tabular-nums">${esc(valor)}</span></span>`;
   };
 
+  // El titulo del modulo viene de la copia congelada y es texto del banco: se escapa.
+  // Va debajo del numero y en `muted` sobre `panel` —6,65:1—, porque el numero es lo
+  // que el estudiante busca en la guia y el titulo es lo que lo confirma (decision 6).
+  const titulo = modulo_titulo
+    ? `
+              <span data-papel="titulo-del-modulo" class="block font-body text-xs text-muted">${esc(modulo_titulo)}</span>`
+    : '';
+
   return `
-          <li data-papel="fila-del-modulo" class="flex items-center justify-between gap-4 border-b ${BORDE_DEL_SIMULACRO} py-3 last:border-b-0">
-            <span class="font-display font-semibold text-sm text-paper shrink-0">Módulo ${esc(modulo)}</span>
+          <li data-papel="fila-del-modulo" data-modulo="${esc(modulo)}" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b ${BORDE_DEL_SIMULACRO} py-3 last:border-b-0">
+            <span class="min-w-0"><span class="block font-display font-semibold text-sm text-paper">Módulo ${esc(modulo)}</span>${titulo}
+            </span>
             <span class="flex items-center gap-4">${celda('correcta', correctas)}${celda('incorrecta', incorrectas)}${celda('omitida', omitidas)}
             </span>
           </li>`;
@@ -549,17 +585,150 @@ function dibujarFilaDelModulo({ modulo, correctas, incorrectas, omitidas }) {
  * diciendo de tres formas —color, forma y palabra—; lo que cambia es cual de las tres
  * carga con el texto.
  */
-function dibujarFilaDeLaRevision({ posicion, enunciado, estado, tuRespuesta }) {
+function dibujarFilaDeLaRevision({
+  posicion,
+  pregunta_id,
+  enunciado,
+  estado,
+  agotada = false,
+  dada = null,
+  correcta = null,
+  conJustificacion = null,
+  aviso = null,
+  vigente = null,
+}) {
   const { icono, color, borde, palabra } = ESTADOS_DE_LA_REVISION[estado];
 
+  // Lo que el estudiante hizo, dicho con sus palabras. Una agotada sin nada marcado es
+  // omitida (regla 6), pero no es lo mismo que haberla omitido con dos toques, y la
+  // revision lo distingue.
+  const loQueHiciste =
+    estado === 'omitida'
+      ? agotada
+        ? 'Se te acabó el tiempo sin marcar ninguna.'
+        : 'La omitiste.'
+      : `Marcaste: ${esc(dada)}${agotada ? ' · se te acabó el tiempo con esa marcada' : ''}`;
+
+  // La correcta solo cuando no fue la que se marco: repetirla debajo de «Marcaste»
+  // seria leer dos veces lo mismo.
+  const laCorrecta =
+    estado === 'correcta' || correcta === null
+      ? ''
+      : `
+            <p data-papel="la-correcta" class="mt-1 text-xs text-paper break-words">La correcta: ${esc(correcta)}</p>`;
+
+  // El porque, con la MISMA pieza que el cuestionario (decision 3). Recibe la pregunta
+  // del banco vigente y nada mas; si no trae justificacion, no se dibuja ni el recuadro.
+  const elPorque =
+    conJustificacion && tieneJustificacion(conJustificacion)
+      ? `
+            <div data-papel="justificacion" class="mt-3 bg-panel2 border-l-2 border-jsyellow rounded-r-lg px-4 py-3">${justificacionDibujada(conJustificacion)}
+            </div>`
+      : '';
+
+  // SI LA PREGUNTA CAMBIO DESPUES DEL INTENTO (decisiones 4 y 9). Lo de arriba es lo que
+  // el estudiante vivio y no se toca; lo corregido va APARTE, con su aviso, para que nadie
+  // aprenda una regla que la correccion desmintio y nadie crea que su resultado cambio.
+  const avisoDibujado = (papel, frase) => `
+            <p data-papel="${papel}" class="mt-3 flex items-start gap-2 text-xs text-paper leading-relaxed">${icon(
+              papel === 'aviso-sin-explicacion' ? 'database' : 'history-edu',
+              'text-base text-jsyellow shrink-0'
+            )}<span>${frase}</span></p>`;
+
+  const elCambio =
+    aviso === 'corregida'
+      ? `${avisoDibujado('aviso-corregida', 'Esta pregunta se corrigió después de tu intento. Tu resultado se calculó con la versión que viste; esta es la corregida:')}
+            <div data-papel="version-vigente" class="mt-2 border-l-2 ${BORDE_DEL_SIMULACRO} pl-3">
+              <p class="text-sm text-paper leading-snug break-words">${esc(vigente?.enunciado ?? '')}</p>
+              <p class="mt-1 text-xs text-paper break-words">La correcta hoy: ${esc(vigente?.correcta ?? '')}</p>
+            </div>`
+      : aviso === 'retirada'
+        ? avisoDibujado('aviso-retirada', 'Esta pregunta se retiró del banco después de tu intento. Se muestra como la viste, sin explicación.')
+        : aviso === 'desconocida'
+          ? avisoDibujado('aviso-sin-explicacion', 'Su explicación no está en la copia guardada del banco.')
+          : '';
+
   return `
-          <li data-papel="fila-de-la-revision" data-estado="${esc(estado)}" class="bg-panel border-l-2 ${borde} rounded-r-lg px-4 py-3">
+          <li data-papel="fila-de-la-revision" data-pregunta="${esc(pregunta_id ?? '')}" data-estado="${esc(estado)}" class="bg-panel border-l-2 ${borde} rounded-r-lg px-4 py-3">
             <p class="flex flex-wrap items-center gap-x-2">
               ${icon(icono, `text-base shrink-0 ${color}`)}<span class="font-display font-bold text-sm text-paper">${esc(palabra)}</span><span class="font-mono text-xs text-muted">· pregunta ${esc(posicion)}</span>
             </p>
             <p class="mt-1.5 text-sm text-paper leading-snug break-words">${esc(enunciado)}</p>
-            <p class="mt-1 text-xs text-muted break-words">${esc(tuRespuesta)}</p>
+            <p data-papel="tu-respuesta" class="mt-1 text-xs text-muted break-words">${loQueHiciste}</p>${laCorrecta}${elCambio}${elPorque}
           </li>`;
+}
+
+/**
+ * Lo de dentro del bloque de un modulo de la revision (decision 2 y B3).
+ *
+ * LAS INCORRECTAS Y LAS OMITIDAS VAN ABIERTAS; LAS CORRECTAS, PLEGADAS detras de un
+ * `<button>` que declara su estado con `aria-expanded` y apunta a la lista con
+ * `aria-controls`. Se opera con Enter y Espacio como cualquier boton, sin atajos de una
+ * tecla (decision 11 de la 43).
+ *
+ * Se exporta suelto porque abrir o plegar redibuja SOLO este bloque, y no la revision
+ * entera: 120 preguntas con su justificacion no se reescriben por un toque.
+ *
+ * Las correctas se dibujan aunque esten plegadas: son a lo sumo unas setenta, y
+ * dibujarlas al abrir obligaria a guardar en otra parte lo que se va a dibujar.
+ */
+export function dibujarDentroDelModulo({ modulo, modulo_titulo, abiertas, correctas, correctasAbiertas = false }) {
+  const titulo = modulo_titulo
+    ? `<span class="font-body font-normal text-sm text-muted"> · ${esc(modulo_titulo)}</span>`
+    : '';
+
+  const lasAbiertas =
+    abiertas.length > 0
+      ? `
+            <ul data-papel="revision-abiertas" class="mt-3 grid gap-3">${abiertas.map(dibujarFilaDeLaRevision).join('')}
+            </ul>`
+      : `
+            <p data-papel="revision-sin-errores" class="mt-2 text-sm text-muted leading-relaxed">En este módulo no hay respuestas mal ni omitidas.</p>`;
+
+  const cuantas = correctas.length;
+  const idDeLaLista = `correctas-del-modulo-${modulo}`;
+
+  const rotulo = correctasAbiertas
+    ? cuantas === 1
+      ? 'Ocultar la correcta'
+      : 'Ocultar las correctas'
+    : cuantas === 1
+      ? 'Ver la correcta'
+      : `Ver las ${cuantas} correctas`;
+
+  const lasCorrectas =
+    cuantas > 0
+      ? `
+            <button id="plegar-correctas-${esc(modulo)}" type="button" data-papel="plegar-correctas" data-modulo="${esc(modulo)}" aria-expanded="${correctasAbiertas}" aria-controls="${idDeLaLista}" class="mt-3 inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-xs px-3 py-2 rounded hover:border-jsyellow transition-colors focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
+              ${icon(ESTADOS_DE_LA_REVISION.correcta.icono, `text-base ${ESTADOS_DE_LA_REVISION.correcta.color}`)}<span>${rotulo}</span>
+            </button>
+            <ul id="${idDeLaLista}" data-papel="revision-correctas" class="mt-3 grid gap-3${correctasAbiertas ? '' : ' hidden'}">${correctas.map(dibujarFilaDeLaRevision).join('')}
+            </ul>`
+      : '';
+
+  return `
+            <h3 class="font-display font-bold text-base text-paper">Módulo ${esc(modulo)}${titulo}</h3>${lasAbiertas}${lasCorrectas}`;
+}
+
+/**
+ * La revision entera: un bloque por modulo, en el orden del desglose (decision 2).
+ *
+ * `nota` es una frase del sitio para cuando las justificaciones no se pudieron traer;
+ * no pasa texto del banco.
+ */
+export function dibujarRevisionDelIntento({ modulos, nota = null }) {
+  const laNota = nota
+    ? `
+          <p data-papel="nota-de-la-revision" class="text-sm text-muted leading-relaxed">${nota}</p>`
+    : '';
+
+  return `${laNota}${modulos
+    .map(
+      (bloque) => `
+          <section id="revision-del-modulo-${esc(bloque.modulo)}" data-papel="revision-del-modulo" data-modulo="${esc(bloque.modulo)}" class="mt-6 first:mt-0">${dibujarDentroDelModulo(bloque)}
+          </section>`
+    )
+    .join('')}`;
 }
 
 /**
@@ -598,68 +767,126 @@ function dibujarFilaDeLaRevision({ posicion, enunciado, estado, tuRespuesta }) {
  * pide. La separacion la hace el relleno; agregarle un borde gris encima seria
  * decorar, no distinguir.
  */
-export function dibujarPantallaDelResumen({ aprobado = true } = {}) {
-  const modulos = [
-    { modulo: 2, correctas: 11, incorrectas: 5, omitidas: 1 },
-    { modulo: 3, correctas: 10, incorrectas: 6, omitidas: 2 },
-    { modulo: 4, correctas: 11, incorrectas: 5, omitidas: 1 },
-    { modulo: 5, correctas: 10, incorrectas: 6, omitidas: 1 },
-    { modulo: 6, correctas: 10, incorrectas: 5, omitidas: 2 },
-    { modulo: 7, correctas: 10, incorrectas: 6, omitidas: 1 },
-    { modulo: 8, correctas: 10, incorrectas: 6, omitidas: 1 },
-  ];
+/**
+ * El resultado de ejemplo de la maqueta, con la misma forma que devuelve
+ * `calcularResultado()` de `servicios/resultado-del-intento.js`.
+ *
+ * Las dos variantes suman 120 y el aprobado queda en el 60 % justo. El desglose ya va
+ * en el orden de la decision 7, porque una maqueta ordenada de otra forma ensenaria un
+ * orden que la pagina no usa.
+ */
+function resultadoDeEjemplo(aprobado) {
+  const desglose = aprobado
+    ? [
+        { modulo: 3, correctas: 10, incorrectas: 5, omitidas: 2 },
+        { modulo: 6, correctas: 10, incorrectas: 5, omitidas: 2 },
+        { modulo: 5, correctas: 10, incorrectas: 6, omitidas: 1 },
+        { modulo: 7, correctas: 10, incorrectas: 6, omitidas: 1 },
+        { modulo: 8, correctas: 10, incorrectas: 6, omitidas: 1 },
+        { modulo: 4, correctas: 11, incorrectas: 5, omitidas: 1 },
+        { modulo: 2, correctas: 11, incorrectas: 6, omitidas: 1 },
+      ]
+    : [
+        { modulo: 3, correctas: 7, incorrectas: 8, omitidas: 2 },
+        { modulo: 5, correctas: 8, incorrectas: 8, omitidas: 1 },
+        { modulo: 6, correctas: 8, incorrectas: 7, omitidas: 2 },
+        { modulo: 7, correctas: 9, incorrectas: 7, omitidas: 1 },
+        { modulo: 8, correctas: 9, incorrectas: 7, omitidas: 1 },
+        { modulo: 4, correctas: 10, incorrectas: 6, omitidas: 1 },
+        { modulo: 2, correctas: 10, incorrectas: 7, omitidas: 1 },
+      ];
 
-  const filas = modulos.map(dibujarFilaDelModulo).join('');
+  const suma = (campo) => desglose.reduce((s, f) => s + f[campo], 0);
+  const correctas = suma('correctas');
+
+  return {
+    total: 120,
+    correctas,
+    incorrectas: suma('incorrectas'),
+    omitidas: suma('omitidas'),
+    porcentaje: Math.floor((correctas * 100) / 120),
+    aprobado,
+    desglose,
+    tiempo: { total_ms: 2580000, promedio_ms: 21500 },
+  };
+}
+
+/**
+ * La tarjeta del resultado, su explicacion y el tiempo.
+ *
+ * LA TARJETA DICE UNA DE LAS DOS FRASES Y NADA MAS (actualizacion de ADR-022): «Aprobaste
+ * el simulacro» o «Reprobaste el simulacro». Las cifras de detalle —cuantas mal, cuantas
+ * omitidas, el porcentaje— van fuera, en la explicacion, porque dentro de la tarjeta
+ * `ruby` no admite texto chico (ver el comentario de `dibujarPantallaDelResumen()`).
+ *
+ * EL TITULO RECIBE EL FOCO AL LLEGAR (decision B2), con `tabindex="-1"`: es el mismo
+ * gesto que el cambio de pregunta de la 43, y por el mismo motivo no hay `aria-live`.
+ */
+function dibujarElResultado(resultado) {
+  const { aprobado, correctas, incorrectas, omitidas, total, porcentaje, tiempo } = resultado;
 
   // Los dos estados de la tarjeta del resultado. El reprobado no es una variante
   // decorativa: es la mitad de los casos, y es donde el contraste aprieta.
   const superficie = aprobado ? 'bg-esmeralda' : 'bg-ruby';
-  const correctas = aprobado ? 72 : 61;
   const iconoDelVeredicto = aprobado ? 'check-circle' : 'cancel';
-  const veredicto = aprobado ? 'Aprobaste el simulacro' : 'No alcanzaste el 60 %';
+  const veredicto = aprobado ? 'Aprobaste el simulacro' : 'Reprobaste el simulacro';
 
-  const explicacion = aprobado
-    ? 'Son 72 correctas de 120, justo el mínimo del 60 %.'
-    : 'Son 61 correctas de 120. El mínimo es 72, que es el 60 %.';
+  const cifra = (papel, valor) =>
+    `<strong data-papel="${papel}" class="font-mono font-semibold text-paper tabular-nums">${esc(valor)}</strong>`;
 
-  const revision = [
-    {
-      posicion: 12,
-      enunciado: PREGUNTA_DE_EJEMPLO.enunciado,
-      estado: 'correcta',
-      tuRespuesta: `Marcaste: ${PREGUNTA_DE_EJEMPLO.alternativas[0].texto}`,
-    },
-    {
-      posicion: 13,
-      enunciado: '¿Cuál de estas formas dispara un clic sobre un nodo que ya existe?',
-      estado: 'incorrecta',
-      tuRespuesta: `Marcaste: ${TOKEN_MAS_LARGO}`,
-    },
-    {
-      posicion: 14,
-      enunciado:
-        'Al modularizar la persistencia en archivos planos, ¿cuál es una buena práctica de diseño de código?',
-      estado: 'omitida',
-      tuRespuesta: 'No alcanzaste a responderla.',
-    },
-  ]
-    .map(dibujarFilaDeLaRevision)
-    .join('');
+  const elTiempo = tiempo
+    ? `
+      <p data-papel="tiempo-del-intento" class="mt-2 text-sm text-muted leading-relaxed">Tiempo total ${cifra('tiempo-total', formatearTranscurrido(tiempo.total_ms))} · promedio por pregunta ${cifra('tiempo-promedio', formatearTranscurrido(tiempo.promedio_ms))}. Cada pregunta tenía 30 segundos.</p>`
+    : '';
 
   return `
-    <div data-papel="pantalla-del-resumen">
-
       <section data-papel="resultado" class="${superficie} rounded-xl p-6 text-center">
-        <h2 class="font-display font-bold text-xl text-ink">Resultado del simulacro</h2>
+        <h2 id="titulo-del-resultado" data-papel="titulo-del-resultado" tabindex="-1" class="font-display font-bold text-xl text-ink focus:outline-none">Resultado del simulacro</h2>
         <p class="mt-2 flex items-baseline justify-center gap-2">
-          <span data-papel="cifra-del-resultado" class="font-display font-bold text-5xl text-ink tabular-nums">${esc(correctas)}</span><span class="font-display font-bold text-xl text-ink">de 120</span>
+          <span data-papel="cifra-del-resultado" class="font-display font-bold text-5xl text-ink tabular-nums">${esc(correctas)}</span><span class="font-display font-bold text-xl text-ink">de ${esc(total)}</span>
         </p>
         <p data-papel="veredicto" class="mt-3 inline-flex items-center gap-2 border border-ink rounded-full px-4 py-2">
           ${icon(iconoDelVeredicto, 'text-xl text-ink')}<span class="font-display font-bold text-xl text-ink">${veredicto}</span>
         </p>
       </section>
 
-      <p data-papel="explicacion-del-resultado" class="mt-4 text-sm text-muted leading-relaxed">${explicacion}</p>
+      <p data-papel="explicacion-del-resultado" class="mt-4 text-sm text-muted leading-relaxed">${cifra('cuenta-correctas', correctas)} correctas, ${cifra('cuenta-incorrectas', incorrectas)} respondidas mal y ${cifra('cuenta-omitidas', omitidas)} omitidas: el ${cifra('porcentaje', `${porcentaje} %`)}. El mínimo es 72 correctas, que es el 60 %.</p>${elTiempo}`;
+}
+
+/**
+ * La pantalla del resumen: resultado, desglose por modulo y revision.
+ *
+ * Con `resultado` dibuja el de un intento de verdad, calculado por
+ * `calcularResultado()`; sin el, dibuja el ejemplo de la maqueta, con `aprobado`
+ * eligiendo cual de los dos estados. Es UNA sola funcion para las dos cosas a
+ * proposito: si la maqueta tuviera su propio marcado, se despintaria de la pagina sin
+ * que ninguna comprobacion lo notara.
+ *
+ * `revision` es el HTML de la revision ya armado, o nada. Sin el va el aviso de que se
+ * esta cargando: el resultado sale de la copia congelada y se dibuja en el acto, y la
+ * revision espera a las justificaciones (decision 3).
+ */
+export function dibujarPantallaDelResumen({ aprobado = true, resultado = null, revision = null } = {}) {
+  const deVerdad = resultado !== null;
+  const elResultado = resultado ?? resultadoDeEjemplo(aprobado);
+
+  const filas = elResultado.desglose.map(dibujarFilaDelModulo).join('');
+
+  const laRevision = deVerdad
+    ? `
+        <div id="revision-del-intento" data-papel="revision-del-intento" class="mt-4">${
+          revision ??
+          `
+          <p data-papel="revision-cargando" class="text-sm text-muted leading-relaxed">Cargando la revisión…</p>`
+        }
+        </div>`
+    : `
+        <div class="mt-4">${dibujarRevisionDelIntento({ modulos: revisionDeEjemplo() })}
+        </div>`;
+
+  return `
+    <div data-papel="pantalla-del-resumen">
+${dibujarElResultado(elResultado)}
 
       <section data-papel="desglose" class="mt-6 bg-panel border ${BORDE_DEL_SIMULACRO} rounded-xl p-6">
         <h2 class="font-display font-bold text-xl text-paper">Cómo te fue en cada módulo</h2>
@@ -671,10 +898,65 @@ export function dibujarPantallaDelResumen({ aprobado = true } = {}) {
       </section>
 
       <section data-papel="revision" class="mt-6">
-        <h2 class="font-display font-bold text-xl text-paper">Revisa lo que respondiste</h2>
-        <ul class="mt-4 grid gap-3">${revision}
-        </ul>
+        <h2 class="font-display font-bold text-xl text-paper">Revisa lo que respondiste</h2>${laRevision}
       </section>
 
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-sm px-6 py-3 rounded hover:bg-jsyellowdim transition-colors">Empezar otro intento</button>
+        <p class="text-xs text-muted leading-relaxed">Este resumen queda guardado hasta que empieces otro.</p>
+      </div>
+
     </div>`;
+}
+
+/**
+ * La revision de ejemplo de la maqueta: un modulo con los tres estados.
+ *
+ * Las correctas van ABIERTAS en la maqueta, a diferencia de la pagina, para que la tabla
+ * de contraste mida tambien la fila de una correcta y el control en su estado abierto.
+ * Las justificaciones son texto de ejemplo del sitio y pasan por la misma pieza que en la
+ * pagina.
+ */
+function revisionDeEjemplo() {
+  const porque = (texto) => ({ justificacion: texto });
+
+  return [
+    {
+      modulo: 3,
+      modulo_titulo: 'Fundamentos de Programacion en JavaScript',
+      correctasAbiertas: true,
+      abiertas: [
+        {
+          posicion: 13,
+          pregunta_id: 31,
+          enunciado: '¿Cuál de estas formas dispara un clic sobre un nodo que ya existe?',
+          estado: 'incorrecta',
+          dada: TOKEN_MAS_LARGO,
+          correcta: 'Llamar a click() sobre el nodo obtenido con getElementById.',
+          conJustificacion: porque('click() dispara el evento sobre un nodo que ya está en el documento.'),
+        },
+        {
+          posicion: 14,
+          pregunta_id: 12,
+          enunciado:
+            'Al modularizar la persistencia en archivos planos, ¿cuál es una buena práctica de diseño de código?',
+          estado: 'omitida',
+          agotada: true,
+          correcta: 'Separar la lectura y la escritura en funciones con una sola responsabilidad.',
+          conJustificacion: porque('Una función por responsabilidad se prueba y se cambia sin tocar las demás.'),
+        },
+      ],
+      correctas: [
+        {
+          posicion: 12,
+          pregunta_id: PREGUNTA_DE_EJEMPLO.id,
+          enunciado: PREGUNTA_DE_EJEMPLO.enunciado,
+          estado: 'correcta',
+          dada: PREGUNTA_DE_EJEMPLO.alternativas[0].texto,
+          correcta: PREGUNTA_DE_EJEMPLO.alternativas[0].texto,
+          conJustificacion: porque('sort() sin comparadora convierte los elementos a texto antes de comparar.'),
+        },
+      ],
+    },
+  ];
 }

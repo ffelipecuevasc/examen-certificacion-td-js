@@ -69,7 +69,7 @@
  */
 import { $ } from '../utils/dom.js';
 import { reloj } from '../servicios/reloj.js';
-import { dibujarFranjaDelIntento } from './simulacro-maqueta.js';
+import { dibujarFranjaDelIntento, formatearTranscurrido } from './simulacro-maqueta.js';
 
 /** Lo que dura una pregunta. La regla 2 del README de la epica 40. */
 export const MS_POR_PREGUNTA = 30000;
@@ -77,26 +77,10 @@ export const MS_POR_PREGUNTA = 30000;
 /** A cuanto restante se enciende la franja. Decision del autor, 2026-09-18. */
 export const URGENCIA_MS = 10000;
 
-/**
- * El tiempo transcurrido, en texto (decision 4 de la iteracion 45).
- *
- * `MM:SS` hasta la hora, `H:MM:SS` desde la hora. El caso de varias horas no es
- * teorico: el reloj sigue corriendo fuera de la pagina (decision 3), asi que alguien
- * que deje el intento abierto y vuelva al dia siguiente lo ve. Las horas no se
- * rellenan con cero a la izquierda porque «1:04:09» se lee y «01:04:09» parece un
- * codigo.
- */
-export function formatearTranscurrido(ms) {
-  const totalEnSegundos = Math.max(0, Math.floor(ms / 1000));
-
-  const horas = Math.floor(totalEnSegundos / 3600);
-  const minutos = Math.floor((totalEnSegundos % 3600) / 60);
-  const segundos = totalEnSegundos % 60;
-
-  const dos = (n) => String(n).padStart(2, '0');
-
-  return horas > 0 ? `${horas}:${dos(minutos)}:${dos(segundos)}` : `${dos(minutos)}:${dos(segundos)}`;
-}
+// `formatearTranscurrido()` vive en components/simulacro-maqueta.js desde la iteracion 44:
+// la usan la franja y el resumen, y la maqueta es quien decide como se escribe cada cifra.
+// Se vuelve a exportar desde aqui para quien ya la importaba de este archivo.
+export { formatearTranscurrido };
 
 /**
  * Los segundos que se muestran, redondeando hacia arriba.
@@ -114,13 +98,18 @@ const segundosQueQuedan = (restanteMs) => Math.max(0, Math.ceil(restanteMs / 100
  * @param {() => object} enganches.estado  `{ empezado_en, comenzada_en, posicion, total }`
  * @param {() => (number|null)} enganches.alternativaMarcada  cual esta marcada ahora
  * @param {(paso: object) => void} enganches.resolverLaPregunta  la anota y avanza
- * @param {() => void} [enganches.alTerminarElIntento]  ya no quedan preguntas
+ *
+ * AL TERMINAR EL INTENTO, EL MOTOR SOLO SE APAGA Y VACIA LA FRANJA. Hasta la iteracion 44
+ * tenia un enganche para «ya no quedan preguntas» que dibujaba la pantalla final; y la misma
+ * pantalla la dibujaba tambien el recorrido al no encontrar pregunta, asi que salia dos
+ * veces. La decision B4 de la 44 dejo un solo camino, el del recorrido, porque es el que
+ * cubre ademas la recarga de un intento terminado y el intento sin arriendo, donde este
+ * motor no llega a arrancar.
  */
 export function crearCronometros({
   estado,
   alternativaMarcada = () => null,
   resolverLaPregunta,
-  alTerminarElIntento,
 }) {
   let pase = null;
   let andando = false;
@@ -235,7 +224,6 @@ export function crearCronometros({
     if (estado().posicion >= estado().total) {
       pintar();
       detener();
-      alTerminarElIntento?.();
       return;
     }
 

@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los nueve comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los diez comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -34,8 +34,9 @@
  *   5. comprobar-copias.mjs       las tres paginas dicen lo mismo en encabezado y pie
  *   6. probar-identidad-visual.mjs  el contraste, la paleta y los iconos del simulacro
  *   7. probar-cronometros.mjs     los dos relojes del simulacro y el arriendo de pestana
- *   8. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
- *   9. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
+ *   8. probar-resumen.mjs         el resumen del simulacro cuenta, ordena y avisa bien
+ *   9. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
+ *  10. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
  * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
@@ -75,7 +76,7 @@
  * Una comprobacion que hay que acordarse de correr no vigila nada.
  *
  * Codigos de salida:
- *   0  VERIFICADO             las nueve comprobaciones hechas y en verde
+ *   0  VERIFICADO             las diez comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -96,7 +97,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los nueve comprobadores, con la traduccion de sus codigos.
+ * Los diez comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -173,6 +174,19 @@ const COMPROBADORES = [
       0: [OK, 'los dos cronometros cuentan bien, una sola pestana escribe el intento y el recorrido se sostiene'],
       1: [FALLO, 'CRONOMETRO ROTO: una cifra, un agotamiento o el arriendo de la pestana no cuadra'],
       2: [AVISO, 'no se pudo comprobar: no se dejaron cargar los componentes del simulacro'],
+    },
+  },
+  {
+    // LA OCTAVA ENTRO CON LA ITERACION 44, y por lo mismo que la septima: no necesita
+    // servidor. Siembra el intento terminado en el almacen de mentira, lo retoma, e
+    // intercepta la unica peticion del resumen —las justificaciones—. Asi el resultado,
+    // el desglose, la revision y el aviso de pregunta corregida quedan vigilados en cada
+    // verificacion, y no solo cuando alguien se acuerda de correrlo.
+    nombre: 'resumen',
+    guion: 'probar-resumen.mjs',
+    codigos: {
+      0: [OK, 'el resumen cuenta, ordena, revisa y avisa como dicen las decisiones de la iteracion 44'],
+      1: [FALLO, 'RESUMEN ROTO: una cifra, el orden del desglose, la revision o un aviso no cuadra'],
     },
   },
   {

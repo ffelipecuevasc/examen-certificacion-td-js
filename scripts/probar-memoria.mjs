@@ -802,7 +802,9 @@ function retratoDelSimulacro(dom, paso, simulacro) {
 
   return {
     paso,
-    // El titulo del recuadro: «No se pudo…» o «Intento terminado».
+    // El titulo del recuadro: «No se pudo…» o «Tu simulacro sigue en la otra pestaña».
+    // «Intento terminado» ya no existe desde la iteracion 44: al terminar se dibuja el
+    // resumen, que no es un recuadro.
     //
     // SE LEE POR `data-papel` Y NO POR LAS CLASES. Hasta la iteracion 45 esto
     // buscaba «font-display font-bold text-xl text-paper», o sea que la prueba

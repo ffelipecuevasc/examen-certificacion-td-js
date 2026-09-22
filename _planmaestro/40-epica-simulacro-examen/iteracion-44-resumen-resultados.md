@@ -1,7 +1,7 @@
 # Iteración 44 · Resumen de resultados
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · etapa A cerrada el 2026-09-22 (A1 commiteado aparte; A2 y A3 a la espera de su commit) · quedan B y C
+**Estado:** 🔵 En curso · etapas A y B cerradas el 2026-09-22 (B a la espera de su commit) · queda C
 **Depende de:** iteración 43, cerrada el 2026-09-21.
 
 ## Objetivo
@@ -165,6 +165,8 @@ se ve en rojo por el motivo correcto**, igual que en la tanda 2 de la 43.
 
 Se toman **al abrir la etapa B**, con el código delante. Cada una lleva una propuesta que no es decisión todavía.
 
+**Tomadas por el autor el 2026-09-22, al abrir la etapa B**, las cuatro como estaban propuestas, con dos precisiones: B1 dice el límite en una línea («Cada pregunta tenía 30 segundos»), y B4 se decidió sabiendo que hoy la pantalla final se dibuja **dos veces** —el enganche del motor y el recorrido— y que un intento terminado retomado tomaba el arriendo. Detalle y evidencia en «Notas de la iteración · Etapa B».
+
 ### B1 · El tiempo promedio por pregunta
 
 Propuesta: el tiempo transcurrido total, del comienzo del intento a la resolución de la 120, **dividido por 120**, en el
@@ -201,18 +203,18 @@ cubre también la recarga de un intento ya terminado.
 
 ### Etapa B · El resumen
 
-- [ ] Tomar las decisiones B1 a B4.
-- [ ] Resultado global: correctas, respondidas mal, omitidas, porcentaje y resultado del simulacro (decisión 1).
-- [ ] Desglose por módulo, ordenado de peor a mejor con el desempate de la decisión 7.
-- [ ] Tiempo transcurrido total y promedio por pregunta (B1).
-- [ ] Revisión agrupada por módulo (decisión 2), con los plegables de B3.
-- [ ] Aviso de pregunta corregida o retirada después del intento (decisiones 4 y 9).
-- [ ] Conservar el último intento terminado y recalcular el resumen desde él (decisión 5), con el botón para empezar
+- [x] Tomar las decisiones B1 a B4.
+- [x] Resultado global: correctas, respondidas mal, omitidas, porcentaje y resultado del simulacro (decisión 1).
+- [x] Desglose por módulo, ordenado de peor a mejor con el desempate de la decisión 7.
+- [x] Tiempo transcurrido total y promedio por pregunta (B1).
+- [x] Revisión agrupada por módulo (decisión 2), con los plegables de B3.
+- [x] Aviso de pregunta corregida o retirada después del intento (decisiones 4 y 9).
+- [x] Conservar el último intento terminado y recalcular el resumen desde él (decisión 5), con el botón para empezar
   otro.
-- [ ] Reemplazar «Intento terminado» por el resumen, por un solo camino (B4).
-- [ ] Cambiar la tarjeta del reprobado de la maqueta a «Reprobaste el simulacro» (decisión 1).
-- [ ] Llevar el foco al resumen al llegar (B2).
-- [ ] Agregar a las pantallas de la sección 17 de `probar-identidad-visual.mjs` el resumen dibujado con un intento de
+- [x] Reemplazar «Intento terminado» por el resumen, por un solo camino (B4).
+- [x] Cambiar la tarjeta del reprobado de la maqueta a «Reprobaste el simulacro» (decisión 1).
+- [x] Llevar el foco al resumen al llegar (B2).
+- [x] Agregar a las pantallas de la sección 17 de `probar-identidad-visual.mjs` el resumen dibujado con un intento de
   verdad, aprobado y reprobado, y no solo la maqueta.
 
 ### Etapa C · Abrir el simulacro al sitio
@@ -242,29 +244,29 @@ la 42, y con su prueba vista en rojo por el motivo correcto antes de escribir el
 
 ### Etapa B · Se provocan con guion
 
-- [ ] **Las cifras cuadran**: correctas + respondidas mal + omitidas = 120.
-- [ ] **El umbral es exacto en el borde**: 72 correctas dicen «Aprobaste el simulacro» y 71 «Reprobaste el simulacro».
-- [ ] **Una agotada con alternativa marcada** cuenta según esa alternativa; **una agotada sin alternativa**, como
+- [x] **Las cifras cuadran**: correctas + respondidas mal + omitidas = 120.
+- [x] **El umbral es exacto en el borde**: 72 correctas dicen «Aprobaste el simulacro» y 71 «Reprobaste el simulacro».
+- [x] **Una agotada con alternativa marcada** cuenta según esa alternativa; **una agotada sin alternativa**, como
   omitida.
-- [ ] **El desglose por módulo suma 120** y respeta el orden y el desempate de la decisión 7, provocado con intentos
+- [x] **El desglose por módulo suma 120** y respeta el orden y el desempate de la decisión 7, provocado con intentos
   construidos para empatar en porcentaje y en omitidas.
-- [ ] **El tiempo total y el promedio por pregunta** salen de los instantes guardados según B1, y el reloj controlable
+- [x] **El tiempo total y el promedio por pregunta** salen de los instantes guardados según B1, y el reloj controlable
   los fija a valores conocidos.
-- [ ] **La revisión agrupa por módulo, en el orden del desglose**, con incorrectas y omitidas abiertas y correctas
+- [x] **La revisión agrupa por módulo, en el orden del desglose**, con incorrectas y omitidas abiertas y correctas
   plegadas, y el control de plegado declara su estado según B3.
-- [ ] **Cada pregunta de la revisión muestra la alternativa dada o que se omitió, la correcta y la justificación de esa
+- [x] **Cada pregunta de la revisión muestra la alternativa dada o que se omitió, la correcta y la justificación de esa
   pregunta**, y no la de otra.
-- [ ] **Con una pregunta cambiada en el banco después del intento**, simulado interceptando, el resultado no cambia y la
+- [x] **Con una pregunta cambiada en el banco después del intento**, simulado interceptando, el resultado no cambia y la
   revisión muestra la versión corregida con el aviso. **Con los ids renovados y los textos intactos, no hay aviso.**
   **Con una pregunta retirada**, se muestra la versión congelada con el aviso de retiro (decisión 9).
-- [ ] **Tras simular una recarga en el resumen**, se muestra el mismo resultado, recalculado desde el intento y sin
+- [x] **Tras simular una recarga en el resumen**, se muestra el mismo resultado, recalculado desde el intento y sin
   ningún resultado guardado aparte; **al empezar otro intento**, el anterior deja de estar guardado y la selección es
   nueva.
-- [ ] **Al resolverse la pregunta 120 se dibuja el resumen**, por un solo camino, y quitar ese camino da rojo (B4).
-- [ ] **Al llegar al resumen, el foco queda donde dice B2.**
-- [ ] **Vocabulario de ADR-022:** la sección 17 de `probar-identidad-visual.mjs`, con el resumen de verdad entre sus
+- [x] **Al resolverse la pregunta 120 se dibuja el resumen**, por un solo camino, y quitar ese camino da rojo (B4).
+- [x] **Al llegar al resumen, el foco queda donde dice B2.**
+- [x] **Vocabulario de ADR-022:** la sección 17 de `probar-identidad-visual.mjs`, con el resumen de verdad entre sus
   pantallas, sigue en verde, y el resultado usa exactamente una de las dos frases permitidas.
-- [ ] **`probar:cronometros` e `probar:identidad` siguen en verde.**
+- [x] **`probar:cronometros` e `probar:identidad` siguen en verde.**
 
 ### Etapa C · Se provocan con guion
 
@@ -339,3 +341,103 @@ comprobó el puerto 8788 libre y se levantó uno nuevo—: `probar:filtrado` 0, 
 devolvió las alternativas de las preguntas de prueba») y en verde al repetirlo sin cambios; está anotado en
 «Sin asignar» de `registro_log.md`. Su nota sigue diciendo «120 preguntas congeladas con su correcta y sin
 justificaciones»: el intento no cambió. `instantanea-banco.js` y `d1/respaldo-banco.sql` sin cambios.
+
+### Etapa B · cerrada el 2026-09-22
+
+El autor aprobó el diseño y las once pruebas antes de escribir código: **B1 a B4 tal como se propusieron**, un guion
+nuevo `scripts/probar-resumen.mjs` como décimo comprobador de `verificar`, y dos precisiones —la pregunta corregida
+conserva lo que el estudiante vivió y muestra la vigente aparte; «retirada» solo se afirma si la respuesta vino de la
+capa—. Cada prueba se escribió antes que su código, en el orden aprobado.
+
+**Las piezas.**
+
+- `static/js/servicios/resultado-del-intento.js`, nuevo. Cálculo puro, sin DOM ni red: `calcularResultado()` —cifras,
+  porcentaje, `aprobado` con `CORRECTAS_PARA_APROBAR = 72`, desglose ordenado, tiempo—, `compararConLaVigente()`
+  —decisión 9— y `armarLaRevision()`.
+- `components/simulacro-maqueta.js`: `dibujarPantallaDelResumen()` recibe el resultado de verdad —sin él dibuja el
+  ejemplo, que ahora dice «Reprobaste el simulacro»—, más `dibujarRevisionDelIntento()` y `dibujarDentroDelModulo()`.
+  La justificación se dibuja con `components/justificacion.js`. `formatearTranscurrido()` se mudó aquí desde
+  `cronometros.js` —que la reexporta— porque el resumen la necesita y el motor ya importa la maqueta: importarla al
+  revés cerraba un ciclo.
+- `components/simulacro.js`: `dibujarElResumen()` reemplaza a «Intento terminado»; `pedirLaRevision()` pide
+  `leerPreguntasPorIds(ids, { conJustificacion: true })` al llegar; `alternarLasCorrectas()` atiende el plegable por la
+  misma delegación del recorrido. `elIntento.terminado_en` vive también en memoria.
+- `components/cronometros.js`: sin el enganche del final.
+
+**Las once pruebas, con su rojo antes del código.**
+
+1. **Cifras** — rojo: `ERR_MODULE_NOT_FOUND` del servicio. Verde: cinco intentos —72/30/18 aprueba, 71/31/18
+   reprueba, agotadas mezcladas 60+12 / 20+10 / 10+8 da 72/30/18, todo omitido, todo bien—; cada uno suma 120 y cada
+   pregunta cae en el estado de su respuesta.
+2. **Desglose** — rojo: 31 problemas, sin desglose. Verde: orden `[7, 4, 3, 5, 6, 2, 8]` sobre un intento construido
+   para empatar: 4 antes que 3 por omitidas, 3 antes que 5 por número, y 6 antes que 2 con los mismos 7 errores porque
+   10/17 es peor que 11/18.
+3. **Tiempo (B1)** — rojo: seis problemas, sin tiempo ni línea de los 30 s. Verde: «45:00» y «00:22»; «1:00:00» y
+   «00:30». **Corrección de la prueba antes de implementar**: esperaba «60:00», y con el formato de la franja —el que B1
+   manda— una hora exacta se escribe «1:00:00».
+4. **Comparación (decisión 9)** — rojo: `compararConLaVigente()` no existía. Verde, con lo que la función devolvió en
+   cada caso: idéntica → igual; ids de alternativa renovados → igual; orden cambiado → igual; ids + orden + otra
+   justificación → igual; enunciado cambiado → corregida; texto de una alternativa incorrecta distinto → corregida;
+   texto de la correcta distinto → corregida; correcta movida con los mismos textos → corregida; correcta movida con
+   ids renovados y orden cambiado → corregida; `es_correcta` como 1/0 → igual; ausente desde la capa → retirada;
+   ausente desde la copia → desconocida. **Dos sabotajes** sobre la implementación: comparar por id y en orden da rojo
+   en los ids renovados, en el orden cambiado y en el texto distinto; quitar la comparación de textos da rojo en el
+   texto distinto. Los dos revertidos.
+5. **Un solo camino (B4)** — rojo, y es lo que mostró la lectura del código: la zona se escribía **2 veces** al resolver
+   la 120 por «Siguiente», al agotarse y al recargar; quedaba un temporizador vivo y el arriendo tomado sobre un intento
+   terminado. Verde: una escritura en cada camino, 72 por «Siguiente» (Aprobaste) y 71 agotada sin marcar (Reprobaste),
+   45:00 y 00:22 dejados por el reloj controlable, 0 temporizadores al recargar, ningún arriendo. **Quitar el camino da
+   rojo**: con la llamada de `dibujarElRecorrido()` comentada, los tres caminos fallan; revertido.
+6. **Foco (B2)** — rojo: el foco quedaba en la alternativa, en la tarjeta o en el `body`. Verde: `#titulo-del-resultado`
+   en los tres caminos, y ahí sigue al completarse la revisión. Sin `aria-live`.
+7. **Revisión (decisión 2, B3)** — rojo: sin revisión ni petición. **Un error de la prueba**, visto en el primer verde a
+   medias: cortaba el bloque de cada módulo en su propio `data-papel` y lo dejaba vacío; se corrigió la lectura, no el
+   código. Verde: bloques en `[7, 4, 3, 5, 6, 2, 8]`, 120 filas, cada una con lo dado, la correcta y **su**
+   justificación; incorrectas y omitidas abiertas, correctas plegadas con `aria-expanded` y `aria-controls`; el control
+   del módulo 3 abre, pliega y deja el foco en sí mismo; una sola petición, con las 120 y `con=justificacion`. **Dos
+   sabotajes**: darle a cada fila la justificación de la siguiente da rojo en las 120; abrir también las correctas da
+   rojo en los siete módulos. Revertidos.
+8. **Banco cambiado** — rojo: ningún aviso. **Otro error de la prueba**, corregido antes de implementar: exigía que la
+   10ª quedara «correcta», y en ese intento se respondió mal; ahora exige el estado congelado, sea cual sea. Verde:
+   resultado 72, igual que sin cambios; avisos en la 1002 y la 1009 (corregida) y la 1023 (retirada); la 1016, con ids
+   renovados y orden al revés, sin aviso; la corregida muestra lo que se vio y la versión vigente aparte, y la retirada
+   se muestra congelada y sin justificación.
+9. **Capa caída** — **esta NO se vio en rojo antes de su código**: pasó a la primera, porque lo escrito para la 7 y la 8
+   ya cubría la copia y el caso sin respaldo. Se dice así y no se presenta como rojo. Para que quede probado que sabe
+   fallar, **tres sabotajes**: tratar la copia como capa da rojo —la que falta pasa a «retirada» y se apaga el aviso de
+   ADR-008—; no encender el aviso da rojo; quitar la nota del caso sin copia da rojo. Revertidos. Verde: 120 filas
+   desde la copia, 119 con la justificación del archivo de la instantánea leído aparte, la que la copia no tiene dice
+   que falta su explicación y no que se retiró, y el aviso a la vista; sin capa ni copia, el resultado sigue en 72 y
+   las 120 se dibujan desde la copia congelada, sin justificaciones y con su nota.
+10. **Conservación** — rojo: el resumen no tenía el botón para empezar otro. Con el botón, rojo de la carrera: la
+    revisión del intento anterior llegaba tarde, se escribía y cambiaba el aviso de respaldo del nuevo. Verde: recargar
+    da la misma huella («72 | 45:00 | …»), el almacén solo tiene `preguntas` y `respuestas`, sin campo de resultado;
+    «Empezar otro intento» deja un `intento_id` nuevo con 120 preguntas y 0 respuestas; la revisión rezagada se
+    descarta. La guarda es una cuenta de peticiones que sube al empezar: `elIntento` sigue siendo el viejo durante toda
+    la carga del nuevo, así que mirarlo no alcanzaba.
+11. **Vocabulario (sección 17)** — rojo: el servicio no exportaba `armarLaRevision()` y no había resumen de verdad que
+    barrer. **Un hallazgo al ponerla en verde**: con texto real del banco, el barrido encontró «nota» —las preguntas 7 y
+    92 dicen «una nota al margen» y «Se nota al comparar»—. La sección 17 ya dice que el texto del banco no se barre,
+    así que el barrido usa las mismas pantallas con el texto del banco neutralizado; el contraste se sigue midiendo con
+    el real. **La tarjeta del reprobado ya decía «Reprobaste el simulacro»** desde la prueba 3, cuando se reescribió la
+    pantalla, así que esa comprobación no se vio fallar por sí sola: un **sabotaje** que devuelve «No alcanzaste el
+    60 %» da rojo en la maqueta y en el resumen de verdad. Revertido. Verde: 2 717 mediciones de contraste, ninguna bajo
+    su umbral; 11 pantallas barridas, cada resumen con una sola de las dos frases, la que le toca.
+
+**Consecuencia en otro guion.** El bloque 18 de `probar-cronometros.mjs` exigía «Intento terminado» al resolver la 120;
+ahora exige el resumen. Es el efecto directo de B4, no un cambio de criterio.
+
+**Al cierre**, con `npm run datos:dev` levantado —el servidor anterior se detuvo, se comprobó el 8788 libre y se levantó
+uno nuevo, que recompiló `static/css/style.css` con las clases nuevas—: `probar:resumen` 0, `probar:cronometros` 0,
+`probar:identidad` 0, `probar:filtrado` 0 y `probar:memoria` 0. **`npm run verificar` termina en 1**, con los otros nueve
+en OK y `css` en **DESFASADO**: «el CSS corresponde a su fuente, pero difiere de lo que hay commiteado». Es `style.css`
+recompilado y todavía sin commit; se resuelve con el commit de la etapa. Repetido tras reiniciar el servidor: mismo
+resultado. `instantanea-banco.js` y `d1/respaldo-banco.sql` sin cambios.
+
+**Una caída del servidor, sin investigar.** Al terminar `probar:memoria` —ya en 0—, `wrangler pages dev` se cayó con un
+`[ERROR]` vacío desde `ProxyController`. Las pruebas no se vieron afectadas: habrían dado código 2. Anotado en «Sin
+asignar», junto a H-029.
+
+**Lo que queda para el navegador del autor**: que el resultado se entienda, que la revisión se recorra en el teléfono y
+con teclado, que los plegables se anuncien con lector de pantalla, y un intento real hasta el resumen sin errores de
+consola.

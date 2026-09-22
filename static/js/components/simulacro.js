@@ -92,8 +92,12 @@ import {
   BORDE_DEL_SIMULACRO,
   dibujarBotonesDelIntento,
   dibujarColumnaDelIntento,
+  dibujarDentroDelModulo,
+  dibujarPantallaDelResumen,
+  dibujarRevisionDelIntento,
   dibujarTarjetaDeLaPregunta,
 } from './simulacro-maqueta.js';
+import { armarLaRevision, calcularResultado } from '../servicios/resultado-del-intento.js';
 import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
 import { mostrarAvisoDeGuardado } from './aviso-de-guardado.js';
 
@@ -380,11 +384,17 @@ function dibujarElRecorrido({ enfocar = 'pregunta' } = {}) {
 
   const pregunta = laPreguntaEnCurso();
 
-  // Sin pregunta que dibujar, el intento se acabo. Se atiende aqui y no solo en
-  // `alTerminarElIntento` porque a esta funcion se puede llegar sin cronometros
-  // encendidos —un intento sin arriendo, o uno terminado que se retoma—.
+  // Sin pregunta que dibujar, el intento se acabo, y aqui aparece el resumen.
+  //
+  // ES EL UNICO CAMINO AL RESUMEN (decision B4 de la iteracion 44). Hasta la 44 habia
+  // otro, un enganche del motor de los cronometros, y la pantalla final salia dos veces
+  // seguidas. Se quedo este porque es el que cubre todos los casos: la 120 resuelta con
+  // «Siguiente» o agotada —las dos pasan por `anotarEnElIntento()`, que llega aqui—, la
+  // recarga de un intento terminado, el intento sin arriendo y el que no se guarda, donde
+  // los cronometros no llegan a arrancar. `probar-resumen.mjs` (prueba 5) cuenta que la
+  // zona se escriba UNA vez en cada uno.
   if (!pregunta) {
-    dibujarIntentoTerminado();
+    dibujarElResumen();
     return;
   }
 
@@ -406,33 +416,130 @@ function dibujarElRecorrido({ enfocar = 'pregunta' } = {}) {
 }
 
 /**
- * PANTALLA TRANSITORIA, PUESTA EL 2026-09-18 Y CON FECHA DE SALIDA: la 44.
+ * El resumen del intento terminado (iteracion 44). Reemplaza a la pantalla transitoria
+ * que la 43 dejo con fecha de salida.
  *
- * Al resolverse la pregunta 120 el intento se acaba, y el resumen —resultado, desglose
- * por modulo y revision— es de la iteracion 44. Hasta entonces esto dice que termino y
- * deja una salida, que es lo que un callejon sin salida no tiene. La 44 lo reemplaza
- * por `dibujarPantallaDelResumen()` con las cifras calculadas.
+ * SE RECALCULA CADA VEZ, NO SE GUARDA (ADR-035, parte 7; decision 5 de la 44). Lo que se
+ * conserva es el intento terminado; el resultado sale de su copia congelada y sus
+ * respuestas en cada llamada, sea al terminar o al recargar.
  *
- * Se marca como transitoria igual que se marco la limitacion que dejo escrita la 42:
- * una pantalla provisional sin fecha ni sucesor es la que se queda diez meses.
+ * LO PRIMERO ES APAGAR (decision B4). Terminado el intento no queda nada que contar ni
+ * que proteger: se sueltan el arriendo y los cronometros. Un arriendo vivo sobre un
+ * intento terminado dejaria otra pestana abierta en el resumen bloqueada con «Tu
+ * simulacro sigue en la otra pestaña», que ya no es verdad.
  *
- * El boton lleva el id de «Comenzar» porque hace lo mismo —armar un intento— y porque
- * el oyente vive en la zona y no en el boton.
+ * EL BOTON LLEVA EL ID DE «COMENZAR» porque hace lo mismo —armar un intento nuevo, que
+ * reemplaza a este— y porque el oyente vive en la zona y no en el boton. Lo dibuja la
+ * maqueta junto con el resto de la pantalla.
  */
-function dibujarIntentoTerminado() {
+function dibujarElResumen() {
   laMarcada = null;
   confirmandoOmitir = false;
 
-  const cuantas = elIntento?.preguntas.length ?? PREGUNTAS_DEL_INTENTO;
+  elDueno?.soltar();
+  pararElIntento();
 
-  dibujarRecuadro({
-    titulo: 'Intento terminado',
-    cuerpo: `
-        <p class="mt-3 text-sm text-muted leading-relaxed">Llegaste al final de las <strong class="font-semibold text-paper">${esc(cuantas)} preguntas</strong>. El resumen con tu resultado —cuántas correctas, cómo te fue en cada módulo y la revisión de lo que respondiste— llega en una versión próxima.</p>
-        <div class="mt-6">
-          <button id="comenzar-simulacro" type="button" class="inline-flex items-center gap-2 border ${BORDE_DEL_SIMULACRO} text-paper font-display font-bold text-sm px-5 py-3 rounded hover:border-jsyellow transition-colors">Empezar otro intento</button>
-        </div>`,
+  const franja = $('#franja-del-simulacro');
+  if (franja) franja.innerHTML = '';
+
+  const zona = $('#zona-del-intento');
+  if (!zona || !elIntento) return;
+
+  const resultado = calcularResultado(elIntento);
+
+  laRevision = null;
+  zona.innerHTML = dibujarPantallaDelResumen({ resultado });
+
+  // EL FOCO VA AL TITULO DEL RESULTADO (decision B2), con el mismo gesto que el cambio
+  // de pregunta: quien tenia el foco en «Siguiente» o en la tarjeta de la 120 lo acaba
+  // de perder con el redibujo, y sin esto caeria al `body`. Sin `aria-live`, por lo
+  // mismo que la tarjeta: el foco ya lleva a quien escucha al principio de lo nuevo.
+  $('#titulo-del-resultado')?.focus();
+
+  // Y la revision se pide DESPUES de dibujar (decision 3): el resultado sale de la copia
+  // congelada y no espera a la red; la revision necesita las justificaciones y la
+  // version vigente, y mientras llegan dice que se esta cargando.
+  pedirLaRevision(resultado);
+}
+
+/**
+ * La revision que hay en pantalla: sus bloques por modulo, y en cuales estan abiertas
+ * las correctas. `null` mientras no haya.
+ *
+ * Vive aqui y no en el HTML por lo mismo que `laMarcada`: abrir o plegar redibuja el
+ * bloque, y guardar el estado en lo dibujado seria leerlo de vuelta de lo que uno mismo
+ * escribio.
+ */
+let laRevision = null;
+
+/**
+ * Cuantas revisiones se han pedido. Una respuesta que llega cuando ya se pidio otra
+ * —o cuando se empezo otro intento— se descarta.
+ *
+ * NO BASTA CON MIRAR `elIntento`: al pulsar «Empezar otro intento», `elIntento` sigue
+ * siendo el viejo durante toda la carga del nuevo, que es justo cuando la respuesta
+ * rezagada puede llegar. La cuenta se sube al empezar, y eso si la deja fuera.
+ */
+let peticionDeLaRevision = 0;
+
+/**
+ * Pide las justificaciones y la version vigente por los ids del intento, en UNA
+ * peticion (decisiones 3 y 8), y dibuja la revision al llegar.
+ *
+ * Con la capa caida, `leerPreguntasPorIds()` cae sola a la copia y la trae con sus
+ * justificaciones (etapa A2), y entonces se enciende el aviso de ADR-008: el respaldo
+ * nunca se sirve en silencio. Si no contesta ni la copia, la revision se dibuja igual
+ * desde la copia congelada, sin justificaciones y diciendolo: el estudiante tiene que
+ * poder ver que respondio aunque no se le pueda explicar por que.
+ */
+async function pedirLaRevision(resultado) {
+  const esta = (peticionDeLaRevision += 1);
+
+  const ids = resultado.porPregunta.map(({ pregunta }) => pregunta.id);
+  const respuesta = await leerPreguntasPorIds(ids, { conJustificacion: true });
+
+  if (esta !== peticionDeLaRevision) return;
+
+  const contenedor = $('#revision-del-intento');
+  if (!contenedor) return;
+
+  const desdeLaCopia = Boolean(respuesta.ok && respuesta.meta?.respaldo);
+
+  mostrarAvisoDeRespaldo({
+    sello: desdeLaCopia ? respuesta.meta.respaldo : null,
+    loQueSeCargo: 'la revisión',
   });
+
+  const vigentes = respuesta.ok ? new Map(respuesta.datos.map((p) => [p.id, p])) : null;
+
+  laRevision = armarLaRevision(resultado, vigentes, { desdeLaCopia });
+
+  contenedor.innerHTML = dibujarRevisionDelIntento({
+    modulos: laRevision,
+    nota: vigentes
+      ? null
+      : 'No se pudieron traer las explicaciones: no respondió el banco ni la copia guardada. Tu resultado no cambia; abajo está lo que respondiste.',
+  });
+}
+
+
+/**
+ * Abre o pliega las correctas de un modulo (decision B3).
+ *
+ * Redibuja SOLO ese bloque y devuelve el foco a su control: el redibujo destruye el
+ * boton pulsado, y sin esto el foco de quien usa teclado caeria al `body`.
+ */
+function alternarLasCorrectas(modulo) {
+  const bloque = laRevision?.find((b) => String(b.modulo) === String(modulo));
+  if (!bloque || bloque.correctas.length === 0) return;
+
+  bloque.correctasAbiertas = !bloque.correctasAbiertas;
+
+  const nodo = $(`#revision-del-modulo-${bloque.modulo}`);
+  if (!nodo) return;
+
+  nodo.innerHTML = dibujarDentroDelModulo(bloque);
+  $(`#plegar-correctas-${bloque.modulo}`)?.focus();
 }
 
 /**
@@ -581,7 +688,15 @@ export function conectarElRecorrido() {
       return;
     }
 
-    if (evento.target.closest?.('[data-papel="omitir"]')) tocarOmitir();
+    if (evento.target.closest?.('[data-papel="omitir"]')) {
+      tocarOmitir();
+      return;
+    }
+
+    // Y en el resumen, el control de las correctas de cada modulo (decision B3). Vive en
+    // el mismo oyente por lo mismo que los otros: la zona se reescribe entera.
+    const plegable = evento.target.closest?.('[data-papel="plegar-correctas"]');
+    if (plegable) alternarLasCorrectas(plegable.dataset?.modulo);
   });
 
   // LAS FLECHAS DEL GRUPO DE RADIO (decision 11 de la 43). Por delegacion, igual que
@@ -860,6 +975,12 @@ export async function comenzarElIntento() {
   elDueno?.soltar();
   pararElIntento();
 
+  // Y la revision del resumen anterior, si seguia viajando, queda descartada: sube la
+  // cuenta de peticiones y su respuesta ya no es la ultima. `elIntento` no sirve para
+  // saberlo, porque sigue siendo el viejo durante toda la carga del nuevo.
+  peticionDeLaRevision += 1;
+  laRevision = null;
+
   // Y se olvida lo guardado ANTES de pedir nada. Si el estudiante pulsa «Empezar otro
   // intento» y la carga falla, lo que no puede quedar es el intento anterior en el
   // almacen y la pantalla diciendo que no se pudo armar ninguno: al recargar volveria
@@ -928,6 +1049,7 @@ export async function comenzarElIntento() {
       // El intento y su primera pregunta empiezan en el mismo instante: el del clic.
       empezado_en: empezadoEn,
       comenzada_en: empezadoEn,
+      terminado_en: null,
     };
 
     guardarIntentoNuevo(resultado.preguntas, empezadoEn);
@@ -1020,11 +1142,17 @@ export function anotarEnElIntento(entrada) {
   // acá se deja puesto para que lo guardado sea coherente desde el primer dia.
   elIntento.comenzada_en = resueltaEn;
 
+  // El final del intento es el instante en que quedo resuelta la ultima. Vive tambien
+  // en memoria y no solo en el almacen desde la iteracion 44: el tiempo total del
+  // resumen sale de aqui (B1), y un intento que no se pudo guardar tiene que poder
+  // mostrarlo igual.
+  elIntento.terminado_en =
+      elIntento.posicion === elIntento.preguntas.length ? resueltaEn : null;
+
   const pudo = guardarAvance({
     posicion: elIntento.posicion,
     comenzada_en: elIntento.comenzada_en,
-    terminado_en:
-        elIntento.posicion === elIntento.preguntas.length ? resueltaEn : null,
+    terminado_en: elIntento.terminado_en,
     respuestas: elIntento.respuestas,
   });
 
@@ -1102,6 +1230,7 @@ export function retomarElIntento() {
     // devolvia y lo validaba; lo que faltaba era recogerlo.
     empezado_en: guardado.empezado_en,
     comenzada_en: guardado.comenzada_en,
+    terminado_en: guardado.terminado_en,
   };
 
   // El aviso se recalcula al retomar y no se hereda: el navegador pudo llenarse
@@ -1115,8 +1244,13 @@ export function retomarElIntento() {
 
   // Se retoma DONDE IBA: la pregunta que marca la posicion guardada, no la primera y
   // no un aviso. Si el intento ya estaba terminado, `dibujarElRecorrido()` lo detecta
-  // y dibuja la pantalla del final.
+  // y dibuja el resumen, recalculado desde lo guardado (decision 5).
   dibujarElRecorrido();
+
+  // UN INTENTO TERMINADO NO SE PONE EN MARCHA (decision B4). No queda pregunta que
+  // cronometrar, y tomar el arriendo bloquearia el resumen en otra pestana que lo
+  // estuviera mirando.
+  if (elIntento.posicion >= elIntento.preguntas.length) return;
 
   // Y el reloj sigue donde estaba. Lo primero que hacen los cronometros al arrancar es
   // ponerse al dia, asi que un intento que estuvo dos minutos cerrado vuelve con sus
@@ -1175,9 +1309,8 @@ function ponerEnMarchaElIntento({ hayIntentoGuardado } = {}) {
         resuelta_en,
       });
     },
-    // El enganche que la 42 declaro y que hasta hoy no le pasaba nadie. Lo llama el
-    // motor cuando ya no quedan preguntas, despues de vaciar la franja y de pararse.
-    alTerminarElIntento: dibujarIntentoTerminado,
+    // Sin enganche para el final: al no quedar preguntas el motor vacia la franja y se
+    // para, y el resumen lo dibuja `dibujarElRecorrido()`, que es el unico camino (B4).
   });
 
   losCronometros.arrancar();

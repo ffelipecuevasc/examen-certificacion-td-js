@@ -398,6 +398,100 @@ const PANTALLAS = {
   'resumen reprobado': maqueta.dibujarPantallaDelResumen({ aprobado: false }),
 };
 
+/**
+ * EL RESUMEN DE VERDAD, APROBADO Y REPROBADO (iteracion 44, etapa B).
+ *
+ * La maqueta no basta: su revision son tres filas de ejemplo, y la de verdad trae los
+ * siete bloques, los plegables, las justificaciones y los avisos de pregunta corregida y
+ * retirada. Todo eso son colores y textos que el estudiante ve, y tienen que pasar por la
+ * tabla de contraste y por el barrido del vocabulario como cualquier otra pantalla.
+ *
+ * Se arman con las mismas piezas que usa la pagina —`calcularResultado()`,
+ * `armarLaRevision()` y la maqueta— sobre 120 preguntas de verdad de la instantanea, con
+ * una corregida y una retirada para que los dos avisos aparezcan. Lo que no se usa es el
+ * DOM: esta tabla mide cadenas de marcado, y la revision de verdad es una cadena.
+ */
+const resumenesDeVerdad = {};
+
+/**
+ * Las mismas dos pantallas, con el texto del banco neutralizado, PARA EL BARRIDO DEL
+ * VOCABULARIO y solo para el.
+ *
+ * La seccion 17 no barre el texto del banco —una pregunta de JavaScript puede decir
+ * «una nota al margen» con todo derecho, y la 7 y la 92 lo dicen—, y la revision de
+ * verdad lo trae entero. Se arma entonces otra vez, con la misma estructura y cada
+ * texto del banco cambiado por uno neutro: lo que queda es exactamente lo que dice el
+ * simulacro. El contraste se sigue midiendo sobre las de arriba, con el texto real.
+ */
+const resumenesDeVerdadSinElBanco = {};
+
+try {
+  const servicio = await import('../static/js/servicios/resultado-del-intento.js');
+  const { PREGUNTAS: delBanco } = await import('../static/js/data/instantanea-banco.js');
+
+  if (typeof servicio.armarLaRevision !== 'function') {
+    throw new Error('servicios/resultado-del-intento.js no exporta armarLaRevision()');
+  }
+
+  const neutro = (p, i) => ({
+    ...structuredClone(p),
+    enunciado: `Enunciado ${i}`,
+    modulo_titulo: `Modulo ${p.modulo}`,
+    justificacion: `Explicacion ${i}`,
+    alternativas: p.alternativas.map((a, k) => ({ ...a, texto: `Alternativa ${i}-${k}` })),
+  });
+
+  for (const [destino, PREGUNTAS] of [
+    [resumenesDeVerdad, delBanco.slice(0, 120)],
+    [resumenesDeVerdadSinElBanco, delBanco.slice(0, 120).map(neutro)],
+  ]) {
+    const deVerdad = PREGUNTAS.slice(0, 120).map(({ justificacion, ...resto }) => structuredClone(resto));
+
+    const vigentes = new Map(PREGUNTAS.slice(0, 120).map((p) => [p.id, structuredClone(p)]));
+    vigentes.get(deVerdad[1].id).enunciado = `${deVerdad[1].enunciado} (corregida)`;
+    vigentes.delete(deVerdad[2].id);
+
+    /** Una respuesta por pregunta: en cada decena, `bien` correctas, luego mal, y la ultima omitida. */
+    const respuestasCon = (bien) =>
+      deVerdad.map((pregunta, i) => {
+        const resto = i % 10;
+        const correcta = pregunta.alternativas.find((a) => Boolean(a.es_correcta));
+        const incorrecta = pregunta.alternativas.find((a) => !a.es_correcta);
+
+        if (resto === 9) return { pregunta_id: pregunta.id, alternativa_id: null, estado: 'omitida', agotada: i % 20 === 9 };
+        return {
+          pregunta_id: pregunta.id,
+          alternativa_id: resto < bien ? correcta.id : incorrecta.id,
+          estado: 'respondida',
+          agotada: false,
+        };
+      });
+
+    for (const [nombre, bien] of [['resumen de verdad aprobado', 6], ['resumen de verdad reprobado', 5]]) {
+      const resultado = servicio.calcularResultado({
+        preguntas: deVerdad,
+        respuestas: respuestasCon(bien),
+        empezado_en: 0,
+        terminado_en: 2580000,
+      });
+
+      const modulos = servicio.armarLaRevision(resultado, vigentes, { desdeLaCopia: false });
+
+      // Un bloque con las correctas ABIERTAS, para medir tambien ese estado del control.
+      modulos[0].correctasAbiertas = true;
+
+      destino[nombre] = maqueta.dibujarPantallaDelResumen({
+        resultado,
+        revision: maqueta.dibujarRevisionDelIntento({ modulos }),
+      });
+    }
+  }
+} catch (error) {
+  problemas.push(`resumen de verdad: no se pudo armar para medirlo (${error.message})`);
+}
+
+Object.assign(PANTALLAS, resumenesDeVerdad);
+
 // ---------------------------------------------------------------------------
 // 5 · La tabla de contraste
 // ---------------------------------------------------------------------------
@@ -1216,7 +1310,9 @@ const barridos = [
     texto: textoVisible(principalDelSimulacro),
     conLaDePresentacion: true,
   },
-  ...Object.entries(PANTALLAS).map(([nombre, html]) => ({
+  // Las dos del resumen de verdad se barren en su version sin el texto del banco (ver
+  // `resumenesDeVerdadSinElBanco`): lo que se vigila es lo que dice el simulacro.
+  ...Object.entries({ ...PANTALLAS, ...resumenesDeVerdadSinElBanco }).map(([nombre, html]) => ({
     nombre: `la pantalla «${nombre}»`,
     texto: textoVisible(html),
     conLaDePresentacion: false,
@@ -1235,6 +1331,38 @@ for (const { nombre, texto, conLaDePresentacion } of barridos) {
     problemas.push(
         `vocabulario de ADR-022: ${nombre} dice ` +
         `${[...new Set(indebidas.map((p) => `«${p}»`))].join(', ')}, que no esta autorizado`
+    );
+  }
+}
+
+// EL RESULTADO DICE EXACTAMENTE UNA DE LAS DOS FRASES (iteracion 44, decision 1). Que no
+// haya palabras prohibidas no basta: una tarjeta que dijera las dos, o ninguna, pasaria
+// el barrido de arriba. Se exige en las cuatro pantallas del resumen —las dos de la
+// maqueta y las dos de verdad— que aparezca una sola vez una sola de las dos, y la que
+// corresponde a su estado.
+const pantallasDelResumen = {
+  resumen: 'Aprobaste el simulacro',
+  'resumen reprobado': 'Reprobaste el simulacro',
+  'resumen de verdad aprobado': 'Aprobaste el simulacro',
+  'resumen de verdad reprobado': 'Reprobaste el simulacro',
+};
+
+for (const [nombre, laQueToca] of Object.entries(pantallasDelResumen)) {
+  const html = PANTALLAS[nombre];
+
+  if (html === undefined) {
+    problemas.push(`vocabulario de ADR-022: no hay pantalla «${nombre}» que barrer`);
+    continue;
+  }
+
+  const texto = textoVisible(html);
+  const cuantas = FRASES_AUTORIZADAS.map((frase) => texto.split(frase).length - 1);
+  const total = cuantas.reduce((a, b) => a + b, 0);
+
+  if (total !== 1 || !texto.includes(laQueToca)) {
+    problemas.push(
+        `vocabulario de ADR-022: la pantalla «${nombre}» dice ${FRASES_AUTORIZADAS.map((f, i) => `«${f}» ${cuantas[i]} vez(ces)`).join(' y ')}, ` +
+        `y tiene que decir solo «${laQueToca}», una vez`
     );
   }
 }

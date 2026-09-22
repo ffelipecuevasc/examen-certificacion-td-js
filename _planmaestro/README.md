@@ -11,21 +11,25 @@ decisiones vale tanto como el código que las implementa.
 |---------------|---------------------------------------------------------------------------------|
 | **Iteración** | 44 · Resumen de resultados                                                     |
 | **Épica**     | 40 · Simulacro de examen                                                       |
-| **Estado**    | 🔵 En curso · etapa A cerrada, falta su commit; quedan B y C                   |
+| **Estado**    | 🔵 En curso · etapas A y B cerradas; la B falta commitear. Queda la C          |
 | **Archivo**   | `40-epica-simulacro-examen/iteracion-44-resumen-resultados.md`                 |
 | **Reanudada** | 2026-09-22 · vuelve el reparto de trabajo: autor dirige, Claude Code implementa |
 
-> **Antes de seguir.** El simulacro se juega entero y todavía no dice cómo le fue a
-> nadie: al resolverse la pregunta 120 aparece «Intento terminado», marcada como
-> transitoria, y ese es el hueco de esta iteración. La página sigue sin enlazar
-> desde ninguna parte de momento: eso es la etapa C.
+> **Antes de seguir.** El simulacro ya dice cómo le fue al estudiante: al resolverse
+> la pregunta 120 aparece el resumen —resultado, desglose por módulo, tiempo y
+> revisión—, y «Intento terminado» dejó de existir. Lo que falta es la **etapa C**:
+> la página sigue sin enlazar desde ninguna parte.
 >
-> **Lo que ya está hecho de la etapa A.** El extremo `/api/preguntas` acepta
-> `&con=justificacion` junto a `ids`, y sólo junto a `ids`: cualquier otro uso se
-> rechaza con `PETICION_INVALIDA` (ADR-035, decisión 8). Probado en rojo con seis
-> problemas y en verde con 15 formas de pedir mal. **A2 y A3 cerradas el
-> 2026-09-22**, pendientes de su commit: el servicio `leerPreguntasPorIds(ids,
-> { conJustificacion })` y `components/justificacion.js`. Lo siguiente es la etapa B.
+> **Etapa A, cerrada y commiteada.** El extremo `/api/preguntas` acepta
+> `&con=justificacion` junto a `ids`, y sólo junto a `ids`; el servicio
+> `leerPreguntasPorIds(ids, { conJustificacion })` lo pide por los dos caminos, y
+> `components/justificacion.js` es la pieza única del porqué.
+>
+> **Etapa B, cerrada el 2026-09-22 y pendiente de su commit.** Entra
+> `servicios/resultado-del-intento.js` —cifras, desglose, tiempo y comparación con el
+> banco vigente— y `scripts/probar-resumen.mjs` como **décimo comprobador** de
+> `npm run verificar`. Las decisiones B1 a B4 quedaron tomadas. `verificar` termina
+> en 1 sólo por el CSS recompilado sin commitear.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
