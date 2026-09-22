@@ -1,7 +1,7 @@
 # Iteración 44 · Resumen de resultados
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · etapas A, B y C cerradas el 2026-09-22 (C a la espera de su commit) · quedan los nueve criterios de navegador del autor
+**Estado:** 🔵 En curso · las tres etapas cerradas y commiteadas el 2026-09-22 · pendiente de commit la cuarta excepción de ADR-022 y el ajuste del aviso · quedan los nueve criterios de navegador del autor
 **Depende de:** iteración 43, cerrada el 2026-09-21.
 
 ## Objetivo
@@ -525,7 +525,7 @@ funcionado— y el build falló con `MODULE_NOT_FOUND`; se repuso con `npm insta
 CHECK de es_correcta`: se corrió el diagnóstico de H-029 antes de suponer nada —el `CHECK (es_correcta IN (0, 1))` está
 en la base, y el comprobador suelto dio 0— y al repetir `verificar` salió OK. Tercera aparición de la misma familia.
 
-### Lo que bloquea el cierre y necesita decisión del autor
+### Lo que bloqueó el cierre, y cómo se resolvió
 
 **El texto nuevo del aviso de `simulacro.html` usa «Certificación» y «certificación»**, y esa palabra está en la lista de
 ADR-022 que barre la sección 17 de `probar-identidad-visual.mjs` sobre el `<main>` de esa página. El texto es del autor y
@@ -538,8 +538,36 @@ ADR-022 que barre la sección 17 de `probar-identidad-visual.mjs` sobre el `<mai
    una decisión de producto: la palabra prohibida existe para que ninguna pantalla sugiera que este simulacro certifica
    algo.
 
-Mientras no se resuelva, `probar:identidad` y `npm run verificar` quedan en rojo por ese motivo, y el criterio de
-navegador sobre ADR-022 sigue sin marcar.
+**Resuelto el 2026-09-22 por la segunda vía: ADR-022 gana su cuarta excepción.** El autor la redactó entera y la
+escribió al final del bloque de la tercera frase autorizada: el aviso puede nombrar el examen real **con esta forma
+exacta y ninguna otra** —«examen de certificación de Talento Digital para Chile», con mayúscula inicial solo al abrir
+oración— y **solo dentro de `simulacro.html`**, que es la misma forma que ya usan el título de la página, el meta
+description y el pie de las tres. El motivo, escrito en la ADR: lo que se prohíbe es que **el resultado del simulacro**
+reclame validez de certificación, no que el sitio nombre bien al examen real cuando lo usa de contraste.
+
+**Tres ajustes al texto del aviso**, pedidos por el autor y aplicados solo a lo que nombró: las dos variantes del nombre
+pasan a la forma autorizada; el cierre del tercer párrafo pasa de «no del examen oficial de certificación de Talento
+Digital» a «no del examen real», porque era un tercer nombre para lo mismo y el título del aviso ya lo dice; y
+«(duración & formato)» pasa a «(duración y formato)». El cambio de fuente —de «un correo… e instructores» a «emails y
+videoconferencias… a los participantes»— se dejó tal cual, por indicación del autor.
+
+**La sección 17 de `probar-identidad-visual.mjs`** borra esa frase antes de buscar, y solo en el barrido del `<main>`
+de `simulacro.html`. **Y de paso se le amplió la raíz vigilada**: pasaba de `certificaci[oó]n(es)?` a
+`certific[wáéíóúñ]*`, porque la propia excepción nombra «te certifica» entre lo prohibido y el verbo se colaba en
+verde con la forma anterior.
+
+**Las provocaciones, con evidencia:**
+
+1. **Con la forma autorizada en el aviso**, `probar:identidad` da **IDENTIDAD VISUAL EN PIE**, código 0.
+2. **Sabotaje A**, «este simulacro te certifica» dentro del `<main>`: rojo, «dice «certifica», que no está
+   autorizado». **Sabotaje B**, «al terminar recibes tu certificación»: rojo, «dice «certificación»». **Sabotaje C**, el
+   nombre **incompleto** —«el examen de certificación de Talento Digital», sin «para Chile»—: **rojo también**, que es
+   lo que prueba que la excepción no quedó ancha. Los tres revertidos, y el guion vuelve a verde.
+
+De paso se corrigió el mensaje: con `w` a secas, «certificación» se informaba cortada en «certificaci».
+
+**`npm run verificar` termina en 0**, con los diez comprobadores en OK y `css` confirmando que el CSS versionado
+coincide con lo commiteado.
 
 **Queda pendiente de la pasada del autor en el navegador**, sin marcar: los nueve criterios del bloque final. En
 particular el de **ADR-022** —que ninguna frase sugiera que aprobar el simulacro equivale a aprobar el examen real—, que

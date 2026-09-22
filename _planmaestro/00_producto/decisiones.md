@@ -1113,6 +1113,36 @@ simulacro», «nota», «puntaje oficial», «calificación», «certificación�
 fórmula que sugiera validez de certificación. Y sigue en pie la regla del párrafo
 anterior: una cuarta frase se añade **acá antes** de escribirla en la pantalla.
 
+**Cuarta excepción autorizada · 2026-09-22 · nombrar el examen real, con su nombre
+correcto, fuera de la pantalla de resultados.** *Decisión del autor, tomada al cerrar
+la etapa C de la iteración 44.* El barrido de la sección 17 impidió, con evidencia
+real y no supuesta, que `simulacro.html` nombrara «el examen de certificación de
+Talento Digital para Chile» dentro del aviso que distingue las reglas del simulacro
+de las del examen real — el mismo nombre que el resto del sitio ya usa sin
+restricción: en el título de esta misma página, en el meta description y en el pie
+de las tres.
+
+El guardián disparó correctamente según su propio alcance: barre el `<main>` completo
+de `simulacro.html`, no sólo la pantalla de resultados que esta ADR nombraba
+originalmente. Pero la palabra en sí nunca fue el problema. Lo que esta ADR prohíbe
+es que **el resultado del simulacro** reclame validez de certificación — no que el
+sitio nombre correctamente al examen real cuando lo está usando de contraste, que es
+justamente lo que hace el aviso.
+
+**Permitida, y únicamente con esta forma exacta, en cualquier parte de
+`simulacro.html`:**
+
+- «examen de certificación de Talento Digital para Chile», con mayúscula inicial
+  solo cuando abre oración.
+
+Es la misma forma que ya usan `index.html` y el pie de las tres páginas: no se
+introduce un cuarto nombre para la misma cosa.
+
+**Siguen prohibidas** todas las palabras de siempre, y cualquier otra combinación con
+«certificación» que no sea exactamente esa frase — «te certifica», «tu
+certificación», «certificación» sola sin el resto de la frase, o cualquier forma que
+la vincule al resultado del simulacro en vez de al examen real.
+
 ---
 
 ## ADR-023 · La instantánea se genera desde la base de la nube, en el mismo acto que el respaldo de ADR-014

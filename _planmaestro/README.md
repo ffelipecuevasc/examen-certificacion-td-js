@@ -11,7 +11,7 @@ decisiones vale tanto como el código que las implementa.
 |---------------|---------------------------------------------------------------------------------|
 | **Iteración** | 44 · Resumen de resultados                                                     |
 | **Épica**     | 40 · Simulacro de examen                                                       |
-| **Estado**    | 🔵 En curso · las tres etapas cerradas; la C falta commitear y quedan los nueve criterios de navegador del autor |
+| **Estado**    | 🔵 En curso · las tres etapas cerradas y commiteadas; `verificar` en 0; quedan los nueve criterios de navegador del autor |
 | **Archivo**   | `40-epica-simulacro-examen/iteracion-44-resumen-resultados.md`                 |
 | **Reanudada** | 2026-09-22 · vuelve el reparto de trabajo: autor dirige, Claude Code implementa |
 
@@ -25,21 +25,23 @@ decisiones vale tanto como el código que las implementa.
 > `servicios/resultado-del-intento.js` calcula el resumen, con `scripts/probar-resumen.mjs`
 > como décimo comprobador de `npm run verificar`.
 >
-> **Etapa C, cerrada el 2026-09-22 y pendiente de su commit.** Los enlaces al simulacro,
-> el enlace del resumen a `index.html#modulos` y el escapado de la revisión. `verificar`
-> termina en 1 sólo por el CSS recompilado sin commitear.
+> **Etapa C, cerrada y commiteada el 2026-09-22.** Los enlaces al simulacro, el enlace del
+> resumen a `index.html#modulos` y el escapado de la revisión.
 >
 > **Segunda tanda de la C, 2026-09-22:** el enlace «Simulacro» del menú pasa a pastilla
 > amarilla en las tres páginas, con subrayado negro como marca de página actual en
 > `simulacro.html`, y `comprobar-copias.mjs` gana la comprobación que impide el falso
 > verde de esconder esa marca al normalizar.
 >
+> **ADR-022 gana su cuarta excepción, 2026-09-22.** El aviso de `simulacro.html` puede
+> nombrar el examen real con la forma exacta «examen de certificación de Talento Digital
+> para Chile», y solo ahí; la sección 17 la borra antes de buscar y vigila una raíz más
+> ancha, porque «te certifica» también está prohibido. Con eso, **`npm run verificar`
+> termina en 0**.
+>
 > **Lo que falta para cerrar la iteración:** los nueve criterios que comprueba el autor en
 > el navegador, con el de ADR-022 —ninguna frase que equipare el simulacro con el examen
-> real— a la cabeza, porque es el que no se puede mecanizar. **Y una decisión pendiente:**
-> el aviso reescrito de `simulacro.html` dice «Certificación», palabra que ADR-022 prohíbe
-> y que la sección 17 de `probar-identidad-visual.mjs` marca, así que `verificar` queda en
-> rojo hasta que el autor elija entre reescribir la frase o enmendar ADR-022.
+> real— a la cabeza, porque es el que no se puede mecanizar.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.

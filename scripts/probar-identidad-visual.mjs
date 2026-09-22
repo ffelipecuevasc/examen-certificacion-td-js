@@ -1247,9 +1247,33 @@ notas.push(
 const FRASES_AUTORIZADAS = ['Aprobaste el simulacro', 'Reprobaste el simulacro'];
 const FRASE_DE_LA_PRESENTACION = 'Se aprueba el simulacro con al menos el 60 %';
 
+/**
+ * CUARTA EXCEPCION DE ADR-022 (2026-09-22): nombrar el examen real, con su nombre
+ * correcto, fuera de la pantalla de resultados.
+ *
+ * El aviso de `simulacro.html` distingue las reglas del simulacro de las del examen real,
+ * y para eso tiene que poder nombrarlo — el mismo nombre que el titulo de la pagina, el
+ * meta description y el pie de las tres ya usan. Lo que ADR-022 prohibe es que **el
+ * resultado del simulacro** reclame validez de certificacion, no que el sitio nombre bien
+ * al examen real cuando lo usa de contraste.
+ *
+ * Se permite **esta forma exacta y ninguna otra**, con mayuscula inicial solo cuando abre
+ * oracion, y **solo dentro de `simulacro.html`**. Cualquier otro uso de la raiz sigue
+ * siendo rojo: «te certifica», «tu certificacion», o la palabra suelta.
+ */
+const NOMBRE_DEL_EXAMEN_REAL = 'examen de certificación de Talento Digital para Chile';
+
 const RAIZ_DE_APROBAR = /\b(?:aprob|aprueb|reprob|reprueb)\w*/gi;
+
+// `certific\w*` y no solo «certificacion»: la cuarta excepcion de ADR-022 nombra «te
+// certifica» entre lo que sigue prohibido, y con la forma anterior —que solo miraba el
+// sustantivo— el verbo pasaba en verde. La forma autorizada se borra ANTES de buscar, asi
+// que ampliar la raiz no la toca.
+// La clase incluye las vocales acentuadas a proposito: con `\w` a secas, «certificación»
+// se informaba cortada en «certificaci», porque `\w` no cubre la «ó». Cazaba igual; lo que
+// fallaba era el mensaje, y un mensaje que no nombra bien lo que encontro cuesta de leer.
 const PALABRAS_PROHIBIDAS =
-    /\b(?:notas?|calificaci[oó]n(?:es)?|puntaje oficial|certificaci[oó]n(?:es)?)\b/gi;
+    /\b(?:notas?|calificaci[oó]n(?:es)?|puntaje oficial|certific[\wáéíóúñ]*)\b/gi;
 
 /** Lo que se lee: sin etiquetas, y con lo que dicen `aria-label`, `title` y `alt`. */
 const textoVisible = (html) => {
@@ -1271,10 +1295,21 @@ const literalesDe = (fuente) =>
         .join(' | ');
 
 /** Lo que queda de indebido en un texto despues de borrar las frases autorizadas. */
-const vocabularioIndebido = (texto, { conLaDePresentacion }) => {
+const vocabularioIndebido = (texto, { conLaDePresentacion, conElNombreDelExamen = false }) => {
   const autorizadas = conLaDePresentacion
       ? [...FRASES_AUTORIZADAS, FRASE_DE_LA_PRESENTACION]
-      : FRASES_AUTORIZADAS;
+      : [...FRASES_AUTORIZADAS];
+
+  // La cuarta excepcion, solo donde vale: el `<main>` de `simulacro.html`. Las dos
+  // capitalizaciones son la misma frase —la mayuscula inicial es la de abrir oracion—, y
+  // no se borra nada mas: «certificacion» suelta, o cualquier otra combinacion, sigue
+  // apareciendo en el resto.
+  if (conElNombreDelExamen) {
+    autorizadas.push(
+        NOMBRE_DEL_EXAMEN_REAL,
+        NOMBRE_DEL_EXAMEN_REAL[0].toUpperCase() + NOMBRE_DEL_EXAMEN_REAL.slice(1)
+    );
+  }
 
   let resto = texto;
   for (const frase of autorizadas) resto = resto.split(frase).join(' ');
@@ -1309,6 +1344,7 @@ const barridos = [
     nombre: 'simulacro.html (<main>)',
     texto: textoVisible(principalDelSimulacro),
     conLaDePresentacion: true,
+    conElNombreDelExamen: true,
   },
   // Las dos del resumen de verdad se barren en su version sin el texto del banco (ver
   // `resumenesDeVerdadSinElBanco`): lo que se vigila es lo que dice el simulacro.
@@ -1324,8 +1360,8 @@ const barridos = [
   })),
 ];
 
-for (const { nombre, texto, conLaDePresentacion } of barridos) {
-  const indebidas = vocabularioIndebido(texto, { conLaDePresentacion });
+for (const { nombre, texto, conLaDePresentacion, conElNombreDelExamen } of barridos) {
+  const indebidas = vocabularioIndebido(texto, { conLaDePresentacion, conElNombreDelExamen });
 
   if (indebidas.length > 0) {
     problemas.push(
