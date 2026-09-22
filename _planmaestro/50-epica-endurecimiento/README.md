@@ -50,6 +50,13 @@ mantener la promesa hecha al estudiante, y dejarlo por escrito.
 | 52 | Métricas | ⚪ No iniciada |
 | 53 | Caché y rendimiento | ⚪ No iniciada |
 
+**Y una iteración final, todavía sin número ni alcance.** Anotada el 2026-09-22, al cerrar
+la épica 40: va a hacer falta una iteración aquí para atender la **retroalimentación real
+de estudiantes** que prueben el sitio publicado. **Qué contendría no se sabe y no se
+inventa**: hasta hoy no hay ni una sola observación de uso real, así que escribir su
+alcance ahora sería adivinarlo. Se anota para que la ausencia sea una decisión registrada
+y no un olvido.
+
 ## Nota sobre el reparto de tareas
 
 Buena parte de esta épica se configura en un panel web, no en el repositorio.

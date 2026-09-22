@@ -1,6 +1,6 @@
 # Épica 40 · Simulacro de examen
 
-**Estado:** 🔵 En curso · **41, 45 y 42 cerradas el 2026-09-18**, y la **43** el 2026-09-21; lo siguiente es la **44**
+**Estado:** 🟢 Cerrada el 2026-09-22 · sus cinco iteraciones completadas
 **Depende de:** épica 20 (banco en D1) y épica 30 cerrada (capa de datos con modo degradado, escapado, justificación
 dibujada, transición de carga, memoria en el navegador y guiones de prueba con intercepción).
 
@@ -151,7 +151,7 @@ cronómetro, para no rehacer marcado. Los números no cambian.
 | 45 | Dirección visual del simulacro | 🟢 Cerrada el 2026-09-18 |
 | 42 | Cronómetros | 🟢 Cerrada el 2026-09-18 |
 | 43 | Recorrido de una pregunta a la vez | 🟢 Cerrada el 2026-09-21 · en dos tandas |
-| 44 | Resumen de resultados | ⚪ No iniciada · **es la siguiente** |
+| 44 | Resumen de resultados | 🟢 Cerrada el 2026-09-22 · en tres etapas |
 
 ## Forma de los criterios en toda la épica
 

@@ -1,7 +1,7 @@
 # Iteración 44 · Resumen de resultados
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · las tres etapas cerradas y commiteadas el 2026-09-22 · pendiente de commit la cuarta excepción de ADR-022 y el ajuste del aviso · quedan los nueve criterios de navegador del autor
+**Estado:** 🟢 Cerrada el 2026-09-22 · tres etapas, y los nueve criterios de navegador confirmados por el autor
 **Depende de:** iteración 43, cerrada el 2026-09-21.
 
 ## Objetivo
@@ -275,21 +275,26 @@ la 42, y con su prueba vista en rojo por el motivo correcto antes de escribir el
 - [x] **Los enlaces a la guía apuntan a `index.html#modulos`, y ese `id` existe en el HTML estático de la portada.**
 - [x] **`probar:escapado` cubre la revisión**: una pregunta hostil en el intento, con su justificación hostil, llega
   como texto en el enunciado, las alternativas y la justificación, sin etiquetas ajenas.
-- [ ] **Los siete guiones, `build` y `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql`
-  siguen sin cambios.
+- [x] **Los siete guiones, `build` y `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql`
+  siguen sin cambios. Cerrado el 2026-09-22, tras el commit del CSS recompilado: **`npm run verificar` termina en 0**
+  con `datos:dev` levantado, y sus comprobadores ya son **diez** —`probar-resumen.mjs` entró en esta iteración—.
 
 ### Los comprueba el autor en el navegador, al final
 
-- [ ] **El resultado se entiende a la primera.**
-- [ ] **El desglose dice qué estudiar** sin tener que interpretar números.
-- [ ] **La revisión se recorre cómodamente en el teléfono**, abriendo y plegando correctas.
-- [ ] **La revisión se recorre con teclado**, y con lector de pantalla los plegables anuncian si están abiertos.
-- [ ] **Los enlaces a la guía llevan a la lista de módulos de la portada.**
-- [ ] **Los enlaces al simulacro funcionan** desde el menú, el pie y la portada, en escritorio y en teléfono.
-- [ ] **Ninguna frase sugiere una certificación ni equipara el simulacro con el examen real**, leída en pantalla. Es la
+**Los nueve los confirmó el autor el 2026-09-22**, en su pasada por el navegador. Esa confirmación es su evidencia:
+ninguno de los nueve se puede cerrar con guion, y el de ADR-022 —que ninguna frase sugiera que aprobar el simulacro
+equivale a aprobar el examen real— está declarado no mecanizable en esta misma iteración.
+
+- [x] **El resultado se entiende a la primera.**
+- [x] **El desglose dice qué estudiar** sin tener que interpretar números.
+- [x] **La revisión se recorre cómodamente en el teléfono**, abriendo y plegando correctas.
+- [x] **La revisión se recorre con teclado**, y con lector de pantalla los plegables anuncian si están abiertos.
+- [x] **Los enlaces a la guía llevan a la lista de módulos de la portada.**
+- [x] **Los enlaces al simulacro funcionan** desde el menú, el pie y la portada, en escritorio y en teléfono.
+- [x] **Ninguna frase sugiere una certificación ni equipara el simulacro con el examen real**, leída en pantalla. Es la
   parte de ADR-022 que no se puede mecanizar.
-- [ ] **Un intento real completo** termina en el resumen, **sin errores de consola**.
-- [ ] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
+- [x] **Un intento real completo** termina en el resumen, **sin errores de consola**.
+- [x] **`npm run verificar` termina en 0**, con `npm run datos:dev` levantado.
 
 ## Lo que esta iteración no puede afirmar
 

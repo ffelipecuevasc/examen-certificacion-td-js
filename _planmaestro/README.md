@@ -7,41 +7,12 @@ decisiones vale tanto como el código que las implementa.
 
 ## Iteración activa
 
-| Campo         | Valor                                                                          |
-|---------------|---------------------------------------------------------------------------------|
-| **Iteración** | 44 · Resumen de resultados                                                     |
-| **Épica**     | 40 · Simulacro de examen                                                       |
-| **Estado**    | 🔵 En curso · las tres etapas cerradas y commiteadas; `verificar` en 0; quedan los nueve criterios de navegador del autor |
-| **Archivo**   | `40-epica-simulacro-examen/iteracion-44-resumen-resultados.md`                 |
-| **Reanudada** | 2026-09-22 · vuelve el reparto de trabajo: autor dirige, Claude Code implementa |
+**Ninguna en curso.** La **44 · Resumen de resultados** cerró el 2026-09-22 y con ella la **épica 40 · Simulacro de
+examen**, la última de las cuatro que se ejecutaban en orden.
 
-> **Antes de seguir.** La iteración 44 está terminada salvo la pasada del autor en el
-> navegador. El simulacro dice cómo le fue al estudiante —resultado, desglose por módulo,
-> tiempo y revisión— y **ya está enlazado** desde los dos menús y el pie de las tres
-> páginas y desde la sección `#repaso` de la portada.
->
-> **Etapas A y B, cerradas y commiteadas.** El extremo sirve las justificaciones con
-> `&con=justificacion`, `components/justificacion.js` es la pieza única del porqué, y
-> `servicios/resultado-del-intento.js` calcula el resumen, con `scripts/probar-resumen.mjs`
-> como décimo comprobador de `npm run verificar`.
->
-> **Etapa C, cerrada y commiteada el 2026-09-22.** Los enlaces al simulacro, el enlace del
-> resumen a `index.html#modulos` y el escapado de la revisión.
->
-> **Segunda tanda de la C, 2026-09-22:** el enlace «Simulacro» del menú pasa a pastilla
-> amarilla en las tres páginas, con subrayado negro como marca de página actual en
-> `simulacro.html`, y `comprobar-copias.mjs` gana la comprobación que impide el falso
-> verde de esconder esa marca al normalizar.
->
-> **ADR-022 gana su cuarta excepción, 2026-09-22.** El aviso de `simulacro.html` puede
-> nombrar el examen real con la forma exacta «examen de certificación de Talento Digital
-> para Chile», y solo ahí; la sección 17 la borra antes de buscar y vigila una raíz más
-> ancha, porque «te certifica» también está prohibido. Con eso, **`npm run verificar`
-> termina en 0**.
->
-> **Lo que falta para cerrar la iteración:** los nueve criterios que comprueba el autor en
-> el navegador, con el de ADR-022 —ninguna frase que equipare el simulacro con el examen
-> real— a la cabeza, porque es el que no se puede mecanizar.
+> **Lo siguiente que puede abrirse es la épica 50 · Endurecimiento y observabilidad.** Sus cuatro dependencias están
+> cerradas: la 10 (plataforma), la 20 (banco en D1), la 30 (cuestionario) y la 40 (simulacro). Su alcance está en
+> `50-epica-endurecimiento/README.md` y todavía no se ha planificado ninguna de sus iteraciones.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
@@ -68,6 +39,7 @@ decisiones vale tanto como el código que las implementa.
 | 45 - Dirección visual del simulacro    | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | 42 - Cronómetros                       | 40 - Simulacro de examen    | 2026-09-18 | 🟢 Completada |
 | 43 - Recorrido de una pregunta         | 40 - Simulacro de examen    | 2026-09-21 | 🟢 Completada |
+| 44 - Resumen de resultados             | 40 - Simulacro de examen    | 2026-09-22 | 🟢 Completada |
 | —                                      | —                           | —          | —             |
 
 ## Épicas
@@ -77,7 +49,7 @@ decisiones vale tanto como el código que las implementa.
 | 10 | Plataforma Cloudflare           | 🟢 Completada  | Sitio en Pages, capa de datos y dos bases D1 operativas                     |
 | 20 | Persistencia de preguntas       | 🟢 Completada  | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
 | 30 | Cuestionario                    | 🟢 Completada  | `cuestionario.html` por módulo, con memoria del avance, justificación, repaso y transición de carga |
-| 40 | Simulacro de examen             | 🔵 En curso    | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
+| 40 | Simulacro de examen             | 🟢 Completada  | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
 | 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos               |
 
 Las épicas se ejecutan en orden: cada una depende de la anterior. La 10 va primera porque el banco de preguntas vive en
