@@ -11,25 +11,27 @@ decisiones vale tanto como el código que las implementa.
 |---------------|---------------------------------------------------------------------------------|
 | **Iteración** | 44 · Resumen de resultados                                                     |
 | **Épica**     | 40 · Simulacro de examen                                                       |
-| **Estado**    | 🔵 En curso · etapas A y B cerradas; la B falta commitear. Queda la C          |
+| **Estado**    | 🔵 En curso · las tres etapas cerradas; la C falta commitear y quedan los nueve criterios de navegador del autor |
 | **Archivo**   | `40-epica-simulacro-examen/iteracion-44-resumen-resultados.md`                 |
 | **Reanudada** | 2026-09-22 · vuelve el reparto de trabajo: autor dirige, Claude Code implementa |
 
-> **Antes de seguir.** El simulacro ya dice cómo le fue al estudiante: al resolverse
-> la pregunta 120 aparece el resumen —resultado, desglose por módulo, tiempo y
-> revisión—, y «Intento terminado» dejó de existir. Lo que falta es la **etapa C**:
-> la página sigue sin enlazar desde ninguna parte.
+> **Antes de seguir.** La iteración 44 está terminada salvo la pasada del autor en el
+> navegador. El simulacro dice cómo le fue al estudiante —resultado, desglose por módulo,
+> tiempo y revisión— y **ya está enlazado** desde los dos menús y el pie de las tres
+> páginas y desde la sección `#repaso` de la portada.
 >
-> **Etapa A, cerrada y commiteada.** El extremo `/api/preguntas` acepta
-> `&con=justificacion` junto a `ids`, y sólo junto a `ids`; el servicio
-> `leerPreguntasPorIds(ids, { conJustificacion })` lo pide por los dos caminos, y
-> `components/justificacion.js` es la pieza única del porqué.
+> **Etapas A y B, cerradas y commiteadas.** El extremo sirve las justificaciones con
+> `&con=justificacion`, `components/justificacion.js` es la pieza única del porqué, y
+> `servicios/resultado-del-intento.js` calcula el resumen, con `scripts/probar-resumen.mjs`
+> como décimo comprobador de `npm run verificar`.
 >
-> **Etapa B, cerrada el 2026-09-22 y pendiente de su commit.** Entra
-> `servicios/resultado-del-intento.js` —cifras, desglose, tiempo y comparación con el
-> banco vigente— y `scripts/probar-resumen.mjs` como **décimo comprobador** de
-> `npm run verificar`. Las decisiones B1 a B4 quedaron tomadas. `verificar` termina
-> en 1 sólo por el CSS recompilado sin commitear.
+> **Etapa C, cerrada el 2026-09-22 y pendiente de su commit.** Los enlaces al simulacro,
+> el enlace del resumen a `index.html#modulos` y el escapado de la revisión. `verificar`
+> termina en 1 sólo por el CSS recompilado sin commitear.
+>
+> **Lo que falta para cerrar la iteración:** los nueve criterios que comprueba el autor en
+> el navegador, con el de ADR-022 —ninguna frase que equipare el simulacro con el examen
+> real— a la cabeza, porque es el que no se puede mecanizar.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.

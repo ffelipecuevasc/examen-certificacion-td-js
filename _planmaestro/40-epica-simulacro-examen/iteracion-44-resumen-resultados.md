@@ -1,7 +1,7 @@
 # Iteración 44 · Resumen de resultados
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · etapas A y B cerradas el 2026-09-22 (B a la espera de su commit) · queda C
+**Estado:** 🔵 En curso · etapas A, B y C cerradas el 2026-09-22 (C a la espera de su commit) · quedan los nueve criterios de navegador del autor
 **Depende de:** iteración 43, cerrada el 2026-09-21.
 
 ## Objetivo
@@ -219,11 +219,11 @@ cubre también la recarga de un intento ya terminado.
 
 ### Etapa C · Abrir el simulacro al sitio
 
-- [ ] Enlazar el simulacro desde `index.html` (menú de escritorio y móvil, la sección `#repaso` y el pie) y desde
+- [x] Enlazar el simulacro desde `index.html` (menú de escritorio y móvil, la sección `#repaso` y el pie) y desde
   `cuestionario.html` (menú de escritorio y móvil y pie), con la marca de página activa en `simulacro.html`. Las líneas
   exactas se comprueban al abrir la etapa.
-- [ ] Enlaces a la guía, a `index.html#modulos` (decisión 6).
-- [ ] Agregar a `probar:escapado` el bloque de la revisión: enunciado, alternativas y justificación.
+- [x] Enlaces a la guía, a `index.html#modulos` (decisión 6).
+- [x] Agregar a `probar:escapado` el bloque de la revisión: enunciado, alternativas y justificación.
 
 ## Criterios de aceptación
 
@@ -270,10 +270,10 @@ la 42, y con su prueba vista en rojo por el motivo correcto antes de escribir el
 
 ### Etapa C · Se provocan con guion
 
-- [ ] **El simulacro es alcanzable** desde el menú de escritorio, el menú móvil y el pie de las tres páginas y desde la
+- [x] **El simulacro es alcanzable** desde el menú de escritorio, el menú móvil y el pie de las tres páginas y desde la
   sección `#repaso`, comprobado sobre el HTML, y **`comprobar-copias.mjs` sigue en verde**.
-- [ ] **Los enlaces a la guía apuntan a `index.html#modulos`, y ese `id` existe en el HTML estático de la portada.**
-- [ ] **`probar:escapado` cubre la revisión**: una pregunta hostil en el intento, con su justificación hostil, llega
+- [x] **Los enlaces a la guía apuntan a `index.html#modulos`, y ese `id` existe en el HTML estático de la portada.**
+- [x] **`probar:escapado` cubre la revisión**: una pregunta hostil en el intento, con su justificación hostil, llega
   como texto en el enunciado, las alternativas y la justificación, sin etiquetas ajenas.
 - [ ] **Los siete guiones, `build` y `verificar` terminan bien**, y `instantanea-banco.js` y `d1/respaldo-banco.sql`
   siguen sin cambios.
@@ -441,3 +441,58 @@ asignar», junto a H-029.
 **Lo que queda para el navegador del autor**: que el resultado se entienda, que la revisión se recorra en el teléfono y
 con teclado, que los plegables se anuncien con lector de pantalla, y un intento real hasta el resumen sin errores de
 consola.
+
+### Etapa C · cerrada el 2026-09-22
+
+El autor aprobó dos decisiones de forma antes de escribir nada: **«Simulacro» va justo después de «Cuestionario»** en los
+dos menús —las dos formas de practicar, juntas, de menos a más exigente— y **el simulacro tiene tarjeta propia en
+`#repaso`**, no un segundo botón dentro de la amarilla, porque esa tarjeta ya es un mensaje completo sobre el
+cuestionario y aparte se pueden decir las reglas del simulacro.
+
+**Dónde quedó cada enlace.**
+
+- **Menú de escritorio y menú móvil de las tres páginas**, tras «Cuestionario». En `simulacro.html` lleva la marca de
+  página activa —`nav-link active text-paper` y `mobile-link text-jsyellow`—, que es la misma que usa el cuestionario en
+  la suya y que `comprobar-copias.mjs` ya normalizaba.
+- **Pie de las tres páginas**, un quinto `<li>`: «Simulacro cronometrado».
+- **`index.html`, sección `#repaso`**: tarjeta propia bajo la amarilla y antes de NotebookLM, con las reglas —120
+  preguntas, 30 segundos cada una, sin volver atrás— y el enlace «Ir al simulacro cronometrado».
+- **Resumen**: un solo enlace a `index.html#modulos` al final del desglose, que es donde se lee en qué módulo se falló.
+  No uno por fila: serían siete al mismo destino en media pantalla de teléfono.
+
+**Las cuatro pruebas, con su rojo antes del código.**
+
+1. **El simulacro es alcanzable**, sección nueva de `comprobar-copias.mjs`. Mira **por zona** —menú de escritorio, menú
+   móvil y pie de cada página, más `#repaso` de la portada— y que `<section id="modulos">` siga en el HTML estático.
+   Existe porque la comparación de copias caza que el enlace falte en **una** página, pero no que falte en las **tres**,
+   que era el estado hasta esta etapa. Rojo: los siete sitios de menú y pie, más `#repaso`.
+2. **La provocación pedida por el autor**, con el enlace **solo en `index.html`**: `comprobar-copias.mjs` dio
+   `COPIAS DISTINTAS *** 10 ***`, y **cuatro de esos diez son diferencias entre copias** —encabezado de `index.html`
+   contra el de `cuestionario.html` y el de `simulacro.html`, y lo mismo en el pie—, cada una señalando el carácter
+   exacto y el trozo donde empieza la diferencia. Queda probado con evidencia, y no supuesto, que una omisión en una de
+   las tres se caza sola.
+3. **El resumen lleva a la guía**, en `probar-resumen.mjs`, sobre el resumen **dibujado** de un intento terminado. Rojo:
+   cero enlaces en el desglose. Verde: exactamente uno, a `index.html#modulos`, y una sola vez en toda la pantalla.
+4. **`probar:escapado` cubre la revisión** (bloque 5d). El intento hostil que ya armaba 5c se lleva hasta el final
+   resolviendo sus 120 con los tres estados, y la justificación hostil se cuela por `&con=justificacion`, que es la única
+   petición que la trae. **El primer rojo fue el que el autor pidió confirmar**: código 2, «No se llegó a dibujar la
+   revisión del resumen», y no texto crudo. Con el intento llevado al final, verde. **Sabotaje** para comprobar que la
+   parte nueva muerde: quitarle el `esc()` a la justificación da rojo por su forma cruda, por la escapada ausente y por
+   una etiqueta `img` colada en la revisión. Revertido.
+
+**Al cierre**, con `npm run datos:dev` levantado: `probar:escapado` 0, `probar:resumen` 0, `probar:filtrado` 0,
+`probar:memoria` 0 y `verificar:copias` 0, con la nota «10 sitios llevan a simulacro.html». **`npm run verificar`
+termina en 1** con nueve comprobadores en OK y `css` en DESFASADO —el `style.css` recompilado a la espera del commit—.
+`instantanea-banco.js` y `d1/respaldo-banco.sql` sin cambios.
+
+**Dos tropiezos del entorno, ninguno del código.** El primero: al levantar el servidor, wrangler dijo `Ready on
+http://127.0.0.1:8788` y todo colgaba igual —el `workerd` zombi que describe `CLAUDE.md`—; se detuvo ese grupo, se
+comprobó el puerto libre y se levantó uno limpio. El segundo: en la primera corrida de `verificar`, `escapado` salió como
+AVISO porque `wrangler d1 execute --local` falló con `fetch failed` al aplicar `d1/prueba-escapado.sql`; repetido sin
+tocar nada, OK. Encaja con la familia de H-029 y está anotado ahí, no como hallazgo nuevo.
+
+**Queda pendiente de la pasada del autor en el navegador**, sin marcar: los nueve criterios del bloque final. En
+particular el de **ADR-022** —que ninguna frase sugiera que aprobar el simulacro equivale a aprobar el examen real—, que
+el propio archivo declara no mecanizable. Y una anotación de esta etapa: **el menú de escritorio pasó de cinco a seis
+enlaces**, así que conviene mirarlo cerca de 768 px; si aprieta, la salida barata es bajar `gap-7` a `gap-6` en los tres
+encabezados.

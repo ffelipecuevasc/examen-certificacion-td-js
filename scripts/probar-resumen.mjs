@@ -1589,6 +1589,62 @@ const huellaDelResumen = (dom) => {
 }
 
 // ===========================================================================
+// 11 · El resumen lleva a la guía (decisión 6, etapa C)
+// ===========================================================================
+//
+// Decision 6: los enlaces a la guia van a `index.html#modulos`, que existe en el HTML
+// estatico de la portada y lista los siete modulos. El resumen nombra el modulo en el
+// desglose, asi que el estudiante sabe cual buscar al llegar.
+//
+// UNO SOLO, Y EN EL DESGLOSE. Es donde se lee en que modulo se falló. Siete enlaces —uno
+// por fila— serian siete veces el mismo destino en media pantalla de telefono.
+//
+// Se mira sobre el resumen DIBUJADO de un intento terminado, no sobre la maqueta: lo que
+// tiene que llevar a la guia es la pantalla que el estudiante ve.
+
+{
+  const problemasAntes = problemas.length;
+  const preguntas = preguntasDeJuguete();
+  const vigentes = bancoVigenteDe(preguntas);
+
+  const almacen = almacenDeMentira();
+  sembrar(almacen, { claves: CLAVES_DEL_RECORRIDO, hechas: 120, terminadoEn: T0 + 2700000 });
+
+  const { dom } = await montarVisita({ almacen, desde: T0 + 5000000, fetch: capaDeMentira({ vigentes }) });
+  await esperarLaRed();
+
+  const zona = dom.html('#zona-del-intento');
+  const desglose = zona.match(/<section data-papel="desglose"[\s\S]*?<\/section>/)?.[0] ?? '';
+
+  const enTodoElResumen = [...zona.matchAll(/href="([^"]*#modulos)"/g)].map((m) => m[1]);
+  const enElDesglose = [...desglose.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
+
+  if (enElDesglose.length !== 1 || enElDesglose[0] !== 'index.html#modulos') {
+    problemas.push(
+      `enlace a la guia: el desglose trae ${enElDesglose.length} enlace(s) [${enElDesglose.join(', ')}], y la ` +
+        'decision 6 pide uno solo a index.html#modulos'
+    );
+  }
+
+  if (enTodoElResumen.length !== 1) {
+    problemas.push(`enlace a la guia: el resumen entero trae ${enTodoElResumen.length} enlaces a #modulos, y es uno`);
+  }
+
+  // Y el destino existe en el HTML estatico de la portada, no lo dibuja JavaScript.
+  const portada = readFileSync(join(SITIO, '..', '..', 'index.html'), 'utf8');
+  if (!/<section id="modulos"/.test(portada)) {
+    problemas.push('enlace a la guia: index.html no trae <section id="modulos"> en su HTML estatico');
+  }
+
+  if (problemas.length === problemasAntes) {
+    notas.push(
+      `Enlace a la guia: el desglose del resumen dibujado lleva a «${enElDesglose[0]}», una sola vez en toda la ` +
+        'pantalla, y esa sección existe en el HTML estático de la portada.'
+    );
+  }
+}
+
+// ===========================================================================
 // El veredicto
 // ===========================================================================
 

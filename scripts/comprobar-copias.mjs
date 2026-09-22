@@ -190,6 +190,11 @@ for (const pagina of PAGINAS) {
     favicon: normalizar(favicons[0]),
     encabezado: normalizar(encabezados[0]),
     pie: normalizar(pies[0]),
+    // Los bloques SIN normalizar, para la comprobacion de alcance de mas abajo: ahi no
+    // se comparan copias entre si, se mira si un destino concreto esta donde tiene que
+    // estar, y para eso el `href` tiene que leerse tal como esta escrito.
+    encabezadoCrudo: encabezados[0],
+    pieCrudo: pies[0],
   });
 }
 
@@ -231,6 +236,83 @@ for (const bloque of ['favicon', 'encabezado', 'pie']) {
         'cuatro diferencias permitidas aplicadas.'
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// El simulacro es alcanzable (iteracion 44, etapa C)
+// ---------------------------------------------------------------------------
+//
+// POR QUE ESTA COMPROBACION NO SOBRA, TENIENDO LA DE ARRIBA. La de arriba compara las
+// tres copias entre si: caza que el enlace este en dos paginas y falte en la tercera,
+// pero **no** que falte en las tres. Hasta la iteracion 44 el simulacro no estaba
+// enlazado desde ninguna parte a proposito —terminaba sin resumen—, y esa ausencia era
+// invisible para una comprobacion de igualdad. Esto exige la presencia.
+//
+// SE MIRA POR ZONA Y NO POR PAGINA ENTERA. Que `simulacro.html` aparezca en algun lugar
+// del archivo no dice nada: el estudiante llega por el menu de escritorio, por el de
+// telefono o por el pie, y son tres sitios distintos del marcado. Un enlace en uno solo
+// deja a los otros dos sin salida.
+
+const ZONAS = [
+  {
+    nombre: 'el menú de escritorio',
+    de: (bloques) => bloques.encabezadoCrudo.match(/<nav aria-label="Navegación principal"[\s\S]*?<\/nav>/)?.[0],
+  },
+  {
+    nombre: 'el menú móvil',
+    de: (bloques) => bloques.encabezadoCrudo.match(/<nav id="mobile-menu"[\s\S]*?<\/nav>/)?.[0],
+  },
+  {
+    nombre: 'el pie',
+    de: (bloques) => bloques.pieCrudo.match(/<nav aria-label="Secciones de la guía"[\s\S]*?<\/nav>/)?.[0],
+  },
+];
+
+let alcances = 0;
+
+for (const pagina of comparables) {
+  const bloques = recortados.get(pagina);
+
+  for (const zona of ZONAS) {
+    const trozo = zona.de(bloques);
+
+    if (trozo === undefined) {
+      avisos.push(`${pagina}: no se encontró ${zona.nombre}, así que no se pudo mirar si lleva al simulacro`);
+      continue;
+    }
+
+    if (!/href="simulacro\.html"/.test(trozo)) {
+      problemas.push(`${pagina}: ${zona.nombre} no lleva al simulacro (falta un href="simulacro.html")`);
+    } else {
+      alcances += 1;
+    }
+  }
+}
+
+// La portada, ademas, ofrece el simulacro en la seccion donde invita a practicar.
+const portada = existsSync(join(RAIZ, 'index.html')) ? readFileSync(join(RAIZ, 'index.html'), 'utf8') : '';
+const repaso = portada.match(/<section id="repaso"[\s\S]*?<\/section>/)?.[0];
+
+if (!repaso) {
+  avisos.push('index.html: no se encontró la sección #repaso, así que no se pudo mirar si ofrece el simulacro');
+} else if (!/href="simulacro\.html"/.test(repaso)) {
+  problemas.push('index.html: la sección #repaso invita a practicar y no ofrece el simulacro');
+} else {
+  alcances += 1;
+}
+
+// Y el destino de los enlaces a la guia del resumen (decision 6) tiene que existir en el
+// HTML ESTATICO de la portada. Si algun dia lo dibujara JavaScript, un enlace desde otra
+// pagina llegaria a un ancla que no existe todavia cuando el navegador la busca.
+if (portada && !/<section id="modulos"/.test(portada)) {
+  problemas.push('index.html: no existe <section id="modulos">, que es adonde apuntan los enlaces a la guía (decisión 6)');
+}
+
+if (alcances > 0) {
+  notas.push(
+    `alcance del simulacro: ${alcances} sitio(s) llevan a simulacro.html —los tres menús y pies de las ` +
+      'páginas comparadas, más la sección #repaso de la portada—, y `index.html#modulos` existe en el HTML estático.'
+  );
 }
 
 // ---------------------------------------------------------------------------

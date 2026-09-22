@@ -805,6 +805,13 @@ try {
     if (!String(ruta).includes('ids=')) return respuesta;
 
     const cuerpo = await respuesta.json();
+
+    // Con `&con=justificacion` —la peticion que hace el resumen al llegar (decision 8)—
+    // se envenena TAMBIEN la justificacion. Es la unica peticion que la trae, y durante
+    // el intento no se dibuja nunca: sin esto, el texto mas largo del banco llegaria al
+    // HTML de la revision sin que ninguna prueba lo hubiera atacado.
+    const conJustificacion = /[?&]con=justificacion(&|$)/.test(String(ruta));
+
     cuerpo.datos = (cuerpo.datos ?? []).map((pregunta) => ({
       ...pregunta,
       enunciado: hostil.enunciado,
@@ -812,6 +819,7 @@ try {
         ...alternativa,
         texto: hostil.alternativas[k % hostil.alternativas.length].texto,
       })),
+      ...(conJustificacion ? { justificacion: hostil.justificacion } : {}),
     }));
     respuestasEnvenenadas += 1;
 
@@ -821,7 +829,7 @@ try {
     });
   };
 
-  const { conectarComienzo, comenzarElIntento } = await import(
+  const { anotarEnElIntento, conectarComienzo, comenzarElIntento, preguntasDelIntento } = await import(
       pathToFileURL(join(SITIO, 'components', 'simulacro.js')).href
       );
 
@@ -873,6 +881,83 @@ try {
     problemas.push(
         `simulacro: etiquetas que la tarjeta no emite: ${intrusasEnElSimulacro.join(', ')}`
     );
+  }
+
+  // --- 5d · LA REVISION DEL RESUMEN (iteracion 44, etapa C) ---------------
+  //
+  // La revision es el OTRO sitio del simulacro donde entra texto del banco, y entra por
+  // partida triple: el enunciado, la alternativa que se marco y la correcta, y la
+  // justificacion, que durante el intento no se dibuja nunca. Hasta la iteracion 44 esa
+  // pantalla no existia; ahora existe y hay que atacarla igual.
+  //
+  // COMO SE LLEGA: se termina el intento que 5c acaba de armar —el de las preguntas ya
+  // envenenadas— resolviendo sus 120, la mitad marcando una alternativa y la otra mitad
+  // omitiendo, para que la revision tenga los tres estados. La justificacion se cuela en
+  // la respuesta de `&con=justificacion`, que es la peticion que el resumen hace al
+  // llegar y la unica que puede traerla.
+
+  const delIntento = preguntasDelIntento();
+
+  if (delIntento.length === 0) {
+    sinVeredicto('El intento del simulacro quedo vacio: no hay nada que llevar hasta el resumen.');
+  }
+
+  // Los tres estados, para que la revision los dibuje todos: respondida, omitida y
+  // agotada. `anotarEnElIntento()` es el unico sitio por el que pasa toda pregunta
+  // resuelta, asi que esto recorre el mismo camino que los botones y el cronometro.
+  for (let i = 0; i < delIntento.length; i += 1) {
+    const pregunta = delIntento[i];
+
+    anotarEnElIntento({
+      pregunta_id: pregunta.id,
+      alternativa_id: i % 2 === 0 ? pregunta.alternativas[0].id : null,
+      estado: i % 2 === 0 ? 'respondida' : 'omitida',
+      agotada: i % 4 === 3,
+    });
+  }
+
+  // La revision llega por una peticion: hay que dejarla volver.
+  for (let k = 0; k < 40; k += 1) await new Promise((r) => setTimeout(r, 10));
+
+  const htmlRevision = domSimulacro.html('#revision-del-intento');
+
+  if (htmlRevision === '') {
+    sinVeredicto(
+        'No se llego a dibujar la revision del resumen, asi que no hay donde mirar el escapado.',
+        domSimulacro.html('#zona-del-intento').slice(0, 400)
+    );
+  }
+
+  const textosDeLaRevision = [
+    ['revision, enunciado', hostil.enunciado],
+    ...hostil.alternativas.map((a) => [`revision, alternativa ${a.letra}`, a.texto]),
+    ['revision, justificacion', hostil.justificacion],
+  ];
+
+  for (const [nombre, texto] of textosDeLaRevision) {
+    const escapado = esc(texto);
+
+    if (escapado !== texto && htmlRevision.includes(texto)) {
+      problemas.push(`${nombre}: su forma CRUDA aparece en el HTML, sin escapar`);
+    }
+    if (!htmlRevision.includes(escapado)) {
+      problemas.push(`${nombre}: su forma escapada NO aparece, asi que se perdio texto`);
+    }
+  }
+
+  // Y las etiquetas: las que la revision emite de verdad, y ninguna mas.
+  const PROPIAS_DE_LA_REVISION = new Set(['section', 'h3', 'ul', 'li', 'p', 'span', 'button', 'div']);
+  const presentesEnLaRevision = [
+    ...new Set(
+        [...htmlRevision.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)].map((m) => m[1].toLowerCase())
+    ),
+  ];
+  const intrusasEnLaRevision = presentesEnLaRevision.filter(
+      (etiqueta) => !PROPIAS_DE_LA_REVISION.has(etiqueta)
+  );
+
+  if (intrusasEnLaRevision.length > 0) {
+    problemas.push(`revision: etiquetas que no emite: ${intrusasEnLaRevision.join(', ')}`);
   }
 
   // La busqueda de etiquetas ajenas mira los SIETE modulos dibujados, no uno: una
@@ -935,6 +1020,12 @@ try {
       'EL SIMULACRO (iteracion 43): los textos de la fila hostil se colaron en el',
       'intento interceptando `?ids=`, y la primera pregunta dibujada los trajo como',
       `texto, enteros. Etiquetas en su HTML: ${presentesEnElSimulacro.sort().join(', ')}.`,
+      '',
+      'LA REVISION DEL RESUMEN (iteracion 44): ese mismo intento se llevo hasta el final,',
+      'resolviendo sus 120 con los tres estados, y la justificacion hostil se colo por',
+      '`&con=justificacion`, que es la unica peticion que la trae. El enunciado, las cuatro',
+      'alternativas y la justificacion llegaron a la revision como texto, enteros.',
+      `Etiquetas en su HTML: ${presentesEnLaRevision.sort().join(', ')}.`,
       '',
       'Lo que esto NO prueba: que el banco que hay en PRODUCCION sea el que',
       'se acaba de revisar. Esta prueba corre contra la base LOCAL, y solo vale',

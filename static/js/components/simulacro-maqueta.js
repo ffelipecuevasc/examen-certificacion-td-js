@@ -895,6 +895,14 @@ ${dibujarElResultado(elResultado)}
         </p>
         <ul class="mt-4">${filas}
         </ul>
+
+        <!-- A LA GUIA, Y AL LISTADO DE LOS SIETE (decision 6). No al modulo exacto: los
+             articulos de la portada los crea JavaScript y su id lleva la POSICION, no el
+             numero del modulo, asi que un ancla por modulo apuntaria al vacio o al modulo
+             equivocado. El desglose de arriba ya nombra cual es, y la seccion modulos
+             existe en el HTML estatico. Uno solo, y aqui: es donde se lee en que modulo
+             se falló. -->
+        <p class="mt-5 text-sm text-muted leading-relaxed">¿Qué estudiar? <a href="index.html#modulos" class="text-jsyellow underline underline-offset-2 hover:text-paper transition-colors">Abre la lista de módulos de la guía</a> y busca el que te salió peor.</p>
       </section>
 
       <section data-papel="revision" class="mt-6">

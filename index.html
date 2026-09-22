@@ -39,6 +39,7 @@
       <a href="#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
       <a href="#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
       <a href="cuestionario.html" class="nav-link hover:text-paper transition-colors">Cuestionario</a>
+      <a href="simulacro.html" class="nav-link hover:text-paper transition-colors">Simulacro</a>
       <a href="#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
     </nav>
 
@@ -54,6 +55,7 @@
     <a href="#mapa" class="mobile-link">Mapa</a>
     <a href="#modulos" class="mobile-link">Módulos</a>
     <a href="cuestionario.html" class="mobile-link">Cuestionario</a>
+    <a href="simulacro.html" class="mobile-link">Simulacro</a>
     <a href="#consejos" class="mobile-link">Consejos</a>
   </nav>
 </header>
@@ -242,6 +244,33 @@
         </div>
       </div>
 
+      <!-- El simulacro, en su propia tarjeta y no como segundo boton de la amarilla
+           (decision del autor, 2026-09-22). La amarilla habla del cuestionario de
+           principio a fin —su titulo, su parrafo y sus tres viñetas—, y un segundo
+           destino ahi serian dos mensajes compitiendo. Aparte, ademas, se pueden decir
+           las reglas, que es lo que distingue al simulacro del cuestionario. -->
+      <div class="mt-6 bg-panel border border-panel3 rounded-2xl px-6 py-10 sm:px-12 sm:py-12">
+        <div class="max-w-3xl">
+          <span class="inline-flex items-center gap-2 border border-panel3 rounded-full px-4 py-1.5 font-mono text-[11px] text-muted">
+            <span class="icon i-clock text-base text-jsyellow" aria-hidden="true"></span>120 preguntas · 30 segundos cada una
+          </span>
+
+          <h3 class="mt-5 font-display font-bold text-3xl sm:text-4xl text-paper leading-tight tracking-tight">
+            ¿Ya practicaste? Ponte a prueba con reloj
+          </h3>
+
+          <p class="mt-4 text-base text-muted leading-relaxed">
+            El simulacro arma un intento de 120 preguntas repartidas entre los siete módulos, con 30 segundos por
+            pregunta y sin volver atrás. Al terminar te dice cómo te fue en cada módulo y por qué era correcta cada
+            respuesta.
+          </p>
+
+          <a href="simulacro.html" class="mt-8 inline-flex items-center gap-2 bg-jsyellow text-ink font-display font-bold text-base px-8 py-4 rounded hover:bg-jsyellowdim transition-colors">
+            <span class="icon i-clock-total text-xl" aria-hidden="true"></span>Ir al simulacro cronometrado
+          </a>
+        </div>
+      </div>
+
       <!-- NotebookLM -->
       <div class="mt-14 border border-jsyellow/40 rounded-2xl p-7 sm:p-8 bg-panel">
         <h3 class="font-display font-bold text-2xl flex items-center gap-3"><span class="grid place-items-center w-10 h-10 rounded-lg bg-jsyellow shrink-0">
@@ -347,6 +376,7 @@
           <li><a href="#mapa" class="hover:text-jsyellow transition-colors">Mapa del examen</a></li>
           <li><a href="#modulos" class="hover:text-jsyellow transition-colors">Módulos evaluados</a></li>
           <li><a href="cuestionario.html" class="hover:text-jsyellow transition-colors">Cuestionario de práctica</a></li>
+          <li><a href="simulacro.html" class="hover:text-jsyellow transition-colors">Simulacro cronometrado</a></li>
           <li><a href="#consejos" class="hover:text-jsyellow transition-colors">Consejos de preparación</a></li>
         </ul>
       </nav>
