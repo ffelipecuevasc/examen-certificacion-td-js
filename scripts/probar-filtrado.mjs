@@ -3524,6 +3524,164 @@ try {
   Math.random = azarDeVerdad;
   globalThis.fetch = fetchLimpio;
 
+  // --- 10l · El servicio trae las justificaciones, por los dos caminos ------
+  //
+  // Iteracion 44, etapa A2. `leerPreguntasPorIds(ids, { conJustificacion: true })`
+  // es lo que el resumen va a pedir al llegar: la justificacion y la version vigente
+  // de cada pregunta, en UNA peticion. Con la capa caida, la copia tiene que traer
+  // lo mismo: un resumen que mostrara el porque solo cuando D1 contesta seria un
+  // modo degradado que se degrada a medias.
+  //
+  // Las dos comparaciones van contra algo leido POR OTRO CAMINO (H-023): la del
+  // extremo, contra la respuesta cruda de 10a; la de la copia, contra el archivo de
+  // la instantanea importado en la seccion 9. Comprobar el servicio contra si mismo
+  // dejaria pasar un error compartido.
+  //
+  // Y el control: sin la opcion, NINGUNO de los dos caminos trae justificacion. El
+  // intento sigue igual de liviano al empezar (ADR-035), y si esto se rompiera el
+  // intento pesaria distinto segun de donde saliera.
+
+  const { leerPreguntasPorIds } = await import(
+    pathToFileURL(join(SITIO, 'servicios', 'datos.js')).href
+  );
+
+  const idsDelResumen = intentoDeMuestra.ids;
+  const sinSuPorque = (datos) =>
+    (datos ?? []).filter(
+      (p) => typeof p.justificacion !== 'string' || p.justificacion.trim() === ''
+    ).length;
+
+  // 1 · Con la capa arriba: una sola peticion, con `con=justificacion`, y lo mismo
+  // que el extremo contesta crudo.
+  const rutasDelResumen = [];
+  globalThis.fetch = (ruta, opciones) => {
+    rutasDelResumen.push(String(ruta));
+    return fetchLimpio(ruta, opciones);
+  };
+
+  const conPorqueDeLaCapa = await leerPreguntasPorIds(idsDelResumen, { conJustificacion: true });
+  globalThis.fetch = fetchLimpio;
+
+  if (rutasDelResumen.length !== 1) {
+    problemas.push(
+      `leerPreguntasPorIds con conJustificacion hizo ${rutasDelResumen.length} peticiones: ` +
+        'la justificacion y la version vigente tienen que venir en UNA (decision 8)'
+    );
+  } else if (!/[?&]con=justificacion(&|$)/.test(rutasDelResumen[0])) {
+    problemas.push(
+      `leerPreguntasPorIds con conJustificacion pidio «${rutasDelResumen[0].slice(0, 60)}…» ` +
+        'sin con=justificacion'
+    );
+  }
+
+  if (!conPorqueDeLaCapa.ok || conPorqueDeLaCapa.meta?.respaldo) {
+    problemas.push(
+      'leerPreguntasPorIds con conJustificacion no contesto desde la capa con el servidor arriba'
+    );
+  } else {
+    const faltan = sinSuPorque(conPorqueDeLaCapa.datos);
+    if (faltan > 0) {
+      problemas.push(
+        `leerPreguntasPorIds con conJustificacion, desde la capa: ${faltan} de ` +
+          `${conPorqueDeLaCapa.datos.length} pregunta(s) sin justificacion`
+      );
+    }
+
+    if (
+      JSON.stringify(conPorqueDeLaCapa.datos) !== JSON.stringify(conJustificacion.cuerpo?.datos ?? [])
+    ) {
+      problemas.push(
+        'leerPreguntasPorIds con conJustificacion no devolvio lo mismo que el extremo crudo ' +
+          'con &con=justificacion'
+      );
+    }
+  }
+
+  // 2 · Con la capa caida: la copia, con su sello, y cada justificacion la del
+  // archivo. Tambien las alternativas y la correcta, que son la version vigente con
+  // la que el resumen va a comparar la copia congelada.
+  globalThis.fetch = () => Promise.reject(new Error('caida provocada'));
+  const conPorqueDeLaCopia = await leerPreguntasPorIds(idsDelResumen, { conJustificacion: true });
+  globalThis.fetch = fetchLimpio;
+
+  const pedidasQueLaCopiaTiene = instantanea.PREGUNTAS
+    .filter((p) => idsDelResumen.includes(p.id))
+    .sort((a, b) => a.id - b.id);
+
+  if (!conPorqueDeLaCopia.ok || !conPorqueDeLaCopia.meta?.respaldo) {
+    problemas.push(
+      'con la capa caida, leerPreguntasPorIds con conJustificacion no cayo a la copia con su ' +
+        'sello: sin sello no se encenderia el aviso de ADR-008'
+    );
+  } else {
+    const datosCopia = conPorqueDeLaCopia.datos;
+    const faltan = sinSuPorque(datosCopia);
+
+    if (faltan > 0) {
+      problemas.push(
+        `con la capa caida, leerPreguntasPorIds con conJustificacion: ${faltan} de ` +
+          `${datosCopia.length} pregunta(s) sin justificacion`
+      );
+    }
+
+    if (pedidasQueLaCopiaTiene.length === 0) {
+      problemas.push('ninguno de los ids del intento de muestra esta en la instantanea');
+    }
+
+    const idsCopia = datosCopia.map((p) => p.id).join(',');
+    if (idsCopia !== pedidasQueLaCopiaTiene.map((p) => p.id).join(',')) {
+      problemas.push(
+        'con la capa caida, leerPreguntasPorIds con conJustificacion no devolvio exactamente ' +
+          'las pedidas que la instantanea tiene, en orden de id'
+      );
+    }
+
+    const distintas = pedidasQueLaCopiaTiene.filter((delArchivo) => {
+      const servida = datosCopia.find((p) => p.id === delArchivo.id);
+      return (
+        !servida ||
+        servida.justificacion !== delArchivo.justificacion ||
+        servida.enunciado !== delArchivo.enunciado ||
+        JSON.stringify(servida.alternativas) !== JSON.stringify(delArchivo.alternativas)
+      );
+    });
+
+    if (distintas.length > 0) {
+      problemas.push(
+        `con la capa caida, ${distintas.length} pregunta(s) no traen la justificacion, el ` +
+          'enunciado o las alternativas del archivo de la instantanea'
+      );
+    }
+  }
+
+  // 3 · El control: sin la opcion, ni la capa ni la copia traen justificacion.
+  const sinOpcionDeLaCapa = await leerPreguntasPorIds(idsDelResumen);
+
+  globalThis.fetch = () => Promise.reject(new Error('caida provocada'));
+  const sinOpcionDeLaCopia = await leerPreguntasPorIds(idsDelResumen);
+  globalThis.fetch = fetchLimpio;
+
+  for (const [respuesta, deDonde] of [
+    [sinOpcionDeLaCapa, 'desde la capa'],
+    [sinOpcionDeLaCopia, 'desde la copia'],
+  ]) {
+    const conElCampo = (respuesta.datos ?? []).filter((p) => 'justificacion' in p).length;
+
+    if (!respuesta.ok || conElCampo > 0) {
+      problemas.push(
+        `leerPreguntasPorIds sin conJustificacion, ${deDonde}: ${conElCampo} pregunta(s) con ` +
+          'justificacion, o sin respuesta. El intento tiene que seguir sin ellas (ADR-035)'
+      );
+    }
+  }
+
+  notas.push(
+    `Servicio con justificaciones: leerPreguntasPorIds(${idsDelResumen.length} ids, ` +
+      '{ conJustificacion }) hace UNA peticion con con=justificacion y trae lo mismo que el ' +
+      `extremo crudo; con la capa caida, ${pedidasQueLaCopiaTiene.length} desde la copia, cada ` +
+      'una con la justificacion del archivo. Sin la opcion, ninguno de los dos caminos la trae.'
+  );
+
   // ------------------------------------------------------------------------
   // 11 · Veredicto
   // ------------------------------------------------------------------------

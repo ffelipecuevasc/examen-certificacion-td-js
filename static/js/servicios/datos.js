@@ -140,7 +140,13 @@ export async function leerPreguntas(modulo) {
  * Es `/api/preguntas?ids=…`. Lo usa el simulacro despues de elegir en el navegador:
  * la eleccion sale de `servicios/eleccion-del-intento.js` y aqui solo se viene a
  * buscar lo elegido. **No vuelven las justificaciones**: durante un intento no se
- * corrige, y son el campo mas pesado del banco. Se piden en la iteracion 44.
+ * corrige, y son el campo mas pesado del banco.
+ *
+ * CON `conJustificacion` (iteracion 44, decision 8) se agrega `&con=justificacion`,
+ * y vuelven las mismas preguntas con su justificacion. Es lo que pide el resumen al
+ * llegar: la justificacion y la version vigente de cada pregunta, en UNA peticion.
+ * Si la capa falla, la copia trae las dos cosas tambien: con la opcion, los dos
+ * caminos la traen; sin ella, ninguno.
  *
  * NO SE PIDE SI LA LISTA VIENE VACIA, y eso no es una optimizacion: el extremo
  * rechaza `?ids=` vacio con `PETICION_INVALIDA`, y salir a buscar un error conocido
@@ -152,14 +158,15 @@ export async function leerPreguntas(modulo) {
  * Cae a la instantanea con las mismas reglas que las otras dos lecturas: solo el
  * fallo del SERVICIO cambia al respaldo, y cuando lo hace se dice.
  */
-export async function leerPreguntasPorIds(ids) {
+export async function leerPreguntasPorIds(ids, { conJustificacion = false } = {}) {
   if (!Array.isArray(ids) || ids.length === 0) return NO_SE_PIDIO_NADA;
 
-  const respuesta = await consultar(`/api/preguntas?ids=${ids.join(',')}`);
+  const ruta = `/api/preguntas?ids=${ids.join(',')}${conJustificacion ? '&con=justificacion' : ''}`;
+  const respuesta = await consultar(ruta);
 
   if (respuesta.ok || !respuesta.usar_respaldo) return respuesta;
 
-  return (await leerIdsDeLaInstantanea(ids)) ?? respuesta;
+  return (await leerIdsDeLaInstantanea(ids, { conJustificacion })) ?? respuesta;
 }
 
 /**
@@ -309,26 +316,31 @@ async function leerDesdeInstantanea(modulo) {
  * pidio repone con sus reservas sin tener que saber de donde salieron las que si
  * volvieron. Es lo que permite que el simulacro tenga un solo camino.
  *
- * Y se quitan las justificaciones, como las quita el extremo. La instantanea las
- * trae —ADR-008 las necesita para corregir en el cuestionario—, asi que dejarlas
- * pasar aqui haria que el intento pesara distinto segun el camino, y que la
- * iteracion 44 pudiera creer que ya las tiene cuando por el camino normal no las
- * tendria. Dos caminos que devuelven cosas distintas es justo lo que el modo
- * degradado no se puede permitir.
+ * Y las justificaciones se quitan salvo que se pidan, igual que en el extremo. La
+ * instantanea las trae —ADR-008 las necesita para corregir en el cuestionario—, asi
+ * que dejarlas pasar sin que se pidieran haria que el intento pesara distinto segun
+ * el camino, y que quien llama creyera tenerlas cuando por el camino normal no las
+ * tendria. Con `conJustificacion` se dejan, porque el extremo tambien las devuelve
+ * con `&con=justificacion` (iteracion 44, decision 8). Dos caminos que devuelven
+ * cosas distintas es justo lo que el modo degradado no se puede permitir, en un
+ * sentido o en el otro.
  *
  * El orden es por id, como el del extremo, y por el mismo motivo: que la respuesta
  * no dependa de en que orden estaba escrito el archivo.
  */
-async function leerIdsDeLaInstantanea(ids) {
+async function leerIdsDeLaInstantanea(ids, { conJustificacion = false } = {}) {
   const copia = await cargarInstantanea();
   if (!copia) return null;
 
   const pedidos = new Set(ids);
 
-  const datos = copia.todas
+  const elegidas = copia.todas
     .filter((pregunta) => pedidos.has(pregunta.id))
-    .sort((a, b) => a.id - b.id)
-    .map(({ justificacion, ...resto }) => resto);
+    .sort((a, b) => a.id - b.id);
+
+  const datos = conJustificacion
+    ? elegidas
+    : elegidas.map(({ justificacion, ...resto }) => resto);
 
   return {
     ok: true,

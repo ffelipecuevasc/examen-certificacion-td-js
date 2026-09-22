@@ -56,7 +56,7 @@
  *   npm run probar:escapado
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { almacenDeMentira, prepararDomFalso, relojDeMentira } from './dom-falso.mjs';
@@ -487,6 +487,102 @@ try {
     problemas.push('justificacion tras «Ver por qué»: su forma escapada NO aparece, se perdio texto');
   }
 
+  // --- 5a-2 · LA PIEZA EXTRAIDA (iteracion 44, etapa A3) ------------------
+  //
+  // El resumen del simulacro dibuja la justificacion con la MISMA pieza que el
+  // cuestionario (decision 3 de la 44), y esa pieza recibe la pregunta y nada mas.
+  // Se prueba aqui, y no en un guion aparte, porque lo que la pieza hace de peligroso
+  // es insertar texto del banco, y este es el guion que corre en `verificar`.
+  //
+  // Cuatro cosas, y la tercera es la que importa en una extraccion:
+  //
+  //   1. el modulo existe y exporta las dos funciones;
+  //   2. `tieneJustificacion()` distingue lo que hay que explicar de lo que no;
+  //   3. `justificacionDibujada()` escribe EXACTAMENTE el HTML que escribia dentro
+  //      del cuestionario, copiado de ahi antes de moverla. Que la funcion movida
+  //      «funcione» no alcanza: tiene que dibujar lo mismo;
+  //   4. el cuestionario la importa y no conserva una copia propia. Dos copias es
+  //      justo lo que la decision 3 existe para impedir.
+
+  let pieza = null;
+
+  try {
+    pieza = await import(pathToFileURL(join(SITIO, 'components', 'justificacion.js')).href);
+  } catch (error) {
+    problemas.push(
+      `no se pudo importar static/js/components/justificacion.js: ${error.code ?? error.message}`
+    );
+  }
+
+  if (pieza) {
+    const { tieneJustificacion, justificacionDibujada } = pieza;
+
+    if (typeof tieneJustificacion !== 'function' || typeof justificacionDibujada !== 'function') {
+      problemas.push('components/justificacion.js no exporta tieneJustificacion y justificacionDibujada');
+    } else {
+      const casos = [
+        [null, false, 'null'],
+        [{}, false, 'una pregunta sin el campo'],
+        [{ justificacion: null }, false, 'justificacion nula'],
+        [{ justificacion: '' }, false, 'justificacion vacia'],
+        [{ justificacion: '   \n ' }, false, 'justificacion solo con espacios'],
+        [{ justificacion: 42 }, false, 'justificacion que no es texto'],
+        [{ justificacion: 'Porque map devuelve un arreglo nuevo.' }, true, 'justificacion de verdad'],
+      ];
+
+      for (const [pregunta, esperado, queEs] of casos) {
+        if (tieneJustificacion(pregunta) !== esperado) {
+          problemas.push(`tieneJustificacion() con ${queEs} dio ${!esperado} y tenia que dar ${esperado}`);
+        }
+      }
+
+      // Copiado de `justificacionDibujada()` de cuestionario.js tal como estaba el
+      // 2026-09-22, antes de moverla, con sus saltos y su sangria.
+      const COMO_SE_DIBUJABA =
+        '\n              <p class="font-display font-bold text-jsyellow text-[11px] uppercase ' +
+        'tracking-widest">Por qué</p>\n              <p class="mt-1.5 text-sm text-paper ' +
+        'leading-relaxed">Porque map devuelve un arreglo nuevo.</p>';
+
+      const dibujada = justificacionDibujada({ justificacion: 'Porque map devuelve un arreglo nuevo.' });
+
+      if (dibujada !== COMO_SE_DIBUJABA) {
+        problemas.push(
+          'justificacionDibujada() ya no escribe el mismo HTML que escribia dentro del cuestionario'
+        );
+      }
+
+      const dibujadaHostil = justificacionDibujada(hostil);
+
+      if (dibujadaHostil.includes(hostil.justificacion)) {
+        problemas.push('justificacionDibujada(): la justificacion hostil salio CRUDA, sin escapar');
+      }
+      if (!dibujadaHostil.includes(esc(hostil.justificacion))) {
+        problemas.push('justificacionDibujada(): la justificacion hostil no salio escapada y entera');
+      }
+    }
+  }
+
+  const fuenteDelCuestionario = readFileSync(join(SITIO, 'components', 'cuestionario.js'), 'utf8');
+
+  const laImporta =
+    /import\s*\{[^}]*\btieneJustificacion\b[^}]*\bjustificacionDibujada\b[^}]*\}\s*from\s*'\.\/justificacion\.js'/.test(
+      fuenteDelCuestionario
+    ) ||
+    /import\s*\{[^}]*\bjustificacionDibujada\b[^}]*\btieneJustificacion\b[^}]*\}\s*from\s*'\.\/justificacion\.js'/.test(
+      fuenteDelCuestionario
+    );
+
+  const laDefine = /(const|let|var|function)\s+(tieneJustificacion|justificacionDibujada)\b/.test(
+    fuenteDelCuestionario
+  );
+
+  if (!laImporta) {
+    problemas.push('cuestionario.js no importa tieneJustificacion y justificacionDibujada de ./justificacion.js');
+  }
+  if (laDefine) {
+    problemas.push('cuestionario.js conserva su propia definicion de la pieza de la justificacion');
+  }
+
   // --- 5b · EL BANCO REAL, A ESCALA (ADR-024) -----------------------------
   //
   // Hasta el 2026-09-10 este guion comprobaba una sola fila: la hostil, cargada
@@ -828,6 +924,10 @@ try {
       'ninguna aparecio cruda. Y la de la fila hostil se desplego pulsando «Ver por qué»',
       'sobre una pregunta restaurada del almacen: tampoco aparecio cruda, y su texto',
       'llego entero.',
+      '',
+      'LA PIEZA EXTRAIDA (iteracion 44): components/justificacion.js dibuja el mismo',
+      'HTML que dibujaba dentro del cuestionario, escapa la justificacion hostil, y el',
+      'cuestionario la importa sin conservar una copia propia.',
       '',
       `Etiquetas en el HTML: ${presentes.sort().join(', ')}`,
       'Ninguna ajena al componente.',

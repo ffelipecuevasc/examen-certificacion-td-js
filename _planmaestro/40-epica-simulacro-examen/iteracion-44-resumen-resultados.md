@@ -1,7 +1,7 @@
 # Iteración 44 · Resumen de resultados
 
 **Épica:** 40 · Simulacro de examen
-**Estado:** 🔵 En curso · etapa A1 cerrada el 2026-09-22 · quedan A2, A3, B y C 
+**Estado:** 🔵 En curso · etapa A cerrada el 2026-09-22 (A1 commiteado aparte; A2 y A3 a la espera de su commit) · quedan B y C
 **Depende de:** iteración 43, cerrada el 2026-09-21.
 
 ## Objetivo
@@ -191,12 +191,12 @@ cubre también la recarga de un intento ya terminado.
 
 ### Etapa A · Lo que el resumen necesita
 
-- [ ] Extraer la pieza de la justificación de la 34, exportada, que reciba la pregunta y nada más, y hacer que el
+- [x] Extraer la pieza de la justificación de la 34, exportada, que reciba la pregunta y nada más, y hacer que el
   cuestionario la use sin cambiar lo que muestra.
-- [ ] Ampliar `/api/preguntas?ids=` con `&con=justificacion` (decisión 8).
+- [x] Ampliar `/api/preguntas?ids=` con `&con=justificacion` (decisión 8).
 - [x] Escribir la actualización fechada de ADR-035 en `decisiones.md` (decisión 8). Escrita el 2026-09-21, al preparar
   la iteración, antes de construir nada.
-- [ ] Un servicio en el navegador que pida las justificaciones y la versión vigente por los ids del intento, con la
+- [x] Un servicio en el navegador que pida las justificaciones y la versión vigente por los ids del intento, con la
   instantánea como respaldo.
 
 ### Etapa B · El resumen
@@ -230,14 +230,14 @@ la 42, y con su prueba vista en rojo por el motivo correcto antes de escribir el
 
 ### Etapa A · Se provocan con guion
 
-- [ ] **`?ids=…&con=justificacion` devuelve las mismas preguntas que `?ids=…`, más su justificación**, y `?ids=…` a
+- [x] **`?ids=…&con=justificacion` devuelve las mismas preguntas que `?ids=…`, más su justificación**, y `?ids=…` a
   secas sigue sin justificaciones.
-- [ ] **`con` con otro valor, `con` sin `ids`, y `con` junto a `modulo` o `resumen` se rechazan con
+- [x] **`con` con otro valor, `con` sin `ids`, y `con` junto a `modulo` o `resumen` se rechazan con
   `PETICION_INVALIDA`.**
-- [ ] **120 ids con justificación se sirven en una sola petición**, troceados por dentro como hasta ahora.
-- [ ] **Con la capa de datos caída**, simulado interceptando, el servicio del navegador devuelve justificaciones y
+- [x] **120 ids con justificación se sirven en una sola petición**, troceados por dentro como hasta ahora.
+- [x] **Con la capa de datos caída**, simulado interceptando, el servicio del navegador devuelve justificaciones y
   versión vigente desde la instantánea.
-- [ ] **La justificación del cuestionario se dibuja con la pieza extraída**, y `probar:memoria`, `probar:filtrado` y
+- [x] **La justificación del cuestionario se dibuja con la pieza extraída**, y `probar:memoria`, `probar:filtrado` y
   `probar:escapado` siguen en verde sin cambios de comportamiento.
 
 ### Etapa B · Se provocan con guion
@@ -297,4 +297,45 @@ la 42, y con su prueba vista en rojo por el motivo correcto antes de escribir el
 
 ## Notas de la iteración
 
-_Pendiente._
+### Etapa A · cerrada el 2026-09-22
+
+A1 quedó commiteado aparte (`fd8716b`). A2 y A3 los implementó Claude Code el mismo día, con el diseño aprobado por
+el autor antes de escribir código y **cada prueba vista en rojo por su motivo antes del código que la hace pasar**.
+
+**A2 · `leerPreguntasPorIds(ids, { conJustificacion })`** en `static/js/servicios/datos.js`. Sin la opción, todo sigue
+igual y `simulacro.js` no se tocó. Con ella, la ruta gana `&con=justificacion` y el respaldo
+—`leerIdsDeLaInstantanea(ids, { conJustificacion })`— deja la justificación en vez de quitarla: con la opción, los dos
+caminos la traen; sin ella, ninguno. `leerPreguntasPorIdsDelRespaldo()` **no se tocó**: H-024 es de elegir sobre un
+banco y pedir a otro, y el resumen hace una sola petición. Si la etapa B necesita forzar la copia, se decide ahí.
+
+- **Prueba:** bloque 10l de `scripts/probar-filtrado.mjs`, con los 120 ids del intento de muestra. (1) Con la capa
+  arriba: **una** petición, contada interceptando, con `con=justificacion`, y lo mismo que el extremo crudo de 10a. (2)
+  Con `fetch` rechazado: la copia con su sello, las pedidas que la copia tiene en orden de id, y cada justificación,
+  enunciado y alternativas iguales a los de `instantanea-banco.js` **leído aparte** (H-023). (3) Control: sin la opción,
+  ninguno de los dos caminos trae el campo.
+- **Rojo, antes del código:** `FILTRADO ROTO *** 5 ***` — la petición salió sin `con=justificacion`; 120 de 120 sin
+  justificación desde la capa; distinto del extremo crudo; 120 de 120 sin justificación desde la copia; 120 distintas
+  del archivo. El control (3) no apareció entre los problemas: verde, como se esperaba.
+- **Verde:** `probar:filtrado` en 0, con la nota «hace UNA peticion con con=justificacion y trae lo mismo que el extremo
+  crudo; con la capa caida, 120 desde la copia, cada una con la justificacion del archivo».
+
+**A3 · `static/js/components/justificacion.js`.** `tieneJustificacion()` y `justificacionDibujada()` se movieron tal
+cual, con sus comentarios, y solo importan `esc`. `cuestionario.js` las importa y ya no las define; `porqueDibujado()`,
+`desplegarElPorque()`, el camino de `responder()` y «Ver por qué» se quedaron en el cuestionario.
+
+- **Prueba:** sección 5a-2 de `scripts/probar-escapado.mjs`, que corre en `verificar`: el módulo existe y exporta las
+  dos; `tieneJustificacion()` con siete casos (nulo, sin campo, vacía, solo espacios, un número, texto de verdad);
+  `justificacionDibujada()` **idéntica a una copia fija del HTML** tomada del cuestionario antes de moverla —antes de
+  escribir la prueba se comprobó, con la plantilla leída del archivo, que la copia coincidía byte a byte—, y con la
+  justificación hostil de `d1/prueba-escapado.sql` solo en su forma escapada; y `cuestionario.js` la importa de
+  `./justificacion.js` sin conservar una definición propia.
+- **Rojo, antes del código:** `ESCAPADO ROTO *** 3 ***` — `ERR_MODULE_NOT_FOUND` al importar el módulo, el
+  cuestionario no lo importa, y conserva su propia definición.
+- **Verde:** `probar:escapado` en 0.
+
+**Al cierre**, con `npm run datos:dev` levantado —build primero, servidor después; el primer servidor se detuvo, se
+comprobó el puerto 8788 libre y se levantó uno nuevo—: `probar:filtrado` 0, `probar:escapado` 0, `probar:memoria` 0 y
+`npm run verificar` 0, con sus nueve comprobadores en OK. `probar:memoria` dio una vez código 2 («La base local no
+devolvió las alternativas de las preguntas de prueba») y en verde al repetirlo sin cambios; está anotado en
+«Sin asignar» de `registro_log.md`. Su nota sigue diciendo «120 preguntas congeladas con su correcta y sin
+justificaciones»: el intento no cambió. `instantanea-banco.js` y `d1/respaldo-banco.sql` sin cambios.

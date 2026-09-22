@@ -11,7 +11,7 @@ decisiones vale tanto como el código que las implementa.
 |---------------|---------------------------------------------------------------------------------|
 | **Iteración** | 44 · Resumen de resultados                                                     |
 | **Épica**     | 40 · Simulacro de examen                                                       |
-| **Estado**    | 🔵 En curso · etapa A1 cerrada, quedan A2, A3, B y C                           |
+| **Estado**    | 🔵 En curso · etapa A cerrada, falta su commit; quedan B y C                   |
 | **Archivo**   | `40-epica-simulacro-examen/iteracion-44-resumen-resultados.md`                 |
 | **Reanudada** | 2026-09-22 · vuelve el reparto de trabajo: autor dirige, Claude Code implementa |
 
@@ -23,9 +23,9 @@ decisiones vale tanto como el código que las implementa.
 > **Lo que ya está hecho de la etapa A.** El extremo `/api/preguntas` acepta
 > `&con=justificacion` junto a `ids`, y sólo junto a `ids`: cualquier otro uso se
 > rechaza con `PETICION_INVALIDA` (ADR-035, decisión 8). Probado en rojo con seis
-> problemas y en verde con 15 formas de pedir mal. Falta A2 —el servicio del
-> navegador `leerPreguntasPorIds(ids, { conJustificacion })`— y A3 —extraer
-> `tieneJustificacion()` y `justificacionDibujada()` a un módulo propio.
+> problemas y en verde con 15 formas de pedir mal. **A2 y A3 cerradas el
+> 2026-09-22**, pendientes de su commit: el servicio `leerPreguntasPorIds(ids,
+> { conJustificacion })` y `components/justificacion.js`. Lo siguiente es la etapa B.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.

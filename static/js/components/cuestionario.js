@@ -72,6 +72,7 @@
 import { $, $$, esc, shuffle, icon, prefersReducedMotion } from '../utils/dom.js';
 import { leerPreguntas } from '../servicios/datos.js';
 import { crearTransicionDeCarga } from './transicion-de-carga.js';
+import { tieneJustificacion, justificacionDibujada } from './justificacion.js';
 import { mostrarAvisoDeRespaldo } from './aviso-de-respaldo.js';
 import {
   borrarAvance,
@@ -320,41 +321,8 @@ const veredictoDibujado = (acerto) =>
     ? `${icon('task-alt', 'text-base text-esmeralda mt-0.5')}<span>Correcto. Sigue así.</span>`
     : `${icon('lightbulb', 'text-base text-jsyellow mt-0.5')}<span>La alternativa correcta está marcada en amarillo.</span>`;
 
-/**
- * Si esta pregunta trae algo que explicar.
- *
- * El esquema deja la columna nula (`d1/migraciones/001-banco-de-preguntas.sql`) y
- * quien vigila que ninguna activa se quede sin justificacion es
- * `d1/verificar-banco.sql`, no la validacion por fila del camino de lectura: una
- * pregunta SIN justificacion puede llegar al navegador. Hoy no llega ninguna —368 de
- * 368 la traen—, y por eso mismo la unica forma de saber que este caso se trata bien
- * es provocarlo.
- *
- * Se mira el dato y no el nodo dibujado. Preguntarle al DOM «¿hay un recuadro?»
- * responderia que si en el momento justo en que se acaba de dibujar vacio.
- */
-const tieneJustificacion = (pregunta) =>
-  typeof pregunta?.justificacion === 'string' && pregunta.justificacion.trim() !== '';
-
-/**
- * El contenido del recuadro del porque. **Texto de la base: se escapa siempre.**
- *
- * Sale de aqui y no de dos sitios por el mismo motivo que `veredictoDibujado()`: hay
- * dos caminos que llegan al mismo recuadro —responder ahora, y pulsar «Ver por qué»
- * en una pregunta de otra visita— y si cada uno armara su propio HTML, el dia que
- * uno cambie el estudiante veria una cosa al responder y otra al desplegar.
- *
- * NI UN GRIS, Y NO ES CASUALIDAD
- *
- * La iteracion 36 dejo `mutedink` y `muted` a 1,19:1 entre si, asi que la jerarquia
- * ya no se puede expresar con dos grises (decision 5 bis de la 36). Este recuadro no
- * usa ninguno de los dos: se distingue por el fondo —`panel2` dentro de una tarjeta
- * `panel`—, por el borde y por el rotulo en amarillo y en negrita. Los dos textos van
- * en color principal sobre ese fondo: 13,01:1 el rotulo y 16,40:1 el cuerpo.
- */
-const justificacionDibujada = (pregunta) => `
-              <p class="font-display font-bold text-jsyellow text-[11px] uppercase tracking-widest">Por qué</p>
-              <p class="mt-1.5 text-sm text-paper leading-relaxed">${esc(pregunta.justificacion)}</p>`;
+// `tieneJustificacion()` y `justificacionDibujada()` viven en components/justificacion.js
+// desde la iteracion 44: el resumen del simulacro dibuja el porque con la misma pieza.
 
 /**
  * El recuadro del porque, en el estado que corresponda, o nada.
