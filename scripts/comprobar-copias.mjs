@@ -107,6 +107,35 @@ function bloquesDe(html) {
 // ---------------------------------------------------------------------------
 
 /**
+ * Los tokens con los que un enlace del menu dice «esta es la pagina en la que estas».
+ *
+ * Los tres primeros son los de la iteracion 41: el enlace normal va en `hover:text-paper`
+ * y el de la pagina actual en `active text-paper`, o en `text-jsyellow` en el menu de
+ * telefono.
+ *
+ * LOS CUATRO ULTIMOS SON DE LA ITERACION 44 (decision del autor, 2026-09-22). El enlace
+ * del simulacro es una pastilla amarilla en las tres paginas —fondo `jsyellow` y texto
+ * `ink` siempre—, asi que su marca de activa no puede ser un color de texto: es un
+ * subrayado negro bajo la palabra, que solo lleva `simulacro.html`.
+ *
+ * QUE SE NORMALICE NO BASTA, Y ESA ES LA MITAD IMPORTANTE. Quitar estos tokens antes de
+ * comparar hace que las tres copias sean iguales; si nadie mirara nada mas, **borrar el
+ * subrayado de `simulacro.html` pasaria en verde**, porque la comparacion dejaria de ver
+ * justo lo unico que distingue a esa pagina. Por eso, mas abajo, hay una comprobacion que
+ * exige que la marca ESTE donde corresponde y no este donde no.
+ */
+const MARCAS_DE_ACTIVA = [
+  'active',
+  'text-paper',
+  'hover:text-paper',
+  'text-jsyellow',
+  'underline',
+  'decoration-ink',
+  'decoration-2',
+  'underline-offset-2',
+];
+
+/**
  * Deja un bloque en su forma canonica, aplicando las cuatro diferencias permitidas.
  *
  * El orden importa: los comentarios se van primero, porque dentro de un comentario
@@ -130,7 +159,7 @@ function normalizar(bloque) {
   t = t.replace(/class="(nav-link|mobile-link)([^"]*)"/g, (_, tipo, resto) => {
     const limpio = resto
       .split(/\s+/)
-      .filter((clase) => clase && !['active', 'text-paper', 'hover:text-paper', 'text-jsyellow'].includes(clase))
+      .filter((clase) => clase && !MARCAS_DE_ACTIVA.includes(clase))
       .join(' ');
     return `class="${tipo}${limpio ? ` ${limpio}` : ''}"`;
   });
@@ -306,6 +335,59 @@ if (!repaso) {
 // pagina llegaria a un ancla que no existe todavia cuando el navegador la busca.
 if (portada && !/<section id="modulos"/.test(portada)) {
   problemas.push('index.html: no existe <section id="modulos">, que es adonde apuntan los enlaces a la guía (decisión 6)');
+}
+
+// LA MARCA DE PAGINA ACTIVA DEL SIMULACRO, QUE LA NORMALIZACION ACABA DE ESCONDER
+// (iteracion 44, decision del autor del 2026-09-22).
+//
+// El enlace del simulacro es una pastilla amarilla igual en las tres paginas, y lo unico
+// que distingue a `simulacro.html` es el subrayado negro. Ese token esta en
+// `MARCAS_DE_ACTIVA`, asi que la comparacion de copias **no lo ve**: sin esto, borrarlo
+// dejaria las tres copias iguales y el comprobador en verde, que es el falso verde que
+// H-023 describe. Aqui se exige al reves: que la marca este en el simulacro y no este en
+// las otras dos.
+
+const MARCA_DEL_SUBRAYADO = 'underline';
+
+const problemasAntesDeLaMarca = problemas.length;
+let marcas = 0;
+
+for (const pagina of comparables) {
+  const bloques = recortados.get(pagina);
+
+  for (const zona of ZONAS.slice(0, 2)) {
+    const trozo = zona.de(bloques);
+    if (trozo === undefined) continue;
+
+    const enlace = trozo.match(/<a[^>]*href="simulacro\.html"[^>]*>/)?.[0];
+    if (!enlace) continue;
+
+    const subrayado = new RegExp(`class="[^"]*\\b${MARCA_DEL_SUBRAYADO}\\b[^"]*"`).test(enlace);
+    const esSuPagina = pagina === 'simulacro.html';
+
+    if (esSuPagina && !subrayado) {
+      problemas.push(
+        `${pagina}: el enlace del simulacro en ${zona.nombre} no lleva el subrayado que marca la página actual, ` +
+          'y es la única diferencia que lo distingue de las otras dos copias'
+      );
+    } else if (!esSuPagina && subrayado) {
+      problemas.push(
+        `${pagina}: el enlace del simulacro en ${zona.nombre} lleva el subrayado de página actual, y esta no es ` +
+          'la página del simulacro'
+      );
+    } else {
+      marcas += 1;
+    }
+  }
+}
+
+// La nota solo si el bloque paso entero: «4 enlaces comprobados» impreso junto a dos
+// problemas de este mismo bloque afirma mas de lo que se midio, que es H-023.
+if (marcas > 0 && problemas.length === problemasAntesDeLaMarca) {
+  notas.push(
+    `marca de página activa del simulacro: ${marcas} enlace(s) comprobados —con subrayado en simulacro.html y sin ` +
+      'él en las otras dos—, que es lo que la normalización esconde al comparar las copias.'
+  );
 }
 
 if (alcances > 0) {

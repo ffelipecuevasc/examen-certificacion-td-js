@@ -120,6 +120,15 @@
     @apply w-full;
   }
 
+  /* La pastilla del simulacro (iteracion 44, decision del autor del 2026-09-22) no lleva
+     la barra de arriba: su fondo YA es `jsyellow`, asi que la barra seria amarillo sobre
+     amarillo, y en `simulacro.html` quedaria puesta siempre por `.active`. Lo que marca
+     ahi la pagina actual es el subrayado negro bajo la palabra. El hover lo dice el
+     fondo, con `hover:bg-jsyellowdim`, que es el patron de los botones del sitio. */
+  .nav-link.pastilla::after {
+    content: none;
+  }
+
   .quiz-option[data-state='correct'] {
     @apply bg-jsyellow text-ink border-jsyellow;
   }

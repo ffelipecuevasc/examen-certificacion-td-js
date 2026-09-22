@@ -491,6 +491,56 @@ comprobó el puerto libre y se levantó uno limpio. El segundo: en la primera co
 AVISO porque `wrangler d1 execute --local` falló con `fetch failed` al aplicar `d1/prueba-escapado.sql`; repetido sin
 tocar nada, OK. Encaja con la familia de H-029 y está anotado ahí, no como hallazgo nuevo.
 
+### Etapa C · segunda tanda, 2026-09-22 · la pastilla del menú
+
+Decisión del autor, con el diseño ya en pantalla: **el enlace «Simulacro» del menú es una pastilla amarilla persistente**
+—`bg-jsyellow text-ink`, con la forma y el `hover:bg-jsyellowdim` de los botones del sitio, del tamaño de un ítem de
+menú— en las tres páginas, en escritorio y en móvil. El pie no se toca. **La marca de página actual, solo en
+`simulacro.html`, es un subrayado negro** bajo la palabra: con el texto siempre negro sobre amarillo, el
+`hover:text-paper` de los demás enlaces no aplica y un color de texto no puede distinguir nada.
+
+- **`src/input.css`** gana una regla: `.nav-link.pastilla::after { content: none; }`. La barra amarilla que `.nav-link`
+  dibuja al pasar el ratón quedaría amarillo sobre amarillo, y en `simulacro.html` estaría puesta siempre por `.active`.
+- **`mobile-link` se conserva** en la pastilla del menú de teléfono: `components/nav.js` la usa para cerrar el menú al
+  tocar. `self-start` evita que la pastilla se estire de lado a lado en la columna del menú.
+
+**La comprobación, y el falso verde que evita.** `comprobar-copias.mjs` normaliza los tokens de la página activa antes de
+comparar, así que ahora también esconde el subrayado. Eso solo no basta: **escondido el token, borrarlo pasaría en
+verde**, que es H-023 otra vez. Por eso el guion gana una comprobación que exige lo contrario: que el subrayado **esté**
+en los dos menús de `simulacro.html` y **no esté** en los de las otras dos.
+
+**Rojo visto antes del código, y la provocación que pidió el autor.** Primero, con la pastilla sin escribir: los dos
+menús de `simulacro.html` sin subrayado. Después, ya con el diseño puesto, se quitó el subrayado **a propósito**: la
+comparación de copias siguió diciendo «las tres dicen lo mismo» —la normalización lo esconde— y el rojo salió por la
+comprobación nueva, por diferencia real: «el enlace del simulacro en el menú de escritorio no lleva el subrayado que
+marca la página actual». Restaurado. De paso se corrigió que su nota se imprimía aunque el bloque hubiera fallado.
+
+**Al cierre:** `verificar:copias` 0 —con «6 enlaces comprobados» y «10 sitios llevan a simulacro.html»—,
+`probar:filtrado` 0, `probar:escapado` 0. **`npm run verificar` termina en 1 por dos cosas**: `css` DESFASADO, que se
+cierra con el commit, y **`identidad` ROTA por el texto nuevo del aviso**, que no es de esta tanda y se explica abajo.
+
+**Dos incidentes del entorno.** `node_modules/tailwindcss` desapareció a mitad de la sesión —el build anterior había
+funcionado— y el build falló con `MODULE_NOT_FOUND`; se repuso con `npm install`, sin tocar `package.json` ni
+`package-lock.json`, y quedó en 3.4.19. Y en la primera corrida de `verificar`, `restricciones` dio `RESTRICCION CAIDA ·
+CHECK de es_correcta`: se corrió el diagnóstico de H-029 antes de suponer nada —el `CHECK (es_correcta IN (0, 1))` está
+en la base, y el comprobador suelto dio 0— y al repetir `verificar` salió OK. Tercera aparición de la misma familia.
+
+### Lo que bloquea el cierre y necesita decisión del autor
+
+**El texto nuevo del aviso de `simulacro.html` usa «Certificación» y «certificación»**, y esa palabra está en la lista de
+ADR-022 que barre la sección 17 de `probar-identidad-visual.mjs` sobre el `<main>` de esa página. El texto es del autor y
+**no se tocó**. Las dos salidas, y la elige él:
+
+1. **Reescribir esas dos frases** evitando la palabra —por ejemplo «Examen Oficial de Talento Digital para Chile»—. No
+   cambia ninguna decisión y deja el guardián intacto.
+2. **Enmendar ADR-022 con una actualización fechada** que autorice nombrar el examen real con su nombre propio, y afinar
+   el barrido para que admita **esa forma exacta** y ninguna otra, igual que se hizo con las dos frases del resultado. Es
+   una decisión de producto: la palabra prohibida existe para que ninguna pantalla sugiera que este simulacro certifica
+   algo.
+
+Mientras no se resuelva, `probar:identidad` y `npm run verificar` quedan en rojo por ese motivo, y el criterio de
+navegador sobre ADR-022 sigue sin marcar.
+
 **Queda pendiente de la pasada del autor en el navegador**, sin marcar: los nueve criterios del bloque final. En
 particular el de **ADR-022** —que ninguna frase sugiera que aprobar el simulacro equivale a aprobar el examen real—, que
 el propio archivo declara no mecanizable. Y una anotación de esta etapa: **el menú de escritorio pasó de cinco a seis

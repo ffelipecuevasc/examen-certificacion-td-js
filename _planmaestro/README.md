@@ -29,9 +29,17 @@ decisiones vale tanto como el código que las implementa.
 > el enlace del resumen a `index.html#modulos` y el escapado de la revisión. `verificar`
 > termina en 1 sólo por el CSS recompilado sin commitear.
 >
+> **Segunda tanda de la C, 2026-09-22:** el enlace «Simulacro» del menú pasa a pastilla
+> amarilla en las tres páginas, con subrayado negro como marca de página actual en
+> `simulacro.html`, y `comprobar-copias.mjs` gana la comprobación que impide el falso
+> verde de esconder esa marca al normalizar.
+>
 > **Lo que falta para cerrar la iteración:** los nueve criterios que comprueba el autor en
 > el navegador, con el de ADR-022 —ninguna frase que equipare el simulacro con el examen
-> real— a la cabeza, porque es el que no se puede mecanizar.
+> real— a la cabeza, porque es el que no se puede mecanizar. **Y una decisión pendiente:**
+> el aviso reescrito de `simulacro.html` dice «Certificación», palabra que ADR-022 prohíbe
+> y que la sección 17 de `probar-identidad-visual.mjs` marca, así que `verificar` queda en
+> rojo hasta que el autor elija entre reescribir la frase o enmendar ADR-022.
 
 > Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
 > poner la épica correspondiente en 🔵.
