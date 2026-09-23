@@ -148,6 +148,11 @@ es justo cuando el material más importa— podría dejar el sitio sin datos. El
 respaldo de ADR-008 mitiga el efecto, pero no evita el problema.
 **Propuesta.** Medir el consumo real en la iteración 53, cachear las respuestas del
 Worker y definir por escrito qué hacer si la cuota se agota.
+**Actualización 2026-09-23 (iteración 51, etapa C).** La mitad de vigilancia está escrita en
+`90-manual/vigilancia-del-consumo-y-protecciones.md`: los límites con su fuente, el consumo medido por visita y
+dónde mirarlo en el panel. **El límite que se agota primero son las filas leídas de D1, no las peticiones**, unas
+veinte veces antes. Sigue abierto: la caché es de la iteración 53, y la primera lectura real de producción la hace el
+autor.
 
 ### H-009 · Nueva superficie de escritura
 **Gravedad:** 🟠 · **Estado:** ⚪ Abierto · **Fecha:** 2026-09-02

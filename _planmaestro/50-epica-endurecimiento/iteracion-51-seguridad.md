@@ -83,13 +83,15 @@ Tomadas por el autor el **2026-09-23**.
   antes de que exista, porque `LISTA_COPIA` trata cada entrada como obligatoria y el build se detendría. Entra en el
   mismo cambio que crea la página. _Etapa B, junto con `comprobar-csp.mjs`, `probar-cabeceras.mjs` y la sección de
   la advertencia retirada de `probar-identidad-visual.mjs`, que recorren las mismas páginas._
-- [ ] Investigar, antes de intentar activar nada, cuáles protecciones del plan gratuito siguen disponibles sin dominio
+- [x] Investigar, antes de intentar activar nada, cuáles protecciones del plan gratuito siguen disponibles sin dominio
   propio (Bot Fight Mode, otras reglas del panel) y cuáles requieren una zona igual que el límite de tasa. Documentar
-  cuáles se activan, cuáles no aplican y por qué.
-- [ ] Revisar que ninguna protección afecte al estudiante legítimo: nada que introduzca verificaciones intrusivas
-  contradice el principio de cero fricción.
-- [ ] Dejar visible el consumo del Worker de lectura y de D1 frente a los límites del plan gratuito (H-008), con los
-  números del límite escritos junto a la medición.
+  cuáles se activan, cuáles no aplican y por qué. _Etapa C: `90-manual/vigilancia-del-consumo-y-protecciones.md`, sección 4. Solo aplica Access para las
+  previsualizaciones, y activarla es decisión del autor._
+- [x] Revisar que ninguna protección afecte al estudiante legítimo: nada que introduzca verificaciones intrusivas
+  contradice el principio de cero fricción. _Etapa C: la única que aplica no cubre la dirección principal, y el manual
+  trae la comprobación de las dos mitades._
+- [x] Dejar visible el consumo del Worker de lectura y de D1 frente a los límites del plan gratuito (H-008), con los
+  números del límite escritos junto a la medición. _Etapa C: `90-manual/vigilancia-del-consumo-y-protecciones.md`, secciones 1 a 3._
 - [x] Confirmar que un rechazo por consumo excesivo de la plataforma —un 429 nativo de Cloudflare, no construido por
   este proyecto— activa el mismo respaldo que cualquier otra falla: `SIN_RESPUESTA` en `datos.js`, instantánea con
   aviso. _Etapa A, la mitad local: `probar:respaldo`. La de producción es un criterio y la ejecuta el autor._
@@ -123,25 +125,29 @@ Tomadas por el autor el **2026-09-23**.
   existe** hasta que esta iteración la publique.
 - [x] Extender `scripts/comprobar-copias.mjs` para que vigile la restricción del enlace: `acerca-de.html` aparece en el
   pie de las tres páginas y **no aparece** en ninguno de los dos menús del encabezado. _Etapa B: prueba 8._
-- [ ] Cuando el autor publique `acerca-de.html`, escribir en su fila de `registro_log.md` que se cierra el período sin
+- [x] Cuando el autor publique `acerca-de.html`, escribir en su fila de `registro_log.md` que se cierra el período sin
   atribución visible de animate.css, aceptado el 2026-09-15 por la decisión 7 de la iteración 36. **No antes.**
-  _La página quedó escrita en la etapa B y la fila lo dice, con el período todavía abierto: lo confirmó el autor el
-  2026-09-23._
-- [ ] Documentar toda la configuración manual en `90-manual/`.
+  _Escrito el 2026-09-23 por decisión del autor, **condicionado únicamente a la publicación** en la etapa D: la página
+  está terminada y lo único que falta es desplegarla._
+- [x] Documentar toda la configuración manual en `90-manual/`. _Etapa C: `90-manual/vigilancia-del-consumo-y-protecciones.md` y
+  `90-manual/cabeceras-y-politica-de-contenido.md`, que es el procedimiento de la etapa D._
 
 ## Criterios de aceptación
 
 - [ ] Las cabeceras de seguridad están activas y se muestran las respuestas que lo confirman.
 - [x] `dist/_headers` existe después de `npm run build`, y las cabeceras se leen en la respuesta de `wrangler pages dev`
   antes de publicar.
-- [ ] Con la política aplicada, las cuatro páginas —`index.html`, `cuestionario.html`, `simulacro.html` y
+- [x] Con la política aplicada, las cuatro páginas —`index.html`, `cuestionario.html`, `simulacro.html` y
   `acerca-de.html`— funcionan sin errores de consola, incluidas las barras de progreso pintándose con normalidad.
-- [ ] Las protecciones activadas están documentadas con su motivo, y las que no aplican sin dominio propio están
+  _Dado por bueno por el autor el 2026-09-23: las cuatro páginas, 0 mensajes con la política obligatoria (etapa B), y
+  las barras sin diferencias en 7 pasos (etapa A); la etapa B no tocó `cuestionario.js` ni la política._
+- [x] Las protecciones activadas están documentadas con su motivo, y las que no aplican sin dominio propio están
   nombradas como tales, no omitidas en silencio.
-- [ ] Un estudiante puede entrar y estudiar sin ninguna verificación intermedia.
+- [x] Un estudiante puede entrar y estudiar sin ninguna verificación intermedia. _Hoy no hay ninguna activada; si
+  se activa Access, la sección 4 del manual comprueba que la dirección principal siga abierta._
 - [ ] Existe una forma de ver, sin adivinar, cuánto del límite diario de peticiones y de lecturas de D1 se está
-  consumiendo.
-- [ ] Está escrito, con números, cuál es el límite del plan gratuito y en qué punto conviene preocuparse (H-008).
+  consumiendo. _Escrito en `90-manual/vigilancia-del-consumo-y-protecciones.md`; falta que el autor confirme las rutas en el panel._
+- [x] Está escrito, con números, cuál es el límite del plan gratuito y en qué punto conviene preocuparse (H-008).
 - [x] Ningún mecanismo de esta iteración rechaza peticiones de un estudiante legítimo: la vigilancia informa, no
   bloquea.
 - [ ] Un 429 provocado (simulado o real) llega al estudiante como el mismo aviso de respaldo que cualquier otra falla de
@@ -159,7 +165,7 @@ Tomadas por el autor el **2026-09-23**.
   con el enlace puesto en un menú, el comprobador falla y nombra la página y el menú.
 - [x] El repositorio declara las dos licencias por separado, código y banco, de forma que nadie pueda leer la del código
   como si cubriera las preguntas.
-- [ ] La configuración manual está documentada con el detalle suficiente para reconstruirla.
+- [x] La configuración manual está documentada con el detalle suficiente para reconstruirla.
 
 ## Notas de la iteración
 
@@ -254,6 +260,60 @@ Material Symbols (no 44), más tres de SVG Logos, uno de Huge Icons y el logotip
 del autor, 2026-09-23:** la página sale con las tres pedidas, y el resto va a «Sin asignar», con la licencia de cada
 origen por comprobar.
 
+**Seguimiento el mismo día, por decisión del autor: los orígenes nuevos se investigan y entran ahora**, sin abrir un
+segundo vacío fechado como el de animate.css. Cada licencia se leyó en su fuente:
+
+| Origen | Archivos | Licencia, y dónde se leyó | Resultado |
+|---|---|---|---|
+| SVG Logos, de Gil Barbara | `js-logo.svg`, `github-icon.svg`, `linkedin-icon.svg` | **CC0 1.0 Universal**, en el `LICENSE.txt` que el propio aviso enlaza; la cláusula 4.a y el README dejan las marcas a sus dueños | entra en la página |
+| Huge Icons, de Hugeicons | `web-internet-icon.svg` | **MIT, «Copyright (c) 2025 Hugeicons»**, en `github.com/hugeicons/hugeicons/LICENSE.md`. El aviso del SVG decía «undefined» porque Iconify declara MIT sin dirección; el SVG es idéntico a `hugeicons:internet`, y `InternetIcon` está en el catálogo gratuito (los Pro tienen otra licencia) | entra, y el aviso del SVG pasa a llevar esa dirección |
+| Logotipo de NotebookLM | `notebooklm-gemini-icon.svg` | **ninguna conocida**: el archivo no trae aviso, su commit (`107694d`) no dice de dónde salió, y las directrices de marca de Google piden aprobación previa sin publicar una licencia abierta | **no entra**: queda en «Sin asignar» para que decida el autor |
+
+De paso, la fila de line-md dejó de decir «su licencia»: su `license.txt` es el texto MIT con «Copyright 2020
+Vjacheslav Trushkin».
+
 **Lo que queda del lado del autor:** `static/css/style.css` cambió por las clases nuevas de la página, así que
 `npm run verificar` marca `css` como DESFASADO hasta el commit. El período sin atribución visible de animate.css sigue
 abierto hasta que `acerca-de.html` se publique, y H-006 se cierra con esa publicación.
+
+### Etapa C · 2026-09-23 · vigilancia del consumo, protecciones y manual
+
+**Cada límite y cada comportamiento se leyó en la documentación oficial de Cloudflare el mismo día**, en su versión
+Markdown, y el manual nombra la página de cada uno. Tres datos que cambian la lectura de H-008:
+
+- **Solo las peticiones a `/api/` cuentan.** Las páginas y los archivos estáticos son gratis e ilimitados en Pages.
+- **Los límites son de la cuenta.** Las 100 000 peticiones y las 5 millones de filas diarias se comparten con
+  cualquier otro proyecto de la cuenta y con la base de pruebas.
+- **Desde el 1 de septiembre de 2026, D1 gratuito falla al pasar su límite**, y el correo de Cloudflare llega al
+  alcanzarlo, no antes. El sitio cae entonces a la instantánea con aviso: `FALLO_CONSULTA` con `usar_respaldo`, que
+  ya es un control de `probar:respaldo`.
+
+**El consumo se midió, no se dedujo:** un arnés fuera del repositorio recorrió en Chrome visitas reales contra el
+servidor local con las 368 preguntas, y anotó cada petición a `/api/` con el `filas_leidas` de su respuesta.
+
+| Visita | Peticiones | Filas |
+|---|---|---|
+| portada, «Acerca de» | 0 | 0 |
+| abrir el cuestionario | 2 | 1111 (+ `/api/estado`, sin dato) |
+| los siete módulos | 7 | 4073 |
+| un simulacro completo, hasta su revisión | 3 | 6693 |
+| **sesión completa** | **12** | **11 877** |
+
+La base local reproduce la de producción: `?resumen=1` da 1111 filas en las dos. **Las filas de D1 se agotan unas
+veinte veces antes que las peticiones:** caben unas 420 sesiones completas por día contra unas 8300 por peticiones.
+Los umbrales de atención (50 %) y de acción (80 %) quedaron escritos en el manual como propuesta.
+
+**Protecciones:** Bot Fight Mode y las reglas del WAF (de tasa y personalizadas) se configuran en una zona, y sin
+dominio propio no hay zona. Bot Fight Mode, además, chocaría con la política estricta, porque su detección inyecta
+un script en línea. La protección DDoS de capa 7 no se configura desde aquí. **La única que aplica es Access para las
+previsualizaciones:** cada despliegue queda público para siempre en `<hash>.examen-certificacion-td-js.pages.dev`, y
+la política cubre esas direcciones sin tocar la principal. **Activarla es decisión del autor**, y el manual trae
+cómo comprobar las dos mitades.
+
+**Un aviso operativo, repetido dos veces en esta sesión:** detener la tarea de fondo que lanzó `wrangler pages dev`
+no detiene el `node` de Wrangler ni su `workerd`, y el puerto 8788 queda tomado. Las dos veces se comprobó que el
+proceso era el lanzado en la sesión (su línea de comandos y su hora de inicio), se detuvo su árbol y se comprobó el
+puerto libre, como permite CLAUDE.md.
+
+**Lo que queda del lado del autor:** confirmar en el panel las rutas de la sección 3 del manual con una primera
+lectura real de producción, decidir Access, ejecutar la etapa D y acordar cómo provocar el 429 en producción.

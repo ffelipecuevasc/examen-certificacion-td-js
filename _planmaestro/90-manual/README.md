@@ -26,6 +26,8 @@ puede seguirse sin saber programar, está mal escrito.
 | [El escapado del banco de preguntas](escapado-del-banco.md) | Iteración 22 (H-003) | 🟢 Escrito |
 | [Cómo editar el banco de preguntas](administrar-el-banco.md) | Iteración 23 | 🟢 Escrito |
 | [Ensayo del camino de importación](ensayo-del-camino-de-importacion.md) | Iteración 25 (H-025) | 🟢 Escrito, sin correr |
+| [Vigilar el consumo y las protecciones del plan gratuito](vigilancia-del-consumo-y-protecciones.md) | Iteración 51 (H-008) | 🟢 Escrito, rutas del panel sin confirmar |
+| [Cabeceras de seguridad y política de contenido en producción](cabeceras-y-politica-de-contenido.md) | Iteración 51, etapa D | 🟢 Escrito, sin ejecutar |
 | Cómo publicar una actualización del sitio | Iteración 41 | ⚪ Pendiente |
 | Configuración manual de Cloudflare | Iteraciones 42 y 43 | ⚪ Pendiente |
 | Cómo leer las métricas | Iteración 43 | ⚪ Pendiente |
