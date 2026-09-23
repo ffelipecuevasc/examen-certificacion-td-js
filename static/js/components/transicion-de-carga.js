@@ -395,18 +395,26 @@ export function crearTransicionDeCarga({
       const latido = prefersReducedMotion() ? '' : ' animate-latido';
 
       // Los tres puntos salen desfasados para que se lean como una secuencia y no como
-      // un parpadeo unico. El desfase va en el atributo `style` y no en una clase
-      // porque son tres valores de uso unico: inventar tres utilidades para esto
-      // dejaria tres reglas en el CSS que no vuelve a usar nadie.
-      const punto = (retraso) => `
-            <span class="w-2 h-2 rounded-full bg-jsyellow${latido}" style="animation-delay:${retraso}ms"></span>`;
+      // un parpadeo unico.
+      //
+      // EL DESFASE VA EN UNA CLASE, Y NO EN UN ATRIBUTO `style` (iteracion 51). Hasta el
+      // 2026-09-23 iba en el atributo, porque tres valores de uso unico no merecian
+      // tres reglas en el CSS. La politica de contenido estricta cambio la cuenta: un
+      // `style=` que entra por innerHTML no se aplica, y los tres puntos latian juntos
+      // sin un solo error visible. `npm run verificar:csp` lo marca si vuelve.
+      //
+      // Las tres clases se escriben enteras, no armadas con el numero: Tailwind solo
+      // genera lo que encuentra escrito tal cual en el codigo.
+      const DESFASES = ['[animation-delay:0ms]', '[animation-delay:200ms]', '[animation-delay:400ms]'];
+      const punto = (orden) => `
+            <span class="w-2 h-2 rounded-full bg-jsyellow${latido} ${DESFASES[orden]}"></span>`;
 
       zona.innerHTML = `
       <div id="${idDelMensaje}" tabindex="-1" class="bg-panel border ${borde} rounded-xl p-8 text-center focus:outline-none focus:ring-2 focus:ring-jsyellow/40">
         <img src="static/resources/js-logo.svg" alt="" class="w-12 h-12 mx-auto rounded-lg">
         <p class="mt-4 font-display font-bold text-paper">${titulo(esc(dato))}</p>
         <p class="mt-2 text-sm text-muted">${detalle}</p>
-        <span class="mt-5 flex items-center justify-center gap-2" aria-hidden="true">${punto(0)}${punto(200)}${punto(400)}
+        <span class="mt-5 flex items-center justify-center gap-2" aria-hidden="true">${punto(0)}${punto(1)}${punto(2)}
         </span>
         <div id="${idDelAvisoLento}" class="hidden mt-5 text-sm text-paper" role="status" aria-live="polite"></div>
       </div>`;

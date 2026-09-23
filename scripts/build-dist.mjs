@@ -59,12 +59,18 @@ if (declarado !== null && declarado !== DESTINO) {
  * generador de iconos: las tres paginas enlazan js-logo.svg y
  * notebooklm-gemini-icon.svg directamente. Filtrarlos por nombre romperia el sitio
  * en silencio el dia que alguien enlace un tercero.
+ *
+ * _headers entro con la iteracion 51, y es el caso que mejor explica esta lista:
+ * sin el, el archivo de cabeceras existia en la raiz, estaba bien escrito, y el
+ * sitio no tenia ninguna. Pages solo lo lee en la raiz de lo publicado.
+ * `npm run probar:cabeceras` falla si dist/_headers no esta.
  */
 const LISTA_COPIA = [
   'index.html',
   'cuestionario.html',
   'simulacro.html',
   'static',
+  '_headers',
 ];
 
 /** Paginas cuyos enlaces locales se comprueban al terminar. */

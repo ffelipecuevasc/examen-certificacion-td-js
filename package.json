@@ -32,6 +32,7 @@
     "verificar:css": "node scripts/verificar.mjs",
     "verificar:cifra": "node scripts/comprobar-cifra.mjs",
     "verificar:copias": "node scripts/comprobar-copias.mjs",
+    "verificar:csp": "node scripts/comprobar-csp.mjs",
     "probar:escapado": "node scripts/probar-escapado.mjs",
     "probar:cronometros": "node scripts/probar-cronometros.mjs",
     "probar:resumen": "node scripts/probar-resumen.mjs",
@@ -39,7 +40,9 @@
     "probar:identidad": "node scripts/probar-identidad-visual.mjs",
     "probar:restricciones": "node scripts/probar-restricciones.mjs",
     "probar:instantanea": "node scripts/comprobar-instantanea.mjs",
-    "probar:memoria": "node scripts/probar-memoria.mjs"
+    "probar:memoria": "node scripts/probar-memoria.mjs",
+    "probar:cabeceras": "node scripts/probar-cabeceras.mjs",
+    "probar:respaldo": "node scripts/probar-respaldo.mjs"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17",

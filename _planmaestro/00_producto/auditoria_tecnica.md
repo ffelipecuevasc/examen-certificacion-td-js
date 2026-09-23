@@ -111,8 +111,10 @@ despliegue ya no publica el repositorio tal cual— y con ella el síntoma.
 
 Queda un residuo menor y de otra naturaleza: la copia versionada de `static/css/`
 puede desfasarse respecto a la fuente. Ya no afecta a lo que ve un estudiante,
-porque no es lo que se publica. Se detecta con `npm run verificar`. La tarea de
-convertir esa comprobación en automática sigue anotada en `registro_log.md`.
+porque no es lo que se publica. Lo detecta `scripts/verificar.mjs` (`npm run verificar:css`,
+dentro de `npm run verificar`), que es la comprobación automática que quedaba pendiente:
+compila el CSS y lo compara contra lo commiteado. Su fila de `registro_log.md` se cerró el
+2026-09-23.
 
 ## Hallazgos menores
 

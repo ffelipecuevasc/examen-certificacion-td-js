@@ -1,60 +1,214 @@
 # Iteración 51 · Seguridad
 
-**Épica:** 50 · Endurecimiento y observabilidad
-**Estado:** ⚪ No iniciada
-**Depende de:** épica 10
+**Épica:** 50 · Endurecimiento y observabilidad **Estado:** 🔵 En curso · desde 2026-09-23 **Depende de:** épicas 10, 20, 30 y 40
 
 ## Objetivo
 
-Aplicar la protección que ofrece el plan gratuito de Cloudflare y endurecer las
-cabeceras del sitio.
+Endurecer las cabeceras del sitio y su política de seguridad de contenido, y dejar visible el consumo del Worker de
+lectura frente a los límites del plan gratuito.
 
 ## Contexto
 
-Con la capa de datos en producción, la superficie de ataque ya no es la de un sitio
-estático. Los riesgos reales son tres: la inyección de contenido a través del banco
-de preguntas, el consumo abusivo del Worker de lectura —que puede agotar los límites
-del plan gratuito y dejar sin servicio a los estudiantes— y la exposición
-involuntaria de algún extremo de escritura, que ADR-009 prohíbe.
+Con la capa de datos en producción, la superficie de ataque ya no es la de un sitio estático. Los riesgos reales son
+tres: la inyección de contenido a través del banco de preguntas, el consumo del Worker de lectura acercándose a los
+límites del plan gratuito, y la exposición involuntaria de algún extremo de escritura, que ADR-009 prohíbe.
 
-La política de seguridad de contenido merece cuidado: el sitio carga tipografías
-externas y, según lo decidido en la épica 10, puede consultar una fuente de datos
-externa. Una política mal calibrada rompe el sitio en silencio.
+**El sitio no tiene dominio propio: vive en `examen-certificacion-td-js.pages.dev`.**
+Esto importa más de lo que parece — varias protecciones del plan gratuito de Cloudflare, incluidas las reglas de tasa
+del panel, viven en una **zona**, y una zona requiere un dominio propio apuntando a Cloudflare. Confirmado el 2026-09-22
+contra la documentación oficial: el archivo de Wrangler para Pages Functions admite `vars`,
+`d1_databases`, `durable_objects`, `hyperdrive`, `kv_namespaces`,
+`queues.producers`, `r2_buckets`, `vectorize`, `services`,
+`analytics_engine_datasets` y `ai`. **`ratelimits` no está en esa lista**: es exclusivo de Workers, y la capa de datos
+de este proyecto son funciones de Pages (ADR-011). No asumas que otra protección de las que siguen abajo está disponible
+sin comprobarlo primero — es el mismo patrón que ya salió una vez.
+
+**Decisión del autor, 2026-09-22: no se construye ningún mecanismo que rechace peticiones.** En su lugar, esta iteración
+se limita a **vigilar** el consumo frente a los límites del plan gratuito. Es más barato y más honesto que levantar un
+limitador aproximado sobre un mecanismo (Workers) que este proyecto no usa.
+
+La política de seguridad de contenido merece cuidado por dos motivos concretos, los dos verificados contra el código y
+no supuestos:
+
+- El sitio carga tipografías externas (`fonts.googleapis.com`, `fonts.gstatic.com`). La fuente de datos, en cambio, **no
+  es externa**: ADR-011 la decidió de mismo origen, bajo `/api/`, sin CORS. `connect-src 'self'` basta; escribir la
+  política pensando en un dominio ajeno la deja más laxa de lo necesario.
+- **Una política estricta de `style-src` rompía una sola cosa, y no era la que se creía.** La primera versión de este
+  contexto decía que las tres barras de `cuestionario.html` quedarían clavadas en 0 %, y el autor decidió el
+  2026-09-22 permitir `'unsafe-inline'` por eso. **No era cierto**, y se midió en un navegador el 2026-09-23: las
+  barras se pintan con `.style.width` desde `components/cuestionario.js:255-257`, es decir por CSSOM, y la
+  política no gobierna el CSSOM. Con la política estricta obligatoria y el código sin tocar, las barras se movieron
+  exactamente igual, píxel por píxel. Lo que la política sí bloquea son los atributos `style="…"` escritos en el
+  marcado, y había dos casos: los tres `style="width:0%"` de `cuestionario.html` —inofensivos, porque el JS escribe
+  el ancho real— y el `style="animation-delay:…"` que `components/transicion-de-carga.js` metía por `innerHTML`.
+  **Ese sí se rompía en silencio:** los tres puntos de la carga dejaban de ir desfasados y latían juntos, sin un solo
+  error visible. Con la premisa corregida, el autor cambió la decisión (PARADA 1, decisión 1): política estricta, sin
+  `'unsafe-inline'`, y se corrigen los dos casos.
+
+## Decisiones de la PARADA 1
+
+Tomadas por el autor el **2026-09-23**.
+
+1. **Política estricta, sin `'unsafe-inline'`.** Se borran los tres `style="width:0%"` de `cuestionario.html` y el
+   desfase de los puntos pasa a una clase. Con un pedido expreso: demostrar con evidencia real, contra el
+   comportamiento de antes, que `components/cuestionario.js` y las tres barras siguen funcionando igual.
+2. **Despliegue en dos pasos:** primero la política en modo informe (`Content-Security-Policy-Report-Only`), después
+   obligatoria, cuando el autor confirme la consola limpia en producción.
+3. **El conjunto de cabeceras de la sección 1 de la PARADA 1**, con sus omisiones: `X-Content-Type-Options` y
+   `Referrer-Policy` no se repiten en `_headers` porque Pages ya las envía, y `Strict-Transport-Security` sobra
+   porque todo `.dev` está precargado en HSTS.
+4. **Vigilancia por el panel de Cloudflare más `90-manual/`**, no por un script con token.
+5. **`/api/estado` se queda público tal cual.** Lo único interno que muestra es la ruta `d1/migraciones/` en
+   `SIN_ESQUEMA`, y el repositorio es público. H-022 lo diseñó informativo a propósito.
+6. **El enlace a `acerca-de.html` va en la franja inferior del pie, junto al copyright.**
 
 ## Tareas
 
-- [ ] Definir y aplicar las cabeceras de seguridad, incluida una política de
-      seguridad de contenido ajustada a lo que el sitio realmente carga.
-- [ ] Verificar que la política no rompe las tipografías, los módulos ES ni el
-      acceso a la fuente de datos.
-- [ ] Activar las protecciones pertinentes del plan gratuito y documentar cuáles y
-      por qué.
-- [ ] Revisar que ninguna protección afecte al estudiante legítimo: nada que
-      introduzca verificaciones intrusivas contradice el principio de cero fricción.
-- [ ] Aplicar límites de tasa al Worker de lectura, calibrados para no estorbar a un
-      estudiante real.
-- [ ] Verificar que ningún extremo de escritura es alcanzable públicamente, según
-      ADR-009.
-- [ ] Revisar que el Worker no filtre detalles internos en sus mensajes de error.
-- [ ] Cerrar el hallazgo H-006 añadiendo licencia propia y atribución de terceros.
+- [x] Definir y aplicar las cabeceras de seguridad, incluida la política de seguridad de contenido:
+  `connect-src 'self'`, `style-src` **sin** `'unsafe-inline'` más el dominio de la hoja de tipografías, y el resto
+  ajustado a lo que el sitio realmente carga. _Etapa A: `_headers` en la raíz, en modo informe (decisión 2)._
+- [x] Borrar los tres `style="width:0%"` de `cuestionario.html` y pasar el desfase de los puntos de
+  `transicion-de-carga.js` a tres clases `[animation-delay:…]`. _Etapa A._
+- [x] Verificar que la política no rompe las tipografías, los módulos ES ni las barras de progreso. _Etapa A: en un
+  navegador, con la política obligatoria; ver las notas._
+- [x] Poner las cabeceras de `/api/` desde `functions/api/_middleware.js`: `_headers` no se aplica a las respuestas de
+  las funciones. _Etapa A._
+- [x] `scripts/comprobar-csp.mjs`, `scripts/probar-respaldo.mjs` y `scripts/probar-cabeceras.mjs`, dentro de
+  `npm run verificar`. _Etapa A._
+- [x] Sumar `_headers` a `LISTA_COPIA` en `scripts/build-dist.mjs`. Pages lo lee solo en la raíz de lo publicado, y lo
+  que no está en esa lista no llega a `dist/` sin que el build avise: las cabeceras quedarían escritas en el
+  repositorio y ausentes del sitio.
+- [ ] Sumar `acerca-de.html` a `LISTA_COPIA` y a `PAGINAS` en `scripts/build-dist.mjs`, y a `PAGINAS` en
+  `scripts/comprobar-copias.mjs`. **Hoy ninguno de los dos la nombra** (comprobado el 2026-09-23): no puede nombrarla
+  antes de que exista, porque `LISTA_COPIA` trata cada entrada como obligatoria y el build se detendría. Entra en el
+  mismo cambio que crea la página.
+- [ ] Investigar, antes de intentar activar nada, cuáles protecciones del plan gratuito siguen disponibles sin dominio
+  propio (Bot Fight Mode, otras reglas del panel) y cuáles requieren una zona igual que el límite de tasa. Documentar
+  cuáles se activan, cuáles no aplican y por qué.
+- [ ] Revisar que ninguna protección afecte al estudiante legítimo: nada que introduzca verificaciones intrusivas
+  contradice el principio de cero fricción.
+- [ ] Dejar visible el consumo del Worker de lectura y de D1 frente a los límites del plan gratuito (H-008), con los
+  números del límite escritos junto a la medición.
+- [x] Confirmar que un rechazo por consumo excesivo de la plataforma —un 429 nativo de Cloudflare, no construido por
+  este proyecto— activa el mismo respaldo que cualquier otra falla: `SIN_RESPUESTA` en `datos.js`, instantánea con
+  aviso. _Etapa A, la mitad local: `probar:respaldo`. La de producción es un criterio y la ejecuta el autor._
+- [x] Verificar que ningún extremo de escritura es alcanzable públicamente, según ADR-009. _Etapa A, en local._
+- [x] Revisar que el Worker no filtre detalles internos en sus mensajes de error. _Etapa A._
+- [x] Decidir y documentar si `/api/estado` sigue público tal cual —entorno, estado del esquema, conteo de preguntas
+  activas— o si algo de eso se restringe. H-022 lo diseñó informativo a propósito; esta tarea es documentar la decisión,
+  no cambiar el comportamiento salvo que el recorrido encuentre un motivo real. _Decidido: público tal cual
+  (decisión 5)._
+- [ ] Cerrar el hallazgo H-006 con `acerca-de.html` como entregable. Decisión del autor, 2026-09-23: **una sola página
+  reúne todo**. Se enlaza **únicamente desde el pie** de las tres páginas, **nunca desde el menú del encabezado**, ni
+  en escritorio ni en móvil. Decisión del autor, 2026-09-23, escrita como restricción y no como descripción: el
+  encabezado ya tiene seis enlaces apretados cerca de los 768 px (iteración 44), y un séptimo ahí sería exactamente el
+  deslizamiento silencioso que este proyecto persigue. La página reúne:
+  - **La licencia del código: MIT.**
+  - **La licencia del banco de preguntas: Creative Commons BY-NC-SA 4.0**, distinta de la del código. Motivo: las
+    preguntas parten de material oficial público, pero la redacción de cada enunciado, las alternativas y sobre todo
+    las 368 justificaciones son expresión propia del autor. Lo protegible no son los hechos, es cómo se explicaron. MIT
+    permitiría revender el trabajo como propio con solo dejar un aviso que nadie lee; BY-NC-SA permite compartir y
+    usar, con crédito, pero no revender ni republicar con fines comerciales.
+  - **Las tres atribuciones de terceros**, con la cita completa de la fila de `acerca-de.html` en `registro_log.md`:
+    animate.css bajo Hippocratic License 2.1, Material Line Icons (`line-md`) de Vjacheslav Trushkin, y Material
+    Symbols de Google bajo Apache 2.0.
+  - **La nota de privacidad.** Describe lo que el sitio hace hoy: el avance y el intento del simulacro se guardan en el
+    almacenamiento del navegador (ADR-034, ADR-035) y no salen del dispositivo. Si la 52 agrega métricas, la actualiza
+    ella.
+- [x] Separar la licencia del código de la del contenido. Decisión del autor, 2026-09-23: `package.json` se queda con
+  `"license": "MIT"`, porque ese campo habla del código y no del contenido, y `LICENSE.md` en la raíz aclara la
+  división: el código bajo MIT y el banco de preguntas aparte bajo CC BY-NC-SA 4.0, con enlace a `acerca-de.html`
+  para el detalle. Escrito el 2026-09-23, antes de la PARADA 1. **Su enlace apunta a una página que todavía no
+  existe** hasta que esta iteración la publique.
+- [ ] Extender `scripts/comprobar-copias.mjs` para que vigile la restricción del enlace: `acerca-de.html` aparece en el
+  pie de las tres páginas y **no aparece** en ninguno de los dos menús del encabezado.
+- [ ] Cuando el autor publique `acerca-de.html`, escribir en su fila de `registro_log.md` que se cierra el período sin
+  atribución visible de animate.css, aceptado el 2026-09-15 por la decisión 7 de la iteración 36. **No antes.**
 - [ ] Documentar toda la configuración manual en `90-manual/`.
 
 ## Criterios de aceptación
 
-- [ ] Las cabeceras de seguridad están activas y se muestran las respuestas que lo
-      confirman.
-- [ ] Con la política aplicada, ambas páginas funcionan sin errores de consola.
-- [ ] Las protecciones activadas están documentadas con su motivo.
+- [ ] Las cabeceras de seguridad están activas y se muestran las respuestas que lo confirman.
+- [x] `dist/_headers` existe después de `npm run build`, y las cabeceras se leen en la respuesta de `wrangler pages dev`
+  antes de publicar.
+- [ ] Con la política aplicada, las cuatro páginas —`index.html`, `cuestionario.html`, `simulacro.html` y
+  `acerca-de.html`— funcionan sin errores de consola, incluidas las barras de progreso pintándose con normalidad.
+- [ ] Las protecciones activadas están documentadas con su motivo, y las que no aplican sin dominio propio están
+  nombradas como tales, no omitidas en silencio.
 - [ ] Un estudiante puede entrar y estudiar sin ninguna verificación intermedia.
-- [ ] El límite de tasa rechaza un consumo abusivo simulado y no afecta a un uso
-      normal: se demuestran ambos casos.
-- [ ] Un recorrido de los extremos del Worker confirma que ninguno permite escribir
-      sin autorización.
-- [ ] Un error provocado en el Worker no revela estructura interna ni consultas.
-- [ ] El repositorio declara su licencia y atribuye a los terceros que usa.
-- [ ] La configuración manual está documentada con el detalle suficiente para
-      reconstruirla.
+- [ ] Existe una forma de ver, sin adivinar, cuánto del límite diario de peticiones y de lecturas de D1 se está
+  consumiendo.
+- [ ] Está escrito, con números, cuál es el límite del plan gratuito y en qué punto conviene preocuparse (H-008).
+- [x] Ningún mecanismo de esta iteración rechaza peticiones de un estudiante legítimo: la vigilancia informa, no
+  bloquea.
+- [ ] Un 429 provocado (simulado o real) llega al estudiante como el mismo aviso de respaldo que cualquier otra falla de
+  la capa de datos, no como una página rota. **Este criterio lo ejecuta el autor** contra el sitio publicado — CLAUDE.md
+  no permite que Claude Code despliegue ni ataque su propia producción.
+- [x] Un recorrido de los extremos del Worker confirma que ninguno permite escribir sin autorización.
+- [x] Un error provocado en el Worker no revela estructura interna ni consultas.
+- [x] La decisión sobre `/api/estado` está escrita, se cumpla o se cambie el comportamiento.
+- [ ] `acerca-de.html` existe, llega a `dist/`, se enlaza desde el pie de las tres páginas, y contiene la licencia MIT
+  del código, la CC BY-NC-SA 4.0 del banco con su motivo, las tres atribuciones y la nota de privacidad.
+- [ ] `npm run verificar:copias` pasa con `acerca-de.html` en su `PAGINAS`: el pie con el enlace nuevo es idéntico en
+  las cuatro páginas.
+- [ ] **El enlace a `acerca-de.html` existe en el pie de las tres páginas y NO existe en ninguno de los dos menús de
+  encabezado, ni el de escritorio ni el móvil.** Lo comprueba `npm run verificar:copias`, y se demuestra provocándolo:
+  con el enlace puesto en un menú, el comprobador falla y nombra la página y el menú.
+- [ ] El repositorio declara las dos licencias por separado, código y banco, de forma que nadie pueda leer la del código
+  como si cubriera las preguntas.
+- [ ] La configuración manual está documentada con el detalle suficiente para reconstruirla.
 
 ## Notas de la iteración
 
-_Pendiente._
+### Etapa A · 2026-09-23 · cabeceras, política, middleware y sus pruebas
+
+Siete pruebas, en el orden en que se hicieron fallar. Cada una se vio en rojo antes de darla por buena en verde.
+
+| # | Prueba | Rojo | Verde |
+|---|---|---|---|
+| 1 | `probar:cabeceras` sin servidor | código **2**, «no se pudo probar», no 1 ni 0 | es el tercer veredicto: no se pone verde |
+| 2 | `probar:cabeceras` sin `_headers` | faltan las cuatro cabeceras en las 5 URL estáticas | — |
+| 3 | `_headers` escrito pero fuera de `LISTA_COPIA` | «dist/_headers no existe»: el archivo existía y el sitio no tenía ninguna | agregado a `LISTA_COPIA`: las 4, iguales, en las 5 URL |
+| 4 | `verificar:csp` sobre el código de entonces | exactamente los 4 puntos: `cuestionario.html:119, 131, 143` y `transicion-de-carga.js:402` | tras corregirlos, COMPATIBLE en 3 páginas, 24 archivos de `static/js/` y el CSS |
+| 4b | `verificar:csp` sobre copias temporales | 7 de 7 plantados (script en línea, `onclick`, script ajeno, `setAttribute('style')`, `style=` en marcado, `eval`, `fetch` ajeno) y 3 de 3 aflojamientos de la política | — |
+| 5 | cabeceras de `/api/` | faltan en los 3 extremos: Pages no aplica `_headers` a las funciones | con el middleware, `nosniff` y `default-src 'none'; frame-ancestors 'none'` en los 3 |
+| 6 | escritura y fugas | con una copia de `_comun.js` que devuelve la traza, la sección 2 falla | 12 escrituras rechazadas (405 en los extremos reales, 404 en el inexistente), 3 errores de lectura sin fugas |
+| 7 | `probar:respaldo` | con una copia de `datos.js` que tiene de vuelta la regresión de H-018: 3 de 11 fallan, justo los 429 en JSON ajeno | 11 de 11 |
+
+**La evidencia de la decisión 1, en un navegador.** Se hizo con un arnés que maneja el Chrome instalado por su
+protocolo de depuración, **sin ninguna dependencia y fuera del repositorio**. El escenario: abrir `cuestionario.html`,
+cargar el módulo 2 y responder cinco preguntas (bien, mal, bien, bien, mal), leyendo tras cada paso el `style.width` y
+el ancho en píxeles de las tres barras y los contadores. También se registró el desfase calculado de los tres puntos
+de carga.
+
+| Corrida | Barras | Puntos | Violaciones |
+|---|---|---|---|
+| R1 · código de antes, sin política | 0 → 2 → 4 → 6 → 8 → 10 % | 0 s / 0,2 s / 0,4 s | 0 |
+| R2 · código de antes, política estricta **obligatoria** | idénticas a R1 | **0 s / 0 s / 0 s** | 6 |
+| R3 · código corregido, política estricta **obligatoria** | **idénticas a R1** | **0 s / 0,2 s / 0,4 s** | **0** |
+
+R1 contra R3: **cero diferencias** en 7 pasos × 7 valores más los puntos. R1 contra R2 marca la diferencia de los
+puntos, que es la prueba de que la comparación ve. `index.html` y `simulacro.html` cargaron también con la política
+obligatoria: 0 violaciones y 0 mensajes de consola, con las tipografías de Google cargadas. El recorrido dinámico de un
+intento del simulacro queda para la pasada de navegador del autor.
+
+**Tres cosas que salieron al construir:**
+
+- **`wrangler pages dev` sí aplica `_headers`.** La documentación no lo dice. Se comprobó en la prueba 3: la prueba de
+  red mide en local lo mismo que Pages va a servir.
+- **En modo informe, Chrome sí escribe las violaciones en la consola, pero como mensajes de nivel _info_, no como
+  errores rojos:** «Applying inline style violates the following Content Security Policy directive…». Esto importa en
+  el paso 1 del despliegue: **una consola filtrada a errores da un falso limpio.** «Limpia» ahí significa que no aparece
+  ningún mensaje «…violates the following Content Security Policy…» en ningún nivel.
+- **El detector de fugas tenía un punto ciego, y lo encontró su propia demostración.** No reconocía una traza de V8
+  con marco anónimo serializada en JSON (`\n    at file:///…:176:20`). Se corrigió el patrón y la autoprueba ahora
+  incluye esa forma.
+
+**Un incidente del arnés, registrado porque toca una regla de CLAUDE.md.** El guion que reiniciaba el servidor local
+—fuera del repositorio— leyó un `servidor.pid` vacío como PID 0 y ejecutó `taskkill /T` sobre ese árbol, que es el
+del sistema. Windows rechazó los seis procesos del árbol (0, 4, 72, 128, 548 y 2684) y **no se terminó ninguno**: los
+seis son el árbol completo de PID 0, y los seis aparecen rechazados. El guion quedó corregido: solo detiene un PID que
+sea un entero positivo y cuyo proceso sea el `cmd.exe` que lanzó él mismo.
+
+**Lo que queda pendiente del lado del autor:** `static/css/style.css` cambió —tres reglas nuevas, ninguna quitada— y
+`npm run verificar` marca `css` como DESFASADO hasta el commit.

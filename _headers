@@ -1,0 +1,20 @@
+# Cabeceras de seguridad del sitio (iteracion 51). Pages lee este archivo solo en la
+# raiz de lo publicado: llega a dist/ porque esta en LISTA_COPIA de build-dist.mjs.
+#
+# NO se aplica a /api/: Pages no pone estas cabeceras en las respuestas de las
+# funciones. Las de la capa de datos las pone functions/api/_middleware.js.
+#
+# La politica va primero en MODO INFORME (decision 2 de la PARADA 1): avisa en la
+# consola de lo que bloquearia, sin bloquear. Pasa a Content-Security-Policy cuando
+# el autor confirme en produccion que la consola queda limpia en las paginas.
+#
+# Sin 'unsafe-inline' en style-src (decision 1). Si algun dia hace falta, lo va a
+# decir `npm run verificar:csp`, con archivo y linea, antes que el navegador.
+#
+# No se repiten X-Content-Type-Options ni Referrer-Policy: Pages ya las envia.
+# No va Strict-Transport-Security: todo .dev esta precargado en HSTS.
+/*
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cross-Origin-Opener-Policy: same-origin

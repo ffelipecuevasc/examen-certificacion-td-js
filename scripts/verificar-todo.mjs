@@ -1,5 +1,5 @@
 /**
- * `npm run verificar`: corre los diez comprobadores del proyecto y da UN veredicto.
+ * `npm run verificar`: corre los trece comprobadores del proyecto y da UN veredicto.
  *
  * POR QUE HACE FALTA UN COORDINADOR, Y NO BASTA CON `&&`
  *
@@ -37,6 +37,9 @@
  *   8. probar-resumen.mjs         el resumen del simulacro cuenta, ordena y avisa bien
  *   9. probar-escapado.mjs        el escapado del banco aguanta contenido hostil
  *  10. probar-restricciones.mjs   las nueve restricciones del esquema rechazan
+ *  11. comprobar-csp.mjs         la politica de contenido no bloquea nada del sitio
+ *  12. probar-respaldo.mjs       toda respuesta ajena enciende el respaldo
+ *  13. probar-cabeceras.mjs      las cabeceras llegan, nadie escribe, nada se filtra
  *
  * La barrera va primera y es la unica que corta: si esta caida, desde aqui se
  * puede llegar a la cuenta de Cloudflare, y ninguna de las otras merece correrse
@@ -75,8 +78,13 @@
  * servidor local ni la base D1: exactamente el perfil de las tres que la preceden.
  * Una comprobacion que hay que acordarse de correr no vigila nada.
  *
+ * Las tres ultimas entraron con la iteracion 51. Las dos primeras no necesitan
+ * servidor —una lee archivos, la otra le pasa respuestas de mentira a datos.js— y
+ * corren siempre. La tercera si lo necesita, y sabe decir «no pude probar» igual
+ * que el escapado: sin servidor avisa, no falla.
+ *
  * Codigos de salida:
- *   0  VERIFICADO             las diez comprobaciones hechas y en verde
+ *   0  VERIFICADO             las trece comprobaciones hechas y en verde
  *   1  VERIFICACION FALLIDA   al menos una encontro algo mal
  *   2  VERIFICACION INCOMPLETA  ninguna fallo, pero alguna no se pudo hacer
  */
@@ -97,7 +105,7 @@ const AVISO = 'AVISO';
 const LINEA = '='.repeat(72);
 
 /**
- * Los diez comprobadores, con la traduccion de sus codigos.
+ * Los trece comprobadores, con la traduccion de sus codigos.
  *
  * Cada uno mantiene los suyos y aqui solo se traducen: este archivo no decide
  * que significa un 2 en el guardian del escapado, lo lee de esta tabla. Un
@@ -216,6 +224,36 @@ const COMPROBADORES = [
       2: [
         AVISO,
         'NO SE PUDO PROBAR. Para cerrarlo: `npm run datos:migrar`, `datos:migrar-002` y repetir',
+      ],
+    },
+  },
+  {
+    nombre: 'csp',
+    guion: 'comprobar-csp.mjs',
+    codigos: {
+      0: [OK, 'la politica de contenido cumple lo decidido y no bloquea nada de lo que el sitio carga'],
+      1: [FALLO, 'CSP INCOMPATIBLE: algo del sitio quedaria bloqueado, o la politica se aflojo'],
+      2: [AVISO, 'no se pudo comprobar: falta una pagina o el JavaScript del sitio'],
+    },
+  },
+  {
+    nombre: 'respaldo',
+    guion: 'probar-respaldo.mjs',
+    codigos: {
+      0: [OK, 'toda respuesta ajena a la capa de datos enciende el respaldo, y el sobre propio manda'],
+      1: [FALLO, 'RESPALDO ROTO: una respuesta ajena dejaria al estudiante sin banco'],
+      2: [AVISO, 'no se pudo comprobar: datos.js no se dejo cargar'],
+    },
+  },
+  {
+    nombre: 'cabeceras',
+    guion: 'probar-cabeceras.mjs',
+    codigos: {
+      0: [OK, 'las cabeceras llegan a las paginas y a /api/, ningun extremo escribe y ningun error filtra'],
+      1: [FALLO, 'CABECERAS: falta una, un extremo acepta escribir o un error cuenta como esta hecho por dentro'],
+      2: [
+        AVISO,
+        'NO SE PUDO PROBAR. Para cerrarlo: `npm run datos:dev` en otra terminal y repetir',
       ],
     },
   },

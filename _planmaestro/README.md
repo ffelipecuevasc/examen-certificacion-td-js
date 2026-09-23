@@ -7,15 +7,12 @@ decisiones vale tanto como el código que las implementa.
 
 ## Iteración activa
 
-**Ninguna en curso.** La **44 · Resumen de resultados** cerró el 2026-09-22 y con ella la **épica 40 · Simulacro de
-examen**, la última de las cuatro que se ejecutaban en orden.
+**51 · Seguridad** — `50-epica-endurecimiento/iteracion-51-seguridad.md` · **Inicio:** 2026-09-23
 
-> **Lo siguiente que puede abrirse es la épica 50 · Endurecimiento y observabilidad.** Sus cuatro dependencias están
-> cerradas: la 10 (plataforma), la 20 (banco en D1), la 30 (cuestionario) y la 40 (simulacro). Su alcance está en
-> `50-epica-endurecimiento/README.md` y todavía no se ha planificado ninguna de sus iteraciones.
-
-> Al arrancar la siguiente: rellenar este bloque con su archivo y su fecha de inicio, y
-> poner la épica correspondiente en 🔵.
+Primera de la **épica 50 · Endurecimiento y observabilidad**, en el orden 51 → 53 → 52 que decidió el autor. La PARADA 1
+se cerró el 2026-09-23 con seis decisiones, y la **etapa A** —cabeceras, política de contenido estricta en modo
+informe, cabeceras de `/api/` y sus pruebas— está construida. Siguen la etapa B (`acerca-de.html`), la C
+(vigilancia, protecciones y `90-manual/`) y la D, que ejecuta el autor en producción.
 
 ## Iteraciones completadas
 
@@ -50,7 +47,7 @@ examen**, la última de las cuatro que se ejecutaban en orden.
 | 20 | Persistencia de preguntas       | 🟢 Completada  | Banco de ~300 preguntas en D1, con administración e instantánea de respaldo |
 | 30 | Cuestionario                    | 🟢 Completada  | `cuestionario.html` por módulo, con memoria del avance, justificación, repaso y transición de carga |
 | 40 | Simulacro de examen             | 🟢 Completada  | `simulacro.html` cronometrado, 120 preguntas, resumen final                 |
-| 50 | Endurecimiento y observabilidad | ⚪ No iniciada | Seguridad, caché y métricas sobre el sitio y la capa de datos               |
+| 50 | Endurecimiento y observabilidad | 🔵 En curso    | Seguridad, caché y métricas sobre el sitio y la capa de datos               |
 
 Las épicas se ejecutan en orden: cada una depende de la anterior. La 10 va primera porque el banco de preguntas vive en
 su infraestructura, y sin banco no hay cuestionario ni simulacro.
