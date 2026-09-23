@@ -1152,7 +1152,7 @@ const sinComentariosHtml = (html) => html.replace(/<!--[\s\S]*?-->/g, '');
 const sinComentariosJs = (js) =>
   js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-for (const nombre of ['index.html', 'cuestionario.html', 'simulacro.html']) {
+for (const nombre of ['index.html', 'cuestionario.html', 'simulacro.html', 'acerca-de.html']) {
   const ruta = join(RAIZ, nombre);
   if (!existsSync(ruta)) continue;
 
@@ -1216,8 +1216,8 @@ for (const [nombre, html] of Object.entries(PANTALLAS)) {
 
 notas.push(
   `Advertencia repetida: ninguna de las ${FRASES_RETIRADAS.length} formas aparece en el cuerpo de ` +
-    `las tres paginas, ni en los ${COMPONENTES.length} componentes, ni en las ` +
-    `${Object.keys(PANTALLAS).length} pantallas dibujadas; y las tres siguen teniendola en el pie. ` +
+    `las cuatro paginas, ni en los ${COMPONENTES.length} componentes, ni en las ` +
+    `${Object.keys(PANTALLAS).length} pantallas dibujadas; y las cuatro siguen teniendola en el pie. ` +
     'La linea de procedencia de components/modules.js no es una de ellas y sigue en su sitio.'
 );
 

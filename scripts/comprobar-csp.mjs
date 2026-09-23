@@ -58,7 +58,7 @@ const NO_SE_PUDO = 2;
 const LINEA = '='.repeat(72);
 
 /** Las paginas del sitio. Las mismas de build-dist.mjs y comprobar-copias.mjs. */
-const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html'];
+const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html', 'acerca-de.html'];
 
 /** Material citado, no codigo del sitio (H-031). */
 const DATOS = join('static', 'js', 'data');

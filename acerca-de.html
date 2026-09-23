@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acerca de - Certificación FullStack JavaScript | Felipe Cuevas</title>
+<meta name="description" content="Licencias del código y del banco de preguntas, atribuciones de terceros y nota de privacidad de la guía de estudio.">
+<meta name="author" content="Felipe Cuevas">
+
+<link rel="icon" type="image/svg+xml" href="static/resources/js-logo.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="static/css/style.css">
+<link rel="stylesheet" href="static/css/icons.css">
+</head>
+
+<body class="bg-ink text-paper font-sans antialiased">
+
+<a href="#contenido" class="skip-link bg-jsyellow text-ink font-display font-bold px-4 py-2 rounded">Saltar al contenido</a>
+
+<!-- ============ ENCABEZADO ============ -->
+<!-- CUARTA COPIA DEL ENCABEZADO Y DEL PIE (iteracion 51). El sitio no tiene
+     plantillas, asi que esta pagina lleva la suya, y scripts/comprobar-copias.mjs
+     la compara con las otras tres en cada `npm run verificar`. Si tocas el
+     encabezado o el pie de una pagina, tocalos en las cuatro.
+
+     NINGUN ENLACE DEL MENU MARCA ESTA PAGINA COMO ACTIVA, y es a proposito: esta
+     pagina no esta en el menu, y no puede estar (decision 6). Se llega a ella solo
+     desde el pie, junto al copyright. -->
+<header class="fixed top-0 inset-x-0 z-50 border-b border-panel3 bg-ink/90 backdrop-blur">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2.5 shrink-0">
+      <img src="static/resources/js-logo.svg" alt="" class="w-8 h-8 rounded-md">
+      <span class="font-display font-bold text-sm sm:text-base tracking-tight">Certificación FullStack JS</span>
+    </a>
+
+    <!-- «Inicio» se suma al enlace del logotipo, no lo reemplaza (iteracion 36).
+         Desde aca lleva a la portada entera, no a un ancla. -->
+    <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-7 font-sans text-sm text-muted">
+      <a href="index.html" class="nav-link hover:text-paper transition-colors">Inicio</a>
+      <a href="index.html#mapa" class="nav-link hover:text-paper transition-colors">Mapa</a>
+      <a href="index.html#modulos" class="nav-link hover:text-paper transition-colors">Módulos</a>
+      <a href="cuestionario.html" class="nav-link hover:text-paper transition-colors">Cuestionario</a>
+      <a href="simulacro.html" class="nav-link pastilla bg-jsyellow text-ink font-display font-bold text-sm px-3 py-1.5 rounded hover:bg-jsyellowdim transition-colors">Simulacro</a>
+      <a href="index.html#consejos" class="nav-link hover:text-paper transition-colors">Consejos</a>
+    </nav>
+
+    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded border border-panel3">
+      <span class="sr-only">Abrir menú</span>
+      <span class="icon i-menu text-xl text-paper menu-icon-open" aria-hidden="true"></span>
+      <span class="icon i-close text-xl text-paper menu-icon-close hidden" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" aria-label="Navegación móvil" class="md:hidden hidden border-t border-panel3 bg-ink px-5 py-4 flex flex-col gap-4 text-sm text-muted">
+    <a href="index.html" class="mobile-link">Inicio</a>
+    <a href="index.html#mapa" class="mobile-link">Mapa</a>
+    <a href="index.html#modulos" class="mobile-link">Módulos</a>
+    <a href="cuestionario.html" class="mobile-link">Cuestionario</a>
+    <a href="simulacro.html" class="mobile-link self-start bg-jsyellow text-ink font-display font-bold text-sm px-3 py-1.5 rounded hover:bg-jsyellowdim transition-colors">Simulacro</a>
+    <a href="index.html#consejos" class="mobile-link">Consejos</a>
+  </nav>
+</header>
+
+<main id="contenido" class="pt-16">
+
+  <!-- ============ PRESENTACION ============ -->
+  <section class="pt-16 sm:pt-20 pb-4 px-5 sm:px-8">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="font-display font-bold text-4xl sm:text-5xl tracking-tight">Acerca de</h1>
+      <p class="mt-4 text-muted leading-relaxed">
+        Esta guía la escribe y la mantiene Felipe Cuevas. Aquí está todo lo que conviene saber sobre cómo puedes usarla:
+        bajo qué licencia va cada parte, qué elementos son de terceros y qué guarda el sitio de ti.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ LICENCIAS ============ -->
+  <!-- DOS LICENCIAS, PORQUE SON DOS COSAS (iteracion 51). La misma division que
+       LICENSE.md en la raiz del repositorio: si cambia una, cambia la otra. -->
+  <section id="licencias" class="py-12 px-5 sm:px-8">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight flex items-center gap-3"><span class="icon i-history-edu text-3xl text-jsyellow" aria-hidden="true"></span>Dos licencias, una para cada cosa</h2>
+      <p class="mt-3 text-muted leading-relaxed">
+        El sitio tiene dos partes distintas, y cada una tiene su propia licencia. Una no cubre a la otra.
+      </p>
+
+      <div class="mt-8 grid gap-4">
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-paper flex items-center gap-2"><span class="icon i-code-blocks text-xl text-jsyellow" aria-hidden="true"></span>El código del sitio: MIT</p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            El HTML, el CSS, el JavaScript y los programas que construyen el sitio están bajo la licencia MIT. Puedes
+            usarlos, copiarlos, modificarlos y redistribuirlos, también con fines comerciales, siempre que conserves el
+            aviso de copyright y el texto de la licencia.
+          </p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            El texto completo, en su versión original, está en
+            <a href="https://github.com/ffelipecuevasc/examen-certificacion-td-js/blob/main/LICENSE.md" target="_blank" rel="noopener" class="text-paper underline underline-offset-2 hover:text-jsyellow transition-colors">LICENSE.md</a>,
+            en el repositorio público.
+          </p>
+        </article>
+
+        <article class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-paper flex items-center gap-2"><span class="icon i-quiz text-xl text-jsyellow" aria-hidden="true"></span>El banco de preguntas: CC BY-NC-SA 4.0</p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            Los enunciados, las alternativas y las justificaciones del banco de preguntas están bajo la licencia
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener" class="text-paper underline underline-offset-2 hover:text-jsyellow transition-colors">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional</a>.
+            Vale para el banco esté donde esté: en el cuestionario, en el simulacro o en los archivos del repositorio,
+            aunque alguno de ellos tenga forma de código.
+          </p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            Puedes compartirlo y adaptarlo, dando crédito, sin fines comerciales y bajo esta misma licencia. No puedes
+            venderlo ni republicarlo con fines comerciales.
+          </p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            <span class="text-paper">Por qué es distinta de la del código.</span> Las preguntas parten de material
+            oficial público, y esos hechos no son de nadie. Lo que sí es trabajo propio es cómo se contaron: la redacción
+            de cada enunciado, la elección de sus alternativas y, sobre todo, las justificaciones que explican por qué
+            una respuesta es la correcta y las demás no. La licencia MIT permitiría revender ese trabajo como propio con
+            solo dejar un aviso que nadie lee. Esta permite compartirlo y usarlo para estudiar, con crédito, pero no
+            revenderlo.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TERCEROS ============ -->
+  <!-- LAS TRES ATRIBUCIONES DE LA ITERACION 51. Cada una conserva su licencia, que
+       ninguna de las dos de arriba reemplaza. La de animate.css es la unica que no
+       viaja de ninguna otra forma al sitio publicado: su aviso vive en
+       tailwind.config.cjs, y ni ese archivo ni sus comentarios llegan a dist/. -->
+  <section id="terceros" class="py-12 px-5 sm:px-8">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight flex items-center gap-3"><span class="icon i-layers text-3xl text-jsyellow" aria-hidden="true"></span>Lo que es de terceros</h2>
+      <p class="mt-3 text-muted leading-relaxed">
+        Algunos elementos del sitio no son obra del autor y conservan su propia licencia.
+      </p>
+
+      <ul class="mt-8 grid gap-4">
+        <li class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-paper">animate.css</p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            El efecto <code class="font-mono text-paper">tada</code> del sitio usa las líneas de ese efecto copiadas de
+            animate.css 4.1.1. Animate.css Copyright 2021 Daniel Eden, bajo la
+            <a href="https://github.com/animate-css/animate.css/blob/main/LICENSE" target="_blank" rel="noopener" class="text-paper underline underline-offset-2 hover:text-jsyellow transition-colors">Hippocratic License 2.1</a>.
+          </p>
+        </li>
+        <li class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-paper">Material Line Icons</p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            El ícono animado de advertencia del aviso de programación es de Material Line Icons
+            (<code class="font-mono text-paper">line-md</code>), de Vjacheslav Trushkin, bajo
+            <a href="https://github.com/cyberalien/line-md/blob/main/license.txt" target="_blank" rel="noopener" class="text-paper underline underline-offset-2 hover:text-jsyellow transition-colors">su licencia</a>.
+          </p>
+        </li>
+        <li class="bg-panel border border-panel3 rounded-xl p-6">
+          <p class="font-display font-bold text-paper">Material Symbols</p>
+          <p class="mt-3 text-sm text-muted leading-relaxed">
+            La mayoría de los íconos del sitio son de Material Symbols Light, de Google, bajo la
+            <a href="https://github.com/google/material-design-icons/blob/master/LICENSE" target="_blank" rel="noopener" class="text-paper underline underline-offset-2 hover:text-jsyellow transition-colors">licencia Apache 2.0</a>.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PRIVACIDAD ============ -->
+  <!-- DESCRIBE LO QUE EL SITIO HACE HOY, no lo que podria hacer (iteracion 51).
+       ADR-034 y ADR-035 son la fuente. Si una iteracion agrega metricas o cualquier
+       otra cosa que salga del navegador, esta nota se actualiza en el mismo cambio. -->
+  <section id="privacidad" class="py-12 pb-20 px-5 sm:px-8">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight flex items-center gap-3"><span class="icon i-shield-lock text-3xl text-jsyellow" aria-hidden="true"></span>Privacidad</h2>
+      <p class="mt-3 text-muted leading-relaxed">
+        El sitio no te pide nada y no sabe quién eres. No hay cuentas, ni correo, ni inicio de sesión, ni cookies, ni
+        analítica.
+      </p>
+
+      <div class="mt-8 bg-panel border border-panel3 rounded-xl p-6">
+        <p class="font-display font-bold text-paper">Lo que se guarda, y dónde</p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          Para que no empieces de cero en cada visita, el sitio guarda en el almacenamiento de tu propio navegador:
+        </p>
+        <ul class="mt-3 flex flex-col gap-2 text-sm text-muted leading-relaxed list-disc pl-5">
+          <li>tu avance en el cuestionario, módulo por módulo: qué preguntas respondiste y qué elegiste;</li>
+          <li>el último intento del simulacro: sus preguntas y tus respuestas, para que una recarga no lo pierda, y una marca que evita que dos pestañas corran el mismo intento a la vez.</li>
+        </ul>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          <span class="text-paper">Nada de eso sale de tu dispositivo.</span> Ninguna petición del sitio lo lleva, y el
+          servidor no tiene dónde recibirlo: la capa de datos solo entrega preguntas, no guarda nada. Por eso tampoco
+          viaja contigo: en otro navegador o en otro equipo empiezas de nuevo.
+        </p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          Para borrarlo, usa «Reiniciar el módulo» en el cuestionario o «Empezar otro intento» en el simulacro. Para
+          borrar todo de una vez, elimina los datos de este sitio desde la configuración de tu navegador.
+        </p>
+      </div>
+
+      <div class="mt-4 bg-panel border border-panel3 rounded-xl p-6">
+        <p class="font-display font-bold text-paper">Con quién habla tu navegador</p>
+        <ul class="mt-3 flex flex-col gap-2 text-sm text-muted leading-relaxed list-disc pl-5">
+          <li><span class="text-paper">Cloudflare</span>, que aloja el sitio y la capa de datos. Las preguntas se piden al mismo sitio, bajo <code class="font-mono text-paper">/api/</code>, y Cloudflare atiende esas peticiones como cualquier servidor web.</li>
+          <li><span class="text-paper">Google Fonts</span>, de donde se cargan las tipografías. Al pedirlas, tu navegador se conecta a los servidores de Google.</li>
+        </ul>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          Los enlaces a NotebookLM, LinkedIn, GitHub y el sitio del instructor llevan a otros sitios, con sus propias
+          reglas. Solo se abren si los pulsas.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ PIE ============ -->
+<footer class="border-t border-panel3 bg-panel">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-14">
+    <div class="grid md:grid-cols-[1.4fr_1fr_1fr] gap-10">
+
+      <div>
+        <div class="flex items-center gap-3">
+          <img src="static/resources/js-logo.svg" alt="" class="w-10 h-10 rounded-md">
+          <div>
+            <p class="font-display font-bold text-paper">Felipe Cuevas</p>
+            <p class="text-xs text-muted">Instructor · Bootcamp Desarrollador FullStack JavaScript</p>
+          </div>
+        </div>
+        <p class="mt-5 text-sm text-muted max-w-sm leading-relaxed">
+          Guía de estudio creada para las y los estudiantes que rinden la certificación de Talento Digital para Chile.
+        </p>
+        <div class="mt-6 flex items-center gap-2">
+          <a href="https://www.linkedin.com/in/ffelipecuevasc/" target="_blank" rel="noopener" class="icon-btn" aria-label="LinkedIn de Felipe Cuevas">
+            <span class="icon i-linkedin-icon text-xl" aria-hidden="true"></span>
+          </a>
+          <a href="https://github.com/ffelipecuevasc" target="_blank" rel="noopener" class="icon-btn" aria-label="GitHub de Felipe Cuevas">
+            <span class="icon i-github-icon text-xl" aria-hidden="true"></span>
+          </a>
+          <a href="https://felipecuevas.dev" target="_blank" rel="noopener"
+             class="inline-flex items-center gap-2 h-10 bg-jsyellow text-ink font-display font-bold text-xs px-4 rounded hover:bg-jsyellowdim transition-colors">
+            <span class="icon i-web-internet-icon text-base" aria-hidden="true"></span>felipecuevas.dev
+          </a>
+        </div>
+      </div>
+
+      <nav aria-label="Secciones de la guía">
+        <p class="font-display font-bold text-sm text-paper">Guía</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
+          <li><a href="index.html#mapa" class="hover:text-jsyellow transition-colors">Mapa del examen</a></li>
+          <li><a href="index.html#modulos" class="hover:text-jsyellow transition-colors">Módulos evaluados</a></li>
+          <li><a href="cuestionario.html" class="hover:text-jsyellow transition-colors">Cuestionario de práctica</a></li>
+          <li><a href="simulacro.html" class="hover:text-jsyellow transition-colors">Simulacro cronometrado</a></li>
+          <li><a href="index.html#consejos" class="hover:text-jsyellow transition-colors">Consejos de preparación</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-label="Recursos para practicar">
+        <p class="font-display font-bold text-sm text-paper">Practicar más</p>
+        <ul class="mt-4 flex flex-col gap-2.5 text-sm text-muted">
+          <li><a href="https://notebook.google.com/notebook/d9ccf98b-c857-4536-bfdc-18f77be8fd46" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-jsyellow transition-colors"><span class="grid place-items-center w-6 h-6 rounded bg-jsyellow shrink-0"><img src="static/resources/notebooklm-gemini-icon.svg" alt="" class="w-3.5 h-auto"></span>NotebookLM · Módulos 3 y 4</a></li>
+          <li><a href="https://notebook.google.com/notebook/895509f9-199b-4d68-b45b-d74acc9bfa3e" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-jsyellow transition-colors"><span class="grid place-items-center w-6 h-6 rounded bg-jsyellow shrink-0"><img src="static/resources/notebooklm-gemini-icon.svg" alt="" class="w-3.5 h-auto"></span>NotebookLM · Módulos 6, 7 y 8</a></li>
+          <li><a href="https://felipecuevas.dev" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-jsyellow transition-colors"><span class="icon i-web-internet-icon text-base" aria-hidden="true"></span>Sitio del instructor</a></li>
+        </ul>
+      </nav>
+
+    </div>
+
+    <div class="mt-12 pt-6 border-t border-panel3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <p class="font-mono text-xs text-mutedink max-w-xl">
+        Material de apoyo no oficial, sin validez de certificación. Elaborado a partir de fuentes públicas, manuales oficiales y el testimonio de alumnos que ya rindieron el examen 2026.
+      </p>
+      <!-- «Acerca de» va solo aqui, junto al copyright, y nunca en el menu del encabezado
+           (iteracion 51, decision 6): lo vigila scripts/comprobar-copias.mjs. -->
+      <p class="font-mono text-xs text-mutedink">© <span id="year">2026</span> Felipe Cuevas · <a href="acerca-de.html" class="underline underline-offset-2 hover:text-jsyellow transition-colors">Acerca de</a></p>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="static/js/acerca-de-main.js"></script>
+
+</body>
+</html>

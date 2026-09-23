@@ -64,17 +64,24 @@ if (declarado !== null && declarado !== DESTINO) {
  * sin el, el archivo de cabeceras existia en la raiz, estaba bien escrito, y el
  * sitio no tenia ninguna. Pages solo lo lee en la raiz de lo publicado.
  * `npm run probar:cabeceras` falla si dist/_headers no esta.
+ *
+ * acerca-de.html entro con la misma iteracion, en el mismo cambio que la crea: esta
+ * lista trata cada entrada como obligatoria, asi que nombrarla antes de que
+ * existiera habria detenido el build. Y al reves, el enlace del pie la vuelve una
+ * referencia de las otras tres paginas: fuera de esta lista, la comprobacion de
+ * enlaces de mas abajo la da por rota.
  */
 const LISTA_COPIA = [
   'index.html',
   'cuestionario.html',
   'simulacro.html',
+  'acerca-de.html',
   'static',
   '_headers',
 ];
 
 /** Paginas cuyos enlaces locales se comprueban al terminar. */
-const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html'];
+const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html', 'acerca-de.html'];
 
 // ---------------------------------------------------------------------------
 // Copia

@@ -78,10 +78,11 @@ Tomadas por el autor el **2026-09-23**.
 - [x] Sumar `_headers` a `LISTA_COPIA` en `scripts/build-dist.mjs`. Pages lo lee solo en la raíz de lo publicado, y lo
   que no está en esa lista no llega a `dist/` sin que el build avise: las cabeceras quedarían escritas en el
   repositorio y ausentes del sitio.
-- [ ] Sumar `acerca-de.html` a `LISTA_COPIA` y a `PAGINAS` en `scripts/build-dist.mjs`, y a `PAGINAS` en
+- [x] Sumar `acerca-de.html` a `LISTA_COPIA` y a `PAGINAS` en `scripts/build-dist.mjs`, y a `PAGINAS` en
   `scripts/comprobar-copias.mjs`. **Hoy ninguno de los dos la nombra** (comprobado el 2026-09-23): no puede nombrarla
   antes de que exista, porque `LISTA_COPIA` trata cada entrada como obligatoria y el build se detendría. Entra en el
-  mismo cambio que crea la página.
+  mismo cambio que crea la página. _Etapa B, junto con `comprobar-csp.mjs`, `probar-cabeceras.mjs` y la sección de
+  la advertencia retirada de `probar-identidad-visual.mjs`, que recorren las mismas páginas._
 - [ ] Investigar, antes de intentar activar nada, cuáles protecciones del plan gratuito siguen disponibles sin dominio
   propio (Bot Fight Mode, otras reglas del panel) y cuáles requieren una zona igual que el límite de tasa. Documentar
   cuáles se activan, cuáles no aplican y por qué.
@@ -120,10 +121,12 @@ Tomadas por el autor el **2026-09-23**.
   división: el código bajo MIT y el banco de preguntas aparte bajo CC BY-NC-SA 4.0, con enlace a `acerca-de.html`
   para el detalle. Escrito el 2026-09-23, antes de la PARADA 1. **Su enlace apunta a una página que todavía no
   existe** hasta que esta iteración la publique.
-- [ ] Extender `scripts/comprobar-copias.mjs` para que vigile la restricción del enlace: `acerca-de.html` aparece en el
-  pie de las tres páginas y **no aparece** en ninguno de los dos menús del encabezado.
+- [x] Extender `scripts/comprobar-copias.mjs` para que vigile la restricción del enlace: `acerca-de.html` aparece en el
+  pie de las tres páginas y **no aparece** en ninguno de los dos menús del encabezado. _Etapa B: prueba 8._
 - [ ] Cuando el autor publique `acerca-de.html`, escribir en su fila de `registro_log.md` que se cierra el período sin
   atribución visible de animate.css, aceptado el 2026-09-15 por la decisión 7 de la iteración 36. **No antes.**
+  _La página quedó escrita en la etapa B y la fila lo dice, con el período todavía abierto: lo confirmó el autor el
+  2026-09-23._
 - [ ] Documentar toda la configuración manual en `90-manual/`.
 
 ## Criterios de aceptación
@@ -147,14 +150,14 @@ Tomadas por el autor el **2026-09-23**.
 - [x] Un recorrido de los extremos del Worker confirma que ninguno permite escribir sin autorización.
 - [x] Un error provocado en el Worker no revela estructura interna ni consultas.
 - [x] La decisión sobre `/api/estado` está escrita, se cumpla o se cambie el comportamiento.
-- [ ] `acerca-de.html` existe, llega a `dist/`, se enlaza desde el pie de las tres páginas, y contiene la licencia MIT
+- [x] `acerca-de.html` existe, llega a `dist/`, se enlaza desde el pie de las tres páginas, y contiene la licencia MIT
   del código, la CC BY-NC-SA 4.0 del banco con su motivo, las tres atribuciones y la nota de privacidad.
-- [ ] `npm run verificar:copias` pasa con `acerca-de.html` en su `PAGINAS`: el pie con el enlace nuevo es idéntico en
+- [x] `npm run verificar:copias` pasa con `acerca-de.html` en su `PAGINAS`: el pie con el enlace nuevo es idéntico en
   las cuatro páginas.
-- [ ] **El enlace a `acerca-de.html` existe en el pie de las tres páginas y NO existe en ninguno de los dos menús de
+- [x] **El enlace a `acerca-de.html` existe en el pie de las tres páginas y NO existe en ninguno de los dos menús de
   encabezado, ni el de escritorio ni el móvil.** Lo comprueba `npm run verificar:copias`, y se demuestra provocándolo:
   con el enlace puesto en un menú, el comprobador falla y nombra la página y el menú.
-- [ ] El repositorio declara las dos licencias por separado, código y banco, de forma que nadie pueda leer la del código
+- [x] El repositorio declara las dos licencias por separado, código y banco, de forma que nadie pueda leer la del código
   como si cubriera las preguntas.
 - [ ] La configuración manual está documentada con el detalle suficiente para reconstruirla.
 
@@ -212,3 +215,45 @@ sea un entero positivo y cuyo proceso sea el `cmd.exe` que lanzó él mismo.
 
 **Lo que queda pendiente del lado del autor:** `static/css/style.css` cambió —tres reglas nuevas, ninguna quitada— y
 `npm run verificar` marca `css` como DESFASADO hasta el commit.
+
+### Etapa B · 2026-09-23 · `acerca-de.html`, su enlace y la prueba 8
+
+La prueba 8 se escribió antes que la página, y se vio en rojo por su propia causa.
+
+| # | Caso | Resultado | Código |
+|---|---|---|---|
+| 8 · rojo | `verificar:copias` con `acerca-de.html` en `PAGINAS`, sin página ni enlace | las 3 páginas sin el enlace en la franja inferior del pie, y «falta acerca-de.html» | **1** |
+| 8 · intermedio | con el enlace en las 3 páginas y la página todavía sin escribir | «falta acerca-de.html: no hay con que comparar» | **2**, no 0 |
+| 8 · verde | con la página y el enlace | 6 parejas iguales por bloque; el enlace está en las 4 franjas y falta en los 8 menús y en el resto del encabezado | **0** |
+| 8a | plantado en el menú de escritorio de `cuestionario.html` | nombra la página y «el menú de escritorio», más las 3 parejas distintas | 1 |
+| 8b | plantado en el menú móvil de `index.html` | nombra la página y «el menú móvil» | 1 |
+| 8c | plantado en **los dos menús de las cuatro páginas** | las copias siguen iguales entre sí, y aun así salen los **8** rojos, uno por página y por menú | 1 |
+| 8d | plantado en el encabezado de `simulacro.html`, fuera de los menús | «el encabezado, fuera de los dos menús» | 1 |
+| 8e | **quitado del pie de las cuatro** | las copias siguen iguales, y salen las 4 franjas sin el enlace | 1 |
+| 8f | citado en un comentario dentro del menú | no es un enlace, y sigue verde | 0 |
+
+8c y 8e son los que justifican la comprobación: en los dos, la comparación de copias da verde, porque las cuatro dicen
+lo mismo. Solo la exigencia de presencia en un lugar y de ausencia en el otro los caza. Los casos se corrieron sobre
+copias temporales de las cuatro páginas y del guion, fuera del repositorio.
+
+**El build también lo vigila, por el otro lado.** Con `acerca-de.html` quitada de `LISTA_COPIA` y de `PAGINAS` en
+una copia de `build-dist.mjs`, el build se detiene: «1 referencia(s) sin destino dentro de dist/: acerca-de.html».
+El enlace del pie la vuelve una referencia de las otras tres páginas. Con la lista real: «6 entradas copiadas»,
+«36 recursos enlazados, ninguno roto».
+
+**En un navegador**, con el mismo tipo de arnés de la etapa A (Chrome instalado, por su protocolo de depuración, sin
+dependencias y fuera del repositorio) y la política **obligatoria** reescrita en la respuesta: las cuatro páginas
+cargaron con **0 mensajes** de consola, de excepción o de registro, en todos los niveles. El arnés sabe ver: con un
+`style="…"` sembrado en `acerca-de.html`, registró la violación como error de seguridad. En 375 px, `acerca-de.html`
+abre y cierra el menú de teléfono, escribe el año del pie, carga las tres tipografías, pinta sus cinco íconos por
+máscara y no se desborda a lo ancho.
+
+**Un hallazgo al escribir la página, que no se resolvió en ella.** La fila de `registro_log.md` pedía recorrer lo que el
+sitio usa antes de escribir las atribuciones, y el recorrido encontró más orígenes que los tres anotados: 39 íconos de
+Material Symbols (no 44), más tres de SVG Logos, uno de Huge Icons y el logotipo de NotebookLM sin aviso. **Decisión
+del autor, 2026-09-23:** la página sale con las tres pedidas, y el resto va a «Sin asignar», con la licencia de cada
+origen por comprobar.
+
+**Lo que queda del lado del autor:** `static/css/style.css` cambió por las clases nuevas de la página, así que
+`npm run verificar` marca `css` como DESFASADO hasta el commit. El período sin atribución visible de animate.css sigue
+abierto hasta que `acerca-de.html` se publique, y H-006 se cierra con esa publicación.

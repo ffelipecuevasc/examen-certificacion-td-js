@@ -31,7 +31,7 @@
  * escritas igual si la unica diferencia entre ellas era una de estas cuatro:
  *
  *   1. EL DESTINO DEL LOGOTIPO Y DE LOS ENLACES. En la portada las secciones son
- *      anclas (`#mapa`); desde las otras dos paginas hay que salir a la portada
+ *      anclas (`#mapa`); desde las demas paginas hay que salir a la portada
  *      primero (`index.html#mapa`). Y `index.html` a secas es el mismo sitio que
  *      `#inicio`. Se normaliza todo a `index.html#ancla`.
  *
@@ -78,8 +78,14 @@ const SIN_VEREDICTO = 2;
 
 const LINEA = '='.repeat(72);
 
-/** Las tres paginas del sitio. Si aparece una cuarta, va aqui y nada mas. */
-const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html'];
+/**
+ * Las paginas del sitio. Si aparece otra, va aqui y nada mas.
+ *
+ * `acerca-de.html` es la cuarta desde la iteracion 51, y lleva la misma copia del
+ * encabezado y del pie que las otras tres: no tiene enlace propio en el menu, asi
+ * que ninguno de sus enlaces del encabezado lleva la marca de pagina activa.
+ */
+const PAGINAS = ['index.html', 'cuestionario.html', 'simulacro.html', 'acerca-de.html'];
 
 // ---------------------------------------------------------------------------
 // Sacar los bloques
@@ -345,7 +351,7 @@ if (portada && !/<section id="modulos"/.test(portada)) {
 // `MARCAS_DE_ACTIVA`, asi que la comparacion de copias **no lo ve**: sin esto, borrarlo
 // dejaria las tres copias iguales y el comprobador en verde, que es el falso verde que
 // H-023 describe. Aqui se exige al reves: que la marca este en el simulacro y no este en
-// las otras dos.
+// las demas.
 
 const MARCA_DEL_SUBRAYADO = 'underline';
 
@@ -368,7 +374,7 @@ for (const pagina of comparables) {
     if (esSuPagina && !subrayado) {
       problemas.push(
         `${pagina}: el enlace del simulacro en ${zona.nombre} no lleva el subrayado que marca la página actual, ` +
-          'y es la única diferencia que lo distingue de las otras dos copias'
+          'y es la única diferencia que lo distingue de las demás copias'
       );
     } else if (!esSuPagina && subrayado) {
       problemas.push(
@@ -386,7 +392,92 @@ for (const pagina of comparables) {
 if (marcas > 0 && problemas.length === problemasAntesDeLaMarca) {
   notas.push(
     `marca de página activa del simulacro: ${marcas} enlace(s) comprobados —con subrayado en simulacro.html y sin ` +
-      'él en las otras dos—, que es lo que la normalización esconde al comparar las copias.'
+      'él en las demás—, que es lo que la normalización esconde al comparar las copias.'
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Acerca de: solo desde el pie (iteracion 51, decision 6)
+// ---------------------------------------------------------------------------
+//
+// ESTO ES UNA RESTRICCION, NO UNA DESCRIPCION. El autor decidio el 2026-09-23 que
+// `acerca-de.html` se enlaza unicamente desde la franja inferior del pie, junto al
+// copyright, y nunca desde el encabezado: los seis enlaces del menu ya van apretados
+// cerca de los 768 px (iteracion 44), y un septimo ahi seria justo el deslizamiento
+// silencioso que esta comprobacion existe para cazar.
+//
+// POR QUE HACEN FALTA LAS DOS MITADES. La comparacion de copias de arriba no alcanza:
+// si alguien pone el enlace en el menu de LAS CUATRO paginas, las copias siguen
+// iguales entre si y la comparacion pasa en verde. Y si alguien lo quita del pie de
+// las cuatro, lo mismo. Por eso se exige la presencia en un sitio y la ausencia en el
+// otro, pagina por pagina.
+//
+// Se miran los bloques sin comentarios: un comentario que explique el enlace puede
+// citar su `href` sin que eso sea un enlace.
+
+const ENLACE_ACERCA_DE = /href="acerca-de\.html"/;
+
+const sinComentarios = (texto) => texto.replace(/<!--[\s\S]*?-->/g, '');
+
+/** El parrafo del copyright: el que lleva el `<span id="year">`. */
+const FRANJA_INFERIOR = {
+  nombre: 'la franja inferior del pie',
+  de: (bloques) =>
+    sinComentarios(bloques.pieCrudo).match(/<p\b[^>]*>(?:(?!<\/p>)[\s\S])*?id="year"[\s\S]*?<\/p>/)?.[0],
+};
+
+const problemasAntesDeAcercaDe = problemas.length;
+let franjasConElEnlace = 0;
+let menusSinElEnlace = 0;
+
+for (const pagina of comparables) {
+  const bloques = recortados.get(pagina);
+
+  const franja = FRANJA_INFERIOR.de(bloques);
+
+  if (franja === undefined) {
+    avisos.push(`${pagina}: no se encontró ${FRANJA_INFERIOR.nombre} (el párrafo del copyright), así que no se pudo mirar si enlaza a acerca-de.html`);
+  } else if (!ENLACE_ACERCA_DE.test(franja)) {
+    problemas.push(`${pagina}: ${FRANJA_INFERIOR.nombre} no enlaza a acerca-de.html junto al copyright (falta un href="acerca-de.html")`);
+  } else {
+    franjasConElEnlace += 1;
+  }
+
+  for (const zona of ZONAS.slice(0, 2)) {
+    const trozo = zona.de(bloques);
+    if (trozo === undefined) continue;
+
+    if (ENLACE_ACERCA_DE.test(sinComentarios(trozo))) {
+      problemas.push(
+        `${pagina}: ${zona.nombre} enlaza a acerca-de.html, y esa página se enlaza solo desde el pie ` +
+          '(decisión 6 de la iteración 51)'
+      );
+    } else {
+      menusSinElEnlace += 1;
+    }
+  }
+
+  // Y el resto del encabezado, fuera de los dos menus: el logotipo, el boton del menu
+  // de telefono o lo que se agregue mañana. «Solo desde el pie» no deja rincones.
+  let restoDelEncabezado = sinComentarios(bloques.encabezadoCrudo);
+  for (const zona of ZONAS.slice(0, 2)) {
+    const trozo = zona.de(bloques);
+    if (trozo !== undefined) restoDelEncabezado = restoDelEncabezado.replace(sinComentarios(trozo), '');
+  }
+
+  if (ENLACE_ACERCA_DE.test(restoDelEncabezado)) {
+    problemas.push(
+      `${pagina}: el encabezado, fuera de los dos menús, enlaza a acerca-de.html, y esa página se enlaza ` +
+        'solo desde el pie (decisión 6 de la iteración 51)'
+    );
+  }
+}
+
+// La nota solo si el bloque paso entero, por la misma razon que la de la marca activa.
+if (franjasConElEnlace > 0 && problemas.length === problemasAntesDeAcercaDe) {
+  notas.push(
+    `acerca de: enlazada desde la franja inferior del pie en ${franjasConElEnlace} página(s), y ausente de ` +
+      `los ${menusSinElEnlace} menús del encabezado y del resto del encabezado, como pide la decisión 6 de la iteración 51.`
   );
 }
 
@@ -417,9 +508,9 @@ for (const n of notas) console.log(`  ${n}`);
 
 if (problemas.length) {
   console.log('');
-  console.log('Las tres paginas llevan su propia copia del encabezado y del pie, porque el');
-  console.log('sitio no usa plantillas (decision 8 de la iteracion 41). Si el cambio de arriba');
-  console.log('es intencional, hay que hacerlo en LAS TRES. Si es una diferencia legitima que');
+  console.log('Cada pagina lleva su propia copia del encabezado y del pie, porque el sitio');
+  console.log('no usa plantillas (decision 8 de la iteracion 41). Si el cambio de arriba es');
+  console.log('intencional, hay que hacerlo en TODAS. Si es una diferencia legitima que');
   console.log('esta comprobacion todavia no conoce, se agrega a `normalizar()` en este mismo');
   console.log('archivo, con su motivo escrito: la lista de permitidas no vive en ningun otro');
   console.log('sitio.');

@@ -31,7 +31,7 @@
  *   2. verificar.mjs              el CSS versionado corresponde a su fuente
  *   3. comprobar-instantanea.mjs  la instantanea dice lo mismo que el respaldo
  *   4. comprobar-cifra.mjs        la portada publica la cifra del banco
- *   5. comprobar-copias.mjs       las tres paginas dicen lo mismo en encabezado y pie
+ *   5. comprobar-copias.mjs       las cuatro paginas dicen lo mismo en encabezado y pie, y «Acerca de» va solo en el pie
  *   6. probar-identidad-visual.mjs  el contraste, la paleta y los iconos del simulacro
  *   7. probar-cronometros.mjs     los dos relojes del simulacro y el arriendo de pestana
  *   8. probar-resumen.mjs         el resumen del simulacro cuenta, ordena y avisa bien
@@ -156,7 +156,7 @@ const COMPROBADORES = [
     nombre: 'copias',
     guion: 'comprobar-copias.mjs',
     codigos: {
-      0: [OK, 'las tres paginas dicen lo mismo en su encabezado, su pie y su favicon'],
+      0: [OK, 'las cuatro paginas dicen lo mismo en su encabezado, su pie y su favicon, y «Acerca de» va solo en el pie'],
       1: [FALLO, 'COPIAS DISTINTAS: una pagina se desfaso del encabezado o del pie de las otras'],
       2: [AVISO, 'no se pudo comparar: falta una pagina o no trae alguno de los tres bloques'],
     },

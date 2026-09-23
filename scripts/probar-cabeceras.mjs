@@ -74,7 +74,7 @@ const CSP = 'content-security-policy';
 const CSP_INFORME = 'content-security-policy-report-only';
 
 /** Paginas y archivos estaticos que se piden. Sin `.html`: Pages redirige con 308. */
-const ESTATICOS = ['/', '/cuestionario', '/simulacro', '/static/css/style.css', '/static/js/main.js'];
+const ESTATICOS = ['/', '/cuestionario', '/simulacro', '/acerca-de', '/static/css/style.css', '/static/js/main.js'];
 
 /** Extremos de la capa de datos. El ultimo no existe: lo contesta el middleware. */
 const EXTREMOS = ['/api/estado', '/api/preguntas?resumen=1', '/api/no-existe'];
