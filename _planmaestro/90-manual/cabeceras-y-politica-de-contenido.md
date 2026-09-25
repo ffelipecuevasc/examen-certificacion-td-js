@@ -19,6 +19,11 @@ Este documento empieza cuando el despliegue ya terminó.
 | `_headers`, en la raíz | cuatro cabeceras para todas las páginas: la política de contenido (hoy `Content-Security-Policy-Report-Only`), `X-Frame-Options`, `Permissions-Policy` y `Cross-Origin-Opener-Policy` | que ninguna página cargue lo que no debe, ni se pueda incrustar en otro sitio |
 | `functions/api/_middleware.js` | `X-Content-Type-Options: nosniff` y una política `default-src 'none'; frame-ancestors 'none'` en todo `/api/` | Pages no aplica `_headers` a las Functions |
 
+La política permite, además del propio sitio, dos orígenes de Cloudflare Web Analytics y ninguno más (ADR-036):
+`https://static.cloudflareinsights.com` en `script-src`, de donde carga el beacon que inyecta la plataforma, y
+`https://cloudflareinsights.com` en `connect-src`, adonde envía. **En local no se ven**, porque el beacon lo pone el
+borde de Cloudflare: solo aparecen en el sitio publicado.
+
 `X-Content-Type-Options` y `Referrer-Policy` no están en `_headers` porque Pages ya las envía, y
 `Strict-Transport-Security` sobra porque todo `.dev` está precargado en HSTS (decisión 3).
 
@@ -54,6 +59,11 @@ En cada una, abre las herramientas de desarrollo (F12) → **Console**, y **mues
 
 **Esto importa:** en modo informe, Chrome escribe las violaciones como mensajes de nivel *info*, no como errores
 rojos. Con la consola filtrada a errores, parece limpia aunque no lo esté. Se comprobó en la etapa A.
+
+**Qué esperar desde el 2026-09-25:** la primera publicación en modo informe mostró una violación del beacon de
+Cloudflare Web Analytics en `script-src`. La política ya permite sus dos orígenes, así que **con esta versión no debería
+aparecer ninguna**. Si aparece una que nombre `cloudflareinsights.com`, anótala completa: significa que la plataforma
+cambió algo.
 
 **Limpia** significa que no aparece **ningún** mensaje «…violates the following Content Security Policy…», en ningún
 nivel y en ninguna de las cuatro páginas.

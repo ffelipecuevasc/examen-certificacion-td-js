@@ -2224,7 +2224,7 @@ mismo. El desfase ya lo declara el aviso de ADR-008.
 
 ## ADR-034 · El avance del estudiante se guarda en su navegador, y nunca afirma lo que el banco ya no sostiene
 
-**Fecha:** 2026-09-15 · **Estado:** aceptada · **Decide:** Felipe Cuevas
+**Fecha:** 2026-09-15 · **Estado:** ✅ (parcial) vigente salvo en lo que ADR-036 sustituye · **Decide:** Felipe Cuevas
 
 ### Contexto
 
@@ -2487,6 +2487,13 @@ fuera del almacén ni del DOM, y tres criterios de esa iteración dependían de 
 
 **Lo que esta actualización no resuelve, y ya estaba asumido.** Dos pestañas abiertas se siguen
 pisando, y ahora además de forma asimétrica: ver la limitación declarada en la iteración 34.
+
+### Actualización · 2026-09-25 · «ni analítica» dejó de ser cierto
+
+**ADR-036 enmienda un solo punto de esta ADR:** la frase «No hay cuentas, ni correo, ni inicio de sesión, ni cookies,
+ni analítica». Cloudflare Web Analytics se encontró activo en producción y se adoptó. Hay analítica agregada, sin
+cookies y sin nada guardado en el dispositivo, comprobado en un navegador limpio y no tomado del proveedor. Todo lo
+demás de esta ADR sigue vigente: el avance nunca sale del dispositivo, no hay cuentas ni cookies, y no hay banner.
 
 ---
 
@@ -2911,3 +2918,133 @@ extremo y una sola validación**. Un extremo aparte habría obligado a dos petic
 pedir mal que validar desde cero.
 
 **Se construye en la etapa A de la iteración 44**, con su prueba antes que su código.
+---
+
+## ADR-036 · Cloudflare Web Analytics es el mecanismo de métricas: se encontró activo y se adopta
+
+**Estado:** ✅ Aceptada · **Fecha:** 2026-09-25 · **Decide:** Felipe Cuevas
+
+### Contexto: se descubrió, no se eligió
+
+**Esta ADR no elige un mecanismo de cero, y no lo finge.** Cloudflare Web Analytics ya estaba activo en producción
+cuando se supo de él. Lo cazó la política de contenido estricta de la iteración 51, publicada en modo informe: la
+consola de Chrome registró que cargar `https://static.cloudflareinsights.com/beacon.min.js` violaba `script-src
+'self'`. El sitio no tiene ninguna línea que cargue ese script. **Lo inyecta la plataforma** en cada página
+publicada, antes de `</body>`, cuando Web Analytics está activado en el proyecto de Pages (*Workers & Pages* → el
+proyecto → *Metrics* → *Web Analytics*).
+
+**No consta en el repositorio quién lo activó ni cuándo.** Ningún archivo lo mencionaba antes del 2026-09-25, y el
+manual de publicación de la iteración 11 no lo registra. Dos consecuencias que conviene decir:
+
+- **Estuvo midiendo antes de estar decidido.** Durante ese tiempo, dos textos del proyecto decían algo inexacto:
+  ADR-034 («ni cookies, ni analítica») y la nota de privacidad de `acerca-de.html` («ni cookies, ni analítica»). La
+  parte de las cookies resultó cierta; la de la analítica, no.
+- **Es exactamente lo que el modo informe existe para cazar.** Si la política hubiera pasado directo a obligatoria,
+  el navegador habría bloqueado el beacon en silencio: el autor habría tenido un panel de métricas vacío sin saber
+  por qué, y la etapa D habría roto algo que nadie sabía que existía.
+
+### Decisión
+
+**Web Analytics se queda activo y se adopta ahora como el mecanismo de la iteración 52**, que pedía «elegir el
+mecanismo de métricas» y «documentarlo como ADR». Esta ADR cierra **solo esa pieza**. El resto de la 52 —definir qué
+preguntas responde el panel, aplicarlo formalmente a las páginas y al simulacro, y documentar cómo se lee— sigue
+pendiente para cuando le toque.
+
+La política de contenido gana **exactamente dos orígenes**, uno por directiva, y ninguno más:
+
+| Directiva | Origen nuevo | Para qué |
+|---|---|---|
+| `script-src` | `https://static.cloudflareinsights.com` | cargar el beacon que inyecta la plataforma |
+| `connect-src` | `https://cloudflareinsights.com` | que el beacon envíe sus mediciones |
+
+`scripts/comprobar-csp.mjs` exige estas fuentes **exactas** en las dos directivas: un origen de más o de menos es un
+rojo. Se provocaron un origen de más en cada directiva y la política de antes, y los tres casos dan rojo.
+
+**ADR-011 no cambia.** La capa de datos sigue siendo del mismo origen, bajo `/api/`, y `'self'` sigue siendo la única
+fuente de `connect-src` que habla con ella. El origen nuevo no es de datos: solo recibe mediciones.
+
+### Por qué cumple `vision.md`, comprobado y no prometido
+
+`vision.md` pone fuera de alcance la «analítica que rastree individuos» y exige cero fricción, sin banner de
+consentimiento. **No se tomó la palabra del proveedor.** El 2026-09-25 se abrió el sitio publicado en un Chrome con
+perfil nuevo y vacío, manejado por su protocolo de depuración, que lee lo mismo que el panel *Application* de las
+herramientas de desarrollo. Se visitaron la portada y `acerca-de`, las dos páginas que no llaman a `/api/`, y se
+revisó todo después de que el beacon cargara y enviara:
+
+| Qué se miró | Resultado |
+|---|---|
+| Cookies en el navegador, **de cualquier dominio**, antes y después | **0 y 0** |
+| Cookies enviadas en las peticiones al beacon | **ninguna**, en las 5 |
+| `Set-Cookie` en las respuestas del beacon y de la página | **ninguno** |
+| localStorage, sessionStorage, IndexedDB y Cache Storage del sitio, de `static.cloudflareinsights.com` y de `cloudflareinsights.com` | **0 entradas** en los tres orígenes |
+| Lo mismo leído desde dentro de la página, con el beacon ya cargado | `document.cookie` vacío y 0 en los cuatro almacenamientos |
+| **Control positivo**: una cookie y una entrada de localStorage sembradas a mano | **se ven las dos**: la inspección sabe ver |
+
+**Qué envía el beacon**, leído en el cuerpo de sus dos envíos:
+
+- el motor y la versión del navegador, y la versión del sistema operativo;
+- datos de memoria de JavaScript y tiempos de carga;
+- la dirección de la página y el tipo de navegación;
+- la versión del script y el identificador del sitio;
+- un `pageloadId`.
+
+**El `pageloadId` fue distinto en cada carga**, así que identifica una carga de página, no un dispositivo ni una
+persona. Nada de lo enviado sale de un valor guardado en el navegador, porque no hay ninguno.
+
+Con eso, lo que el sitio cumple **del lado del navegador está comprobado**: no hay cookies ni identificadores
+persistentes, y no queda nada en el dispositivo. Por eso tampoco hace falta un banner de consentimiento.
+
+**Lo que no se puede comprobar desde el navegador, y se dice.** Como cualquier servidor, Cloudflare recibe la IP y el
+agente de usuario de cada envío. Que no los use para seguir a nadie en el tiempo es una **promesa del proveedor**:
+su blog de lanzamiento de Web Analytics dice que no usa estado del cliente, como cookies o localStorage, ni sigue a
+los usuarios por su IP, su agente de usuario ni otros atributos inmutables. Esa promesa no es verificable desde aquí.
+Se acepta sabiendo que el sitio ya lo aloja Cloudflare y que la IP le llega igual con cada página.
+
+### Lo que se encontró distinto de lo que dice Cloudflare
+
+Documentado porque es lo que se vio, no lo que la documentación anuncia. La FAQ de Web Analytics se leyó el
+2026-09-25.
+
+1. **La FAQ dice que, con la inyección automática, el beacon envía al mismo dominio y basta `connect-src 'self'`.**
+   En `pages.dev` no es así: los envíos van a `https://cloudflareinsights.com/cdn-cgi/rum`, otro origen. Con la
+   política nueva sin ese origen, Chrome bloquea el envío: «Connecting to 'https://cloudflareinsights.com/cdn-cgi/rum'
+   violates the following Content Security Policy directive: "connect-src 'self'"». Se provocó para comprobarlo.
+2. **La FAQ dice que la inyección automática agrega `integrity` y `type="module"` a la etiqueta.** La etiqueta
+   inyectada en la portada no trae ninguno de los dos: es `<script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+   data-cf-beacon='…'>`. Sin `integrity`, el navegador ejecuta lo que ese servidor entregue. **Se acepta a
+   sabiendas**, porque el servidor es de Cloudflare, que ya sirve todo el sitio. Queda anotado un endurecimiento
+   posible que no se hace ahora: la FAQ admite limitar `script-src` a la ruta exacta del script (`…/beacon.min.js`)
+   en vez de a todo el origen.
+
+### La prueba de que la consola queda limpia
+
+El 2026-09-25, sobre las páginas **publicadas**, se reemplazó la cabecera por la política en modo **obligatorio**.
+El cambio se hizo en el propio navegador de la prueba, sin tocar producción:
+
+| Política | Resultado en `/` y `/acerca-de` |
+|---|---|
+| la nueva | **0 mensajes**, incluso esperando el envío del beacon al salir de la página |
+| la de antes (control) | «Loading the script 'https://static.cloudflareinsights.com/beacon.min.js' violates … "script-src 'self'"», una vez por página |
+| la nueva sin el origen de `connect-src` (control) | la violación del envío citada arriba, una vez por página |
+
+Esas cargas de prueba pueden aparecer en el panel de métricas del 2026-09-25: fueron unas diez.
+
+### Qué sustituye
+
+**Enmienda un punto de ADR-034, y solo ese.** Donde ADR-034 dice «No hay cuentas, ni correo, ni inicio de sesión, ni
+cookies, ni analítica», desde esta ADR vale: *no hay cuentas, ni correo, ni inicio de sesión, ni cookies; **hay**
+analítica, la de Cloudflare Web Analytics, agregada, sin cookies y sin nada guardado en el dispositivo, y ninguna que
+rastree individuos*.
+
+Sobre la frase «no se comparte nada con terceros»: el beacon le envía a Cloudflare datos de cada carga de página,
+pero Cloudflare no es un tercero nuevo, porque ya aloja el sitio. El avance del estudiante sigue sin salir del
+dispositivo, y el resto de ADR-034 queda entero.
+
+### Cómo se revierte
+
+Si algún día se decide quitarlo, hay que hacer tres cosas en el mismo cambio, porque cada una por separado deja a las
+otras mintiendo:
+
+1. Desactivarlo en el panel: *Workers & Pages* → el proyecto → *Metrics* → *Web Analytics*.
+2. Quitar los dos orígenes de `_headers` y de `FUENTES_EXACTAS` en `scripts/comprobar-csp.mjs`.
+3. Corregir la nota de privacidad de `acerca-de.html`.

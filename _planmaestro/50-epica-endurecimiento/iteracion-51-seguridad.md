@@ -345,3 +345,29 @@ se había dicho con verano e invierno invertidos, y esa versión no quedó escri
 **La etapa C queda cerrada.** Queda la D, que es del autor: confirmar las rutas del panel con una lectura real, desplegar,
 comprobar las cabeceras en producción, revisar la consola en modo informe en las cuatro páginas, pasar la política a
 obligatoria y publicar `acerca-de.html`, que cierra el período de animate.css y H-006.
+
+### Después del cierre de la etapa C · 2026-09-25 · el modo informe cazó Cloudflare Web Analytics
+
+Al publicar la política en modo informe, la consola del sitio publicado registró una violación que el sitio no
+provoca: **el beacon de Cloudflare Web Analytics, inyectado por la plataforma**, desde
+`https://static.cloudflareinsights.com`. Nadie sabía que estaba activo. Es justo lo que la decisión 2 de la PARADA 1
+quería cazar: en modo obligatorio se habría bloqueado en silencio.
+
+**Decisión del autor:** se queda y se adopta como mecanismo de la iteración 52 (**ADR-036**). En esta iteración cambian
+dos directivas de `_headers`, y nada más: `script-src` gana `https://static.cloudflareinsights.com` y `connect-src`
+gana `https://cloudflareinsights.com`. Lo que el contexto de arriba dice de `connect-src 'self'` sigue valiendo para
+la capa de datos (ADR-011): el origen nuevo no es de datos.
+
+| Prueba | Resultado |
+|---|---|
+| `verificar:csp` con la política nueva y el comprobador viejo | **rojo**: «connect-src tiene que ser 'self' y nada más», como debía |
+| `verificar:csp` con las fuentes exactas de ADR-036 | COMPATIBLE |
+| sobre copias: un origen de más en `connect-src`, uno de más en `script-src`, y la política de antes | **3 rojos**, cada uno con su directiva |
+| sobre copias: la portada con el beacon inyectado, y `script-src` sin su origen | rojo en `index.html:408` y en la regla |
+| control: la portada con el beacon y la política nueva | COMPATIBLE |
+| `probar:cabeceras` y `npm run verificar` completo, en local | en pie; 13 de 13 |
+| Chrome sobre `/` y `/acerca-de` publicadas, con la política nueva **obligatoria** reemplazada en el navegador | **0 mensajes**; con la vieja, el bloqueo del beacon; sin el origen de `connect-src`, el bloqueo del envío |
+
+`comprobar-csp.mjs` dejó de exigir `connect-src 'self'` a secas y ahora exige **las fuentes exactas** de
+`script-src` y `connect-src`: antes `script-src` no limitaba sus orígenes, y un dominio agregado sin ADR habría pasado
+en verde.

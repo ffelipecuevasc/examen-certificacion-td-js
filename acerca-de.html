@@ -203,14 +203,19 @@
 
   <!-- ============ PRIVACIDAD ============ -->
   <!-- DESCRIBE LO QUE EL SITIO HACE HOY, no lo que podria hacer (iteracion 51).
-       ADR-034 y ADR-035 son la fuente. Si una iteracion agrega metricas o cualquier
-       otra cosa que salga del navegador, esta nota se actualiza en el mismo cambio. -->
+       ADR-034, ADR-035 y ADR-036 son la fuente. Si una iteracion agrega o quita algo
+       que salga del navegador, esta nota se actualiza en el mismo cambio.
+
+       LA PRIMERA VERSION DECIA «ni analitica», Y NO ERA CIERTO: Cloudflare Web
+       Analytics ya estaba activo en produccion, inyectado por la plataforma, y nadie
+       lo sabia. Lo cazo la politica de contenido en modo informe. Corregido el
+       2026-09-25, con lo que se comprobo en un navegador limpio (ADR-036). -->
   <section id="privacidad" class="py-12 pb-20 px-5 sm:px-8">
     <div class="max-w-3xl mx-auto">
       <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight flex items-center gap-3"><span class="icon i-shield-lock text-3xl text-jsyellow" aria-hidden="true"></span>Privacidad</h2>
       <p class="mt-3 text-muted leading-relaxed">
-        El sitio no te pide nada y no sabe quién eres. No hay cuentas, ni correo, ni inicio de sesión, ni cookies, ni
-        analítica.
+        El sitio no te pide nada y no sabe quién eres. No hay cuentas, ni correo, ni inicio de sesión, ni cookies. Sí se
+        cuentan las visitas, de forma agregada y sin reconocerte: más abajo está cómo.
       </p>
 
       <div class="mt-8 bg-panel border border-panel3 rounded-xl p-6">
@@ -234,9 +239,32 @@
       </div>
 
       <div class="mt-4 bg-panel border border-panel3 rounded-xl p-6">
+        <p class="font-display font-bold text-paper">Cómo se cuentan las visitas</p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          El sitio usa <span class="text-paper">Cloudflare Web Analytics</span>. Cloudflare agrega a cada página un
+          pequeño script, desde <code class="font-mono text-paper">static.cloudflareinsights.com</code>, que al cargarla
+          envía a <code class="font-mono text-paper">cloudflareinsights.com</code> qué página se abrió, el navegador y el
+          sistema operativo con sus versiones, y cuánto tardó en cargar. Sirve para saber cuánto se usa la guía y cuándo,
+          no qué hizo cada estudiante.
+        </p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          <span class="text-paper">No usa cookies ni guarda nada en tu navegador,</span> y cada carga de página lleva un
+          número distinto, así que no te reconoce de una visita a la siguiente. No lo decimos porque lo diga Cloudflare:
+          lo comprobamos abriendo el sitio en un navegador limpio y revisando su almacenamiento.
+        </p>
+        <p class="mt-3 text-sm text-muted leading-relaxed">
+          Lo que no se puede comprobar desde el navegador: como cualquier servidor, Cloudflare recibe la dirección IP de
+          tu conexión. Según Cloudflare, no la usa para seguir a nadie. El detalle completo está en la decisión ADR-036,
+          en el archivo de
+          <a href="https://github.com/ffelipecuevasc/examen-certificacion-td-js/blob/main/_planmaestro/00_producto/decisiones.md" target="_blank" rel="noopener" class="text-paper underline underline-offset-2 hover:text-jsyellow transition-colors">decisiones del proyecto</a>.
+        </p>
+      </div>
+
+      <div class="mt-4 bg-panel border border-panel3 rounded-xl p-6">
         <p class="font-display font-bold text-paper">Con quién habla tu navegador</p>
         <ul class="mt-3 flex flex-col gap-2 text-sm text-muted leading-relaxed list-disc pl-5">
           <li><span class="text-paper">Cloudflare</span>, que aloja el sitio y la capa de datos. Las preguntas se piden al mismo sitio, bajo <code class="font-mono text-paper">/api/</code>, y Cloudflare atiende esas peticiones como cualquier servidor web.</li>
+          <li><span class="text-paper">Cloudflare Web Analytics</span>, en <code class="font-mono text-paper">static.cloudflareinsights.com</code> y <code class="font-mono text-paper">cloudflareinsights.com</code>, para contar las visitas como se explica arriba.</li>
           <li><span class="text-paper">Google Fonts</span>, de donde se cargan las tipografías. Al pedirlas, tu navegador se conecta a los servidores de Google.</li>
         </ul>
         <p class="mt-3 text-sm text-muted leading-relaxed">

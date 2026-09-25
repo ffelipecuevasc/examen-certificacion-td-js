@@ -24,7 +24,9 @@
  *
  * Y revisa la politica misma contra lo decidido: sin 'unsafe-inline' ni en
  * script-src ni en style-src (decision 1 de la PARADA 1, 2026-09-23), object-src
- * y frame-ancestors en 'none', y connect-src en 'self' y nada mas (ADR-011).
+ * y frame-ancestors en 'none', y connect-src y script-src con sus fuentes exactas: 'self'
+ * (ADR-011) y el unico origen de Cloudflare Web Analytics que cada una necesita
+ * (ADR-036). Ni uno mas: un origen agregado sin su ADR es un rojo.
  *
  * static/js/data/ NO se revisa, y es la misma regla de build-dist.mjs (H-031): esos
  * archivos guardan material citado. Un ejemplo de HTML con `style=` dentro de una
@@ -148,6 +150,24 @@ function permite(directiva, url) {
 
 // Lo decidido sobre la politica misma.
 const fuenteDeLaPolitica = '_headers';
+
+/**
+ * Las fuentes exactas de las dos directivas que hablan con otros origenes.
+ *
+ * 'self' es la capa de datos, del mismo origen (ADR-011). Los dos origenes de
+ * Cloudflare son los de Web Analytics, que la plataforma inyecta en produccion
+ * (ADR-036): el beacon se carga desde static.cloudflareinsights.com y envia sus
+ * mediciones a cloudflareinsights.com, sin el static. Se comparan como conjunto:
+ * el orden no importa, y una fuente de mas o de menos es un rojo.
+ */
+const FUENTES_EXACTAS = {
+  'script-src': ["'self'", 'https://static.cloudflareinsights.com'],
+  'connect-src': ["'self'", 'https://cloudflareinsights.com'],
+};
+
+const sonExactamente = (fuentes, esperadas) =>
+  Array.isArray(fuentes) && fuentes.length === esperadas.length && esperadas.every((e) => fuentes.includes(e));
+
 const politicaDecidida = [
   ['script-src', (f) => f && !f.includes("'unsafe-inline'") && !f.includes("'unsafe-eval'") && !f.includes('*'),
     "script-src tiene que existir y no llevar 'unsafe-inline', 'unsafe-eval' ni *"],
@@ -156,8 +176,10 @@ const politicaDecidida = [
   ['object-src', (f) => f?.length === 1 && f[0] === "'none'", "object-src tiene que ser 'none'"],
   ['frame-ancestors', (f) => f?.length === 1 && f[0] === "'none'", "frame-ancestors tiene que ser 'none'"],
   ['base-uri', (f) => Boolean(f), 'base-uri tiene que existir'],
-  ['connect-src', (f) => f?.length === 1 && f[0] === "'self'",
-    "connect-src tiene que ser 'self' y nada mas: la capa de datos es del mismo origen (ADR-011)"],
+  ['connect-src', (f) => sonExactamente(f, FUENTES_EXACTAS['connect-src']),
+    `connect-src tiene que ser exactamente ${FUENTES_EXACTAS['connect-src'].join(' ')}: la capa de datos (ADR-011) y el envio de Web Analytics (ADR-036)`],
+  ['script-src', (f) => sonExactamente(f, FUENTES_EXACTAS['script-src']),
+    `script-src tiene que ser exactamente ${FUENTES_EXACTAS['script-src'].join(' ')}: los modulos del sitio y el beacon de Web Analytics (ADR-036)`],
 ];
 
 for (const [directiva, cumple, texto] of politicaDecidida) {

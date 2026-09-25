@@ -13,8 +13,13 @@
 #
 # No se repiten X-Content-Type-Options ni Referrer-Policy: Pages ya las envia.
 # No va Strict-Transport-Security: todo .dev esta precargado en HSTS.
+#
+# Los dos origenes de Cloudflare Web Analytics (ADR-036): la plataforma inyecta en
+# produccion un <script defer> externo desde static.cloudflareinsights.com, y ese
+# script envia sus mediciones a cloudflareinsights.com. En local no existe: lo pone
+# el borde de Cloudflare. Nada mas cambia en la politica.
 /*
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Cross-Origin-Opener-Policy: same-origin
