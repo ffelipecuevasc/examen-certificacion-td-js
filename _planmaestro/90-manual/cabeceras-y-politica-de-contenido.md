@@ -94,12 +94,21 @@ inexistente.
 
 ---
 
-## Lo que este documento todavía no cubre
+## El 429 no se provoca en producción
 
-**El criterio del 429 en producción.** La iteración 51 pide que un 429 provocado, simulado o real, llegue al
-estudiante como el aviso de respaldo y no como una página rota, y lo ejecuta el autor. En local ya está comprobado
-(`npm run probar:respaldo`, 11 de 11). Para producción falta acordar **cómo** provocarlo sin agotar la cuota de
-verdad. No se escribe aquí un método que no se haya probado.
+**Decisión del autor, 2026-09-25.** El criterio de la iteración 51 que pedía provocar un 429 contra el sitio
+publicado **cambió de forma**: se da por cumplido con la evidencia sintética de la etapa A, y no con un apagón real.
+
+**Por qué.** Fabricar un 429 de verdad exige agotar la cuota diaria de la cuenta, y eso deja sin servicio a los
+estudiantes reales hasta el reinicio, solo para probar algo que ya está probado. La prueba 7 de la etapa A
+(`npm run probar:respaldo`) reemplaza `fetch` por respuestas fabricadas y comprueba que **cualquier respuesta ajena al
+sobre propio del proyecto** —un 429 en HTML con la página del error 1027, un 429 en un JSON ajeno, un 503, un 200 con
+HTML, la red caída, un JSON roto— recibe el mismo trato que la capa de datos caída: se enciende el respaldo. Da 11 de
+11, y en rojo cuando se le devolvió la regresión de H-018.
+
+**Por qué alcanza sin ver el 429 real.** La regla no reconoce el 429 por su cuerpo: enciende el respaldo ante todo lo
+que no sea el sobre propio del proyecto. Si Cloudflare cambiara la página de su error de límite, la regla seguiría
+valiendo igual.
 
 ---
 

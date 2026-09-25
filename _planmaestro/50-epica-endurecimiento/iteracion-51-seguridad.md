@@ -86,7 +86,7 @@ Tomadas por el autor el **2026-09-23**.
 - [x] Investigar, antes de intentar activar nada, cuáles protecciones del plan gratuito siguen disponibles sin dominio
   propio (Bot Fight Mode, otras reglas del panel) y cuáles requieren una zona igual que el límite de tasa. Documentar
   cuáles se activan, cuáles no aplican y por qué. _Etapa C: `90-manual/vigilancia-del-consumo-y-protecciones.md`, sección 4. Solo aplica Access para las
-  previsualizaciones, y activarla es decisión del autor._
+  previsualizaciones, y el autor la aplazó el 2026-09-25._
 - [x] Revisar que ninguna protección afecte al estudiante legítimo: nada que introduzca verificaciones intrusivas
   contradice el principio de cero fricción. _Etapa C: la única que aplica no cubre la dirección principal, y el manual
   trae la comprobación de las dos mitades._
@@ -94,7 +94,8 @@ Tomadas por el autor el **2026-09-23**.
   números del límite escritos junto a la medición. _Etapa C: `90-manual/vigilancia-del-consumo-y-protecciones.md`, secciones 1 a 3._
 - [x] Confirmar que un rechazo por consumo excesivo de la plataforma —un 429 nativo de Cloudflare, no construido por
   este proyecto— activa el mismo respaldo que cualquier otra falla: `SIN_RESPUESTA` en `datos.js`, instantánea con
-  aviso. _Etapa A, la mitad local: `probar:respaldo`. La de producción es un criterio y la ejecuta el autor._
+  aviso. _Etapa A: `probar:respaldo`. La mitad de producción se reemplazó por esta evidencia el 2026-09-25 (ver el
+  criterio del 429)._
 - [x] Verificar que ningún extremo de escritura es alcanzable públicamente, según ADR-009. _Etapa A, en local._
 - [x] Revisar que el Worker no filtre detalles internos en sus mensajes de error. _Etapa A._
 - [x] Decidir y documentar si `/api/estado` sigue público tal cual —entorno, estado del esquema, conteo de preguntas
@@ -150,9 +151,16 @@ Tomadas por el autor el **2026-09-23**.
 - [x] Está escrito, con números, cuál es el límite del plan gratuito y en qué punto conviene preocuparse (H-008).
 - [x] Ningún mecanismo de esta iteración rechaza peticiones de un estudiante legítimo: la vigilancia informa, no
   bloquea.
-- [ ] Un 429 provocado (simulado o real) llega al estudiante como el mismo aviso de respaldo que cualquier otra falla de
-  la capa de datos, no como una página rota. **Este criterio lo ejecuta el autor** contra el sitio publicado — CLAUDE.md
-  no permite que Claude Code despliegue ni ataque su propia producción.
+- [x] Un 429 de la plataforma recibe el mismo trato que cualquier otra falla de la capa de datos: se enciende el
+  respaldo, y no se muestra una página rota. **Se cumple con evidencia sintética, no con un apagón real.** La prueba 7
+  de la etapa A (`probar:respaldo`) reemplaza `fetch` por respuestas fabricadas, y cualquier respuesta ajena al sobre
+  propio enciende el respaldo: un 429 en HTML con la página del error 1027, un 429 en JSON ajeno, un 503, la red
+  caída. Resultado: 11 de 11, y en rojo cuando se le devolvió la regresión de H-018.
+  _**Criterio reescrito el 2026-09-25 por decisión del autor**, y no dejado sin cerrar. Decía «un 429 provocado
+  (simulado o real)… lo ejecuta el autor contra el sitio publicado». Fabricar un 429 real exige agotar la cuota diaria
+  de la cuenta, y eso deja sin servicio a los estudiantes reales hasta el reinicio, solo para probar algo que ya está
+  probado. La regla no depende del cuerpo de la respuesta, así que tampoco la rompe un cambio en la página de error
+  de Cloudflare. Detalle en `90-manual/cabeceras-y-politica-de-contenido.md`._
 - [x] Un recorrido de los extremos del Worker confirma que ninguno permite escribir sin autorización.
 - [x] Un error provocado en el Worker no revela estructura interna ni consultas.
 - [x] La decisión sobre `/api/estado` está escrita, se cumpla o se cambie el comportamiento.
@@ -307,8 +315,8 @@ Los umbrales de atención (50 %) y de acción (80 %) quedaron escritos en el man
 dominio propio no hay zona. Bot Fight Mode, además, chocaría con la política estricta, porque su detección inyecta
 un script en línea. La protección DDoS de capa 7 no se configura desde aquí. **La única que aplica es Access para las
 previsualizaciones:** cada despliegue queda público para siempre en `<hash>.examen-certificacion-td-js.pages.dev`, y
-la política cubre esas direcciones sin tocar la principal. **Activarla es decisión del autor**, y el manual trae
-cómo comprobar las dos mitades.
+la política cubre esas direcciones sin tocar la principal. El autor la aplazó el 2026-09-25 (ver el cierre de la
+etapa, abajo), y el manual trae cómo activarla y comprobar las dos mitades cuando se decida.
 
 **Un aviso operativo, repetido dos veces en esta sesión:** detener la tarea de fondo que lanzó `wrangler pages dev`
 no detiene el `node` de Wrangler ni su `workerd`, y el puerto 8788 queda tomado. Las dos veces se comprobó que el
@@ -317,3 +325,23 @@ puerto libre, como permite CLAUDE.md.
 
 **Lo que queda del lado del autor:** confirmar en el panel las rutas de la sección 3 del manual con una primera
 lectura real de producción, decidir Access, ejecutar la etapa D y acordar cómo provocar el 429 en producción.
+
+### Cierre de la etapa C · 2026-09-25 · tres decisiones del autor
+
+1. **El logotipo de NotebookLM se conserva, como uso nominativo.** `acerca-de.html` le da su propia fila en «Lo que es de
+   terceros»: es una marca de Google, no se usa bajo una licencia citable —Google exige aprobación previa para su marca
+   y este sitio no la tiene—, se usa solo para identificar el producto al que lleva el enlace, y no indica patrocinio.
+   La introducción de la sección dejó de decir que todo lo de terceros tiene licencia. La fila de «Sin asignar» se cerró.
+2. **Access para las previsualizaciones no se activa por ahora.** Es un aplazamiento, no un no: activarla cambia el
+   flujo de trabajo del autor, porque ver cualquier previsualización futura pediría sesión iniciada. Queda en «Sin
+   asignar», con los despliegues viejos públicos aceptados a sabiendas, y el manual la deja lista para cuando se decida.
+3. **El criterio del 429 en producción cambió de forma:** se cumple con la evidencia sintética de la prueba 7 de la
+   etapa A, no con un apagón real que dejaría sin servicio a los estudiantes. Reescrito arriba, con el motivo.
+
+**Verificado al cerrar:** el manual dice que las 00:00 UTC son las 21:00 en Chile con horario de verano (UTC−3) y las
+20:00 con el de invierno (UTC−4), que es lo correcto; lo confirmó el autor contra fuentes independientes. En la PARADA 1
+se había dicho con verano e invierno invertidos, y esa versión no quedó escrita en ningún archivo del repositorio.
+
+**La etapa C queda cerrada.** Queda la D, que es del autor: confirmar las rutas del panel con una lectura real, desplegar,
+comprobar las cabeceras en producción, revisar la consola en modo informe en las cuatro páginas, pasar la política a
+obligatoria y publicar `acerca-de.html`, que cierra el período de animate.css y H-006.

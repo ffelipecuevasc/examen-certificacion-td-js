@@ -158,7 +158,7 @@ documentación, la dirección del panel de esas protecciones lleva `:zone`, y si
 | **Reglas de límite de tasa** (WAF) | **No** | Se crean en *Security rules* de una zona. En Workers existe una API de límites, pero no está entre lo que admite el archivo de Wrangler de Pages, y la capa de datos son Functions de Pages (ADR-011). Además, la decisión del 2026-09-22 es no construir nada que rechace peticiones | nada |
 | **Reglas personalizadas** (WAF) | **No** | Se crean en *Security rules* de una zona | nada |
 | **Protección DDoS de capa 7** | No se configura | Cloudflare la describe como siempre activa para las zonas incorporadas. El tráfico de `pages.dev` pasa por la red de Cloudflare, pero sin zona propia no hay nada que ajustar ni un panel de eventos que mirar | nada |
-| **Access para las previsualizaciones** | **Sí** | Se activa en el propio proyecto de Pages. Ver abajo | **decisión del autor** |
+| **Access para las previsualizaciones** | **Sí** | Se activa en el propio proyecto de Pages. Ver abajo | **aplazada el 2026-09-25**: no se activa por ahora |
 | Desafíos al visitante (Turnstile o cualquier captcha) | No se considera | Contradice el principio de cero fricción: el estudiante entra y estudia sin verificaciones | nada |
 
 **Ninguna protección de esta iteración rechaza ni desafía a un estudiante.** La única que aplica, la de abajo, no
@@ -181,7 +181,11 @@ todas las direcciones con hash o con nombre de rama, y **no** la dirección prin
 `examen-certificacion-td-js.pages.dev`. Proteger también la principal exige pasos adicionales que esta iteración
 **no** propone, porque dejaría afuera a los estudiantes.
 
-**Para activarla, si lo decides:**
+**Aplazada el 2026-09-25, por decisión del autor.** Activarla cambia tu flujo de trabajo: ver cualquier
+previsualización futura pediría sesión iniciada. Se decide con calma en otro momento; mientras tanto, los despliegues
+viejos siguen públicos a sabiendas. La fila está en `registro_log.md`, «Sin asignar».
+
+**Para activarla, cuando se decida:**
 
 1. Panel de Cloudflare → **Workers & Pages** → **examen-certificacion-td-js**.
 2. **Settings** → **General** → **Enable access policy**.
@@ -203,4 +207,4 @@ Anota el resultado y la fecha en la sección 5.
 
 | Fecha | Qué | Quién | Resultado |
 |---|---|---|---|
-| — | Access para las previsualizaciones | autor | pendiente de decisión |
+| 2026-09-25 | Access para las previsualizaciones | autor | **aplazada**: no se activa por ahora |

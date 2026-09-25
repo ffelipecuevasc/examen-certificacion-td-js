@@ -12,8 +12,8 @@ decisiones vale tanto como el código que las implementa.
 Primera de la **épica 50 · Endurecimiento y observabilidad**, en el orden 51 → 53 → 52 que decidió el autor. La PARADA 1
 se cerró el 2026-09-23 con seis decisiones. Están construidas la **etapa A** —cabeceras, política de contenido
 estricta en modo informe, cabeceras de `/api/` y sus pruebas— la **etapa B** —`acerca-de.html`, enlazada solo desde el
-pie y vigilada por `verificar:copias`— y la **etapa C** —vigilancia del consumo, protecciones y `90-manual/`—. Sigue
-la D, que ejecuta el autor en producción.
+pie y vigilada por `verificar:copias`— y la **etapa C** —vigilancia del consumo, protecciones y `90-manual/`—, cerrada
+el 2026-09-25. Sigue la D, que ejecuta el autor en producción.
 
 ## Iteraciones completadas
 
